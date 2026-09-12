@@ -132,9 +132,13 @@ scenes:
       secure both now.
     steps:
       - { math: "\\sin A-\\sin B = 2\\cos\\frac{A+B}{2}\\,\\sin\\frac{A-B}{2}", reason: "sum-to-product" }
-      - { math: "\\sin(x+h)-\\sin x = 2\\cos\\!\\left(x+\\frac h2\\right)\\sin\\frac h2", reason: "$A=x+h,\\ B=x$" }
-      - { math: "\\frac{\\sin(x+h)-\\sin x}{h} = \\cos\\!\\left(x+\\frac h2\\right)\\cdot\\frac{\\sin(h/2)}{h/2}", reason: "write $h=2\\cdot\\tfrac h2$" }
-    result: { math: "\\cos\\!\\left(x+\\frac h2\\right)\\to\\cos x\\quad\\text{and}\\quad \\frac{\\sin(h/2)}{h/2}\\to 1", reason: "continuity + the limit" }
+      - { math: "\\sin(x+h)-\\sin x = 2\\cos\\!\\left(x+\\frac h2\\right)\\sin\\frac h2", reason: "$A=x+h,\\ B=x$", anim: transform }
+      - { math: "\\frac{\\sin(x+h)-\\sin x}{h} = \\cos\\!\\left(x+\\frac h2\\right)\\cdot\\frac{\\sin(h/2)}{h/2}", reason: "write $h=2\\cdot\\tfrac h2$", anim: transform }
+    result: { math: "\\cos\\!\\left(x+\\frac h2\\right)\\to\\cos x\\quad\\text{and}\\quad \\frac{\\sin(h/2)}{h/2}\\to 1", reason: "continuity + the limit", anim: transform }
+    # the substitution / divide / hand-off rows REWRITE the line above them instead of
+    # arriving finished, and the screen holds after the decisive step so it can land.
+    pauses:
+      - { after: step.2, seconds: 1.5 }
 
   # 4 ------------------------------------------- divider: Stage 2 opener
   - id: divider_squeeze
@@ -246,6 +250,9 @@ scenes:
       - "$0\\le|\\sin\\theta|\\le|\\theta|$ (chord $\\le$ arc)"
       - "$|\\theta|\\to 0$, squeeze $\\Rightarrow\\ \\sin\\theta\\to 0$"
     qed: "$\\lim_{\\theta\\to 0}\\sin\\theta = 0$"
+    # let the squeeze step sit before the payoff line arrives.
+    pauses:
+      - { after: proof.1, seconds: 1.2 }
 
   # 8 ------------------- Proposition 3.1 (part 2/2): sum-to-product argument -> continuity
   - id: continuity_argument
@@ -323,7 +330,8 @@ scenes:
       {show plot.0} Here runs $\cos\theta$, the dashed floor.
       {show plot.1} And the ceiling -- the constant line at height one.
       {show plot.2} Between them, the ratio $\sin\theta$ over $\theta$, caught in
-      the narrowing gap. As $\theta$ slides toward zero the floor rises to one
+      the narrowing gap.
+      {show plot.4} As $\theta$ slides toward zero the floor rises to one
       and the ceiling already is one, so the curve is squeezed right to one.
       {show plot.3} Notice the open circle at $\theta=0$: the ratio is undefined
       there, zero over zero.
@@ -341,6 +349,13 @@ scenes:
       - { kind: line, start: [-1.72, 1], end: [1.72, 1], color_role: secondary, label: "$1$", label_point: [1.15, 1.08], reveal: true }
       - { kind: function, expression: "sin(x)/x", x_range: [-1.72, 1.72], color_role: accent, label: "$\\tfrac{\\sin\\theta}{\\theta}$", label_point: [-0.72, 1.06], reveal: true }
       - { kind: point, point: [0, 1], hollow: true, hollow_reason: "ratio undefined at theta=0 (0/0)", color_role: accent, reveal: true }
+      # the cursor the narration describes: it walks theta in toward zero, dragging a dot
+      # on each of the three curves and shading the gap it closes. x_to is a hair off zero
+      # -- the ratio is undefined AT zero (that is the scene's point, and the hollow circle
+      # above says so), so the dot would have nowhere to rest there. x_from stays inside the
+      # cos curve's own x_range: past pi/2 cos goes negative, and the shaded gap would run off
+      # the bottom of the plot chasing a curve that is not drawn there.
+      - { kind: sweep, x_from: 1.55, x_to: 0.02, seconds: 7.5, follow: [0, 1, 2], gap: [1, 0], leave: cursor, color_role: accent }
     annotations:
       - "Trapped between $\\cos\\theta$ and $1$, the ratio is forced to $1$ -- undefined at $\\theta=0$."
 

@@ -24,11 +24,16 @@ from manim import (
     Axes,
     Circle,
     DashedLine,
+    DashedVMobject,
     Dot,
+    FadeOut,
     Line,
     Polygon,
+    ValueTracker,
     VGroup,
     VMobject,
+    always_redraw,
+    linear,
 )
 
 from .. import brand
@@ -246,6 +251,123 @@ def _clipped_function_curve(axes: Axes, expression: str, xr: list[float],
     return segs
 
 
+_DASH_PITCH = 0.18       # screen units between dash starts on a dashed curve
+
+
+def _dashed_curve(curve):
+    """A dashed copy of a plotted curve. `dashed: true` used to be honoured for
+    `kind: line` only and silently dropped for `kind: function`, so an authored dashed
+    reference curve came out solid -- indistinguishable from the carrier curve it was
+    meant to sit behind (ch03 squeeze_graph, rewatch R2 2026-09-12)."""
+    n = max(int(round(float(curve.width) / _DASH_PITCH)), 8)
+    return DashedVMobject(curve, num_dashes=n, dashed_ratio=0.55)
+
+
+def _finite(fn, x: float) -> bool:
+    """Is fn(x) a real, drawable number? (0/0, a pole, a domain error -> no.)"""
+    try:
+        return math.isfinite(float(fn(x)))
+    except (ArithmeticError, ValueError, TypeError):
+        return False
+
+
+def _follow_fn(plot: dict[str, Any], index: int):
+    """y(x) in DATA coordinates for a curve a sweep can ride. Reading the authored
+    expression / endpoints rather than the built mobject keeps this correct after
+    _fit_graph_to_safe_zone rescales the group (the sweep re-reads `axes` each frame)."""
+    kind = plot.get("kind")
+    if kind == "function":
+        return lambda x, e=plot["expression"]: safe_eval_expression(e, x)
+    if kind == "line":
+        (x0, y0), (x1, y1) = plot["start"], plot["end"]
+        x0, y0, x1, y1 = float(x0), float(y0), float(x1), float(y1)
+        if abs(x1 - x0) < 1e-9:
+            raise ValueError(f"sweep follow: plots[{index}] is a vertical line -- no y(x)")
+        return lambda x: y0 + (y1 - y0) * (x - x0) / (x1 - x0)
+    raise ValueError(f"sweep follow: plots[{index}] is kind={kind!r}; only function/line "
+                     f"curves can carry a cursor dot")
+
+
+def _sweep_block(plot: dict[str, Any], index: int, prior: list[dict[str, Any]],
+                 axes: Axes, ground: str, y_range: list[float]) -> Block:
+    """A cursor scanning along x: a vertical rule, a dot on each followed curve, and an
+    optional shaded band between two of them, all driven by one ValueTracker.
+
+    The tracker is BUILT at `x_to`, so the un-rendered snapshot the layout gates measure is
+    the frame the sweep ends on; the animation rewinds it to `x_from` before playing.
+    """
+    for key in ("x_from", "x_to", "seconds"):
+        if plot.get(key) is None:
+            raise ValueError(f"plots[{index}] kind=sweep needs '{key}'")
+    x_from, x_to = float(plot["x_from"]), float(plot["x_to"])
+    seconds = float(plot["seconds"])
+    col = _role_color(ground, plot, "accent")
+
+    def curve_at(j: int):
+        j = int(j)
+        if not 0 <= j < len(prior):
+            raise ValueError(f"plots[{index}] kind=sweep: follow/gap index {j} has no plot "
+                             f"before it (this scene has {len(prior)} earlier plot(s))")
+        return _follow_fn(prior[j], j)
+
+    follow = [curve_at(j) for j in plot.get("follow", [])]
+    gap_pair = plot.get("gap")
+    if gap_pair is not None and len(gap_pair) != 2:
+        raise ValueError(f"plots[{index}] kind=sweep: gap needs exactly two plot indices")
+    gap = [curve_at(j) for j in (gap_pair or [])]
+
+    tracker = ValueTracker(x_to)
+    parts: list[Any] = []
+
+    if gap:
+        top_fn, bot_fn = gap
+
+        def band():
+            x = tracker.get_value()
+            if abs(x - x_from) < 1e-6:
+                return VMobject()            # nothing swept yet -> nothing to shade
+            xs = [x_from + (x - x_from) * k / 24 for k in range(25)]
+            xs = [t for t in xs if _finite(top_fn, t) and _finite(bot_fn, t)]
+            if len(xs) < 2:
+                return VMobject()
+            pts = ([axes.c2p(t, top_fn(t)) for t in xs]
+                   + [axes.c2p(t, bot_fn(t)) for t in reversed(xs)])
+            return Polygon(*pts, stroke_width=0, color=col, fill_color=col,
+                           fill_opacity=float(plot.get("opacity", 0.16)))
+        parts.append(always_redraw(band))
+
+    def rule():
+        x = tracker.get_value()
+        return Line(axes.c2p(x, y_range[0]), axes.c2p(x, y_range[1]),
+                    color=col, stroke_width=2.0).set_opacity(0.75)
+    parts.append(always_redraw(rule))
+
+    def dot(f):
+        x = tracker.get_value()
+        # a curve the sweep rides can be undefined at some x (sin(x)/x at 0 is the whole
+        # point of ch03 squeeze_graph). Drawing that dot puts a NaN in the group's bbox,
+        # which propagates through _fit_graph_to_safe_zone and NaNs the entire figure --
+        # so skip the dot for that frame and let the curve's own hollow marker say why.
+        return Dot(axes.c2p(x, f(x)), color=col, radius=0.07) if _finite(f, x) else VMobject()
+
+    for fn in follow:
+        parts.append(always_redraw(lambda f=fn: dot(f)))
+
+    group = VGroup(*parts)
+    leave = str(plot.get("leave", "cursor"))
+
+    def anim(scene, mob, _ground) -> float:
+        tracker.set_value(x_from)
+        scene.add(mob)
+        scene.play(tracker.animate.set_value(x_to), run_time=seconds, rate_func=linear)
+        if leave == "none":
+            scene.play(FadeOut(mob), run_time=0.3)
+            return seconds + 0.3
+        return seconds
+
+    return Block(f"plot.{index}", group, anim=anim, anim_seconds=seconds, static=False)
+
+
 def _plot_blocks(spec: dict[str, Any], axes: Axes, ground: str) -> tuple[list[Block], list[Any]]:
     blocks: list[Block] = []
     labels = []
@@ -254,14 +376,21 @@ def _plot_blocks(spec: dict[str, Any], axes: Axes, ground: str) -> tuple[list[Bl
     y_range = _range(ac["y_range"], 0.25)
     default_label_size = str(ac.get("label_size", "math_sm"))   # was "label" (30px) -- carrier >= ticks (P-A1)
 
-    for i, plot in enumerate(spec.get("plots", [])):
+    all_plots = spec.get("plots", [])
+    for i, plot in enumerate(all_plots):
         kind = plot.get("kind")
         col = _role_color(ground, plot, "secondary")
         # reveal: true -> dynamic block, waits for {show plot.N}; its label is
         # folded into the same block so one marker reveals both (see docstring).
         static = not bool(plot.get("reveal"))
 
-        if kind == "function":
+        if kind == "sweep":
+            # a cursor scan is a plot like any other, so it takes the next plot.N id and
+            # {show plot.N} / sizecheck's target cross-check need no special case. Always
+            # dynamic: a sweep with nothing to trigger it would run at scene end, unseen.
+            blocks.append(_sweep_block(plot, i, all_plots[:i], axes, ground, y_range))
+
+        elif kind == "function":
             xr = _range(plot.get("x_range", x_range[:2]), x_range[2])
             sw = float(plot.get("stroke_width", 5.0))
             samples = int(plot.get("samples", 900))
@@ -280,6 +409,11 @@ def _plot_blocks(spec: dict[str, Any], axes: Axes, ground: str) -> tuple[list[Bl
                     color=col,
                     stroke_width=sw,
                 )
+            # keep the solid curve as the geometry reference for label placement (it is a
+            # ParametricFunction; the dashed wrapper is not, and input_to_graph_point needs one)
+            curve = graph
+            if plot.get("dashed"):
+                graph = _dashed_curve(graph)
             glow = graph.copy().set_stroke(col, width=12, opacity=0.24)
             group = VGroup(glow, graph)
 
@@ -292,7 +426,7 @@ def _plot_blocks(spec: dict[str, Any], axes: Axes, ground: str) -> tuple[list[Bl
                 lab = _label(plot["label"], ground,
                              role=_carrier_label_role(plot),
                              size=plot.get("label_size", default_label_size))
-                _place_function_label(lab, graph, axes, plot, xr, y_range)
+                _place_function_label(lab, curve, axes, plot, xr, y_range)
                 if static:
                     labels.append(lab)
                 else:

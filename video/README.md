@@ -119,6 +119,18 @@ video/
   選用判準、容量上限見 [DESIGN.md](DESIGN.md)「Template selection」；demo
   稿 `storyboards/_demo_derivation.yml`。
 
+模板層的 **motion primitive**（2026-09-12 首輪，全部 opt-in；契約與理由見
+[DESIGN.md](DESIGN.md)「motion primitive」節）：
+
+- **揭示時序**——`say` 寫了 `{show statement}` 時，`theorem_proof`／`derivation`
+  的字卡才改為該拍滑入（否則仍屬開場畫面）；`theorem_proof` 的 `PROOF` 小標
+  在有 `{show proof.0}` 時跟第一行證明一起進場。
+- **`pauses:`**（場級）——某個 reveal 之後讓畫面靜靜停 N 秒（旁白不動、不重合成）。
+- **`anim: transform`**（`derivation` 的 `steps[i]`／`result`）——把上一列的式子
+  原地變形成這一列，來源那列退為 muted。
+- **`kind: sweep`**（`graph` 的 `plots[]`）——游標沿 x 掃描，可在多條曲線上掛點、
+  在兩條曲線之間拉半透明色帶。另修好 `dashed: true` 對 `kind: function` 失效的問題。
+
 目前生效的設計決策：
 
 - intro/outro 使用淺色紙張底；教學場景使用暗色藍圖底。

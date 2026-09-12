@@ -18,6 +18,7 @@ from manim import DOWN, LEFT, VGroup
 
 from .. import brand
 from ..blocks import Block, accent_role
+from ..narration import list_reveal_targets
 from ..scene_roles import resolve_chip
 from ..visuals import theme as T
 
@@ -439,6 +440,17 @@ def motif_corner(ground: str) -> Block:
     motif.move_to([T.FRAME_W / 2 - T.SAFE_MARGIN - motif.width / 2,
                    -T.FRAME_H / 2 + T.SAFE_MARGIN + motif.height / 2, 0])
     return Block("motif", motif, anim="fade", static=True, layer="decoration")
+
+
+def reveals(spec: dict[str, Any], block_id: str) -> bool:
+    """True iff the scene's `say` names ``{show <block_id>}``.
+
+    The marker is the opt-in for reveal-timed framing: a block the narration calls for is
+    built dynamic (it enters on that beat); one nobody calls for stays part of the opening
+    frame, exactly as before. Without this a `{show statement}` re-played a FadeIn on an
+    already-visible card -- a reveal that changed nothing on screen.
+    """
+    return block_id in list_reveal_targets(spec.get("say", ""))
 
 
 def _assumption_text(meta, flag_id) -> str | None:

@@ -18,6 +18,8 @@
 
 **成功定義（一句話）：** 三場試點在不改一個字旁白、不多一次 TTS 的前提下，靜止比例從 95% 掉到 70% 以下、R2 導演鏡的 ① 級 finding 關閉、verdict 升到 ok 以上，且所有既有閘（schema／lint／sizecheck／23 selftest／doctor --smoke）維持綠。
 
+> **〔2026-09-12 收尾修訂〕上面這條的「靜止比例 < 70%」已被推翻，保留作本輪被判定時所依據的原文。** 六鏡 digest 的相關性分析顯示 `static_ratio` 對 verdict 幾乎無解釋力（r = −0.18），真正的預測因子是 **`longest_still_seconds`（r = −0.82）**；本輪 A/B 自己就是證據——11 升到 `good` 靠的是最長靜止 20.2 s→7.2 s，04 靜止比例動了 3 點但最長靜止 +0.8 s，must 因此沒關。**新驗收線見 §7 第 1 條**，裁決與完整數據見 `REBUILD_STATUS.md` 品質補強輪 ⑧。
+
 ## 2. 已驗證的 code 事實（2026-09-12 快照；行號會漂，用 grep）
 
 **揭示模型**
@@ -119,7 +121,10 @@
 
 ## 7. 驗收迴圈（Phase 2 收尾；機器閘免費、人閘一個）
 
-1. **數字**：`rewatch_pack.py --deck ch03_trig_derivatives_mimo --scene <三場> --out output/ch03/s3.1/rewatch_pack_after`。對照 `rewatch_pack_before`：每場 `static_ratio` < 0.70、`longest_still_seconds` 明顯下降、11 的非 reveal 變化 > 0（sweep）。
+1. **數字**（2026-09-12 修訂驗收線）：`rewatch_pack.py --deck ch03_trig_derivatives_mimo --scene <三場> --out output/ch03/s3.1/rewatch_pack_after`。對照 `rewatch_pack_before`：
+   - **主指標＝`longest_still_seconds`：每個 content 場 ≤ 12 s。** 超過即 finding，但**可用一句理由豁免**（比照 lint／sizecheck 的 warn-default），不自動判死。門檻來源：六鏡 digest 21 個 content 場，`longest_still ≤ 12 s` 放進的 10 個好場（verdict ≥ 2.5）裡命中 6 個、**誤收 0 個差場**；放寬到 14 s 命中 8 個但開始誤收（F1 最佳 0.84，precision 破功）。**閘寧可誤報、不可漏放**，故取 12 s。
+   - **次指標＝`static_ratio`（僅記錄、不設門檻）**：它對 verdict 的相關性只有 −0.18，且 `pauses:` 宣告的刻意靜默在它上面是倒扣的。要引用時把 `pauses` 秒數從分母扣掉。
+   - 11 的非 reveal 變化 > 0（sweep 確實在動）。
 2. **既有閘**：schema／lint／sizecheck 綠；`visual-frame-audit` subagent 看 after 的 fullest frames（V1–V9 0 blocking）。
 3. **R2 導演鏡重跑（Opus 5 subagent，使用者已同意）**：`rewatch_prompts.py --ws <scratchpad>/rewatch_ws2 --pack …/rewatch_pack_after --runs R2 --scenes difference_quotient_for_sine,squeeze_graph,continuity_statement_sin_limit`，subagent prompt 比照 2026-09-12（讀 `<ws>/R2/PROMPT.md`、只讀 pack、輸出 JSON 到 `<ws>/R2/result.json`）；before 也跑一次同範圍（或直接用 `_gen/rewatch_lenses/R2.json` 的三場）。驗收線：三場 ① 級 finding 關閉、verdict ≥ ok、無新 must。orchestrator 逐條核實（`rewatch_merge.py --verify` → `rewatch_multilens.gen.py`）→ `REVIEW-ch03_s31-pilot-ab.html`。
 4. **人閘（唯一停點）**：把三場真旁白短片（`output/ch03/s3.1/ch03_trig_derivatives_mimo__<scene>.mp4`）交給使用者看，決定要不要放大到全片。

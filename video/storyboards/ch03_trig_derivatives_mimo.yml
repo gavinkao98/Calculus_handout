@@ -33,9 +33,9 @@ meta:
   derived_from:
     inputs:
     - path: ch03_trig_derivatives.yml
-      sha256: 375a70e919ec708595e6af1b1bd52c3909c24be11ef4e72de68003134f78d8d7
+      sha256: 53bc4f52202c063511c9a301e2a56971851cd5a1ce099b068c679aede625daa8
     - path: ../content_scripts/ch03_trig_derivatives.spoken.yml
-      sha256: 60f63ffdd126f08a607036eda9294c90012253a049d8740809daa3169ab24225
+      sha256: c6d4ce2934684581449b9efd31c338f52cfbba9f20be6960c172bd57f3de7ca5
 scenes:
 - id: intro
   kind: intro
@@ -162,11 +162,17 @@ scenes:
     reason: sum-to-product
   - math: \sin(x+h)-\sin x = 2\cos\!\left(x+\frac h2\right)\sin\frac h2
     reason: $A=x+h,\ B=x$
+    anim: transform
   - math: \frac{\sin(x+h)-\sin x}{h} = \cos\!\left(x+\frac h2\right)\cdot\frac{\sin(h/2)}{h/2}
     reason: write $h=2\cdot\tfrac h2$
+    anim: transform
   result:
     math: \cos\!\left(x+\frac h2\right)\to\cos x\quad\text{and}\quad \frac{\sin(h/2)}{h/2}\to 1
     reason: continuity + the limit
+    anim: transform
+  pauses:
+  - after: step.2
+    seconds: 1.5
 - id: divider_squeeze
   kind: divider
   accent: definition
@@ -344,6 +350,9 @@ scenes:
   - $0\le|\sin\theta|\le|\theta|$ (chord $\le$ arc)
   - $|\theta|\to 0$, squeeze $\Rightarrow\ \sin\theta\to 0$
   qed: $\lim_{\theta\to 0}\sin\theta = 0$
+  pauses:
+  - after: proof.1
+    seconds: 1.2
 - id: continuity_argument
   kind: content
   template: theorem_proof
@@ -459,7 +468,9 @@ scenes:
 
     {show plot.2} Between them, the ratio sine theta over theta, caught in the
 
-    narrowing gap. As theta slides toward zero the floor rises to one and the
+    narrowing gap.
+
+    {show plot.4} As theta slides toward zero the floor rises to one and the
 
     ceiling already is one, so the curve is squeezed right to one.
 
@@ -533,6 +544,19 @@ scenes:
     hollow_reason: ratio undefined at theta=0 (0/0)
     color_role: accent
     reveal: true
+  - kind: sweep
+    x_from: 1.55
+    x_to: 0.02
+    seconds: 7.5
+    follow:
+    - 0
+    - 1
+    - 2
+    gap:
+    - 1
+    - 0
+    leave: cursor
+    color_role: accent
   annotations:
   - Trapped between $\cos\theta$ and $1$, the ratio is forced to $1$ -- undefined at $\theta=0$.
 - id: limit_not_identity

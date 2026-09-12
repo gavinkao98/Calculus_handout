@@ -20,6 +20,10 @@ STOCK_ANIM_SECONDS = {
     "write_glow": 1.4,
     "slide_pop": 0.85,
     "write": 0.7,
+    # in-place rewrite (derivation `anim: transform`): morphs the previous row into this
+    # one. Played by a Block CALLABLE, so this entry is the single source of its nominal
+    # length -- the template reads it into Block.anim_seconds.
+    "transform": 1.2,
 }
 
 

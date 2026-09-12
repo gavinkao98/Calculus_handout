@@ -167,11 +167,11 @@ Demo storyboard 在 `storyboards/_demo_*.yml`。
 | template | 教學形狀 | payload 欄位 | reveal target |
 |---|---|---|---|
 | `definition_math` | definition / statement / note / motivation：statement + math lines（key line 用 `anim: highlight` → amber + glow） | `statement`、`math[]`、`kicker`、`math_align: center`(opt) | `math.N` |
-| `theorem_proof` | gold-bar 面板 statement + 藍點 proof steps + 綠 QED | `statement`、`proof[]`、`qed` | `proof.N`、`qed` |
+| `theorem_proof` | gold-bar 面板 statement + 藍點 proof steps + 綠 QED | `statement`、`proof[]`、`qed` | `proof.N`、`qed`、`statement`（寫了 `{show statement}` 才動態；`PROOF` 小標跟 `proof.0` 同進） |
 | `procedure_steps` | 01/02 藍數字步驟 + 底部圓角 worked strip | `steps[{text,math}]`、`worked[]` | `math.N`、`worked` |
-| `derivation` ★ | **統一數學系統**：式子左欄 + reason rail（dotted leader）+ amber ∴ result + 綠 ✓ check | `steps[{math, reason?}]`、`result:{math, reason?}`、`check:{math, reason?}`；**或** back-compat `lines[]`（`anim: highlight` → result）、`statement` | `step.N`/`result`/`check`（或 `line.N`） |
+| `derivation` ★ | **統一數學系統**：式子左欄 + reason rail（dotted leader）+ amber ∴ result + 綠 ✓ check | `steps[{math, reason?, anim?}]`、`result:{math, reason?, anim?}`、`check:{math, reason?}`；**或** back-compat `lines[]`（`anim: highlight` → result）、`statement`。`anim: transform` ＝原地改寫（見下方 motion primitive 節） | `step.N`/`result`/`check`（或 `line.N`）、`statement`（寫了 `{show statement}` 才動態） |
 | `callout` ★ | Remark / Caution / Note：eyebrow `[ TYPE n.n ]`＋title masthead，body 文字置於標題下方（色隨 type：remark 藍／caution 紅／note 琥珀）；`body` 字串→散文、list→條列（同色圓點）。同 `definition_math` 走 `scene_head`＋`place_body`（2026-06-29 改版，見下） | `type: remark\|caution\|note`、`number`(opt)、`title`、`body`(字串或 list) | `body` |
-| `graph` ★ | **統一 graph 引擎**：`mode: single`（一張全幅 plot）或 `mode: 2up`（兩張並排比較） | single：`axes`、`plots[]`、`annotations[]`；2up：`left`/`right` `{axes, plots, caption, verdict}`、`annotations[]` | single：`annotation.N`、`plot.N`(`reveal:true`)；2up：`caption.left/right`、`left.plot.N`/`right.plot.N`、`annotation.N` |
+| `graph` ★ | **統一 graph 引擎**：`mode: single`（一張全幅 plot）或 `mode: 2up`（兩張並排比較） | single：`axes`、`plots[]`、`annotations[]`；2up：`left`/`right` `{axes, plots, caption, verdict}`、`annotations[]`。plot kind＝`function`／`line`／`band`／`point`／`sweep`（游標掃描，見下方 motion primitive 節） | single：`annotation.N`、`plot.N`(`reveal:true`；`sweep` 恆為動態)；2up：`caption.left/right`、`left.plot.N`/`right.plot.N`、`annotation.N` |
 | `value_table` | 數值 limit 表 / formula grid（punchline 欄／列鋪 scene accent 同色 tint + 抬升 ink） | `header[]`、`rows[][]`、`reveal: rows\|cols`、`accent_col`/`accent_row`、`statement` | `row.N` 或 `col.N` |
 | `sign_chart` | number line + signed interval rows（+綠/−紅 glow、↗/↘） | `points[]`（`excluded: true` 表示 break）、`rows[{label, marks}]`、`statement` | `mark.R.I`（row R, interval I） |
 | `recap_cards` | key point（amber 發光編號當 marker）+ blue-bar remember-formula cards | `points[]`、`formulas[]` | `point.N`、`formula.N` |
@@ -666,6 +666,13 @@ say: |
   （curve first、*然後* ε-band、*然後* δ-band）變成 `say` 中的 beat 決策，
   不需要 hook。Revealed plot 的 `label` 折入同一個 block，因此一個 marker 同時
   帶出元素和它的名稱。Demo：`storyboards/_demo_graph_reveal.yml`。
+- **`{show statement}` 讓字卡真的在那一拍進場**（2026-09-12，motion primitive 首輪）。
+  `theorem_proof` 與 `derivation` 的 `statement` 預設是開場畫面的一部分（static）；
+  **`say` 一旦寫了 `{show statement}`，它就改為該 beat 滑入**（`slide`，0.5 s）。
+  marker 即 opt-in：沒寫的場逐 token 不變。同理 `theorem_proof` 的 **`PROOF` 小標
+  在 `say` 有 `{show proof.0}` 時跟第一行證明一起進場**（否則照舊 static）。
+  在此之前，reveal 打在 static block 上只是對已在畫面上的 mobject 再播一次 FadeIn，
+  「揭示」前後兩幀無差（ch03 `continuity_statement_sin_limit`，rewatch R2 2026-09-12）。
 - `say` 中的 LaTeX 是正典寫法（mock 與閱讀版直接用）。**真旁白走 MiMo**，由
   `<deck>.spoken.yml` 把數學攤成口語（見下方「MiMo 口語軌」）；若某短語以特定
   方式朗讀更好，就在 `.spoken.yml` 中如此撰寫。
@@ -681,6 +688,58 @@ math:
 `anim` 選項（沿用）：`write`（預設）、`highlight`、`transform_from_previous`。
 *何時*（reveal timing）在 `say` 中透過 `{show math.N}`；*如何*（animation
 style）在此。乾淨分離。
+
+### motion primitive：`pauses:`／`anim: transform`／`kind: sweep`（2026-09-12 首輪）
+
+三個 opt-in 欄位，治 §3.1 六鏡盲審的「畫面 95% 時間靜止」。都不改一個字旁白、
+不多一次 TTS（`tts.py` 的 reuse 只看 `scene_text_hash`）。
+
+**`pauses:`（場級）——揭示之後讓畫面靜靜停一下。**
+
+```yaml
+pauses:                      # content 場專用，opt-in
+  - after: step.2            # 這個 reveal（必須是 say 裡出現過的 `{show}` 目標）
+    seconds: 1.5             # 畫面停住、旁白不出聲
+```
+
+實作是**純旁白變換**（[`pipeline/pauses.py`](pipeline/pauses.py)）：在該 beat 的音訊
+起點插入 `seconds` 的靜音，同一個 beat 的時長加上同樣的秒數。因為 beat 的畫面長度
+本來就等於它的旁白長度、而播放器在動畫之後就只是等待，所以 reveal 動畫會播在靜音裡、
+畫面接著停住、旁白才進來——`scene.py` 一行都不用改。render（beat 時長）、compose
+（混音）與 sidecar（`timeline.json`／`.vtt`）全部讀同一份「已加停頓」的 manifest，
+不可能各自漂移。**落在磁碟上的 `manifest.json` 不會被改寫**——它是 TTS 的紀錄，
+reuse／freshness 都對它做雜湊；變換只作用於 make.py 記憶體中的副本。
+`schema.py` 擋 `after` 指到 `say` 沒揭示過的 id（指錯的 pause 一定是 typo）。
+
+**`anim: transform`（derivation 的 `steps[i]` / `result`）——原地改寫。**
+不是淡入一行寫好的式子，而是把**上一列的式子變形成這一列**，並把來源那列退為
+muted（opacity 0.55）。用 `TransformMatchingShapes` 逐字形配對，**不是**
+`TransformMatchingTex`＋`substrings_to_isolate`：把 `\frac` 之類的巨集從引數切開會
+直接讓 LaTeX 編譯失敗，而且會擾動被切那幾列的間距。字形配對完全不改 mob 的建法，
+所以終態幾何與未變形版逐 token 相同（sizecheck 量到的是同一幀）。第一列沒有可變形
+的來源，會靜默沿用原本的 reveal。名義時長 1.2 s，見 `timing.STOCK_ANIM_SECONDS`。
+
+**`kind: sweep`（graph 的 `plots[]`）——游標掃描。**
+
+```yaml
+- kind: sweep
+  x_from: 1.7         # 游標起點（資料座標）
+  x_to: 0.02          # 終點
+  seconds: 3.0        # 動畫長度
+  follow: [0, 1, 2]   # 在這些 plot index 的曲線上掛點（function／line 皆可）
+  gap: [0, 1]         # 選填：這兩條曲線之間填半透明色帶，隨游標推進
+  leave: cursor       # 終態：cursor（留游標與點）| none（動畫後淡出）
+```
+
+sweep 就是 `plots[]` 裡的一個 plot，**佔用下一個 `plot.N` id**，所以 `{show plot.N}`
+與 sizecheck 的 T5 目標交叉檢查都不需要特例。一個 `ValueTracker` 同時驅動垂直游標、
+每條被 follow 曲線上的點、以及色帶。**tracker 建在 `x_to`**——sizecheck 建 scene 但不
+render，停在起點的 tracker 會把「影片從不會停在的那一幀」交給版面閘。
+被 follow 的曲線在某些 x 可能無定義（`sin(x)/x` 在 0 正是 ch03 squeeze_graph 的題眼）：
+那一格的點直接不畫，否則一個 NaN 會經 `_fit_graph_to_safe_zone` 把整張圖的 bbox 變成 NaN。
+
+**附帶修正：`dashed: true` 現在對 `kind: function` 生效**（以前只有 `kind: line` 認它，
+function 靜默忽略，於是作者標了虛線的參考曲線畫出來是實線——與它要襯托的主曲線分不出來）。
 
 ### Text rendering：prose vs math（no garble）
 

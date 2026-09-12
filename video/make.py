@@ -46,6 +46,7 @@ from pipeline.derived_check import check_derived_freshness, text_sha256  # noqa:
 from pipeline.narration import estimate_seconds, parse_say  # noqa: E402
 from pipeline.tts import read_manifest_status, _has_audio  # noqa: E402 (manim-free fail-closed guard reuse)
 from pipeline import house_audio  # noqa: E402
+from pipeline import pauses  # noqa: E402
 from pipeline.timing import (  # noqa: E402
     SCENE_LEAD_SECONDS,
     SCENE_TAIL_SECONDS,
@@ -321,7 +322,11 @@ def _warn_short_beats(meta: dict, scenes: list[dict], manifest: dict) -> None:
             block = by_id.get(beat.reveal)
             if block is None or block.static:
                 continue
-            anim_seconds = stock_animation_seconds(block.anim)
+            # a callable anim is opaque to the stock table; a template that knows how long
+            # its custom animation runs declares it on the Block (blocks.Block.anim_seconds).
+            anim_seconds = block.anim_seconds
+            if anim_seconds is None:
+                anim_seconds = stock_animation_seconds(block.anim)
             if anim_seconds is None:
                 continue
             extra = beat_extra_padding_seconds(float(beat_seconds[index - 1]), anim_seconds)
@@ -956,6 +961,12 @@ def main() -> int:
                          empty_seconds=args.empty_beat_seconds)
         manifest_path.write_text(json.dumps(manifest, indent=2, ensure_ascii=False) + "\n", encoding="utf-8")
         print(f"[synth] manifest -> {manifest_path}", flush=True)
+
+    # `pauses:` -- authored silent holds, folded into the in-memory manifest only (the
+    # on-disk one stays the TTS record the reuse/freshness contract hashes off). Everything
+    # downstream -- beat durations, the muxed WAV, timeline.json/.vtt -- reads this one copy,
+    # so the picture and the narration cannot drift apart. No-op for decks without the field.
+    manifest = pauses.apply_pauses(scenes, manifest, audio_dir / "paused")
 
     _warn_short_beats(meta, scenes, manifest)
 

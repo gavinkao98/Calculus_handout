@@ -13,8 +13,10 @@ BELOW the card (full width); a narrow proof sits to the LEFT of the card (two
 columns). The statement-only proposition path (no proof) keeps the balanced
 card+aside two-column layout unchanged.
 
-Reveal: statement is static (the frame); each proof step and the QED line are
-dynamic (proof.0/1/2, qed) so narration walks the argument via {show ...}.
+Reveal: each proof step and the QED line are dynamic (proof.0/1/2, qed) so narration
+walks the argument via {show ...}. The statement card is the frame by default (static);
+a scene whose `say` names ``{show statement}`` instead has it slide in on that beat, and
+the PROOF eyebrow then rides with proof.0 rather than standing over an empty column.
 
 YAML shape:
   template: theorem_proof
@@ -30,13 +32,14 @@ from __future__ import annotations
 
 from typing import Any
 
-from manim import DOWN, LEFT, RIGHT, UP, MathTex, Rectangle, RoundedRectangle, Tex, VGroup
+from manim import DOWN, FadeIn, LEFT, RIGHT, UP, MathTex, Rectangle, RoundedRectangle, Tex, VGroup
 
 from .. import brand
 from ..blocks import Block
+from ..timing import STOCK_ANIM_SECONDS
 from ..visuals import theme as T
 from ._common import (scene_head, motif_corner, center_in_zone, build_aside, render_scaffold,
-                      ColumnPlan, SPINE_X, CONTENT_W, PRIMARY_W, RAIL_X, RAIL_W)
+                      reveals, ColumnPlan, SPINE_X, CONTENT_W, PRIMARY_W, RAIL_X, RAIL_W)
 
 
 _ROW_GAP = 0.5   # proof-chain min inter-row pitch (edge-to-edge); tall rows keep it
@@ -121,6 +124,25 @@ def _rail_card(stmt_text: str, is_formula: bool, ground: str):
                               pad=0.34, pad_x=_CARD_PAD_X)
 
 
+_LABEL_FADE_SECONDS = STOCK_ANIM_SECONDS["fade"]
+
+
+def _reveal_with_label(label):
+    """proof.0's reveal, bringing the PROOF eyebrow in with it."""
+    def anim(scene, mob, _ground) -> float:
+        scene.play(FadeIn(label), FadeIn(mob, shift=0.1 * UP), run_time=_LABEL_FADE_SECONDS)
+        return _LABEL_FADE_SECONDS
+    return anim
+
+
+def _statement_block(spec: dict[str, Any], card) -> Block:
+    """The statement card's Block. ``{show statement}`` in `say` makes it a narration-timed
+    entrance (slide in on that beat); with no marker it stays part of the opening frame."""
+    if reveals(spec, "statement"):
+        return Block("statement", card, anim="slide", static=False)
+    return Block("statement", card, anim="fade", static=True)
+
+
 def _qed_row(qed_text: str, ground: str):
     """The green closing line + boxed QED mark, folded into the proof chain rhythm."""
     line = brand.prose(qed_text, ground, role="success", size="step")
@@ -172,7 +194,7 @@ def build(spec: dict[str, Any], ctx: dict[str, Any]) -> list[Block]:
         card.move_to([left + card.width / 2, 0, 0])
         aside.move_to([RAIL_X, 0, 0], aligned_edge=LEFT)
         center_in_zone([card, aside], body_ref)
-        blocks.append(Block("statement", card, anim="fade", static=True))
+        blocks.append(_statement_block(spec, card))
         blocks.append(Block("aside", aside, anim="fade", static=True, layer="decoration"))
         blocks.append(motif_corner(ground))
         return blocks
@@ -212,14 +234,19 @@ def build(spec: dict[str, Any], ctx: dict[str, Any]) -> list[Block]:
         card = _rail_card(stmt_text, is_formula, ground)
         card.move_to([SPINE_X + CONTENT_W - card.width / 2, zone_top - card.height / 2, 0])
         proof_top = zone_top                            # proof sits BESIDE the card
-    blocks.append(Block("statement", card, anim="fade", static=True))
+    blocks.append(_statement_block(spec, card))
 
     # -- proof: an equation chain on the Lectern spine, flush-left, closing on the green QED. In
     #    RAIL mode a row wide enough to reach the card's column drops the whole chain BELOW the card;
     #    in BAND mode the chain already sits below the full-width band. --
     reaches_rail = (not promote) and any(proof_left + m.width > RAIL_X - 0.25 for m in step_mobs)
     proof_label.move_to([proof_left, proof_top - proof_label.height / 2, 0], aligned_edge=LEFT)
-    blocks.append(Block("proof_label", proof_label, anim="fade", static=True))
+    # The eyebrow rides with the first step when narration reveals it ({show proof.0}), so the
+    # word PROOF no longer stands over an empty column for the whole run-up; with no marker it
+    # stays in the opening frame as before. Grouping only -- placement below is untouched.
+    fold_label = bool(step_mobs) and reveals(spec, "proof.0")
+    if not fold_label:
+        blocks.append(Block("proof_label", proof_label, anim="fade", static=True))
 
     chain: list = []
     y = 0.0
@@ -229,8 +256,17 @@ def build(spec: dict[str, Any], ctx: dict[str, Any]) -> list[Block]:
         if prev_half is not None:
             y -= prev_half + _ROW_GAP + half
         m.move_to([proof_left, y, 0], aligned_edge=LEFT)
-        blocks.append(Block(f"proof.{i}", m, anim="fade", static=False))
-        chain.append(m)
+        if fold_label and i == 0:
+            # The label rides in on proof.0's ANIMATION, not inside its mobject: a VGroup
+            # spanning label-to-row would hand the layout gates a box with a hollow middle,
+            # and _overlap_issues / _capacity_issues would read that empty span as content
+            # (it warned on _demo_tall_rows). This way the measured geometry is the bare row,
+            # exactly as before.
+            blocks.append(Block(f"proof.{i}", m, anim=_reveal_with_label(proof_label),
+                                anim_seconds=_LABEL_FADE_SECONDS, static=False))
+        else:
+            blocks.append(Block(f"proof.{i}", m, anim="fade", static=False))
+        chain.append(m)   # the raw row: the anchor shift below must move the step, not the label
         prev_half = half
 
     if qrow is not None:

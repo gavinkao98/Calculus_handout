@@ -1,0 +1,417 @@
+<!doctype html>
+<html lang="zh-Hant">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>§3.1 motion primitive 試點 A/B — 三場前後對照</title>
+<script>window.MathJax={tex:{inlineMath:[['$','$']]},svg:{fontCache:'global'}};</script>
+<script src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-svg.js" id="MathJax-script" async></script>
+<style>
+  :root {
+    --bg:#0f1720; --panel:#16202b; --panel2:#1b2734; --ink:#e8eef5; --ink2:#a9b8c9;
+    --line:#2a3849; --good:#4ec9a0; --warn:#e8b04b; --bad:#e2725b; --accent:#7fb2e5;
+  }
+  * { box-sizing:border-box; }
+  body { margin:0; background:var(--bg); color:var(--ink);
+    font:16px/1.7 "Noto Sans TC","PingFang TC","Microsoft JhengHei",system-ui,sans-serif; }
+  .wrap { max-width:1180px; margin:0 auto; padding:40px 24px 80px; }
+  h1 { font-size:30px; margin:0 0 6px; letter-spacing:.01em; }
+  .sub { color:var(--ink2); margin:0 0 28px; }
+  h2 { font-size:21px; margin:40px 0 14px; padding-bottom:8px; border-bottom:1px solid var(--line); }
+  h3 { font-size:18px; margin:0 0 4px; }
+  .scene-title { color:var(--ink2); font-weight:400; font-size:15px; margin-left:8px; }
+  table { width:100%; border-collapse:collapse; font-size:14px; }
+  th,td { text-align:left; padding:9px 10px; border-bottom:1px solid var(--line); vertical-align:top; }
+  th { color:var(--ink2); font-weight:600; font-size:13px; }
+  td.sid { font-family:ui-monospace,Consolas,monospace; font-size:13px; }
+  .delta { font-size:12px; margin-left:6px; padding:1px 6px; border-radius:10px; }
+  .delta.good { background:rgba(78,201,160,.16); color:var(--good); }
+  .delta.flat { background:rgba(169,184,201,.14); color:var(--ink2); }
+  .verdict { font-size:12px; padding:2px 9px; border-radius:11px; margin-left:8px; }
+  .v-good { background:rgba(78,201,160,.18); color:var(--good); }
+  .v-ok { background:rgba(127,178,229,.18); color:var(--accent); }
+  .v-weak { background:rgba(232,176,75,.18); color:var(--warn); }
+  .v-bad { background:rgba(226,114,91,.18); color:var(--bad); }
+  .scene { background:var(--panel); border:1px solid var(--line); border-radius:12px;
+    padding:22px 24px; margin:22px 0; }
+  .what { color:var(--ink2); font-size:14px; margin:2px 0 16px; }
+  .stats { display:flex; flex-wrap:wrap; gap:10px; margin-bottom:18px; }
+  .stats > div { background:var(--panel2); border-radius:8px; padding:9px 14px; }
+  .stats .k { display:block; color:var(--ink2); font-size:12px; }
+  .stats .v { font-size:15px; font-variant-numeric:tabular-nums; }
+  .two { display:grid; grid-template-columns:1fr 1fr; gap:18px; }
+  @media (max-width:900px) { .two { grid-template-columns:1fr; } }
+  .col h4 { font-size:14px; margin:0 0 8px; color:var(--ink2); }
+  .note { font-size:13px; color:var(--ink2); margin:0 0 10px; }
+  .finding { background:var(--panel2); border-left:3px solid var(--line);
+    border-radius:0 8px 8px 0; padding:10px 13px; margin-bottom:9px; font-size:13.5px; }
+  .finding.sev-must { border-left-color:var(--bad); }
+  .finding.sev-should { border-left-color:var(--warn); }
+  .finding.sev-nice { border-left-color:var(--accent); }
+  .fhead { margin-bottom:5px; }
+  .sev { text-transform:uppercase; font-size:11px; letter-spacing:.08em; font-weight:700; }
+  .sev-must .sev { color:var(--bad); } .sev-should .sev { color:var(--warn); }
+  .sev-nice .sev { color:var(--accent); }
+  .dim { font-family:ui-monospace,Consolas,monospace; font-size:12px;
+    color:var(--ink2); margin-left:8px; }
+  .where { display:block; color:var(--ink2); font-size:12px; margin-top:2px; }
+  .finding p { margin:4px 0; }
+  .clean { color:var(--good); font-size:13.5px; margin:4px 0; }
+  .callout { background:var(--panel); border:1px solid var(--line);
+    border-left:4px solid var(--warn); border-radius:0 10px 10px 0; padding:16px 20px; margin:18px 0; }
+  .callout.ok { border-left-color:var(--good); }
+  .callout h3 { margin:0 0 8px; font-size:16px; }
+  ul { margin:8px 0; padding-left:22px; }
+  li { margin:5px 0; }
+  code { font-family:ui-monospace,Consolas,monospace; font-size:13px;
+    background:var(--panel2); padding:1px 5px; border-radius:4px; }
+  .foot { color:var(--ink2); font-size:12.5px; margin-top:40px;
+    border-top:1px solid var(--line); padding-top:14px; }
+</style>
+</head>
+<body><div class="wrap">
+
+<h1>§3.1 motion primitive 試點 — 三場 A/B</h1>
+<p class="sub">2026-09-12 · 品質補強輪 ⑦（首輪三原語落地）· 全程離線零計費（mock render ＋ 現有 Dean 音檔 reuse，TTS <code>backend_calls: 0</code>）</p>
+
+<h2>一、一眼看完</h2>
+<table>
+  <thead><tr><th>場</th><th>靜止比例</th><th>畫面在動</th><th>最長靜止</th><th>R2 verdict</th><th>R2 findings</th></tr></thead>
+  <tbody>
+        <tr>
+          <td class="sid">04_difference_quotient_for_sine</td>
+          <td>97% → <b>94%</b>
+              <span class="delta good">-3 pt</span></td>
+          <td>2.5 s → <b>4.5 s</b></td>
+          <td>20.2 s → <b>21.0 s</b>
+              <span class="delta flat">+0.8 s</span></td>
+          <td>weak → <b>ok</b></td>
+          <td>1 must / 2 should → <b>1 must / 2 should</b></td>
+        </tr>
+        <tr>
+          <td class="sid">08_continuity_statement_sin_limit</td>
+          <td>96% → <b>96%</b>
+              <span class="delta flat">+0 pt</span></td>
+          <td>2.5 s → <b>2.0 s</b></td>
+          <td>27.2 s → <b>27.5 s</b>
+              <span class="delta flat">+0.3 s</span></td>
+          <td>weak → <b>weak</b></td>
+          <td>1 must / 2 should → <b>1 must / 2 should</b></td>
+        </tr>
+        <tr>
+          <td class="sid">11_squeeze_graph</td>
+          <td>94% → <b>72%</b>
+              <span class="delta good">-22 pt</span></td>
+          <td>2.0 s → <b>10.2 s</b></td>
+          <td>20.2 s → <b>7.2 s</b>
+              <span class="delta good">-13.0 s</span></td>
+          <td>ok → <b>good</b></td>
+          <td>1 must / 0 should → <b>0 must / 1 should</b></td>
+        </tr></tbody>
+</table>
+
+<div class="callout">
+  <h3>驗收線逐條核對（§7）：三條達標之一，一條未達</h3>
+  <table style="margin:10px 0">
+    <thead><tr><th>驗收線</th><th>04</th><th>08</th><th>11</th><th>判定</th></tr></thead>
+    <tbody>
+      <tr><td>① 級（<code>must</code>）finding 關閉</td><td>✗ 原 must 仍在</td><td>✗ 原 must 仍在</td><td>✓ 關閉</td><td>1 / 3</td></tr>
+      <tr><td>verdict ≥ <code>ok</code></td><td>✓ weak → ok</td><td>✗ weak → weak</td><td>✓ ok → good</td><td>2 / 3</td></tr>
+      <tr><td>無新 <code>must</code></td><td>✓</td><td>✓</td><td>✓</td><td>3 / 3（全片 must 3 → 2）</td></tr>
+      <tr><td>靜止比例 &lt; 70%</td><td>✗ 94%</td><td>✗ 96%</td><td>△ 72%</td><td>0 / 3</td></tr>
+    </tbody>
+  </table>
+  <p><b>一句話：三支原語裡，<u>游標掃描（原語 3）獨力達標，揭示時序與原地變形沒有</u>。</b>
+  差別不在實作，而在「原語的作用時間尺度」——transform 一次 1.2 秒、字卡滑入一次 0.5 秒，
+  放進 20–27 秒的長拍裡，動的比例當然拉不動；sweep 是唯一能<strong>跟著一整拍長</strong>的原語
+  （在 11 佔滿 8.1 秒的那一拍），所以一場就從 94% 掉到 72%、最長靜止 20.2 s → 7.2 s。</p>
+  <p>R2 的兩條未關 <code>must</code> 也指向同一件事，而且兩條都<strong>不是本輪三原語能修的</strong>：</p>
+  <ul>
+    <li><b>04</b>：要的是把 <span>$h = 2\cdot\tfrac h2$</span> 這個 trick 拆成「展開 → 係數 2 相消 → 兩個 <span>$\tfrac h2$</span> 對齊框起」三段編舞（原語 4 聚焦）。
+      本輪的 <code>anim: transform</code> 讓那一行<em>整行</em>原地改寫——R2 也確認看見了（「兩次的中間態都被抽幀抓到」）——但它演的是「換一行」，不是「2 去哪了」。</li>
+    <li><b>08</b>：要的是把單位圓搬回畫面右半、把半弦與弧比長度演出來（原語 5 跨場延續 ＋ 原語 6 圖跟旁白長）。
+      這正是 KICKOFF §6 自己預告「本輪不做、記進 §8」的那 27 秒。
+      <b>而且揭示時序修好之後，這 27 秒比以前更空</b>——舊版至少有一張（提前劇透的）字卡佔著版面，新版誠實地讓它空著。這是本輪最該請你裁決的取捨。</li>
+  </ul>
+  <p class="note" style="margin-top:12px">附帶：<code>pauses:</code> 在數字上是<strong>倒扣</strong>的——它刻意增加靜止時間（04 +1.5 s、08 +1.2 s）。
+  靜止比例這個指標本身無法表達「這裡的靜止是設計的」；若要續用它當水位指標，建議把 <code>pauses</code> 宣告的秒數從分母扣掉。</p>
+</div>
+
+<div class="callout ok">
+  <h3>已關閉的項目</h3>
+  <ul>
+    <li><b>11 的 <code>must</code>（D-motion）</b>：「旁白全是動詞 slides／rises／squeezed，畫面卻是靜止三線圖」——
+      R2 改動前開的處方（垂直游標滑向 0、曲線上掛點、兩線間半透明色帶隨之收窄）就是本輪 <code>kind: sweep</code> 的實作，重跑後這條消失、verdict 升到 <code>good</code>。</li>
+    <li><b>11 的 <code>nice</code>（D-focus）</b>：「旁白叫觀眾找 <i>the dashed floor</i>，畫面上沒有虛線」——
+      <code>dashed: true</code> 以前只對 <code>kind: line</code> 生效、對 <code>kind: function</code> 靜默忽略，本輪修好，<span>$\cos\theta$</span> 現在真的是虛線。</li>
+    <li><b>04 的一條 <code>should</code>（D-motion，beat 3 代入）</b>：「代入是一個動作，畫面卻用『再寫一行』表示」——
+      <code>anim: transform</code> 關閉了它（重跑後該條不再出現，換成一條關於開場 13.9 秒的新 <code>should</code>）。</li>
+    <li><b>08 的「reveal 名存實亡」</b>：字卡以前 +0.5 s 就在畫面上、到 +27.7 s 的 reveal 前後兩幀無差；
+      現在 +27.7 s 才滑入，<code>PROOF</code> 小標也跟著 <code>proof.0</code> 一起進場。R2 這次沒有再提這條。</li>
+  </ul>
+</div>
+
+<div class="callout">
+  <h3>R2 順手指出、值得記下的兩件事（本輪未動）</h3>
+  <ul>
+    <li><b>11 色帶的語意方向</b>：色帶是跟著游標<em>往左鋪開</em>的，面積隨 <span>$\theta\to 0$</span> 變大，
+      與旁白 <i>the narrowing gap</i> 的語意相反。R2 判定「收尾時確實收斂成尖到 <span>$\theta=0$</span> 的楔形、讀起來仍正確」，因此沒有列為 finding。
+      若要對齊語意，可讓色帶只畫游標<em>前方</em>尚未收束的那一段。</li>
+    <li><b>11 橫軸標籤是 <code>x</code>、圖上其他全用 <span>$\theta$</span></b>：一個字元的既有筆誤，與本輪無關，放大階段順手改。</li>
+  </ul>
+</div>
+
+
+<h2>二、逐場前後對照</h2>
+
+      <section class="scene">
+        <h3>04_difference_quotient_for_sine <span class="scene-title">The Difference Quotient for Sine</span></h3>
+        <p class="what"><b>本輪施加：</b>原語 2 原地變形 ＋ 原語 1 靜默停留</p>
+        <div class="stats">
+          <div><span class="k">靜止比例</span><span class="v">97% → 94%</span></div>
+          <div><span class="k">畫面在動</span><span class="v">2.5 s → 4.5 s</span></div>
+          <div><span class="k">最長靜止</span><span class="v">20.2 s → 21.0 s</span></div>
+          <div><span class="k">拍數／揭示</span><span class="v">5／4 → 5／4</span></div>
+        </div>
+        <div class="two">
+          <div class="col before">
+            <h4>改動前 · R2 判定 <span class="verdict v-weak">weak</span></h4>
+            <p class="note">四行推導逐行堆疊、右側有 dotted-leader 註解，結構清楚；問題全在「每一步都只是新的一行，沒有一步是演出來的」。</p>
+            
+        <div class="finding sev-must">
+          <div class="fhead"><span class="sev">must</span>
+            <span class="dim">D-carry</span>
+            <span class="where">difference_quotient_for_sine beat 4（+32.9s→+53.7s），tile 07（+33.6s）</span></div>
+          <p class="prob"><b>問題：</b>這是本場唯一的「決定性一步」，也是最容易卡住初學者的地方（h 怎麼就變成 h/2 了？）。畫面把它當成又一行結果貼出來，再停 20 秒，觀眾沒有機會看到中間發生了什麼。</p>
+          <p class="prop"><b>提議：</b>三個連續動作共 3 秒：分母的 h 先高亮，0.8s 內裂成 2·(h/2)；前面的 2 與分子 2cos… 的 2 同時變灰並消失（0.6s）；剩下的 h/2 滑到 sin(h/2) 正下方對齊成分數（0.8s），此時再把整行定稿。</p>
+        </div>
+        <div class="finding sev-should">
+          <div class="fhead"><span class="sev">should</span>
+            <span class="dim">D-motion</span>
+            <span class="where">difference_quotient_for_sine beat 3，tile 04（+14.6s）→ tile 05（+22.4s）</span></div>
+          <p class="prob"><b>問題：</b>代入是一個動作，畫面卻用「再寫一行」表示，觀眾得自己在兩行之間目視比對 A、B 各自跑到哪裡去了。</p>
+          <p class="prop"><b>提議：</b>讓上一行的 A 標藍、B 標橘；旁白念到時用 1.2s 的 transform 把 A 原地換成 x+h、B 換成 x（顏色保留），再把整行往下複製成第二行——代入變成看得見的替換，而不是兩行之間的謎題。</p>
+        </div>
+        <div class="finding sev-should">
+          <div class="fhead"><span class="sev">should</span>
+            <span class="dim">D-focus</span>
+            <span class="where">difference_quotient_for_sine beat 5（+53.7s→+74.0s），tile 09（+54.4s）與 tile 10（+63.9s）</span></div>
+          <p class="prob"><b>問題：</b>20.2 秒的結論段裡，畫面不告訴觀眾「第一個因子」「第二個因子」分別是哪一塊，兩個極限來源（連續性／基本極限）也沒有和式子對上。</p>
+          <p class="prop"><b>提議：</b>講到 first 時把 cos(x+h/2) 打亮、其餘壓暗到 40%（1.5s）；講到 second 時換成 sin(h/2)/(h/2) 打亮；同時讓右側 CONTINUITY 與 THE LIMIT 兩個字各自在對應時刻亮起，形成兩條明確的對照。</p>
+        </div>
+          </div>
+          <div class="col after">
+            <h4>改動後 · R2 重跑 <span class="verdict v-ok">ok</span></h4>
+            <p class="note">三場裡動得最實在的一場：兩次 TransformMatchingTex 的中間態都被抽幀抓到（tile 05、tile 07），層級（舊行灰／當前行亮／結論金）也乾淨。扣分全在「動的時機」，不在「會不會動」。</p>
+            
+        <div class="finding sev-must">
+          <div class="fhead"><span class="sev">must</span>
+            <span class="dim">D-carry</span>
+            <span class="where">beat 4（+32.9→+53.7s），tile 07 (+33.6s) 與 tile 08 (+43.3s)</span></div>
+          <p class="prob"><b>問題：</b>全場最關鍵的代數動作——把分母的 h 寫成 2·(h/2)，讓它跟 sin(h/2) 裡的 h/2 配對、順手把前面的係數 2 吃掉——在畫面上是「第 2 行整行換成第 3 行」一次跳完。2 去哪了、哪個 h/2 配哪個 h/2，畫面完全沒演，只有右側一個灰色小註 &#x27;write h = 2·h/2&#x27;。跳完之後畫面凍結 21 秒，剩旁白一個人講完這個 trick。初學者最可能在這裡掉隊。</p>
+          <p class="prop"><b>提議：</b>把 step.1→step.2 拆成三段動作（合計約 4–5 秒，接在 +33s）：(1) 先只把分母的 h 原地展開成 2·(h/2)（TransformMatchingTex，0.8s）；(2) 讓展開出的 2 與等號左邊的係數 2 同時閃一下、再一起淡出相消（0.8s）；(3) 把剩下的 h/2 移到 sin(h/2) 正下方對齊成分母，同時用同一顏色的細框同時框住兩個 h/2 停留 1.2s。beat 4 後段（+42s 之後）若仍無事，就讓 cos(x+h/2) 與 sin(h/2)/(h/2) 各自被淡框圈起來，預告下一拍的「兩個因子」。</p>
+        </div>
+        <div class="finding sev-should">
+          <div class="fhead"><span class="sev">should</span>
+            <span class="dim">D-motion</span>
+            <span class="where">+0.5s→+13.9s（tile 01、tile 02、tile 03）</span></div>
+          <p class="prob"><b>問題：</b>開場 13.9 秒是一張不動的標題卡，而且旁白口中的主角「that difference quotient」在畫面上根本不存在——(sin(x+h)−sin x)/h 要到 +33s 才完整現身。副標又把 beat 1 的結論（sum-to-product 把差變積）預先寫死，等於旁白講完了畫面才開始。</p>
+          <p class="prop"><b>提議：</b>+1.0s 就把上一場的 (sin(x+h)−sin x)/h 接進來，單獨放在版面中央偏上、字級放大；念到 &#x27;fighting it head-on&#x27; 時讓它輕微抖動並降灰 0.6s（此路不通），再以 1s 縮小歸位到左上作為推導的第 0 行；念到 &#x27;sum-to-product&#x27; 時才讓恆等式從下方滑入接上。副標改成 beat 1 結束時才淡入，不要一開場劇透。</p>
+        </div>
+        <div class="finding sev-should">
+          <div class="fhead"><span class="sev">should</span>
+            <span class="dim">D-focus</span>
+            <span class="where">beat 5（+53.7→+74.0s），tile 09 (+54.4s)、tile 10 (+63.8s)、tile 11 (+75.8s)</span></div>
+          <p class="prob"><b>問題：</b>beat 5 有 20.2 秒、53 個字，內容是「先講左邊那個因子、再講右邊那個因子」，畫面卻是兩件事同時出現後不動，沒有任何東西告訴觀眾此刻該看左半還是右半；而這兩半正是接下來兩大段（continuity 與 the limit）的路標，卻沒有被視覺分開。</p>
+          <p class="prop"><b>提議：</b>把 result 拆成兩次 reveal：念 &#x27;The first slides to cos x&#x27; 時只亮左半，並用一條 0.6s 的箭頭把上一行的 cos(x+h/2) 拉下來；念 &#x27;the second is exactly sine theta over theta&#x27; 時左半降到 40% 不透明、右半亮起，同時在 sin(h/2)/(h/2) 下方用 0.8s 浮出 &#x27;θ = h/2&#x27; 的替換標籤。最後一句 &#x27;We secure both now&#x27; 時，讓 CONTINUITY 與 THE LIMIT 兩個字分別對齊滑到左右兩半的正下方，成為後續兩段的路標。</p>
+        </div>
+          </div>
+        </div>
+      </section>
+      <section class="scene">
+        <h3>08_continuity_statement_sin_limit <span class="scene-title">Sine and Cosine Are Continuous</span></h3>
+        <p class="what"><b>本輪施加：</b>原語 1 揭示時序（字卡＋PROOF 小標）＋靜默停留</p>
+        <div class="stats">
+          <div><span class="k">靜止比例</span><span class="v">96% → 96%</span></div>
+          <div><span class="k">畫面在動</span><span class="v">2.5 s → 2.0 s</span></div>
+          <div><span class="k">最長靜止</span><span class="v">27.2 s → 27.5 s</span></div>
+          <div><span class="k">拍數／揭示</span><span class="v">5／4 → 5／4</span></div>
+        </div>
+        <div class="two">
+          <div class="col before">
+            <h4>改動前 · R2 判定 <span class="verdict v-weak">weak</span></h4>
+            <p class="note">27.2s 靜止＋一個看不出變化的 reveal＋一欄空了 35 秒的 PROOF，是全片版面問題最集中的一場。</p>
+            
+        <div class="finding sev-must">
+          <div class="fhead"><span class="sev">must</span>
+            <span class="dim">D-carry</span>
+            <span class="where">continuity_statement_sin_limit beat 1（+1.0s→+27.7s），tile 03（+14.4s）</span></div>
+          <p class="prob"><b>問題：</b>旁白明講「read geometrically」，畫面卻沒有幾何。這個弦短於弧的圖三場之前才畫過，卻沒有被帶回來，26.7 秒的關鍵直覺完全落空。</p>
+          <p class="prop"><b>提議：</b>把 sector_inequality 的單位圓縮圖調回畫面左側（1s 淡入）；講到 half-chord 時讓 sinθ 的半弦與 θ 的弧同時高亮成兩種顏色，再讓弧「拉直」成一段線段與弦並排比長度（1.5s），最後定格成 |sin θ| ≤ |θ|。</p>
+        </div>
+        <div class="finding sev-should">
+          <div class="fhead"><span class="sev">should</span>
+            <span class="dim">D-focus</span>
+            <span class="where">continuity_statement_sin_limit frame f_03_+014.4s 與 f_04_+028.4s</span></div>
+          <p class="prob"><b>問題：</b>旁白說「So here is the claim, made precise」時，畫面上什麼也沒發生——那張卡 27 秒前就擺好了。reveal 名存實亡，觀眾的注意力沒有被帶到該看的地方。</p>
+          <p class="prop"><b>提議：</b>開場不顯示該卡；等旁白說到 here is the claim 時讓它從右側滑入（0.5s）並沿邊框跑一圈亮線（0.4s）定住，讓「宣告」這個動作真的發生在宣告的那一秒。</p>
+        </div>
+        <div class="finding sev-should">
+          <div class="fhead"><span class="sev">should</span>
+            <span class="dim">D-composition</span>
+            <span class="where">continuity_statement_sin_limit tile 01–04（+0.5s 至 +28.4s）</span></div>
+          <p class="prob"><b>問題：</b>一個標題掛在那裡空等 35 秒，畫面看起來像還沒載入完；同時整個左欄的空間被白白佔住。</p>
+          <p class="prop"><b>提議：</b>PROOF 標籤與它的第一行證明同時淡入；空出來的 35 秒改放上一條的單位圓圖（弦 vs 弧），讓左欄在該講幾何時就是幾何、該講證明時才變證明。</p>
+        </div>
+          </div>
+          <div class="col after">
+            <h4>改動後 · R2 重跑 <span class="verdict v-weak">weak</span></h4>
+            <p class="note">全場沒有任何一個非 reveal 的動態（md：every change is a reveal fade-in，moving 2.0 s / 57.4 s，static 96%）。這是三場裡唯一一場「把畫面完全交給文字」的場。</p>
+            
+        <div class="finding sev-must">
+          <div class="fhead"><span class="sev">must</span>
+            <span class="dim">D-carry</span>
+            <span class="where">beat 1（+1.0→+27.7s），tile 01、tile 02、tile 03</span></div>
+          <p class="prob"><b>問題：</b>57.4 秒的場有 27.5 秒是一張不動的標題卡，而且它正好蓋住整場唯一真正非畫不可的兩件事：連續性的「輕推一點、只動一點」與 chord ≤ arc 的幾何來源。旁白說 &#x27;We even have the tool that says so&#x27;，畫面上卻沒有那個 tool；那個幾何事實最後只以括號文字 &#x27;(chord ≤ arc)&#x27; 出現在 +35.5s 的證明行裡。初學者在前半場沒有任何可看的東西，|sin θ| ≤ |θ| 的來歷只能用聽的。</p>
+          <p class="prop"><b>提議：</b>beat 1 就把單位圓搬回畫面右半（沿用先前場次的同一張圖以保持視覺連貫）：(1) +1.0s 圓與角 θ 進場，θ 用滑桿左右輕推兩次約 2s，讓 sin θ 的高度跟著小幅上下——這就是 &#x27;move only a little, never jump&#x27;；(2) 念到 &#x27;half-chord&#x27; 時把半弦畫成一筆（0.8s），念到 &#x27;the arc&#x27; 時把弧畫成另一筆（0.8s），兩者用不同顏色；(3) 念到 &#x27;shorter than&#x27; 時把兩筆同時拉直、並排、對齊同一基線比長度（1.5s），比完就地長出 |sin θ| ≤ |θ|。演完再讓 statement 方塊進場，圖縮到右下角當佐證留在畫面上。</p>
+        </div>
+        <div class="finding sev-should">
+          <div class="fhead"><span class="sev">should</span>
+            <span class="dim">D-motion</span>
+            <span class="where">beat 3–4（+35.4→+49.6s），tile 05 (+36.1s)、tile 06 (+40.7s)、tile 07 (+46.8s)</span></div>
+          <p class="prob"><b>問題：</b>整場唯一的推理動作——夾擠——完全沒有被演出來。0 ≤ |sin θ| ≤ |θ| 這行從 +35.5s 起就定住不動，「上界 |θ| 收到 0，把 |sin θ| 一起帶下去」只有文字宣告，沒有任何東西在畫面上收縮。</p>
+          <p class="prop"><b>提議：</b>在 proof.0 那行正下方加兩條同起點（釘在 0）的細長 bar：上面一條長度＝|θ|，下面一條較短＝|sin θ|。beat 4 念到 &#x27;the squeeze theorem forces&#x27; 時，讓 |θ| 的 bar 在 1.5 秒內收到 0，短 bar 因為被夾在中間只能跟著收到 0；收完了 &#x27;sin θ → 0&#x27; 這行才淡入。只用兩條會縮的 bar、不畫函數圖，成本低，也不會和第 11 場的 squeeze 圖重複。</p>
+        </div>
+        <div class="finding sev-should">
+          <div class="fhead"><span class="sev">should</span>
+            <span class="dim">D-composition</span>
+            <span class="where">tile 09 (+56.8s)，原尺寸幀 f_09_+056.8s.jpg</span></div>
+          <p class="prob"><b>問題：</b>版面層級整個反了：整場要立的結論是畫面上最小的東西，只是鋪陳用的 statement 方塊卻橫跨全寬、字最大。最後 5 秒觀眾的眼睛沒有被帶到重點上。</p>
+          <p class="prop"><b>提議：</b>把結論行放大到至少與 statement 方塊同級，移到版面中央下半的空白區；同時在 qed reveal 時把上方兩行證明行降到 60% 不透明（0.5s），讓 beat 5 到 tail 的視覺重心明確落在 lim_{θ→0} sin θ = 0。空出來的右半正好放前一條 finding 提的單位圓縮圖。</p>
+        </div>
+        <div class="finding sev-nice">
+          <div class="fhead"><span class="sev">nice</span>
+            <span class="dim">D-focus</span>
+            <span class="where">reveal qed (+51.0s)，tile 09 (+56.8s)</span></div>
+          <p class="prob"><b>問題：</b>證畢記號出現在一頁只做到 sin θ → 0 的證明上，而它正上方掛著一個更大的命題方塊，視覺上容易被讀成「這個命題已經證完了」。</p>
+          <p class="prop"><b>提議：</b>這一頁不要用 ∎：改成進度記號，例如把右上角的 &#x27;1 / 2&#x27; 在此刻放大成 &#x27;STEP 1 OF 2&#x27; 並亮 1 秒再收回原大小；∎ 留到第 2 頁真正收尾時才出現。</p>
+        </div>
+          </div>
+        </div>
+      </section>
+      <section class="scene">
+        <h3>11_squeeze_graph <span class="scene-title">The Squeeze, Drawn</span></h3>
+        <p class="what"><b>本輪施加：</b>原語 3 游標掃描 ＋ dashed function 修正</p>
+        <div class="stats">
+          <div><span class="k">靜止比例</span><span class="v">94% → 72%</span></div>
+          <div><span class="k">畫面在動</span><span class="v">2.0 s → 10.2 s</span></div>
+          <div><span class="k">最長靜止</span><span class="v">20.2 s → 7.2 s</span></div>
+          <div><span class="k">拍數／揭示</span><span class="v">6／5 → 7／6</span></div>
+        </div>
+        <div class="two">
+          <div class="col before">
+            <h4>改動前 · R2 判定 <span class="verdict v-ok">ok</span></h4>
+            <p class="note">全片少數真正用圖教學的場：空軸 → cos θ → 水平線 1 → 比值曲線 → 空心圓 → 註解，前 10 秒的分拍很好。</p>
+            
+        <div class="finding sev-must">
+          <div class="fhead"><span class="sev">must</span>
+            <span class="dim">D-motion</span>
+            <span class="where">squeeze_graph beat 4（+9.5s→+23.1s），tile 05（+10.2s）／tile 06（+16.3s）／tile 07（+23.8s）</span></div>
+          <p class="prob"><b>問題：</b>這一段旁白全是動詞——slides、rises、squeezed——而畫面是一張靜止的三線圖。「夾擠」這個全節的核心動作，在唯一畫得出它的場次裡沒有被演出來。</p>
+          <p class="prop"><b>提議：</b>放一條垂直游標從 x≈2 等速滑向 0（3s），游標上同時掛兩個點（cos θ 上與 y=1 上）並即時顯示兩者的縫隙；縫隙區域填半透明藍色帶，隨游標推進而收窄，收到 0 時整條帶子閃一次白，比值曲線上的點同步被推到高度 1。</p>
+        </div>
+        <div class="finding sev-nice">
+          <div class="fhead"><span class="sev">nice</span>
+            <span class="dim">D-focus</span>
+            <span class="where">squeeze_graph frame f_09_+036.3s，旁白 beat 2「Here runs cosine theta, the dashed floor.」</span></div>
+          <p class="prob"><b>問題：</b>旁白叫觀眾找「the dashed floor」，畫面上沒有虛線；而且地板比被夾的主角還暗，第一次看的人要花時間才能確定在指哪一條。</p>
+          <p class="prop"><b>提議：</b>把 cos θ 改成虛線（與旁白一致）並提亮一階；beat 2 讓這條虛線由左向右畫出 1.2s，再定住當地板。</p>
+        </div>
+          </div>
+          <div class="col after">
+            <h4>改動後 · R2 重跑 <span class="verdict v-good">good</span></h4>
+            <p class="note">另記（非 finding）：陰影區是跟著掃描線往左鋪開的，所以它的面積隨 θ→0 而變大，方向上與 &#x27;the narrowing gap&#x27; 的語意相反；但收尾時那塊陰影確實收斂成一個尖到 θ=0 的楔形、讀起來仍正確，所以不列為 finding。整場 7 拍 6 reveal、節奏 2.3–8.1 秒一拍，是這包裡唯一讓畫面自己講完一件事的場。</p>
+            
+        <div class="finding sev-should">
+          <div class="fhead"><span class="sev">should</span>
+            <span class="dim">D-focus</span>
+            <span class="where">beat 6（+23.1→+30.0s），tile 08 (+23.8s)，原尺寸幀 f_08_+023.8s.jpg</span></div>
+          <p class="prob"><b>問題：</b>這一拍 6.8 秒只講一件事——那個開圓圈——但它是全場最小、周圍最雜的元素，小到連 4 Hz、0.2% 像素門檻的差分都偵測不到它出現。旁白叫觀眾 &#x27;Notice&#x27;，畫面卻沒有任何動作幫他找到要看的東西。</p>
+          <p class="prop"><b>提議：</b>beat 6 一開始先用 0.5 秒把橘色掃描線與陰影淡出（任務已完成），畫面只剩三條曲線；接著讓開圓圈從 1× 放大到 2.2× 再回落到 1.4×（0.8 秒 pulse），同時從圓圈拉一條短引線到右方寫 &#x27;0/0 — 無定義&#x27;。若還有餘裕，再用 1.5 秒把視窗 zoom 到 θ ∈ [−0.3, 0.3]、y ∈ [0.9, 1.02]，讓「曲線逼到 1、那一點卻被挖掉」真的看得見，停 2 秒後 zoom 回全景。</p>
+        </div>
+        <div class="finding sev-nice">
+          <div class="fhead"><span class="sev">nice</span>
+            <span class="dim">D-motion</span>
+            <span class="where">beat 5（+15.1→+23.1s），tile 06 (+15.8s) → tile 07 (+19.1s) → tile 08 (+23.8s)</span></div>
+          <p class="prob"><b>問題：</b>旁白 &#x27;As theta slides toward zero&#x27; 講的是雙側逼近，畫面卻只從右側走一次，左半的曲線整場只是靜靜擺著；視覺重量也因此明顯偏右。</p>
+          <p class="prop"><b>提議：</b>改成雙側同步：兩條掃描線各從 ±π/2 對稱往 0 收（維持同樣 8 秒），兩側陰影一起鋪，最後在 θ=0 匯合成同一個開圓圈。若怕畫面太忙，至少在 beat 5 收尾後補 1 秒的鏡像動作，讓左側也掃一次再停。</p>
+        </div>
+        <div class="finding sev-nice">
+          <div class="fhead"><span class="sev">nice</span>
+            <span class="dim">D-composition</span>
+            <span class="where">全場，tile 10 (+36.2s)，原尺寸幀 f_10_+036.2s.jpg</span></div>
+          <p class="prob"><b>問題：</b>橫軸叫 x、圖上其他所有東西叫 θ，初學者要多花一秒把兩個名字對起來，而這一秒正好花在最需要專心看 gap 的時候。</p>
+          <p class="prop"><b>提議：</b>把橫軸標籤從 x 改成 θ（縱軸可留 y 或改成空白），一個字元的修改；若想保留 x 作為通用變數，就改在 plot.0 出現時用 0.5 秒讓 &#x27;x&#x27; 變形成 &#x27;θ&#x27;，順便把換名這件事本身演掉。</p>
+        </div>
+          </div>
+        </div>
+      </section>
+
+<h2>三、R2 重跑的全片模式判讀（改動後）</h2>
+<p class="note">這包三場的視覺語言是「乾淨的投影片」而不是「會教書的動畫」。版面系統、字級、配色（金＝當前主角／結論，藍＝已知參照，灰虛線＝下界，舊行降灰）跨場一致且好讀，11_squeeze_graph 證明這條產線畫得出會動、會掃、會收斂的圖；但兩場文字場（04、08）把畫面當成旁白的字幕板：16 個 change event 裡只有 1 個不繫於 reveal，所有變化幾乎都是「新的一行淡入」。更關鍵的是，兩場的最長靜止都剛好壓在整場最該用動作說明的那一拍上——04 的 21.0 秒靜止蓋住 h = 2·(h/2) 的拆解，08 的 27.5 秒靜止（近全場一半）蓋住 chord ≤ arc 的幾何與「輕推一點只動一點」的連續性直覺。三場的優先順序很清楚：08 要補畫面、04 要把動作挪到關鍵步驟上、11 只要把最後那個開圓圈演出來就近乎滿分。</p>
+<ul><li>動＝翻頁，不＝教學。三場合計 16 個 change event，md 只標出 1 個不繫於 reveal（04 場 +55.2s）；08 與 11 兩場的統計直接寫著 every change is a reveal fade-in。畫面改變的時機由「有沒有新文字」決定，不由「旁白正在解釋什麼」決定。</li><li>文字場開場必有長標題卡：04 場第一個 reveal 在 +13.9s、08 場在 +27.7s，而唯一的圖場 11 場在 +3.3s。旁白先跑一大段、畫面才開始，是推導／命題這類文字場的共同起手式。</li><li>會動的地方動得其實不錯：04 場 tile 05 (+22.4s) 與 tile 07 (+33.6s) 都抓到 TransformMatchingTex 的中間態（字元正在重排），舊行降灰、當前行留亮的層級也穩。所以問題不是「不會動」，是「只在換行時動、不在講關鍵步驟時動」。</li><li>長靜止總是壓在承重拍上：04 最長靜止 21.0s 落在 beat 4（h 拆成 2·(h/2) 的 trick），08 最長靜止 27.5s 落在 beat 1（單位圓上半弦短於弧）。靜止不是罪，但兩次都剛好停在該演的地方。</li><li>旁白點名的幾何物件不一定在畫面上：08 場說 &#x27;We even have the tool that says so -- on the unit circle...&#x27;，畫面上一張圖都沒有，那個幾何事實最後只以括號文字 &#x27;(chord ≤ arc)&#x27; 出現；04 場開場說 &#x27;that difference quotient&#x27;，該式子要到 +33s 才完整現身。11 場的存在說明這是分配問題不是能力問題。</li><li>版面長期偏上偏左：04 與 08 的下方約 1/3、右方約 40% 全場空白，11 的圖只用了中央約 45% 的寬度。留白乾淨，但舞台被浪費，而最該大的東西反而最小（08 的結論行、11 的開圓圈）。</li><li>顏色語彙是這部片最穩的資產：金色＝此刻的主角或結論（04 的 result 行、11 的 sin θ/θ 曲線與掃描線），藍色＝已知的參照（kicker、ceiling 線），灰虛線＝下界。跨場一致，建議之後所有新增動作都沿用同一套。</li></ul>
+
+<h2>四、視覺幀稽核（V1–V9／A1–A7）</h2>
+<div class="callout ok">
+  <h3>V1–V9 blocking ＝ 0（三場、五張幀）</h3>
+  <p>依 <code>VISUAL-FRAME-RUBRIC.md</code> 對 after 成品的最滿幀＋兩張動畫中段幀審。
+  <code>08</code> 是三場中唯一 V 維完全乾淨的一場。另兩條 advisory 皆為 magnitude 級、未蓋字不丟資訊：
+  <code>04</code> 終幀 result 列算式吃進 rail 欄使 <code>CONTINUITY + THE LIMIT</code> 貼著「1」（約 10–20 px）；
+  <code>11</code> 原點上方 (0,1) 約 30 px 內擠了刻度「1」／<span>$y=1$</span> 線／比值曲線／空心圓——<b>後者是既有狀況，before build 亦然</b>。</p>
+</div>
+
+<div class="callout ok">
+  <h3>我特別請它驗的兩題</h3>
+  <p><b>① 55% dimmed 的算式會不會太淡？——不會，且不是 finding。</b>
+  <code>ink_1 #eef2fb</code> 以 0.55 alpha 疊在 <code>bg #0a1322</code> 上合成約 <code>#888E99</code>，
+  對比 <b>≈6.1:1</b>，字級 48 px。專案 2026-06-21 曾判「太淡、reads as disabled」的 <code>ink_3 #6b748a</code> 只有 ≈4.0:1——
+  <b>本輪的 dim 比那個被否決的水位還亮約 1.5 倍</b>。（<code>derivation.py</code> 裡「Codex read 0.5/0.55 too faint」那句講的是 1–2 px 髮絲 dotted leader 的 stroke opacity，不是 48 px 實心字，不可直接套用。）</p>
+  <p><b>② <code>11</code> 的色帶是教學內容還是雜散 artifact？——明確是教學內容。</b>三條證據：
+  上緣貼 cyan <span>$y=1$</span>（旁白「the ceiling」）、下緣貼虛線 <span>$\cos\theta$</span>（旁白「the dashed floor」），它就是兩者之間的走廊；
+  形狀本身在 <span>$\theta=0$</span> 收斂成零高度、往 <span>$\pi/2$</span> 張開，正是「caught in the narrowing gap」的字面圖像；
+  且它是被游標掃出來的（<code>f_07</code> 三個點高度實測 cos≈0.76／ratio≈0.92／1.00，理論值 0.760／0.919／1，相符）。</p>
+</div>
+
+<div class="callout ok">
+  <h3>稽核抓到一條本輪引入的真缺陷 —— 已修並回歸</h3>
+  <p><code>{A4/A7, med}</code>：dim 原本只套在算式上、reason 標籤沒跟著暗，於是終幀出現<b>層級倒置</b>——
+  「sum-to-product」「write <span>$h=2\cdot\tfrac h2$</span>」是全 ink_2 亮度，比它們所註解的（已 dim 的）算式還亮，眼睛先被拉到右欄。</p>
+  <p><b>修法：</b>dim 改為作用於整個 row group（算式＋dotted leader＋reason），而非只有算式；
+  加一條 selftest <code>test_transform_dims_the_whole_previous_row_not_just_its_equation</code> 釘住它，重 render 後由同一支稽核回歸複核。</p>
+</div>
+
+<div class="callout">
+  <h3>A 維（magnitude，不 gate；留給放大階段排序）</h3>
+  <table style="margin:10px 0">
+    <thead><tr><th>幀</th><th>A1 版面</th><th>A2 美感</th><th>A3 邏輯</th><th>A4 一致</th><th>A5 深度</th><th>A6 字排</th><th>A7 層級</th></tr></thead>
+    <tbody>
+      <tr><td class="sid">04 f_11</td><td>78</td><td>82</td><td>90</td><td>72</td><td>94</td><td>80</td><td>74</td></tr>
+      <tr><td class="sid">08 f_09</td><td>68</td><td>80</td><td>88</td><td>76</td><td>92</td><td>74</td><td>72</td></tr>
+      <tr><td class="sid">11 f_10</td><td>74</td><td>88</td><td>92</td><td>86</td><td>92</td><td>78</td><td>76</td></tr>
+    </tbody>
+  </table>
+  <p>稽核建議的重 render 優先序：<code>08</code>（statement 卡滿版、底下 proof 只排到六成寬，右側約 950×400 px 死區；且結論列 <span>$\lim_{\theta\to0}\sin\theta=0$</span> 的實際字面只有 proof 列的約 2/3，全場 payoff 反而最小）→ <code>04</code> → <code>11</code>（圖只佔內容區約 35%、底部 caption 有 widow「<span>$\theta=0$</span>.」單獨成行）。
+  這些都是<b>既有版面問題、非本輪引入</b>，且與 R2 的 <code>08</code> must 指向同一處版面。</p>
+</div>
+
+
+<div class="foot">
+  資料來源：<code>video/output/ch03/s3.1/rewatch_pack_before</code>（2026-07-05 成片）與
+  <code>rewatch_pack_after</code>（本輪成片）；R2 改動前＝
+  <code>video/content_scripts/_audit/_gen/rewatch_lenses/R2.json</code>，
+  改動後＝本 session 以 Opus 5 subagent 盲審重跑（只讀 pack，不讀 storyboard／code）。
+  靜止統計＝<code>rewatch_pack.py</code> 的 4 fps 差分、&gt;0.2% 像素變動算「有動」；
+  細線與小標籤的變化抓不到，因此靜止比例是<strong>高估</strong>。
+</div>
+
+</div></body></html>

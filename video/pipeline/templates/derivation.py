@@ -27,19 +27,26 @@ Two authoring shapes (both supported):
     - { tex: "= 1", anim: highlight }
 
 Reveal: each row is dynamic. ids: structured -> step.0..N / result / check;
-back-compat lines -> line.0..N (so existing storyboards keep working).
+back-compat lines -> line.0..N (so existing storyboards keep working). The optional
+`statement` line is part of the opening frame unless `say` names {show statement}.
+
+A row may ask for `anim: transform` (steps[i] / result): instead of fading the finished
+line in, it morphs the PREVIOUS row's equation into this one glyph by glyph, and mutes the
+row it came from -- so an algebraic rewrite reads as one line changing rather than a new
+line appearing.
 """
 from __future__ import annotations
 
 from typing import Any
 
-from manim import DOWN, LEFT, RIGHT, MathTex, VGroup
+from manim import DOWN, LEFT, RIGHT, FadeIn, MathTex, TransformMatchingShapes, VGroup
 
 from .. import brand
 from ..blocks import Block
+from ..timing import STOCK_ANIM_SECONDS
 from ..visuals import theme as T
 from ._common import (scene_head, example_head, motif_corner, place_body, body_zone,
-                      fill_gap, render_scaffold, ColumnPlan, SPINE_X, CONTENT_W, RAIL_X)
+                      fill_gap, render_scaffold, reveals, ColumnPlan, SPINE_X, CONTENT_W, RAIL_X)
 
 _ROW_GAP = 0.40       # between rows (min pitch; expands for tall rows)
 MIN_PITCH = _ROW_GAP  # tightest inter-row gap -- sizecheck's split-capacity trigger reads this
@@ -60,13 +67,13 @@ def _rows_from_spec(spec: dict[str, Any]) -> list[dict]:
         for i, st in enumerate(spec.get("steps", [])):
             st = st if isinstance(st, dict) else {"math": st}
             rows.append({"math": str(st.get("math", "")), "reason": st.get("reason"),
-                         "kind": "step", "rid": f"step.{i}", "anim": "write",
+                         "kind": "step", "rid": f"step.{i}", "anim": st.get("anim") or "write",
                          "mark": st.get("mark")})
         if spec.get("result") is not None:
             r = spec["result"]
             r = r if isinstance(r, dict) else {"math": r}
             rows.append({"math": str(r.get("math", "")), "reason": r.get("reason"),
-                         "kind": "result", "rid": "result", "anim": "write_glow"})
+                         "kind": "result", "rid": "result", "anim": r.get("anim") or "write_glow"})
         if spec.get("check") is not None:
             c = spec["check"]
             c = c if isinstance(c, dict) else {"math": c}
@@ -106,6 +113,49 @@ def _eq_mob(row: dict, ground: str):
             mark = brand.text_glow(mark, ground, role="success", width=2.0, opacity=0.42)
         return VGroup(eq, mark)
     return eq
+
+
+TRANSFORM_SECONDS = STOCK_ANIM_SECONDS["transform"]
+MUTED_OPACITY = 0.55     # what the row a transform came FROM fades back to
+_DEFAULT_ANIM = {"step": "write", "result": "write_glow", "check": "write"}
+
+
+def _eq_core(mob):
+    """The MathTex inside a row's equation mob. `_eq_mob` wraps some rows (a result in a
+    glow group, a marked row with its verdict glyph), and the morph has to run on the glyphs
+    themselves, not the wrapper."""
+    if isinstance(mob, MathTex):
+        return mob
+    for sub in getattr(mob, "submobjects", []):
+        found = _eq_core(sub)
+        if found is not None:
+            return found
+    return None
+
+
+def _transform_anim(prev_eq, prev_row, this_eq):
+    """An in-place rewrite: the previous row's equation morphs into this one, and the row it
+    came from dims. Glyph-matching (TransformMatchingShapes), not term-matching: splitting the
+    tex with `substrings_to_isolate` to get named parts breaks any row using `\\frac` (the macro
+    is cut from its arguments and LaTeX refuses to compile), and it would perturb the spacing of
+    the very rows it touched. Shape matching needs no change to how the row is built, so the
+    terminal frame is byte-identical to the un-transformed one.
+
+    The WHOLE previous row dims -- equation, leader and reason together. Dimming only the
+    equation inverted the hierarchy: a spent row's rail annotation stayed at full ink and so
+    read brighter than the equation it annotates (visual-frame audit, 2026-09-12)."""
+    def anim(scene, mob, ground) -> float:
+        ghost = prev_eq.copy()
+        scene.add(ghost)
+        rail = VGroup(*[m for m in mob.submobjects if m is not this_eq])
+        scene.play(
+            TransformMatchingShapes(ghost, this_eq),
+            prev_row.animate.set_opacity(MUTED_OPACITY),
+            *([FadeIn(rail)] if rail.submobjects else []),
+            run_time=TRANSFORM_SECONDS,
+        )
+        return TRANSFORM_SECONDS
+    return anim
 
 
 def _reason_mob(row: dict, ground: str):
@@ -244,9 +294,25 @@ def build(spec: dict[str, Any], ctx: dict[str, Any]) -> list[Block]:
             content.align_to(body_ref, LEFT)
 
     if statement is not None:
-        blocks.append(Block("statement", statement, anim="fade", static=True))
-    for r, group, _eq in row_mobs:
-        blocks.append(Block(r["rid"], group, anim=r["anim"], static=False))
+        # `{show statement}` in `say` makes the motive line enter on that beat (slide in);
+        # with no marker it stays part of the opening frame, as before.
+        if reveals(spec, "statement"):
+            blocks.append(Block("statement", statement, anim="slide", static=False))
+        else:
+            blocks.append(Block("statement", statement, anim="fade", static=True))
+    for i, (r, group, eq) in enumerate(row_mobs):
+        # `anim: transform` morphs the row ABOVE into this one. The first row has nothing to
+        # morph from, so it keeps its stock reveal -- silently, since "transform the opening
+        # line" is a reasonable thing for an author to write and there is nothing to fix.
+        prev_eq = _eq_core(row_mobs[i - 1][2]) if i else None
+        this_eq = _eq_core(eq)
+        if r["anim"] == "transform" and prev_eq is not None and this_eq is not None:
+            blocks.append(Block(r["rid"], group,
+                                anim=_transform_anim(prev_eq, row_mobs[i - 1][1], this_eq),
+                                anim_seconds=TRANSFORM_SECONDS, static=False))
+        else:
+            anim = _DEFAULT_ANIM[r["kind"]] if r["anim"] == "transform" else r["anim"]
+            blocks.append(Block(r["rid"], group, anim=anim, static=False))
 
     blocks.append(motif_corner(ground))
     return blocks

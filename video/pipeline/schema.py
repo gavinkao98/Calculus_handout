@@ -40,6 +40,35 @@ def reveal_targets(say: str) -> list[str]:
     return [m.group(1).strip().replace("[", ".").replace("]", "") for m in _SHOW.finditer(say)]
 
 
+def _pause_issues(sid: str, scene: dict, say) -> "list[tuple[str, str]]":
+    """`pauses:` is an authored silent hold after a reveal (pipeline/pauses.py). Its
+    `after` must name a reveal this scene actually makes -- a typo'd one would otherwise
+    be a hold nobody ever sees, with no other symptom. Errors, not warnings: a pause that
+    points nowhere is always a mistake."""
+    if "pauses" not in scene:
+        return []
+    entries = scene.get("pauses")
+    if not isinstance(entries, list):
+        return [("error", f"{sid}.pauses: must be a list of {{after, seconds}}")]
+    revealed = set(reveal_targets(say) if isinstance(say, str) else [])
+    issues: list[tuple[str, str]] = []
+    for j, item in enumerate(entries):
+        where = f"{sid}.pauses[{j}]"
+        if not isinstance(item, dict):
+            issues.append(("error", f"{where}: not a mapping (expected {{after, seconds}})"))
+            continue
+        after = item.get("after")
+        seconds = item.get("seconds")
+        if not isinstance(after, str) or not after:
+            issues.append(("error", f"{where}.after: required non-empty reveal id"))
+        elif after not in revealed:
+            issues.append(("error", f"{where}.after {after!r}: `say` never does "
+                                    f"{{show {after}}} (revealed here: {sorted(revealed)})"))
+        if not isinstance(seconds, (int, float)) or isinstance(seconds, bool) or seconds <= 0:
+            issues.append(("error", f"{where}.seconds: required positive number"))
+    return issues
+
+
 def schema_storyboard(data) -> "list[tuple[str, str]]":
     """Return a list of (severity, message); severity is 'error' or 'warn'.
     'error' aborts the render (broken / unparseable structure); 'warn' is advisory."""
@@ -103,7 +132,12 @@ def schema_storyboard(data) -> "list[tuple[str, str]]":
                 for t in reveal_targets(say):
                     if not t:
                         issues.append(("warn", f"{sid}: empty {{show}} target (reveals nothing)"))
-        elif kind in ("intro", "outro"):
+            issues += _pause_issues(sid, scene, scene.get("say"))
+        elif "pauses" in scene:
+            issues.append(("error", f"{sid}: 'pauses' is a content-scene field "
+                                    f"(this scene is kind={kind!r})"))
+
+        if kind in ("intro", "outro"):
             say = scene.get("say")
             if isinstance(say, str) and say.strip():
                 issues.append(("warn",
