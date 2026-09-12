@@ -1,0 +1,70 @@
+# meta.color_map demo／驗證稿（非正式節，檔名底線前綴）
+#
+# 目的：驗證 deck 級變數色表 meta.color_map（SPEC-motion-language 規則 5、
+# KICKOFF-motion-language-gaps T1）——同一個 θ／h／sin 在推導列、graph 軸標、曲線標籤、
+# 純數學 annotation 全部同色。
+#   scene 1 derivation：\frac 引數內的 h 也要上色（manim 0.20 的 dvisvgm 分段可切 \frac 引數；
+#                        key 只對整個 token 配對，所以 h 不會切壞 \theta）。
+#   scene 2 graph：軸標 x 讀表；沒寫 color_role 的曲線從它的標籤取 role（$y=\sin x$ → sin 的色）。
+# 零行為改變：把 meta.color_map 拿掉就是舊路徑（單色 MathTex）。
+# 寫法注意：色表 key 是 token（"\\theta"、"h"、"\\sin"）；\frac 的引數請加大括號（\frac{h}{2}，
+# 不要 \frac h2——後者 LaTeX 會拒絕切片，該列退回單色並印一行 [color_map] warn）。
+# demo 專用，不屬任何正式節；驗證後留作模板範例。
+
+meta:
+  id: demo_color_map
+  chapter: "Demo"
+  chapter_title: "Template Validation"
+  section: "0.0"
+  title: "Color Map Demo"
+  language: en
+  theme: midnight
+  voice: Kore
+  video: { w: 1920, h: 1080, fps: 30 }
+  sections:
+    - { id: "0.0", title: "Color Map Demo" }
+  color_map:                 # 變數／幾何量 → palette role（theme.DARK 的 key）
+    "\\theta": concept
+    "h": caution
+    "\\sin": result
+    "x": practice
+
+scenes:
+
+  # 1 ---------------- derivation：θ、h、sin 各自一色，連 \frac 裡的 h 也是
+  - id: half_angle_chain
+    kind: content
+    template: derivation
+    accent: derivation
+    source: "合成例（取 §3.1 差商的半角改寫）"
+    title: "One Variable, One Colour"
+    say: |
+      The table names three things: theta, h, and sine.
+      {show step.0} The difference quotient for sine at theta.
+      {show step.1} Sum-to-product turns the numerator into a product.
+      {show result} And the half-angle ratio is what the limit will act on.
+    steps:
+      - { math: "\\frac{\\sin(\\theta+h)-\\sin\\theta}{h}", reason: "difference quotient" }
+      - { math: "= \\frac{2\\cos\\!\\left(\\theta+\\frac{h}{2}\\right)\\sin\\frac{h}{2}}{h}", reason: "sum-to-product" }
+    result: { math: "= \\cos\\!\\left(\\theta+\\frac{h}{2}\\right)\\cdot\\frac{\\sin(h/2)}{h/2}", reason: "regroup" }
+
+  # 2 ---------------- graph：軸標 x、曲線（從標籤取 sin 的 role）、純數學 annotation
+  - id: sine_curve
+    kind: content
+    template: graph
+    accent: derivation
+    source: "合成例"
+    title: "Same Colours on the Graph"
+    say: |
+      The axis label for x and the sine curve read the same table.
+      {show plot.0} The curve is drawn in sine's colour, taken from its label.
+      {show annotation.0} And a pure-math annotation colours its tokens too.
+    axes:
+      x_range: [-3.5, 3.5, 1]
+      y_range: [-1.4, 1.4, 0.5]
+      x_length: 8.0
+      y_length: 4.0
+    plots:
+      - { kind: function, expression: "sin(x)", x_range: [-3.3, 3.3], label: "$y=\\sin x$", reveal: true }
+    annotations:
+      - "$\\sin h \\approx h$"
