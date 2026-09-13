@@ -48,6 +48,7 @@ from manim import (
     Rectangle,
     ReplacementTransform,
     SurroundingRectangle,
+    Transform,
     TransformMatchingShapes,
     VGroup,
     ValueTracker,
@@ -2332,76 +2333,199 @@ def _play_stock(scene, anim, mob, ground) -> float:
 #      number line: x_0 fixed, x sliding into it, the bracket between them closing. The qed
 #      beat says "let x -> x_0: the half-angle goes to zero" -- now it happens on screen,
 #      paced to the beat, in the empty lower-right quadrant the proof column never uses.
+#
+# R2 rerun, 2026-09-14 (two more `must`s, user-approved). BOTH independent beginner lenses
+# lost the thread in this scene, and both lost it in the same two places:
+#
+#   A. proof.0 -- the COSINE sum-to-product identity had never been on screen. Scene 04
+#      spends 39.7 s deriving the SINE one; this scene opens by using its cosine twin as if
+#      it were known, and its provenance ("obtained the same way as the first one") does not
+#      arrive until scene 17, nine minutes later. A beginner stops here to ask where the row
+#      came from and misses the next two beats. So the beat now RECALLS scene 04's row --
+#      the same tex, set the same way, shrunk, dropped in from above the frame -- and morphs
+#      it IN PLACE into the cosine version, changed tokens only (規則 2): the half-sum and
+#      half-difference factors trade places, cos <-> sin, the sign flips, the rest glides.
+#      A `same u, v trick` tag hangs over the row while the two identities are on screen,
+#      which also answers the other lens's finding (scene 04's identity is re-written here
+#      as a brand-new line with no back-reference).
+#   B. proof.2 -- "Drop it to its largest size, one" is the move the whole scene turns on,
+#      and the factor being dropped was indistinguishable from the one that survives: the
+#      half-sum (x+x_0)/2 and the half-difference (x-x_0)/2 differ by one sign, in one
+#      colour, at one size. They now carry SEMANTIC COLOURS from the storyboard's
+#      `seg_roles` (規則 5) -- half-difference = accent amber, the colour the number line
+#      below already gives the half-gap; half-sum = strategy purple, the deck's angle-object
+#      axis, and the midpoint dot (which IS (x+x_0)/2) goes purple with it. And the drop is
+#      PLAYED rather than delivered finished: the boxed half-sum factors become 1 where they
+#      stand while `=` becomes `<=` and the difference picks up its absolute-value bars (so
+#      no frame ever carries a false equation -- the factor is BOUNDED by one, not equal to
+#      it), then what survives slides down and BECOMES the bound row. proof.2 never fades in
+#      as a new line. No `say` text and no {show ...} marker changed for either must.
+#
+# Segment indices below are the storyboard's `{{...}}` cuts, which `_selftest_continuity_
+# argument` re-derives from the deck so this file and the deck cannot drift apart.
+_CT_HALF_SUM_SEG = (2, 1)      # proof.0 / proof.1: the (x+x_0)/2 factor's segment
+_CT_HALF_DIFF_SEG = (1, 2)     # proof.0 / proof.1: the (x-x_0)/2 factor's segment
+# Scene 04's step.0, verbatim (storyboards/ch03_trig_derivatives.yml), cut into the same
+# three segments as the proof rows so the recall morphs part-for-part.
+_CT_RECALL_TEX = r"$ {{\sin A-\sin B = 2}} {{\cos\frac{A+B}{2}}} {{\,\sin\frac{A-B}{2}}} $"
+_CT_RECALL_ROLES = {r"\cos\frac{A+B}{2}": "strategy", r"\,\sin\frac{A-B}{2}": "accent"}
+# recall segment -> proof.0 segment: lhs to lhs, half-sum to half-sum, half-diff to half-diff
+_CT_RECALL_PAIRS = ((0, 0), (1, _CT_HALF_SUM_SEG[0]), (2, _CT_HALF_DIFF_SEG[0]))
+# proof.0 segment -> proof.1 segment: the two half-angle factors trade places. Explicit, not
+# TransformMatchingShapes: sin((x-x_0)/2) and sin((x+x_0)/2) are near-identical shapes, so a
+# shape match pairs them arbitrarily and the amber/purple coding scrambles mid-morph.
+_CT_FLIP_PAIRS = ((0, 0), (_CT_HALF_SUM_SEG[0], _CT_HALF_SUM_SEG[1]),
+                  (_CT_HALF_DIFF_SEG[0], _CT_HALF_DIFF_SEG[1]))
+# The "drop it to one" state of each row, segment-aligned with it: the half-sum factor's
+# segment becomes `. 1`, `=` becomes `<=`, and the difference gains its bars. Every one of
+# these is TRUE, which is why the substitution can be shown at all.
+_CT_BOUND_TEX = (
+    r"$ {{|\cos x-\cos x_0|\le 2}} {{\left|\sin\frac{x-x_0}{2}\right|}} {{\cdot 1}} $",
+    r"$ {{|\sin x-\sin x_0|\le 2}} {{\cdot 1}} {{\cdot\left|\sin\frac{x-x_0}{2}\right|}} $",
+)
+_CT_BOUND_ROLES = (
+    {r"\left|\sin\frac{x-x_0}{2}\right|": "accent", r"\cdot 1": "strategy"},
+    {r"\cdot 1": "strategy", r"\cdot\left|\sin\frac{x-x_0}{2}\right|": "accent"},
+)
+
+
 def continuity_template(spec, ctx, blocks):
     ground = ctx["ground"]
     ids = _by_id(blocks)
     row0 = ids["proof.0"].mobject
     qed_block = ids["qed"]
 
-    amber = T.color(ground, "accent")
+    amber = T.color(ground, "accent")       # the half-GAP (x-x_0)/2, in the rows and the line
+    violet = T.color(ground, "strategy")    # the half-SUM (x+x_0)/2, in the rows and the line
     mut = T.color(ground, "muted")
     ink = T.color(ground, "text")
+
+    # Everything the two rows' annotations share, filled at play time (the rows are still
+    # being positioned while hooks run) and read back by the later beats.
+    marks: dict = {}
+
+    def _segmented() -> bool:
+        return all(len(ids[f"proof.{i}"].mobject.submobjects) >= 3 for i in (0, 1))
+
+    # -- proof.0: recall scene 04's identity, then flip only the changed tokens ---
+    def _recall_and_flip(scene, mob, _ground) -> float:
+        """must A. The sine identity scene 04 derived comes back from above the frame,
+        shrunk, and turns into the cosine one where it lands -- so the row this whole proof
+        hangs on is no longer a line that fell out of the sky."""
+        if len(mob.submobjects) < 3:
+            return pacing.paced_write(scene, mob)    # un-segmented deck: stock behaviour
+        t0 = _elapsed(scene)
+        total = TM.beat_run_time(scene, 3.0)
+        recall = brand.math_line(_CT_RECALL_TEX, ground, role="text", size="label",
+                                 seg_roles=_CT_RECALL_ROLES)
+        recall.move_to(mob, aligned_edge=LEFT)
+        home = recall.get_center().copy()
+        recall.shift(UP * (T.FRAME_H / 2 + recall.height - home[1]))
+        tag = brand.prose(r"same $u,v$ trick", ground, role="muted", size="label")
+        tag.next_to(mob, UP, buff=0.34).align_to(mob, LEFT)
+        marks["tag"] = tag
+        scene.add(recall)
+        scene.play(recall.animate.move_to(home), run_time=0.9)
+        scene.play(FadeIn(tag), run_time=0.5)
+        # The narration over this beat reads the cosine identity aloud for 15 s, so the
+        # morph is given most of it: you watch A,B become x,x_0 and the two half-angle
+        # factors trade places while you hear the row being read.
+        morph = min(max((total - 1.4) * 0.8, 1.2), 9.0)
+        scene.play(*[Transform(recall.submobjects[i], mob.submobjects[j].copy())
+                     for i, j in _CT_RECALL_PAIRS], run_time=morph)
+        scene.remove(recall)                          # the morphed copy IS mob, pixel for pixel
+        scene.add(mob)
+        return _spent(scene, t0, 0.9 + 0.5 + morph)
+
+    ids["proof.0"].anim = _recall_and_flip
 
     # -- the second identity: the first one with the changed tokens flipped ------
     def _fill_second(scene, mob, _ground) -> float:
         total = TM.beat_run_time(scene, 1.6)
         t0 = _elapsed(scene)
+        run = min(max(total * 0.55, 1.2), 8.0)
         ghost = row0.copy()
         scene.add(ghost)
         # Let the morph actually UNFOLD. A 1.4 s cap left 15.2 s of frozen picture on a
         # 16.6 s beat -- the film's real worst dead zone, and mine. The narration over this
         # beat is reading the sine identity aloud, so a morph that takes most of the reading
         # is well matched: you watch cos turn into sin while you hear it.
-        scene.play(TransformMatchingShapes(ghost, mob),
-                   run_time=min(max(total * 0.55, 1.2), 8.0))
+        if _segmented():
+            scene.play(*[Transform(ghost.submobjects[i], mob.submobjects[j].copy())
+                         for i, j in _CT_FLIP_PAIRS], run_time=run)
+            scene.remove(ghost)
+        else:
+            scene.play(TransformMatchingShapes(ghost, mob), run_time=run)
         scene.add(mob)
         _mark_factors(scene)
-        return _spent(scene, t0, min(max(total * 0.55, 1.2), 8.0) + 1.6)
+        return _spent(scene, t0, run + 1.6)
 
     ids["proof.1"].anim = _fill_second
 
-    # -- proof.0 keeps its WRITE ------------------------------------------------
-    # The row was split into {{...}} segments so the box below has something to surround.
-    # `pacing.block_parts` reads two submobjects as "a block with parts to walk", which
-    # would turn "the row is written as it is read" into two fades -- so name the write.
-    ids["proof.0"].anim = lambda scene, mob, _g: pacing.paced_write(scene, mob)
-
     # -- the half-sum factor, marked (R2 round-18 must, ML3) ---------------------
-    # Segment 1 of each row IS the half-sum factor (see the storyboard's {{...}}). The beat
-    # says "in each, the half-sum factor never exceeds one in size" and nothing on screen
-    # said WHICH piece that was: box both, drop the rest of each row back, and hang one
-    # shared bound off the pair. Built at play time, not here, because the rows are still
-    # being positioned while hooks run.
-    #
-    # R2 asked for the boxed factors to "become 1" on the next beat. Not done, deliberately:
-    # replacing them in place would leave `cos x - cos x_0 = -2 sin(half-diff) . 1` on screen,
-    # which is false -- the factor is BOUNDED by one, not equal to it. The boxes instead
-    # leave as proof.2's genuine inequality row arrives, and the existing `focus.indicate`
-    # flashes both rows there, so the beat still points back at them.
-    marks: list = []
-
+    # The beat says "in each, the half-sum factor never exceeds one in size" and nothing on
+    # screen said WHICH piece that was: box both (in the half-sum's own purple, so the box
+    # names a colour the viewer has been reading since the row appeared), drop the rest of
+    # each row back, and hang one shared bound off the pair.
     def _mark_factors(scene) -> None:
         rows = [ids["proof.0"].mobject, ids["proof.1"].mobject]
-        if any(len(r.submobjects) < 2 for r in rows):
+        if not _segmented():
             return                                   # un-segmented: nothing to address
-        boxes = VGroup(*[SurroundingRectangle(r.submobjects[1], color=amber,
-                                              stroke_width=2.4, buff=0.09) for r in rows])
-        bound = brand.math_line(r"|\,\cdot\,|\le 1", ground, role="accent", size="label")
+        boxes = VGroup(*[SurroundingRectangle(r.submobjects[k], color=violet,
+                                              stroke_width=2.4, buff=0.09)
+                         for r, k in zip(rows, _CT_HALF_SUM_SEG)])
+        bound = brand.math_line(r"|\,\cdot\,|\le 1", ground, role="strategy", size="label")
         bound.next_to(boxes, RIGHT, buff=0.34)
-        rest = VGroup(*[s for r in rows for i, s in enumerate(r.submobjects) if i != 1])
-        # multiplicative fade in, snapshot/restore out -- focus.apply's contract, for the
-        # same reason: a flat opacity paints over anything deliberately transparent.
-        rest.save_state()
-        marks.extend((boxes, bound, rest))
+        rest = VGroup(*[s for r, k in zip(rows, _CT_HALF_SUM_SEG)
+                        for i, s in enumerate(r.submobjects) if i != k])
+        group = VGroup(*rows)
+        # The TRUE identities at full brightness: proof.2 borrows the rows for the
+        # substitution and hands them back to this state (snapshot/restore, focus.apply's
+        # contract -- a flat opacity paints over anything deliberately transparent).
+        group.save_state()
+        marks.update(boxes=boxes, bound=bound, rows=group)
+        # multiplicative fade: it scales each family member's own opacity, so it cannot
+        # make an invisible part visible on the way back.
         scene.play(*[Create(b) for b in boxes],
                    rest.animate.fade(0.55), run_time=1.1)
         scene.play(FadeIn(bound), run_time=0.5)
 
-    def _release_factors(scene) -> None:
-        if not marks:
-            return
-        boxes, bound, rest = marks
-        scene.play(FadeOut(boxes), FadeOut(bound), rest.animate.restore(), run_time=0.6)
+    def _drop_to_one(scene, mob) -> float:
+        """must B. The boxed half-sum factors become 1 WHERE THEY STAND, and what survives
+        slides down and becomes the bound row -- `mob` (proof.2) is built out of the two
+        identities instead of fading in underneath them.
+
+        The substitution runs on copies laid pixel-for-pixel over the rows, which are
+        blanked for the duration and restored as the copies leave: the rows keep saying
+        what they say, and the intermediate the copies pass through
+        (`|cos x - cos x_0| <= 2|sin((x-x_0)/2)| . 1`) is true in every frame."""
+        total = TM.beat_run_time(scene, 2.6)
+        rows = marks["rows"]
+        boxes = marks["boxes"]
+        bounds = [brand.math_line(tex, ground, role="text", size="step", seg_roles=roles)
+                  for tex, roles in zip(_CT_BOUND_TEX, _CT_BOUND_ROLES)]
+        for b, r in zip(bounds, rows.submobjects):
+            b.move_to(r, aligned_edge=LEFT)
+        ghosts = [r.copy() for r in rows.submobjects]
+        for g in ghosts:
+            scene.add(g)
+        rows.set_opacity(0)                  # covered pixel-for-pixel by the ghosts
+        drop = min(max(total * 0.30, 0.9), 3.2)
+        swaps = [Transform(g.submobjects[i], bounds[gi].submobjects[i].copy())
+                 for gi, g in enumerate(ghosts) for i in range(3)]
+        swaps += [Transform(boxes.submobjects[gi],
+                            SurroundingRectangle(bounds[gi].submobjects[_CT_HALF_SUM_SEG[gi]],
+                                                 color=violet, stroke_width=2.4, buff=0.09))
+                  for gi in range(len(ghosts))]
+        scene.play(*swaps, run_time=drop)
+        slide = min(max(total * 0.36, 1.0), 3.6)
+        leaving = [FadeOut(boxes), FadeOut(marks["bound"])]
+        if marks.get("tag") is not None:
+            leaving.append(FadeOut(marks["tag"], shift=0.2 * UP, scale=0.7))
+        scene.play(TransformMatchingShapes(VGroup(*ghosts), mob), *leaving,
+                   rows.animate.restore(), run_time=slide)
+        scene.add(mob)
+        return drop + slide
 
     # -- the half-gap number line (lower right; the proof column keeps the left) --
     HALF_W = 2.15                       # half the line's length
@@ -2422,7 +2546,10 @@ def continuity_template(spec, ctx, blocks):
         return Dot(_x_pt(), radius=0.075, color=amber)
 
     def _dot_mid():
-        return Dot(_mid_pt(), radius=0.06, color=ink)
+        # The midpoint of x_0 and x IS (x+x_0)/2 -- the half-SUM. It wears the half-sum's
+        # purple so the factor the rows drop and the dot on the line read as one quantity
+        # (規則 5); the bracket beside it, the half-DIFFERENCE, stays amber like its factor.
+        return Dot(_mid_pt(), radius=0.06, color=violet)
 
     def _bracket():
         """The half-gap itself: midpoint -> x, the argument of every sine in the bound."""
@@ -2488,11 +2615,15 @@ def continuity_template(spec, ctx, blocks):
 
     def _show_half(scene, mob, _ground) -> float:
         t0 = _elapsed(scene)
-        _release_factors(scene)
-        stock = _play_stock(scene, stock_p2, mob, _ground)
+        # must B: the bound row is BUILT from the two identities (the half-sum factors drop
+        # to 1 in place, the survivors slide down here) rather than fading in on its own.
+        # Without the storyboard's segments there is nothing to box or drop -- fall back to
+        # the stock reveal, exactly as before.
+        spent = (_drop_to_one(scene, mob) if "rows" in marks
+                 else _play_stock(scene, stock_p2, mob, _ground))
         scene.add(half_group)
         scene.play(FadeIn(lab_half), run_time=0.45)
-        return _spent(scene, t0, stock + 1.05)
+        return _spent(scene, t0, spent + 0.45)
 
     p2_block.anim = _show_half
 
