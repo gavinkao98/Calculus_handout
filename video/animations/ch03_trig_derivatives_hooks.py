@@ -1397,8 +1397,12 @@ def continuity_template(spec, ctx, blocks):
         t0 = _elapsed(scene)
         ghost = row0.copy()
         scene.add(ghost)
+        # Let the morph actually UNFOLD. A 1.4 s cap left 15.2 s of frozen picture on a
+        # 16.6 s beat -- the film's real worst dead zone, and mine. The narration over this
+        # beat is reading the sine identity aloud, so a morph that takes most of the reading
+        # is well matched: you watch cos turn into sin while you hear it.
         scene.play(TransformMatchingShapes(ghost, mob),
-                   run_time=min(max(total * 0.30, 0.7), 1.4))
+                   run_time=min(max(total * 0.55, 1.2), 8.0))
         scene.add(mob)
         return _elapsed(scene) - t0
 
@@ -1438,14 +1442,57 @@ def continuity_template(spec, ctx, blocks):
         return brand.math_line("x", ground, role="text", size="label").next_to(
             _x_pt(), UP, buff=0.16)
 
+
     dot_x0 = Dot(x0_pt, radius=0.075, color=ink)
     lab_x0 = brand.math_line("x_0", ground, role="text", size="label").next_to(
         x0_pt, UP, buff=0.16)
     lab_half = brand.math_line(r"\tfrac{x-x_0}{2}", ground, role="accent", size="label")
     lab_half.next_to(CENTRE + 0.30 * DOWN, DOWN, buff=0.22)
-    halfgap = VGroup(axis, dot_x0, lab_x0, lab_half,
-                     always_redraw(_dot_x), always_redraw(_dot_mid),
-                     always_redraw(_bracket), always_redraw(_x_label))
+    # Two stages, because the narration introduces them two beats apart: the LINE (x_0, x,
+    # and x moving) belongs to the statement beat, the HALF-gap (midpoint, bracket, the
+    # (x-x_0)/2 label) to proof.2, where the bound first names it.
+    line_group = VGroup(axis, dot_x0, lab_x0,
+                        always_redraw(_dot_x), always_redraw(_x_label))
+    half_group = VGroup(lab_half, always_redraw(_dot_mid), always_redraw(_bracket))
+
+    # -- statement: draw the line, then let x ASK the question ------------------
+    # 25 s of narration over one card was the last scene above the 12 s line. This beat
+    # says "fix a point x_0, and ask how much they can change as x moves toward it" --
+    # so x probes toward x_0 and back, twice, across whatever the beat has left. It
+    # returns to where it started, so proof.2 and qed still open on a full gap.
+    stmt_block = ids["statement"]
+    stock_stmt = stmt_block.anim
+
+    def _pose_question(scene, mob, _ground) -> float:
+        t0 = _elapsed(scene)
+        _play_stock(scene, stock_stmt, mob, _ground)
+        scene.play(Create(axis), FadeIn(dot_x0), FadeIn(lab_x0), run_time=0.7)
+        scene.add(line_group)
+        used = _elapsed(scene) - t0
+        left = TM.beat_run_time(scene, used + 1.2) - used - 0.4
+        # One brisk probe, not a slow drift: x slides most of the way in and back so
+        # "as x moves toward it" is something you see, then the line rests as a scaffold
+        # until proof.2 adds the half-gap and qed closes it. (A drift spread over the
+        # whole beat moved the dot ~0.2 u/s -- under a pixel per frame, and unreadable.)
+        if left >= 3.0:
+            scene.play(gap.animate.set_value(0.15), run_time=min(left * 0.45, 3.0),
+                       rate_func=there_and_back)
+        return _elapsed(scene) - t0
+
+    stmt_block.anim = _pose_question
+
+    # -- proof.2: the bound names the half-angle, so the half-gap arrives here ---
+    p2_block = ids["proof.2"]
+    stock_p2 = p2_block.anim
+
+    def _show_half(scene, mob, _ground) -> float:
+        t0 = _elapsed(scene)
+        _play_stock(scene, stock_p2, mob, _ground)
+        scene.add(half_group)
+        scene.play(FadeIn(lab_half), run_time=0.45)
+        return _elapsed(scene) - t0
+
+    p2_block.anim = _show_half
 
     # -- qed: the payoff beat draws the gap and then closes it ------------------
     # The figure is revealed from INSIDE this reveal rather than by a {show halfgap}
@@ -1459,14 +1506,11 @@ def continuity_template(spec, ctx, blocks):
     stock_qed = qed_block.anim
 
     def _close_gap(scene, mob, _ground) -> float:
-        """Reveal the qed line, draw the number line, then walk x into x_0 across whatever
-        is left of the beat -- the narration's own 'let x -> x_0' happening rather than
-        being asserted."""
+        """Reveal the qed line, then walk x into x_0 across whatever is left of the beat --
+        the narration's own 'let x -> x_0' happening rather than being asserted. The line
+        and the half-gap are already on screen (statement / proof.2)."""
         t0 = _elapsed(scene)
         _play_stock(scene, stock_qed, mob, _ground)
-        scene.play(Create(axis), FadeIn(dot_x0), FadeIn(lab_x0), run_time=0.6)
-        scene.add(halfgap)
-        scene.play(FadeIn(lab_half), run_time=0.35)
         # whatever the beat has left, never more: a floor here would run the scene
         # past its own narration and trip the [sync] render/audio length gate.
         used = _elapsed(scene) - t0
