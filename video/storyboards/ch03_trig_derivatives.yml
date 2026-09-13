@@ -339,11 +339,11 @@ scenes:
     part: { current: 2, total: 2 }
     ref: md:continuity_argument
     covers: [cos_identity, sin_identity, bound, qed]     # proof.0/1/2 + qed (all shown)
-    # 三拍都不走 paced：proof.1 與 qed 的 reveal 都被 hook 換成 callable（pacing 只升級 stock
-    # reveal），各自有自己的填滿方式——proof.1 是由 proof.0 變形過去，qed 是「寫完最後一列
-    # ＋畫數線＋把 x 走進 x₀」，那段步行本身就把拍子的剩餘時間吃掉；proof.0 為了讓 hook 框得到
-    # 半和因子而分了段，block_parts 會把「兩個 submobject」讀成「有段可走」而改走兩次 fade，
-    # 所以由 hook 直接指名 pacing.paced_write——這一列仍然是「隨旁白書寫」，行為不變。
+    # 四拍都不走 paced：四個 reveal 都被 hook 換成 callable（pacing 只升級 stock reveal），
+    # 各自有自己的填滿方式——proof.0 是「把場 04 的和差化積叫回來、原地翻成 cos 版」，proof.1 是
+    # 由 proof.0 變形過去，proof.2 是「半和因子就地變成 1、存活的滑下來變成界」，qed 是「寫完
+    # 最後一列＋畫數線＋把 x 走進 x₀」。三列都分了段（`{{…}}`），block_parts 會把多個 submobject
+    # 讀成「有段可走」而改走逐段 fade，所以一律由 hook 指名動作，不進 `paced:`。
     # 規則 3：proof.2「Drop it to its largest size, one」講的是上面兩列的半和因子，閃兩列。
     focus:
       - { at: proof.2, dim: [], indicate: [proof.0, proof.1] }
@@ -352,6 +352,14 @@ scenes:
     # 模板填兩次，cos 翻成 sin、前面的負號離開、兩個半角因子交換位置，其餘滑動（規則 2，螢幕文字
     # 一字未改，所以 proof.1 退出 paced）；(2) 右下角空白處補一條數線：x_0 不動、x 滑進去、
     # 中點與半距括號跟著收——qed 那拍旁白說的「let x→x_0，半角趨近 0」變成看得到的事。
+    # R2 重跑的第二批 must（2026-09-14 使用者核准，兩份初學者鏡都在這一場跟丟）：
+    # (A) proof.0 的 **cos 版**和差化積全片第一次出現卻被當已知（sin 版在場 04 推了 39.7 秒、
+    #     cos 版的出處要到場 17 才補一句）——hook 把場 04 那一列縮小、從畫面上方叫回來，落在
+    #     proof.0 的位置後原地只動變的 token 翻成 cos 版，旁邊掛 `same u, v trick` 小標籤；
+    # (B) proof.2 的關鍵動作「把半和因式放大成 1」看不出是哪個因式——半和／半差改用語意色分開
+    #     （見下方 proof 的 seg_roles），並在該拍讓被框的半和因式**就地變成 1**（同時 `=` 變 `≤`、
+    #     左邊加絕對值，所以每一幀都成立），存活的 `2|sin((x−x₀)/2)|` 滑下來**變成** proof.2 那一列
+    #     （不是另外淡入一行）。兩條都沒有動 `say` 與 `{show …}`，零 TTS。
     hook: animations.ch03_trig_derivatives_hooks:continuity_template
     scaffold: { motive: "Turn $\\sin\\theta\\to 0$ into full continuity, everywhere." }
     source: "chapter3-print-standalone.html SS3.1 . Proposition 3.1 . Proof (sum-to-product bound + squeeze)"
@@ -375,9 +383,27 @@ scenes:
       # {{…}} 分段：把「半和因子」切成自己的 submobject，hook 才框得到它（R2 must ML3）。
       # 每個 {{ 前面都要留一個空白——manim 只在字串開頭或空白後才認分段起點，texparts 照抄；
       # 寫成 }}{{ 會被靜靜併回一段並改變排版。量過：有空白時兩列寬度到小數 4 位完全不變。
-      - "$ {{\\cos x-\\cos x_0=-2\\sin\\frac{x-x_0}{2}\\,}} {{\\sin\\frac{x+x_0}{2}}} $"
-      - "$ {{\\sin x-\\sin x_0=\\phantom{-}2}} {{\\cos\\frac{x+x_0}{2}}} {{\\,\\sin\\frac{x-x_0}{2}}} $"
-      - "$|\\cos x-\\cos x_0|,\\ |\\sin x-\\sin x_0|\\le 2|\\sin\\frac{x-x_0}{2}|$"
+      #
+      # R2 盲審重跑 must B（2026-09-13 使用者核准）：「半和 (x+x₀)/2 與半差 (x−x₀)/2 只差一個
+      # 加減號、同色同字級，初學者分不出旁白說的 the half-sum factor 是哪一個」。三列各切段、用
+      # seg_roles 上**語意色**（規則 5「同一個量在圖與式裡同一色」）：
+      #   半差 (x−x₀)/2 → accent 琥珀：hook 數線上的半距括號與 \tfrac{x-x_0}{2} 標籤本來就是琥珀，
+      #     而且兩列的半差因子都是 sin，正好對上本片「琥珀＝sin」那條軸；bound 列的存活因子同色。
+      #   半和 (x+x₀)/2 → strategy 紫：它在列 0 是 sin、在列 1 是 cos，函數色（琥珀/藍）在這條軸上
+      #     說不通，所以借「角度物件＝紫」（\theta 已是 strategy）這條既有軸；數線的中點圓點
+      #     （就是 (x+x₀)/2 的位置）同步改紫，圖與式一組色。不發明新色。
+      # 列 0 比原來多切一刀（半差從左段獨立出來）；`\,` 併進半和段（零寬，幾何不變）。
+      - tex: "$ {{\\cos x-\\cos x_0=-2}} {{\\sin\\frac{x-x_0}{2}}} {{\\,\\sin\\frac{x+x_0}{2}}} $"
+        seg_roles:
+          "\\sin\\frac{x-x_0}{2}": accent
+          "\\,\\sin\\frac{x+x_0}{2}": strategy
+      - tex: "$ {{\\sin x-\\sin x_0=\\phantom{-}2}} {{\\cos\\frac{x+x_0}{2}}} {{\\,\\sin\\frac{x-x_0}{2}}} $"
+        seg_roles:
+          "\\cos\\frac{x+x_0}{2}": strategy
+          "\\,\\sin\\frac{x-x_0}{2}": accent
+      - tex: "$ {{|\\cos x-\\cos x_0|,\\ |\\sin x-\\sin x_0|\\le}} {{2|\\sin\\frac{x-x_0}{2}|}} $"
+        seg_roles:
+          "2|\\sin\\frac{x-x_0}{2}|": accent
     qed: "$x\\to x_0\\ \\Rightarrow\\ \\cos x\\to\\cos x_0,\\ \\sin x\\to\\sin x_0$"
 
   # 9 --------------------------- Proposition 3.2 + Proof: the fundamental limit = 1 (L2)
@@ -542,6 +568,11 @@ scenes:
     kind: content
     template: derivation
     accent: example
+    # 里程碑六鏡審（2026-09-13）：開場拍 8.5 s 畫面零變化，且旁白念的就是標頭已寫好的字。
+    # 該拍的 reveal 是 None（`{show scaffold.motive}` 才是本場第一個標記），reveal 驅動的原語
+    # 都搆不到它，故由 hook 以 time-based updater 逐段寫出 statement（同 SHM spring 的手法）。
+    hook: animations.ch03_trig_derivatives_hooks:companion_limit_opening
+    statement: '$ {{(1-\cos\theta)/\theta}} {{\;\longrightarrow\;}} {{0\quad(\theta \to 0)}} $'
     ref: md:companion_limit
     covers: [conjugate, split, evaluate]     # step.0/1 + result (all shown)
     # 規則 2＋4：step.1 從 step.0 變形（1−cos² → sin²，先框住上一列）、result 從 step.1 變形（各因子走到極限）；

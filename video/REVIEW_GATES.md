@@ -183,6 +183,13 @@
 且每次都長在那一輪新改的東西上，advisory 卻是 6＋2 → 9 → 8 → **10**，修完又長回來。片子越好，評審的標準跟著抬高；
 **每輪跑生成式盲審＝每輪製造工作。**
 
+**鏡頭產出驗收（lens QA；2026-09-13 §3.1 里程碑審實跑補）：** 收到每一鏡的輸出後，**進合成之前**先驗四件事——
+① `lens` 欄與派出去的鏡一致；② `findings[].dim` 的維度代碼屬於該鏡（R1＝`L-`／R2＝`D-`／R3＝`A-`／R4＝`T-`／R5＝`I-`）；
+③ `scenes[].id` 是場 id 字串（不是場號）且 27 場齊全；④ 抽驗一條 finding 的數字對得上 pack。
+**任一不符＝該鏡作廢重派，不要把錯鏡的 finding 併進 digest**（外部模型重跑要重新徵同意）。
+依據：該次三個 agy 鏡有**兩個審了不是自己的鏡頭**（R3 輸出 `L-` 維度、R1a 輸出 `T-` 維度），
+根因是工作區佈局而非模型，見 [REWATCH-REVIEW-RUBRIC.md](content_scripts/_audit/REWATCH-REVIEW-RUBRIC.md)「編排」的 agy 隔離條。
+
 **新 finding 上限（G2 假設，2026-09-13 設定）：** 輪內新 must **超過 3 條**，就當成**排序問題**——
 **退回內容階段**（§二 第 7 條的內容鎖），不要繼續拋光。依據：⑲ 的五條 must 全是 Task D 拉長旁白後的畫面缺口，
 剔除後趨勢是 2 → 2 → 1，本來就是收斂的。
@@ -208,6 +215,12 @@
 - [ ] TTS 依 [RUNBOOK-mimo-narration-route.md](RUNBOOK-mimo-narration-route.md)：`--reuse-existing`／`--no-billing`／`--skip-qa` 的適用範圍
       （reuse key 不含場號——**已做**）
 - [ ] **兩道硬閘在**：`[sync]`（§一 層 6）與 `[still-gate]`（§一 層 7），render 後必跑
+
+> **在 worktree 裡跑第一項要注意（2026-09-13 實跑）：** `tools/doctor.py --smoke` 的 deck 閘走 `<repo>/.venv`，
+> 而 `<repo>` 是**當前工作樹**——worktree 沒有 `.venv`，那一段會直接 `[info] 略過`，**打勾等於沒跑**。
+> 在 worktree 裡改成對該 deck 手動跑四道離線閘（等價物）：
+> `python video/pipeline/schema.py <sb>`、`lint.py <sb>`、`sizecheck.py <sb>`、`derive_spoken.py --deck <deck> --check`。
+> `run_selftests.py` 不受影響（不吃 `.venv`）。
 
 ### 6.5 契約進測試（G6）
 

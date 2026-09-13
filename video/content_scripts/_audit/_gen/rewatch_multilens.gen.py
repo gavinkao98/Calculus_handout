@@ -108,15 +108,17 @@ def render(digest: dict, pack_dir: Path, embed: bool) -> str:
     scenes = digest["scenes"]
     film = digest.get("film", {})
     runs = list(lenses.keys())
+    title = digest.get("title", "§3.1 成片 看片多鏡評審")
+    film_note = digest.get("film_note", "，2026-07-05 Dean 成片")
     out: list[str] = []
     out.append(f"""<!DOCTYPE html><html lang="zh-Hant"><head><meta charset="utf-8">
-<meta name="viewport" content="width=device-width, initial-scale=1"><title>§3.1 成片 看片多鏡評審</title>
+<meta name="viewport" content="width=device-width, initial-scale=1"><title>{esc(title)}</title>
 <script>window.MathJax={{tex:{{inlineMath:[['$','$']],displayMath:[['$$','$$']]}},svg:{{fontCache:'global'}}}};</script>
 <script src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-svg.js" async></script>
 <style>{CSS}</style></head><body><div class="wrap">
-<header class="top"><div class="eyebrow">video · rewatch multi-lens review · advisory</div>
-<h1>§3.1 成片 看片多鏡評審</h1>
-<div class="sub">被審物：<code>{esc(Path(digest['film_path']).name)}</code>（{fmt(digest['total_seconds'])}，{len(scenes)} 場，2026-07-05 Dean 成片）。五鏡六份獨立盲審，orchestrator 逐條核實後合成。契約：<code>{esc(digest['rubric'])}</code>。</div>
+<header class="top"><div class="eyebrow">{esc(digest.get('eyebrow', 'video · rewatch multi-lens review · advisory'))}</div>
+<h1>{esc(title)}</h1>
+<div class="sub">被審物：<code>{esc(Path(digest['film_path']).name)}</code>（{fmt(digest['total_seconds'])}，{len(scenes)} 場{esc(film_note)}）。五鏡六份獨立盲審，orchestrator 逐條核實後合成。契約：<code>{esc(digest['rubric'])}</code>。</div>
 <div class="meta"><span>日期：{esc(digest['date'])}</span><span>鏡頭：{'、'.join(f"{r}={lenses[r]['model']}" for r in runs)}</span><span>合成：Fable 5.1（refute-by-default）</span></div>
 <div class="tldr"><p><b>一句話：</b>{esc(film.get('overall', ''))}</p>
 <p><b>全片共同模式（多鏡同指）：</b></p><ul>{''.join(f'<li>{esc(p)}</li>' for p in film.get('patterns', []))}</ul>
@@ -196,9 +198,10 @@ def main() -> int:
     ap.add_argument("--digest", type=Path, default=HERE / "rewatch_multilens.digest.json")
     ap.add_argument("--out", type=Path, default=HERE.parent / "REVIEW-ch03_s31-rewatch-multilens.html")
     ap.add_argument("--no-embed", action="store_true", help="link sheets instead of embedding base64")
+    ap.add_argument("--pack", type=Path, default=None, help="pack dir the digest was built from (default: <film dir>/rewatch_pack)")
     args = ap.parse_args()
     digest = json.loads(args.digest.read_text(encoding="utf-8"))
-    pack_dir = Path(digest["film_path"]).parent / "rewatch_pack"
+    pack_dir = args.pack or Path(digest["film_path"]).parent / "rewatch_pack"
     args.out.write_text(render(digest, pack_dir, embed=not args.no_embed), encoding="utf-8")
     print(f"wrote {args.out} ({args.out.stat().st_size // 1024} KB)")
     return 0

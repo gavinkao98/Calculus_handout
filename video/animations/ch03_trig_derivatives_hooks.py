@@ -48,6 +48,7 @@ from manim import (
     Rectangle,
     ReplacementTransform,
     SurroundingRectangle,
+    Transform,
     TransformMatchingShapes,
     VGroup,
     ValueTracker,
@@ -63,6 +64,7 @@ from pipeline import focus
 from pipeline import pacing
 from pipeline import timing as TM
 from pipeline.blocks import Block, play_block
+from pipeline.narration import estimate_seconds, list_reveal_targets, parse_say
 from pipeline.visuals import theme as T
 
 PI = np.pi
@@ -87,19 +89,13 @@ def _centre_in_zone(title_mob, group, *, bottom_pad: float = 0.45) -> None:
     group.move_to([0, (zone_top + zone_bottom) / 2, 0])
 
 
-# Both report the renderer's clock (see `_spent`), not a constant. They used to claim
-# 0.65 / 0.75 s for a 0.55 / 0.65 s play -- 0.10 s of OVER-report each, the opposite sign
-# to the frame-quantisation loss, which the beat's hold then had to give back: measured on
-# slope_equals_height (three _draw plus one _fade) the scene ran 0.41 s SHORT of its
-# narration. Nothing in the history or the comments makes that 0.10 s deliberate, so it is
-# read as a slip, not padding.
-def _fade(scene, mob, g):
-    t0 = _elapsed(scene)
-    scene.play(FadeIn(mob), run_time=0.55)
-    scene.add(mob)
-    return _spent(scene, t0, 0.55)
-
-
+# Reports the renderer's clock (see `_spent`), not a constant. It used to claim 0.75 s for a
+# 0.65 s play -- 0.10 s of OVER-report, the opposite sign to the frame-quantisation loss,
+# which the beat's hold then had to give back: measured on slope_equals_height (three _draw
+# plus a fade) the scene ran 0.41 s SHORT of its narration. Nothing in the history or the
+# comments makes that 0.10 s deliberate, so it is read as a slip, not padding.
+# (Its twin `_fade` had the same fix and the same wording; it lost its last caller when
+# slope_equals_height's `cos_dots` became the three-pairing choreography below.)
 def _draw(scene, mob, g):
     t0 = _elapsed(scene)
     scene.play(Create(mob), run_time=0.65)
@@ -288,7 +284,14 @@ def sector_inequality(spec, ctx, blocks):
         lab = brand.math_line(lab_tex, ground, role=role, size="label")
         lab.next_to(whole, DOWN, buff=0.28)
         badge = _badge(n, o[0] + R / 2, badge_col)   # centred over the slot, equal height
-        return VGroup(shape, *nested, lab, badge)
+        g = VGroup(shape, *nested, lab, badge)
+        # `_peel` used to read these back BY POSITION (mob[0], mob[1:-2], mob[-2], mob[-1]).
+        # Glyph ② now carries a derivation line as well (see `sector_area` below), and a
+        # block's mobject is also what `exit:` fades and `focus:` dims -- so the line has
+        # to be IN the group, and the group can no longer be indexed from its ends. The
+        # parts are named here instead of counted there; nothing else changes.
+        g._peel_parts = (shape, list(nested), lab, badge)
+        return g
 
     dst1 = _slot(O1, _tri(O1, B_off, amber, MAIN_FOP, 3),
                  r"\tfrac12\sin\theta", "accent", 1, amber)
@@ -298,6 +301,27 @@ def sector_inequality(spec, ctx, blocks):
     dst3 = _slot(O3, _tri(O3, C_off, green, MAIN_FOP, 1),
                  r"\tfrac12\tan\theta", "success", 3, green,
                  nested=[_sec(O3, strategy, MAIN_FOP, 2), _tri(O3, B_off, amber, MAIN_FOP, 3)])
+
+    # -- glyph ②: the one area that has to be COMPUTED (six-lens must, beat 5) ---
+    # `1/2 theta` hung under the peeled sector as a finished label and the step the
+    # narration actually speaks -- "the fraction theta over two pi of the disc" -- was
+    # nowhere on screen. Of the three areas it is the only one that is not read straight
+    # off a base and a height, and it is the ONE place in the film where the radian
+    # convention is load-bearing: the sector is 1/2 theta only because theta is measured
+    # in radians, which is what scene 13's "radians are structural" later leans on. Left
+    # in the audio it becomes a formula to memorise. Written in two stages inside the
+    # same beat (see `_peel`'s `derive`): the fraction of the disc, then its value.
+    # It goes INTO dst2 so the scene's `exit:` fade and the `focus:` dims carry it with
+    # the glyph it belongs to; `_slot` names its parts so the extra member is harmless.
+    sector_area = brand.math_line(
+        r"{{\left(\tfrac{\theta}{2\pi}\right)\cdot\pi\cdot 1^{2}}} {{=}} {{\tfrac12\theta}}",
+        ground, role="text", size="label",
+        seg_roles={r"\tfrac12\theta": "strategy"})
+    sector_area.next_to(dst2, DOWN, buff=0.22)
+    dst2.add(sector_area)
+    # stage 1 = the fraction of the disc, stage 2 = "= 1/2 theta" (the `=` rides with the
+    # value it introduces rather than arriving on a step of its own).
+    sector_stages = (sector_area[0], VGroup(*sector_area[1:]))
 
     # the three terms in the three regions' colours (SPEC rule 5 "same quantity, same
     # colour"; rollout T2-2; 2026-09-13 colour-axis unification, second call: sin=accent/amber,
@@ -313,8 +337,44 @@ def sector_inequality(spec, ctx, blocks):
     row = VGroup(dst1, dst2, dst3)
     ineq.next_to(row, DOWN, buff=0.55)
 
+    # -- the two regions the `ineq` beat NAMES but never pointed at (must A) ------
+    # That beat says "you can see exactly what each one adds: the corner piece A B C is
+    # what the outer triangle adds to the inner one, and inside it sits the sliver between
+    # the chord A B and the arc" -- and then holds a frozen picture for 8.2 s (the longest
+    # still in the film at the 0.05% threshold; the paced walk's two `\le` glyphs are too
+    # small to register as motion, so its five steps read as three, 8 s apart). Both named
+    # regions are small and neither reacts, so a first-time viewer has nowhere to look.
+    # SPEC-motion-language rule 3: trace the boundary, brighten the region, drop the rest
+    # of the figure -- never a camera move.
+    #
+    # The corner piece IS triangle A B C: B lies on OC, so OAC = OAB + ABC. The sliver is
+    # the circular segment between chord AB and the arc (sector minus OAB), which really
+    # does sit inside it -- the narration's claim is a fact about these two shapes.
+    # Both are SUBSETS of regions already in `full`, so putting them in it cannot move the
+    # layout (their points are interior to src_outer / src_sector); they ride along with
+    # _centre_in_zone instead of being rebuilt off the stale pre-centring coordinates,
+    # the same trap the evenness aside works around with `scaffold.get_center()`.
+    def _annot(shape, col):
+        """(outline, wash) for one region: its own boundary in its own colour, drawn by
+        `Create` so the stroke TRAVELS it, over a light wash that lifts the fill."""
+        shape.set_stroke(color=col, width=6.0, opacity=1.0).set_fill(opacity=0.0)
+        shape.set_z_index(12)
+        wash = shape.copy().set_stroke(width=0.0).set_fill(color=text, opacity=0.22)
+        wash.set_z_index(11)
+        return shape, wash
+
+    arc_AB = Arc(radius=R, start_angle=0.0, angle=th, arc_center=O)
+    arc_AB.add_line_to(A)                            # ...and back along the chord B->A
+    corner_edge, corner_wash = _annot(Polygon(A, B, C), green)
+    sliver_edge, sliver_wash = _annot(arc_AB, strategy)
+    annot = VGroup(corner_wash, corner_edge, sliver_wash, sliver_edge)
+    # what the sliver's moment drops to ANNOT_DIM: the construction and its three fills,
+    # i.e. everything of the main figure except the two lit outlines, which are not in it.
+    main_figure = VGroup(scaffold, src_inner, src_sector, src_outer,
+                         chip_inner, chip_sector, chip_outer)
+
     full = VGroup(scaffold, src_inner, src_sector, src_outer,
-                  chip_inner, chip_sector, chip_outer, dst1, dst2, dst3, ineq)
+                  chip_inner, chip_sector, chip_outer, dst1, dst2, dst3, ineq, annot)
     _centre_in_zone(title, full)
 
     # legibility pads under the three dimension labels that land on the 0.88-opaque fills
@@ -451,13 +511,13 @@ def sector_inequality(spec, ctx, blocks):
         scene.play(FadeOut(mob), backdrop.animate.restore(), run_time=OUT_SECONDS)
         return _spent(scene, t0, total)
 
-    def _peel(src, chip):
+    def _peel(src, chip, derive=()):
         def anim(scene, mob, ground):
-            # [shape, *nested, label, badge] -- `nested` is the smaller regions this glyph
-            # contains (empty for glyph ①); they arrive with the label, so the flown copy
-            # is still the one region this beat is about.
-            shape, label, badge = mob[0], mob[-2], mob[-1]
-            nested = list(mob[1:-2])
+            # `nested` is the smaller regions this glyph contains (empty for glyph ①);
+            # they arrive with the label, so the flown copy is still the one region this
+            # beat is about. Named by `_slot`, not indexed off the group's ends -- glyph ②
+            # carries a derivation line too (must B).
+            shape, nested, label, badge = mob._peel_parts
             t0 = _elapsed(scene)
             scene.play(FadeIn(src), run_time=0.4)            # region appears on the left
             scene.add(src)
@@ -469,7 +529,14 @@ def sector_inequality(spec, ctx, blocks):
             # figure's own ①②③ chip appears, tying the two halves together.
             scene.play(FadeIn(label, shift=0.08 * UP), FadeIn(badge), FadeIn(chip),
                        *[FadeIn(m) for m in nested], run_time=0.32)
-            return _spent(scene, t0, 1.52)
+            spent = 1.52
+            # glyph ②'s area derivation walks whatever is left of the beat (primitive 7),
+            # so its two stages arrive with the two halves of the sentence instead of
+            # landing together inside the peel's first 1.5 s of a 6.3 s beat.
+            if derive:
+                total = TM.beat_run_time(scene, spent + pacing.FADE_SECONDS * len(derive))
+                spent += pacing.walk(scene, list(derive), max(total - spent, 0.0))
+            return _spent(scene, t0, spent)
         return anim
 
     out.append(Block("circle", stage_circle, anim=_draw, static=False, layer="graph"))
@@ -477,24 +544,78 @@ def sector_inequality(spec, ctx, blocks):
     out.append(Block("frame", stage_frame, anim=_draw, static=False, layer="graph"))
     out.append(Block("apex", stage_apex, anim=_draw, static=False, layer="graph"))
     out.append(Block("tri_inner", dst1, anim=_peel(src_inner, chip_inner), static=False, layer="graph"))
-    out.append(Block("sector", dst2, anim=_peel(src_sector, chip_sector), static=False, layer="graph"))
+    out.append(Block("sector", dst2, anim=_peel(src_sector, chip_sector, derive=sector_stages),
+                     static=False, layer="graph"))
     out.append(Block("tri_outer", dst3, anim=_peel(src_outer, chip_outer), static=False, layer="graph"))
     # The inequality lands on a beat that grew to ~22 s when the corner-piece sentence
     # was added (Task D), and a single fade left 20.8 s of still picture -- over the 12 s
     # line. Its three terms are already `{{...}}` segments, so primitive 7 can walk them
     # across the beat: each term arrives as the narration names it. (`pacing.apply` only
     # upgrades STOCK reveals, and this one is a callable, so it is wired here by hand.)
+    #
+    # Where the beat's three moments sit, as shares of the beat's BUDGET (the beat minus
+    # the indicate + focus reservation and the paced tail, which is why they read
+    # .38/.53/.76 rather than the raw .36/.49/.71). Taken from the locked narration's own
+    # word counts for this beat -- 73 words over 22.7 s: the three terms are all named
+    # inside the first 36% ("...one half sine theta, then one half theta, then one half
+    # tangent theta"), "the corner piece A B C" starts at 49%, "and inside it sits the
+    # sliver" at 71%, and "the whole argument hangs on that one picture" is the last 11%,
+    # which is where the figure comes back whole.
+    WALK_SHARE, CORNER_AT, SLIVER_AT = 0.38, 0.53, 0.76
+    TRACE_SECONDS, ANNOT_OUT_SECONDS = 0.8, 0.4     # rule 3 "約 1 s" / temporary-annotation exit
+    ANNOT_DIM = 0.45                                # what the rest of the figure drops to
+    ANNOT_SECONDS = 2 * TRACE_SECONDS + ANNOT_OUT_SECONDS
+
     def _ineq_anim(scene, mob, _ground) -> float:
-        """`paced_reveal`, plain -- the beat's `focus[].indicate` (rule 3: the three regions
-        flash so the viewer can pair them with the three terms) that follows this reveal is
-        now reserved generically by `scene.py`/`timing.beat_run_time` (every beat pairing a
-        beat-filling reveal with an indicate hits the same trap; this one was the first and
-        used to reserve the flash's share by hand here -- now redundant, since `beat_run_time`
-        already leaves it out of the budget this asks for)."""
+        """Walk the inequality's terms while the narration names them, then POINT at the
+        two regions the rest of the beat talks about.
+
+        The walk alone (what this used to be) is honest about the terms but leaves the
+        back two thirds of a 22.7 s beat holding a finished picture -- and the beat's own
+        words there are "you can see exactly what each one adds", naming two regions that
+        do nothing. So each phrase gets its region traced (rule 3: stroke the boundary,
+        brighten it, never move the camera) and the SAME-COLOURED cell on the right
+        flashed with it (rule 5: the corner piece is what the outer triangle adds, so it
+        pairs with glyph ③; the sliver is what the sector adds, so it pairs with ②). The
+        sliver's moment also drops the rest of the figure to ANNOT_DIM, and the last play
+        gives the whole picture back on "the whole argument hangs on that one picture".
+        The annotations are temporary, so they leave with it: the scene's final frame --
+        what the layout and visual gates read -- is unchanged.
+
+        The beat's `focus[].indicate` and its focus fade are reserved generically by
+        `scene.py`/`timing.beat_run_time`, so the budget asked for here already leaves
+        them out."""
         t0 = _elapsed(scene)
         parts = pacing.block_parts(mob)
-        spent = pacing.walk(scene, parts, TM.beat_run_time(scene, pacing.FADE_SECONDS * len(parts)))
+        total = TM.beat_run_time(scene, pacing.FADE_SECONDS * len(parts) + ANNOT_SECONDS)
+        spent = pacing.walk(scene, parts, total * WALK_SHARE)
         scene.add(mob)
+
+        def _hold_to(mark: float) -> None:
+            """Wait until *mark* seconds into the beat; never rewinds."""
+            nonlocal spent
+            gap = max(mark - spent, 0.0)
+            if gap:
+                scene.wait(gap)
+                spent += gap
+
+        _hold_to(total * CORNER_AT)
+        scene.play(Create(corner_edge), FadeIn(corner_wash),
+                   Indicate(dst3, scale_factor=focus.INDICATE_SCALE, color=text),
+                   run_time=TRACE_SECONDS)
+        spent += TRACE_SECONDS
+        _hold_to(total * SLIVER_AT)
+        # `fade` in, `save_state`/`restore` out -- never `set_opacity` either way: the
+        # ①②③ badges are hollow rings and a flat opacity fills them in (focus.apply).
+        main_figure.save_state()
+        scene.play(Create(sliver_edge), FadeIn(sliver_wash),
+                   Indicate(dst2, scale_factor=focus.INDICATE_SCALE, color=text),
+                   main_figure.animate.fade(1.0 - ANNOT_DIM),
+                   run_time=TRACE_SECONDS)
+        spent += TRACE_SECONDS
+        _hold_to(total - ANNOT_OUT_SECONDS)
+        scene.play(FadeOut(annot), main_figure.animate.restore(), run_time=ANNOT_OUT_SECONDS)
+        spent += ANNOT_OUT_SECONDS
         return _spent(scene, t0, spent)
 
     out.append(Block("ineq", ineq, anim=_ineq_anim, static=False, layer="graph"))
@@ -645,12 +766,60 @@ def slope_equals_height(spec, ctx, blocks):
             ml.next_to(dot, UP if h > 0 else DOWN, buff=0.14)
         cos_dots.add(VGroup(connector, dot, ml))
 
+    # The PAIRING action (SPEC-motion-language 規則 3; §3.1 rewatch, beginner lens).
+    # The whole scene is called Slope Equals Height and, until this round, that equals
+    # sign was never drawn: `m=1` / `m=0` / `m=-1` sat on the left rim, the top and the
+    # right rim, `cos 0 = 1` / `cos pi/2 = 0` / `cos pi = -1` sat elsewhere in another
+    # colour, and the beat that reads "they match exactly" was ONE 0.55 s fade of all
+    # three followed by 9.8 s of frozen picture to the end of the scene. A viewer knew
+    # they were equal because the narration said so, not because the screen ever paired
+    # them. So `cos_dots` now reveals as THREE pairing moves, one per number the
+    # narration reads ("one, zero, minus one"): the dashed connector draws down x=x0,
+    # the read-off dot and its label land on cosine, and then the tangent and that dot
+    # PULSE TOGETHER -- one synchronised move, which is what says "these two are the
+    # same thing". The beat's existing `focus[].indicate` (the three tangents) then flashes
+    # once more on "they match exactly" and closes the beat.
+    # `cos_dots` is deliberately NOT added to that indicate list: it is ONE block, so
+    # `focus.indicate` would scale all three read-off marks about the group's centroid and
+    # push them apart -- rendered and checked, `cos 0 = 1` slid onto the y-axis label for
+    # the 0.8 s of the flash. Rule 3 says an emphasis MUST NOT move other objects, so the
+    # collective flash stays tangent-only and the pairing is carried by the pulses above.
+    # NOT DONE, by the user's 2026-09-13 ruling: the same review also proposed dropping
+    # the green/blue split and recolouring the three pairs by x. Declined -- it would
+    # break this deck's semantic colour axis (琥珀=sin / 青=cos / 綠=結論) and the
+    # 品質補強輪 ⑳ rule that segment/curve colour outranks token colour (SPEC 規則 5,
+    # VISUAL-FRAME V10). The pairing is carried by MOTION only; no colour changed.
+    pairs = list(zip((tan_0, tan_halfpi, tan_pi), cos_dots))
+    PAIR_SECONDS = 1.2                 # one pairing = one narrated number
+    _F_DRAW, _F_LAND, _F_PULSE = 0.29, 0.21, 0.50    # shares of one pairing
+
+    def _pair_reveal(scene, mob, g):
+        # Budgeted against the beat, not fixed, so a re-cut narration can only make the
+        # pairings quicker, never overrun: `beat_run_time` has already subtracted the
+        # 0.8 s this beat reserves for its `focus[].indicate` and the paced tail.
+        t0 = _elapsed(scene)
+        per = min(PAIR_SECONDS, TM.beat_run_time(scene, PAIR_SECONDS * len(pairs)) / len(pairs))
+        flash = T.color(g, "amber_ink")    # the ink `focus.indicate` uses on an accent-less
+                                           # scene -- the three pairings and the flash that
+                                           # follows them must read as one gesture
+        for tan, mark in pairs:
+            connector, dot, label = mark[0], mark[1], mark[2]
+            if connector.submobjects:
+                scene.play(Create(connector), run_time=per * _F_DRAW)
+            scene.play(FadeIn(dot), FadeIn(label), run_time=per * _F_LAND)
+            scene.play(Indicate(tan, scale_factor=focus.INDICATE_SCALE, color=flash),
+                       Indicate(VGroup(dot, label), scale_factor=focus.INDICATE_SCALE,
+                                color=flash),
+                       run_time=per * _F_PULSE)
+        scene.add(mob)
+        return _spent(scene, t0, per * len(pairs))
+
     out = list(blocks)
     out.append(Block("xticks", xticks, static=True, layer="graph"))
     out.append(Block("tan_0", tan_0, anim=_draw, static=False, layer="graph"))
     out.append(Block("tan_halfpi", tan_halfpi, anim=_draw, static=False, layer="graph"))
     out.append(Block("tan_pi", tan_pi, anim=_draw, static=False, layer="graph"))
-    out.append(Block("cos_dots", cos_dots, anim=_fade, static=False, layer="graph"))
+    out.append(Block("cos_dots", cos_dots, anim=_pair_reveal, static=False, layer="graph"))
     return out
 
 
@@ -1416,7 +1585,10 @@ def chord_vs_arc(spec, ctx, blocks):
 #     spoken over a screen that shows the one finished row and then holds: 25.8 s of measured
 #     stillness (rewatch_pack_after17, fine threshold) against a 12 s acceptance line. The
 #     derivation now happens where the narration puts it, as a TEMPORARY draft in the band
-#     step.1 / step.2 / result will occupy, which is empty for the whole of this beat.
+#     step.1 / step.2 / result will occupy, which is empty for the whole of this beat. The
+#     milestone six-lens round re-filed it (R3/R4, independently): splitting the reveal was
+#     only half of it -- the draft is a SIDE BRANCH off the main line, and nothing on screen
+#     said so, so it now carries a tag and leaves as one block (`_DRAFT_TAG` below).
 #   beat 4 (20.9 s, step.2) is "the decisive step" -- write h as 2*(h/2) so the denominator
 #     carries the very h/2 that is inside the sine. The stock row posts the FINISHED line
 #     and holds: "畫面把它當成又一行結果貼出來，再停 20 秒，觀眾沒有機會看到中間發生了什麼"
@@ -1436,6 +1608,14 @@ def chord_vs_arc(spec, ctx, blocks):
 # layout gate still measures exactly the terminal frame it measured before.
 _DRAFT_X = -5.85                      # the chain's left edge (-6.37) plus one indent
 _DRAFT_Y = (-0.55, -1.30, -2.25)      # the empty band between step.0 and the bottom margin
+# ... and it SAYS it is a side branch. The indent and the dimmer ink make the block subordinate;
+# the tag makes it nameable, which is what the beginner needs to know the block can be set aside
+# and the main line (we are computing (sin(x+h) - sin x)/h) resumed. Without it the six-lens
+# review's R3/R4 `must` is only half closed: the derivation is visible but unmarked.
+_DRAFT_TAG = "[ where it comes from ]"
+_DRAFT_TAG_Y = 0.10                   # the gap between step.0's row (bottom 0.47) and _DRAFT_Y[0]
+_DRAFT_TAG_ROLE = "muted"             # quieter than the draft's own `text` ink: a marker, not content
+_DRAFT_EXIT_SCALE = 0.82              # 規則 1: 臨時標註退場用縮小加淡出 -- the block leaves as one
 # The substitution line is split at the narration's own comma ("put u equals ... AND v equals
 # ..." is 9 s of speech), so the two halves arrive on the two clauses instead of together.
 _DRAFT_SUBS = (r"{{u=\frac{A+B}{2},}} {{\quad v=\frac{A-B}{2}}}",
@@ -1502,6 +1682,8 @@ def difference_quotient_for_sine(spec, ctx, blocks):
     step0_eq = _core(step0_row)
     step0_rail = _rail(step0_row, step0_row.submobjects[0])
 
+    tag = brand.eyebrow(_DRAFT_TAG, ground, role=_DRAFT_TAG_ROLE)
+    tag.move_to([_DRAFT_X, _DRAFT_TAG_Y, 0], aligned_edge=LEFT)
     subs = [_draft_line(tex, ground, y) for tex, y in zip(_DRAFT_SUBS, _DRAFT_Y)]
     work = _draft_line(_DRAFT_START, ground, _DRAFT_Y[2])
     expanded = _draft_line(_DRAFT_EXPANDED, ground, _DRAFT_Y[2])
@@ -1540,8 +1722,13 @@ def difference_quotient_for_sine(spec, ctx, blocks):
         #     capped so it is finished by the time the narration starts deriving it).
         w = max(at("u") - pacing.FADE_SECONDS - 0.4, 1.0)
         play(Write(step0_eq), run_time=min(pacing.write_seconds(step0_eq, w), w))
+        # The reason rail rides in with the side-branch tag, on "... it did not:" -- the band
+        # below is labelled BEFORE anything is written into it, so the block reads as scratch
+        # work from its first glyph. One play, so the cue clock is unchanged.
+        entrance = [FadeIn(tag, shift=0.1 * UP)]
         if step0_rail.submobjects:
-            play(FadeIn(step0_rail), run_time=pacing.FADE_SECONDS)
+            entrance.append(FadeIn(step0_rail))
+        play(*entrance, run_time=pacing.FADE_SECONDS)
         scene.add(mob)
         hold(at("u"))
 
@@ -1587,10 +1774,12 @@ def difference_quotient_for_sine(spec, ctx, blocks):
         play(TransformMatchingShapes(flyer, landed), run_time=1.1)
         play(FadeOut(landed), run_time=0.4)     # step.0's own RHS is underneath, untouched
 
-        # (6) "A product is also exactly what we want ..." -- clear the band well before
+        # (6) "A product is also exactly what we want ..." -- the side branch closes: tag and
+        #     result leave TOGETHER, shrinking as they fade (規則 1 的臨時標註退場), so the
+        #     main line is what is left standing, and the band is clear well before
         #     {show step.1} needs it.
         hold(at("clear"))
-        play(FadeOut(product), run_time=0.8)
+        play(FadeOut(VGroup(tag, product), scale=_DRAFT_EXIT_SCALE), run_time=0.8)
         hold(total)
         return _spent(scene, t0, max(total, t))
 
@@ -1680,9 +1869,13 @@ def difference_quotient_for_sine(spec, ctx, blocks):
 # (`brand.math_line`, METHODOLOGY §5), one indent in from the chain's left edge, no semantic
 # hue. It is built inside the hook, never becomes a Block, and is cleared before
 # {show proof.1} needs the space, so every layout gate still measures the terminal frame it
-# measured before. proof.0's own reveal is WRAPPED, not replaced: the stock
-# `_reveal_with_label` (the PROOF eyebrow riding in with the row) plays first and reports
-# its own seconds, then the draft runs in the rest of the beat.
+# measured before. proof.0's own reveal is WRAPPED, not replaced: the stock reveal plays
+# first and reports its own seconds, then the draft runs in the rest of the beat.
+# (2026-09-14, T5 `ea5cf47`: the PROOF eyebrow is no longer folded into that reveal. It is a
+# Block of its own declaring `reveal_with="proof.0"`, so the player runs it as a RIDER just
+# before the beat's reveal and charges it to `beat_reserved_seconds`. Wrapping still works --
+# this hook only needs whatever `step0.anim` is -- and the eyebrow now survives the override,
+# which is the bug T5 fixed.)
 _C_INDENT = 0.5                    # the proof chain's left edge plus one indent
 # Scene 04 established u and v; "the same way as the first one" is the narration POINTING at
 # that substitution, so the draft recalls it in one line instead of re-deriving it.
@@ -1722,7 +1915,10 @@ def cosine_identity_draft(spec, ctx, blocks):
     step0 = ids["proof.0"]
     row = step0.mobject
     row_eq = derivation._eq_core(row) or row
-    stock_reveal = step0.anim            # _reveal_with_label(PROOF eyebrow); wrapped, not replaced
+    stock_reveal = step0.anim            # the row's own reveal; wrapped, not replaced. Since
+                                         # T5 the PROOF eyebrow is a separate `reveal_with`
+                                         # rider, so it is NOT inside this anim (and is no
+                                         # longer lost when a hook overrides proof.0).
 
     # The draft column and its two lines are read off the REAL chain, so the band is exactly
     # the space proof.1 / proof.2 will take and nothing has to be re-measured by hand.
@@ -2187,76 +2383,199 @@ def _play_stock(scene, anim, mob, ground) -> float:
 #      number line: x_0 fixed, x sliding into it, the bracket between them closing. The qed
 #      beat says "let x -> x_0: the half-angle goes to zero" -- now it happens on screen,
 #      paced to the beat, in the empty lower-right quadrant the proof column never uses.
+#
+# R2 rerun, 2026-09-14 (two more `must`s, user-approved). BOTH independent beginner lenses
+# lost the thread in this scene, and both lost it in the same two places:
+#
+#   A. proof.0 -- the COSINE sum-to-product identity had never been on screen. Scene 04
+#      spends 39.7 s deriving the SINE one; this scene opens by using its cosine twin as if
+#      it were known, and its provenance ("obtained the same way as the first one") does not
+#      arrive until scene 17, nine minutes later. A beginner stops here to ask where the row
+#      came from and misses the next two beats. So the beat now RECALLS scene 04's row --
+#      the same tex, set the same way, shrunk, dropped in from above the frame -- and morphs
+#      it IN PLACE into the cosine version, changed tokens only (規則 2): the half-sum and
+#      half-difference factors trade places, cos <-> sin, the sign flips, the rest glides.
+#      A `same u, v trick` tag hangs over the row while the two identities are on screen,
+#      which also answers the other lens's finding (scene 04's identity is re-written here
+#      as a brand-new line with no back-reference).
+#   B. proof.2 -- "Drop it to its largest size, one" is the move the whole scene turns on,
+#      and the factor being dropped was indistinguishable from the one that survives: the
+#      half-sum (x+x_0)/2 and the half-difference (x-x_0)/2 differ by one sign, in one
+#      colour, at one size. They now carry SEMANTIC COLOURS from the storyboard's
+#      `seg_roles` (規則 5) -- half-difference = accent amber, the colour the number line
+#      below already gives the half-gap; half-sum = strategy purple, the deck's angle-object
+#      axis, and the midpoint dot (which IS (x+x_0)/2) goes purple with it. And the drop is
+#      PLAYED rather than delivered finished: the boxed half-sum factors become 1 where they
+#      stand while `=` becomes `<=` and the difference picks up its absolute-value bars (so
+#      no frame ever carries a false equation -- the factor is BOUNDED by one, not equal to
+#      it), then what survives slides down and BECOMES the bound row. proof.2 never fades in
+#      as a new line. No `say` text and no {show ...} marker changed for either must.
+#
+# Segment indices below are the storyboard's `{{...}}` cuts, which `_selftest_continuity_
+# argument` re-derives from the deck so this file and the deck cannot drift apart.
+_CT_HALF_SUM_SEG = (2, 1)      # proof.0 / proof.1: the (x+x_0)/2 factor's segment
+_CT_HALF_DIFF_SEG = (1, 2)     # proof.0 / proof.1: the (x-x_0)/2 factor's segment
+# Scene 04's step.0, verbatim (storyboards/ch03_trig_derivatives.yml), cut into the same
+# three segments as the proof rows so the recall morphs part-for-part.
+_CT_RECALL_TEX = r"$ {{\sin A-\sin B = 2}} {{\cos\frac{A+B}{2}}} {{\,\sin\frac{A-B}{2}}} $"
+_CT_RECALL_ROLES = {r"\cos\frac{A+B}{2}": "strategy", r"\,\sin\frac{A-B}{2}": "accent"}
+# recall segment -> proof.0 segment: lhs to lhs, half-sum to half-sum, half-diff to half-diff
+_CT_RECALL_PAIRS = ((0, 0), (1, _CT_HALF_SUM_SEG[0]), (2, _CT_HALF_DIFF_SEG[0]))
+# proof.0 segment -> proof.1 segment: the two half-angle factors trade places. Explicit, not
+# TransformMatchingShapes: sin((x-x_0)/2) and sin((x+x_0)/2) are near-identical shapes, so a
+# shape match pairs them arbitrarily and the amber/purple coding scrambles mid-morph.
+_CT_FLIP_PAIRS = ((0, 0), (_CT_HALF_SUM_SEG[0], _CT_HALF_SUM_SEG[1]),
+                  (_CT_HALF_DIFF_SEG[0], _CT_HALF_DIFF_SEG[1]))
+# The "drop it to one" state of each row, segment-aligned with it: the half-sum factor's
+# segment becomes `. 1`, `=` becomes `<=`, and the difference gains its bars. Every one of
+# these is TRUE, which is why the substitution can be shown at all.
+_CT_BOUND_TEX = (
+    r"$ {{|\cos x-\cos x_0|\le 2}} {{\left|\sin\frac{x-x_0}{2}\right|}} {{\cdot 1}} $",
+    r"$ {{|\sin x-\sin x_0|\le 2}} {{\cdot 1}} {{\cdot\left|\sin\frac{x-x_0}{2}\right|}} $",
+)
+_CT_BOUND_ROLES = (
+    {r"\left|\sin\frac{x-x_0}{2}\right|": "accent", r"\cdot 1": "strategy"},
+    {r"\cdot 1": "strategy", r"\cdot\left|\sin\frac{x-x_0}{2}\right|": "accent"},
+)
+
+
 def continuity_template(spec, ctx, blocks):
     ground = ctx["ground"]
     ids = _by_id(blocks)
     row0 = ids["proof.0"].mobject
     qed_block = ids["qed"]
 
-    amber = T.color(ground, "accent")
+    amber = T.color(ground, "accent")       # the half-GAP (x-x_0)/2, in the rows and the line
+    violet = T.color(ground, "strategy")    # the half-SUM (x+x_0)/2, in the rows and the line
     mut = T.color(ground, "muted")
     ink = T.color(ground, "text")
+
+    # Everything the two rows' annotations share, filled at play time (the rows are still
+    # being positioned while hooks run) and read back by the later beats.
+    marks: dict = {}
+
+    def _segmented() -> bool:
+        return all(len(ids[f"proof.{i}"].mobject.submobjects) >= 3 for i in (0, 1))
+
+    # -- proof.0: recall scene 04's identity, then flip only the changed tokens ---
+    def _recall_and_flip(scene, mob, _ground) -> float:
+        """must A. The sine identity scene 04 derived comes back from above the frame,
+        shrunk, and turns into the cosine one where it lands -- so the row this whole proof
+        hangs on is no longer a line that fell out of the sky."""
+        if len(mob.submobjects) < 3:
+            return pacing.paced_write(scene, mob)    # un-segmented deck: stock behaviour
+        t0 = _elapsed(scene)
+        total = TM.beat_run_time(scene, 3.0)
+        recall = brand.math_line(_CT_RECALL_TEX, ground, role="text", size="label",
+                                 seg_roles=_CT_RECALL_ROLES)
+        recall.move_to(mob, aligned_edge=LEFT)
+        home = recall.get_center().copy()
+        recall.shift(UP * (T.FRAME_H / 2 + recall.height - home[1]))
+        tag = brand.prose(r"same $u,v$ trick", ground, role="muted", size="label")
+        tag.next_to(mob, UP, buff=0.34).align_to(mob, LEFT)
+        marks["tag"] = tag
+        scene.add(recall)
+        scene.play(recall.animate.move_to(home), run_time=0.9)
+        scene.play(FadeIn(tag), run_time=0.5)
+        # The narration over this beat reads the cosine identity aloud for 15 s, so the
+        # morph is given most of it: you watch A,B become x,x_0 and the two half-angle
+        # factors trade places while you hear the row being read.
+        morph = min(max((total - 1.4) * 0.8, 1.2), 9.0)
+        scene.play(*[Transform(recall.submobjects[i], mob.submobjects[j].copy())
+                     for i, j in _CT_RECALL_PAIRS], run_time=morph)
+        scene.remove(recall)                          # the morphed copy IS mob, pixel for pixel
+        scene.add(mob)
+        return _spent(scene, t0, 0.9 + 0.5 + morph)
+
+    ids["proof.0"].anim = _recall_and_flip
 
     # -- the second identity: the first one with the changed tokens flipped ------
     def _fill_second(scene, mob, _ground) -> float:
         total = TM.beat_run_time(scene, 1.6)
         t0 = _elapsed(scene)
+        run = min(max(total * 0.55, 1.2), 8.0)
         ghost = row0.copy()
         scene.add(ghost)
         # Let the morph actually UNFOLD. A 1.4 s cap left 15.2 s of frozen picture on a
         # 16.6 s beat -- the film's real worst dead zone, and mine. The narration over this
         # beat is reading the sine identity aloud, so a morph that takes most of the reading
         # is well matched: you watch cos turn into sin while you hear it.
-        scene.play(TransformMatchingShapes(ghost, mob),
-                   run_time=min(max(total * 0.55, 1.2), 8.0))
+        if _segmented():
+            scene.play(*[Transform(ghost.submobjects[i], mob.submobjects[j].copy())
+                         for i, j in _CT_FLIP_PAIRS], run_time=run)
+            scene.remove(ghost)
+        else:
+            scene.play(TransformMatchingShapes(ghost, mob), run_time=run)
         scene.add(mob)
         _mark_factors(scene)
-        return _spent(scene, t0, min(max(total * 0.55, 1.2), 8.0) + 1.6)
+        return _spent(scene, t0, run + 1.6)
 
     ids["proof.1"].anim = _fill_second
 
-    # -- proof.0 keeps its WRITE ------------------------------------------------
-    # The row was split into {{...}} segments so the box below has something to surround.
-    # `pacing.block_parts` reads two submobjects as "a block with parts to walk", which
-    # would turn "the row is written as it is read" into two fades -- so name the write.
-    ids["proof.0"].anim = lambda scene, mob, _g: pacing.paced_write(scene, mob)
-
     # -- the half-sum factor, marked (R2 round-18 must, ML3) ---------------------
-    # Segment 1 of each row IS the half-sum factor (see the storyboard's {{...}}). The beat
-    # says "in each, the half-sum factor never exceeds one in size" and nothing on screen
-    # said WHICH piece that was: box both, drop the rest of each row back, and hang one
-    # shared bound off the pair. Built at play time, not here, because the rows are still
-    # being positioned while hooks run.
-    #
-    # R2 asked for the boxed factors to "become 1" on the next beat. Not done, deliberately:
-    # replacing them in place would leave `cos x - cos x_0 = -2 sin(half-diff) . 1` on screen,
-    # which is false -- the factor is BOUNDED by one, not equal to it. The boxes instead
-    # leave as proof.2's genuine inequality row arrives, and the existing `focus.indicate`
-    # flashes both rows there, so the beat still points back at them.
-    marks: list = []
-
+    # The beat says "in each, the half-sum factor never exceeds one in size" and nothing on
+    # screen said WHICH piece that was: box both (in the half-sum's own purple, so the box
+    # names a colour the viewer has been reading since the row appeared), drop the rest of
+    # each row back, and hang one shared bound off the pair.
     def _mark_factors(scene) -> None:
         rows = [ids["proof.0"].mobject, ids["proof.1"].mobject]
-        if any(len(r.submobjects) < 2 for r in rows):
+        if not _segmented():
             return                                   # un-segmented: nothing to address
-        boxes = VGroup(*[SurroundingRectangle(r.submobjects[1], color=amber,
-                                              stroke_width=2.4, buff=0.09) for r in rows])
-        bound = brand.math_line(r"|\,\cdot\,|\le 1", ground, role="accent", size="label")
+        boxes = VGroup(*[SurroundingRectangle(r.submobjects[k], color=violet,
+                                              stroke_width=2.4, buff=0.09)
+                         for r, k in zip(rows, _CT_HALF_SUM_SEG)])
+        bound = brand.math_line(r"|\,\cdot\,|\le 1", ground, role="strategy", size="label")
         bound.next_to(boxes, RIGHT, buff=0.34)
-        rest = VGroup(*[s for r in rows for i, s in enumerate(r.submobjects) if i != 1])
-        # multiplicative fade in, snapshot/restore out -- focus.apply's contract, for the
-        # same reason: a flat opacity paints over anything deliberately transparent.
-        rest.save_state()
-        marks.extend((boxes, bound, rest))
+        rest = VGroup(*[s for r, k in zip(rows, _CT_HALF_SUM_SEG)
+                        for i, s in enumerate(r.submobjects) if i != k])
+        group = VGroup(*rows)
+        # The TRUE identities at full brightness: proof.2 borrows the rows for the
+        # substitution and hands them back to this state (snapshot/restore, focus.apply's
+        # contract -- a flat opacity paints over anything deliberately transparent).
+        group.save_state()
+        marks.update(boxes=boxes, bound=bound, rows=group)
+        # multiplicative fade: it scales each family member's own opacity, so it cannot
+        # make an invisible part visible on the way back.
         scene.play(*[Create(b) for b in boxes],
                    rest.animate.fade(0.55), run_time=1.1)
         scene.play(FadeIn(bound), run_time=0.5)
 
-    def _release_factors(scene) -> None:
-        if not marks:
-            return
-        boxes, bound, rest = marks
-        scene.play(FadeOut(boxes), FadeOut(bound), rest.animate.restore(), run_time=0.6)
+    def _drop_to_one(scene, mob) -> float:
+        """must B. The boxed half-sum factors become 1 WHERE THEY STAND, and what survives
+        slides down and becomes the bound row -- `mob` (proof.2) is built out of the two
+        identities instead of fading in underneath them.
+
+        The substitution runs on copies laid pixel-for-pixel over the rows, which are
+        blanked for the duration and restored as the copies leave: the rows keep saying
+        what they say, and the intermediate the copies pass through
+        (`|cos x - cos x_0| <= 2|sin((x-x_0)/2)| . 1`) is true in every frame."""
+        total = TM.beat_run_time(scene, 2.6)
+        rows = marks["rows"]
+        boxes = marks["boxes"]
+        bounds = [brand.math_line(tex, ground, role="text", size="step", seg_roles=roles)
+                  for tex, roles in zip(_CT_BOUND_TEX, _CT_BOUND_ROLES)]
+        for b, r in zip(bounds, rows.submobjects):
+            b.move_to(r, aligned_edge=LEFT)
+        ghosts = [r.copy() for r in rows.submobjects]
+        for g in ghosts:
+            scene.add(g)
+        rows.set_opacity(0)                  # covered pixel-for-pixel by the ghosts
+        drop = min(max(total * 0.30, 0.9), 3.2)
+        swaps = [Transform(g.submobjects[i], bounds[gi].submobjects[i].copy())
+                 for gi, g in enumerate(ghosts) for i in range(3)]
+        swaps += [Transform(boxes.submobjects[gi],
+                            SurroundingRectangle(bounds[gi].submobjects[_CT_HALF_SUM_SEG[gi]],
+                                                 color=violet, stroke_width=2.4, buff=0.09))
+                  for gi in range(len(ghosts))]
+        scene.play(*swaps, run_time=drop)
+        slide = min(max(total * 0.36, 1.0), 3.6)
+        leaving = [FadeOut(boxes), FadeOut(marks["bound"])]
+        if marks.get("tag") is not None:
+            leaving.append(FadeOut(marks["tag"], shift=0.2 * UP, scale=0.7))
+        scene.play(TransformMatchingShapes(VGroup(*ghosts), mob), *leaving,
+                   rows.animate.restore(), run_time=slide)
+        scene.add(mob)
+        return drop + slide
 
     # -- the half-gap number line (lower right; the proof column keeps the left) --
     HALF_W = 2.15                       # half the line's length
@@ -2277,7 +2596,10 @@ def continuity_template(spec, ctx, blocks):
         return Dot(_x_pt(), radius=0.075, color=amber)
 
     def _dot_mid():
-        return Dot(_mid_pt(), radius=0.06, color=ink)
+        # The midpoint of x_0 and x IS (x+x_0)/2 -- the half-SUM. It wears the half-sum's
+        # purple so the factor the rows drop and the dot on the line read as one quantity
+        # (規則 5); the bracket beside it, the half-DIFFERENCE, stays amber like its factor.
+        return Dot(_mid_pt(), radius=0.06, color=violet)
 
     def _bracket():
         """The half-gap itself: midpoint -> x, the argument of every sine in the bound."""
@@ -2343,11 +2665,15 @@ def continuity_template(spec, ctx, blocks):
 
     def _show_half(scene, mob, _ground) -> float:
         t0 = _elapsed(scene)
-        _release_factors(scene)
-        stock = _play_stock(scene, stock_p2, mob, _ground)
+        # must B: the bound row is BUILT from the two identities (the half-sum factors drop
+        # to 1 in place, the survivors slide down here) rather than fading in on its own.
+        # Without the storyboard's segments there is nothing to box or drop -- fall back to
+        # the stock reveal, exactly as before.
+        spent = (_drop_to_one(scene, mob) if "rows" in marks
+                 else _play_stock(scene, stock_p2, mob, _ground))
         scene.add(half_group)
         scene.play(FadeIn(lab_half), run_time=0.45)
-        return _spent(scene, t0, stock + 1.05)
+        return _spent(scene, t0, spent + 0.45)
 
     p2_block.anim = _show_half
 
@@ -2572,3 +2898,109 @@ def shm_device(spec, ctx, blocks):
     out.append(Block("device", device, static=False,
                      anim=lambda scene, mob, ground: 0.0, layer="graph"))
     return out
+
+
+# ================================================================ hook 12
+# companion_limit -- fill the scene's reveal-less OPENING beat.
+#
+# R2/beginner lens, 2026-09-13: the first 8.5 s of this scene (+1.0 -> +9.5, the longest
+# dead opening in the film) show the header line and an empty SOLUTION lead, nothing else,
+# while the narration reads out loud the very sentence that header already spells --
+# "the quantity one minus cosine theta, over theta tends to zero". Heard and seen are the
+# same words, and nothing moves.
+#
+# Why this is a hook and not `paced:` / `pauses:`: `{show scaffold.motive}` is this scene's
+# FIRST marker, so `narration.parse_say` gives the opening beat `reveal=None`. Every motion
+# primitive in the pipeline hangs off a reveal id (`paced:` paces one block's reveal,
+# `pauses:` holds after one, a Block anim plays on one), so none of them can reach a beat
+# that reveals nothing -- and moving the marker is exactly what would re-cut the beats,
+# change their `text_hash` and force a billed re-synthesis. What CAN run there is an
+# updater: the statement line is part of the opening frame (static) and writes itself out
+# segment by segment off a time-based updater, which is also why manim renders that wait
+# frame by frame instead of freezing one (`Scene.should_update_mobjects`). Same house
+# mechanism as the SHM spring's `t_track`, which keeps the device swinging through stretches
+# that reveal nothing of it.
+#
+# The line itself lives in the storyboard's `statement:` field, so deleting `hook:` leaves
+# a perfectly good (static) scene -- the template stays the fallback, per the hook contract.
+# Out of scope by the user's ruling: the narration, this scene's ORDER, and the fact that
+# the limit it banks is never used again (an ordering finding, in the backlog).
+
+OPENING_WRITE_LEAD = 0.35        # after the narration starts, before the first segment
+OPENING_WRITE_FRACTION = 0.80    # of the opening beat, so the line finishes before it ends
+
+
+def companion_limit_opening(spec, ctx, blocks):
+    ids = _by_id(blocks)
+    stmt = ids.get("statement")
+    # `{show statement}` would make it dynamic -- then it has a beat of its own and none of
+    # this is needed (and must not run: the segments would be hidden with nothing to unhide
+    # them until that marker).
+    if stmt is None or not stmt.static:
+        return blocks
+    group = stmt.mobject
+    parts = pacing.block_parts(group)      # the `{{...}}` segments, primitive 7's own cut
+    if len(parts) < 2:
+        return blocks
+
+    beats = parse_say(spec.get("say", ""))
+    opening = beats[0].text if beats and beats[0].reveal is None else ""
+    # Open-loop, because a hook cannot see the TTS manifest: the window is the same
+    # word-count estimate the pipeline itself falls back on. It is the FLOOR that matters --
+    # the real clip is longer than the estimate here (8.5 s measured vs 7.6 s estimated), so
+    # the line finishes early and sits, which is the intended shape. The beat-2 reveal
+    # closes the loop from the other side (see `_freeze`), so it can never be caught
+    # half-written however the narration is re-cut.
+    window = max(estimate_seconds(opening) * OPENING_WRITE_FRACTION,
+                 pacing.FADE_SECONDS * len(parts))
+    start = TM.SCENE_LEAD_SECONDS + OPENING_WRITE_LEAD
+    step = window / len(parts)
+    # every member's built opacity -- glyphs AND the point-less segment containers
+    # `set_opacity` also writes to, so the finished line is exactly the built one (the frame
+    # the visual gates read, the one sizecheck measured) and a later multiplicative `fade`
+    # on a container cannot start from a stale zero.
+    built = [(m, m.get_fill_opacity(), m.get_stroke_opacity()) for m in group.get_family()]
+    for part in parts:
+        part.set_opacity(0.0)
+
+    clock = {"t": 0.0}
+
+    def _freeze():
+        for mob, fill, stroke in built:
+            mob.set_fill(opacity=fill, family=False)
+            mob.set_stroke(opacity=stroke, family=False)
+        group.clear_updaters()
+
+    def _write(m, dt):
+        # `set_opacity` (not focus.apply's save_state/fade dance) is safe here and much
+        # cheaper per frame: these are LaTeX glyphs, solid fills with zero stroke width,
+        # not the hollow rings that a flat opacity ruins. `_freeze` puts the built numbers
+        # back verbatim anyway.
+        clock["t"] += dt
+        for i, part in enumerate(parts):
+            share = (clock["t"] - (start + i * step)) / pacing.FADE_SECONDS
+            part.set_opacity(min(max(share, 0.0), 1.0))
+        if clock["t"] >= start + (len(parts) - 1) * step + pacing.FADE_SECONDS:
+            _freeze()
+
+    group.add_updater(_write)
+
+    motive = ids.get("scaffold.motive")
+    if motive is not None and motive.static and "scaffold.motive" in list_reveal_targets(
+            spec.get("say", "")):
+        # `templates._scaffold_reveal_timing` runs AFTER the hook and rewrites `anim` on any
+        # scaffold block that is still static and named by a marker -- which would throw this
+        # wrapper away. So do its job here (dynamic + "slide", verbatim) and wrap that; it
+        # then sees a block that is already dynamic and leaves it alone.
+        motive.static = False
+        stock = "slide"
+
+        def _motive_reveal(scene, mob, g):
+            """The next beat completes the line before revealing the motive: whatever the
+            real clip length turns out to be, nothing is ever seen half-written."""
+            t0 = _elapsed(scene)
+            _freeze()
+            return _spent(scene, t0, _play_stock(scene, stock, mob, g))
+
+        motive.anim = _motive_reveal
+    return blocks

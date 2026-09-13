@@ -1,0 +1,156 @@
+{
+ "section": "ch03 §3.1",
+ "deck": "ch03_trig_derivatives_mimo",
+ "from_review": "video/content_scripts/_audit/REVIEW-ch03_s31-milestone.html",
+ "baseline_film": "ch03_trig_derivatives_mimo__round21.mp4",
+ "baseline_pack": "video/output/ch03/s3.1/rewatch_pack_after21",
+ "how_to_use": "共用層 v1 的 §3.1 全片 render 之後跑：① python video/pipeline/rewatch_pack.py --deck ch03_trig_derivatives_mimo --out <新 pack> --gate-still 12 --baseline video/output/ch03/s3.1/rewatch_pack_after21（exit 0 才算該輪完成）；② 逐條把下面的 must 標 closed=true/false 並填 closed_evidence（新 pack 的場號＋秒數＋數字）；③ 跑 visual-frame-audit（blocking 必須 0）；④ 依 REVIEW_GATES §六 6.3 判是否收斂——注意「R2 must＝0」的意思是：本清單全部關閉，且輪內回歸沒有新 must（新 must 超過 3 條＝排序問題，退回內容階段）。⑤ 本輪不跑生成式盲審（§6.2：里程碑才跑），只跑這張回歸清單。",
+ "stop_conditions_not_yet_verifiable_in_this_session": [
+  "視覺 blocking = 0（需新成片抽幀）",
+  "逐場最長靜止 |Δ| < 0.5 s（需新 pack 對 after21 做 A/B）",
+  "[sync] = 0（需 render 當下的硬閘輸出）"
+ ],
+ "musts": [
+  {
+   "fid": "R3.04.1",
+   "scene": "difference_quotient_for_sine",
+   "scene_n": 4,
+   "lens": "R3",
+   "dim": "A-load",
+   "rule": null,
+   "where": "beat 3（+13.5–+53.3s，tile 04–05）",
+   "claim": "全片最長的一個 beat，把「恆等式是什麼」「恆等式從哪來」「為什麼要乘積形式」三件事塞進一口氣，中間那件還是可選的旁支，卻擺在主線最關鍵的位置。初學者在這裡最容易掉隊，而本場真正的結論（兩個因子 → 兩個待證事實）反而只剩 20 秒。",
+   "baseline": {
+    "duration": 107.8,
+    "reveals": 5,
+    "longest_still_seconds": 10.2,
+    "static_ratio": 0.884
+   },
+   "disposition": "batch-round-2026-09-13",
+   "closed": null,
+   "closed_evidence": ""
+  },
+  {
+   "fid": "R4.04.1",
+   "scene": "difference_quotient_for_sine",
+   "scene_n": 4,
+   "lens": "R4",
+   "dim": "T-beat",
+   "rule": "ML2",
+   "where": "04_difference_quotient_for_sine beat 3（+13.5 → +53.3 s）",
+   "claim": "39.7 s 是全片最長的 beat，是 T-beat 25 s 線的 1.6 倍，卻要承載整個 sum-to-product 的來歷推導（代換、展開、對消四個動作）。初學者在同一個 reveal 底下要自己追四步，是全片最容易跟丟的位置。",
+   "baseline": {
+    "duration": 107.8,
+    "reveals": 5,
+    "longest_still_seconds": 10.2,
+    "static_ratio": 0.884
+   },
+   "disposition": "batch-round-2026-09-13",
+   "closed": null,
+   "closed_evidence": ""
+  },
+  {
+   "fid": "R2.06.1",
+   "scene": "sector_inequality",
+   "scene_n": 6,
+   "lens": "R2",
+   "dim": "D-carry",
+   "rule": "ML4",
+   "where": "06_sector_inequality +48.8–57.0s（beat 7, ineq；fine longest still 8.2 s）",
+   "claim": "旁白說『你可以清楚看到每一塊各自多加了什麼』，畫面卻在這 8.2 秒完全凍結，而且左側主圖裡那兩塊的尺寸很小（綠角片在 B–C 之間、紫弓形是一條細縫），初學者根本不知道該往哪看，這一句反而製造挫折。全片最重要的那句『The whole argument hangs on that one picture』就落在這段死區裡。",
+   "baseline": {
+    "duration": 82.4,
+    "reveals": 8,
+    "longest_still_seconds": 21.0,
+    "static_ratio": 0.796
+   },
+   "disposition": "batch-round-2026-09-13",
+   "closed": null,
+   "closed_evidence": ""
+  },
+  {
+   "fid": "R5.06.1",
+   "scene": "sector_inequality",
+   "scene_n": 6,
+   "lens": "R5",
+   "dim": "I-emphasis",
+   "rule": null,
+   "where": "beat 5（+26.4s→+32.7s），畫面見 tile 06（+27.1s）與 tile 07（+33.4s）",
+   "claim": "三個面積裡只有中間這一個需要真的算一下，而它偏偏是唯一沒有寫在畫面上的；學生必須在一秒內於腦中完成 π·1²·θ/(2π) = θ/2，而畫面同時正在做複製與平移。更關鍵的是：這一步正是整部片裡 radians 唯一真正發揮作用的地方——扇形面積等於 ½θ 只在弧度制下成立。把它留在聲音裡，結果是學生把 ½θ 當成要背的公式，而且看不到度數為什麼會壞掉，以致 scene 13 的「structural caution」變成沒有著力點的宣告。",
+   "baseline": {
+    "duration": 82.4,
+    "reveals": 8,
+    "longest_still_seconds": 21.0,
+    "static_ratio": 0.796
+   },
+   "disposition": "batch-round-2026-09-13",
+   "closed": null,
+   "closed_evidence": ""
+  },
+  {
+   "fid": "R1a.09.1",
+   "scene": "continuity_argument",
+   "scene_n": 9,
+   "lens": "R1a",
+   "dim": "L-follow",
+   "rule": "ML5",
+   "where": "continuity_argument tile 08 (+43.5s) → tile 09 (+48.4s)；fine 靜止 9.0 s（45.0–54.0 s, beat 4, proof.2）",
+   "claim": "整場的關鍵動作是「把半和因式 sin((x+x₀)/2)／cos((x+x₀)/2) 放大成 1」，但畫面上半和 (x+x₀)/2 與半差 (x−x₀)/2 只差一個加減號、同色同字級，我根本分不出旁白說的『the half-sum factor』是哪一個；而且這一步不是在既有式子上做給我看，而是第三行整行淡入一個做好的結果，然後靜止 9 秒。我在這裡真的跟丟了——看完只知道「結論是某個東西 ≤ 2|sin(...)|」，說不出是哪個因式被丟掉。",
+   "baseline": {
+    "duration": 70.3,
+    "reveals": 5,
+    "longest_still_seconds": 26.2,
+    "static_ratio": 0.886
+   },
+   "disposition": "batch-round-2026-09-13",
+   "closed": null,
+   "closed_evidence": ""
+  },
+  {
+   "fid": "R1b.09.1",
+   "scene": "continuity_argument",
+   "scene_n": 9,
+   "lens": "R1b",
+   "dim": "L-why",
+   "rule": null,
+   "where": "beat 2, +18.5s (tile 05)",
+   "claim": "到這一刻為止，我在片中只看過 sin A − sin B 的和差化積被推導過（04 場）；cos A − cos B 這條是全新的，卻被當成已知拿來當整個連續性證明的骨架。我當下停在「這條哪來的？」而錯過了後面兩個 beat。（它其實要到 17 場、約九分鐘後才被說明是「同樣的作法」。）",
+   "baseline": {
+    "duration": 70.3,
+    "reveals": 5,
+    "longest_still_seconds": 26.2,
+    "static_ratio": 0.886
+   },
+   "disposition": "batch-round-2026-09-13",
+   "closed": null,
+   "closed_evidence": ""
+  },
+  {
+   "fid": "R2.18.1",
+   "scene": "slope_equals_height",
+   "scene_n": 18,
+   "lens": "R2",
+   "dim": "D-carry",
+   "rule": "ML5",
+   "where": "18_slope_equals_height beat 7（+24.1–34.4s），f_10 (+34.8s)",
+   "claim": "整場標題就是『Slope Equals Height』，而這個等號從頭到尾沒有被畫出來：要配對的兩個數字用不同顏色、放在畫面相隔半個螢幕的位置，中間沒有連線、沒有同步脈動、沒有任何動作；初學者聽到『They match exactly』時，眼睛沒有落點，很可能只記得『有一堆數字』而沒有建立起對應。",
+   "baseline": {
+    "duration": 35.433,
+    "reveals": 6,
+    "longest_still_seconds": 9.8,
+    "static_ratio": 0.908
+   },
+   "disposition": "batch-round-2026-09-13",
+   "closed": null,
+   "closed_evidence": ""
+  }
+ ],
+ "content_phase_deferred": [
+  {
+   "scene": "companion_limit",
+   "scene_n": 14,
+   "claim": "45.5 s 建立 (1−cosθ)/θ → 0，15–27 場旁白再沒用過；全片唯一沒有「為什麼現在做」開場句的場。三鏡給 weak。",
+   "why_deferred": "要動旁白／場序 → scoped NFA ＋ 計費 TTS，使用者 2026-09-13 裁決：本輪只做純畫面側（填開場 9.2 s 空白），其餘進 backlog、另案報價。"
+  }
+ ]
+}
