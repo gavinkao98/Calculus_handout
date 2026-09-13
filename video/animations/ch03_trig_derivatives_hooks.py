@@ -126,7 +126,7 @@ def sector_inequality(spec, ctx, blocks):
     mut = T.color(ground, "muted")
     amber = T.color(ground, "accent")
     green = T.color(ground, "success")
-    concept = T.color(ground, "concept")
+    strategy = T.color(ground, "strategy")
 
     def _tri(o, apex_off, col, fop, z):
         return Polygon(o, o + np.array([R, 0.0, 0.0]), o + apex_off,
@@ -138,7 +138,7 @@ def sector_inequality(spec, ctx, blocks):
                              fill_opacity=fop, stroke_width=2.5).set_z_index(z)
 
     # Main-figure fills stack OPAQUE (not translucent): OAB (amber) sits inside
-    # the sector (concept), which sits inside OAC (green), so painting largest-
+    # the sector (strategy), which sits inside OAC (green), so painting largest-
     # first at increasing z-index (outer=1 -> sector=2 -> inner=3) lets each
     # later fill fully mask the part of the one below it -- three clean colour
     # bands (the ring between sector/outer edges) instead of the old low-alpha
@@ -215,9 +215,9 @@ def sector_inequality(spec, ctx, blocks):
     # z-order LARGEST region first (bottom) so each later, smaller, opaque fill
     # fully covers the part of the bigger one it sits inside -- outer (z=1)
     # under sector (z=2) under inner (z=3) leaves three distinct colour rings:
-    # green (OAC-only) / concept (sector-only) / amber (OAB), not a translucent blend.
+    # green (OAC-only) / strategy (sector-only) / amber (OAB), not a translucent blend.
     src_outer = _tri(O, C_off, green, MAIN_FOP, 1)
-    src_sector = _sec(O, concept, MAIN_FOP, 2)
+    src_sector = _sec(O, strategy, MAIN_FOP, 2)
     src_inner = _tri(O, B_off, amber, MAIN_FOP, 3)
 
     # ①②③ chips anchored IN the main figure's three regions (not just the right
@@ -240,9 +240,9 @@ def sector_inequality(spec, ctx, blocks):
     chip_inner = _chip(R * np.array([0.605, 0.158, 0.0]), amber, 1)
     # smaller radius: the sector-only sliver between chord AB and the arc is only
     # ~0.12u deep regardless of R, so a full-size chip would bleed equally into
-    # both neighbours; a tighter ring keeps it legibly "on the concept band."
+    # both neighbours; a tighter ring keeps it legibly "on the strategy band."
     chip_sector = _chip(R * np.array([np.cos(0.52 * th), np.sin(0.52 * th), 0.0]),
-                        concept, 2, radius=0.10)
+                        strategy, 2, radius=0.10)
     chip_outer = _chip(R * np.array([0.947, 0.716, 0.0]), green, 3)
 
     # -- right: three peeled shapes on one baseline (true relative size) ---------
@@ -263,10 +263,10 @@ def sector_inequality(spec, ctx, blocks):
     # same opaque stack, at the same MAIN_FOP, as the source figure on the left.
     #
     # Why (2026-09-13 visual audit): the source figure's opaque stacking leaves each region
-    # showing only its own RING, so concept on the left is the crescent -- what the sector
+    # showing only its own RING, so strategy on the left is the crescent -- what the sector
     # ADDS -- while glyph ② was the WHOLE sector, and badges ①②③ asserted the two were the
     # same thing. Rollout T2-2 then painted the inequality's three terms in the same three
-    # colours, which makes the mismatch load-bearing: the concept term is 1/2 theta, the whole
+    # colours, which makes the mismatch load-bearing: the strategy term is 1/2 theta, the whole
     # sector. Nesting the glyphs makes both readings true at once -- the colour is still the
     # increment, the badge and the outline are the whole area, and "each region sits inside
     # the next" (the narration's own words) becomes something the row SHOWS rather than
@@ -280,23 +280,23 @@ def sector_inequality(spec, ctx, blocks):
 
     dst1 = _slot(O1, _tri(O1, B_off, amber, MAIN_FOP, 3),
                  r"\tfrac12\sin\theta", "accent", 1, amber)
-    dst2 = _slot(O2, _sec(O2, concept, MAIN_FOP, 2),
-                 r"\tfrac12\theta", "concept", 2, concept,
+    dst2 = _slot(O2, _sec(O2, strategy, MAIN_FOP, 2),
+                 r"\tfrac12\theta", "strategy", 2, strategy,
                  nested=[_tri(O2, B_off, amber, MAIN_FOP, 3)])
     dst3 = _slot(O3, _tri(O3, C_off, green, MAIN_FOP, 1),
                  r"\tfrac12\tan\theta", "success", 3, green,
-                 nested=[_sec(O3, concept, MAIN_FOP, 2), _tri(O3, B_off, amber, MAIN_FOP, 3)])
+                 nested=[_sec(O3, strategy, MAIN_FOP, 2), _tri(O3, B_off, amber, MAIN_FOP, 3)])
 
     # the three terms in the three regions' colours (SPEC rule 5 "same quantity, same
-    # colour"; rollout T2-2; 2026-09-13 colour-axis unification: sin=accent/amber,
-    # theta=concept/ochre, tan=success/green): each `{{...}}` segment is one term and
-    # seg_roles paints it whole -- over the deck's theta token colour -- so a term reads
-    # as ONE tinted unit matching the shape above it, instead of the chain falling back
-    # to white.
+    # colour"; rollout T2-2; 2026-09-13 colour-axis unification, second call: sin=accent/amber,
+    # theta=strategy/violet (was concept/ochre -- too close in hue to accent/amber),
+    # tan=success/green): each `{{...}}` segment is one term and seg_roles paints it whole --
+    # over the deck's theta token colour -- so a term reads as ONE tinted unit matching the
+    # shape above it, instead of the chain falling back to white.
     ineq = brand.math_line(
         r"{{\tfrac12\sin\theta}} \;\le\; {{\tfrac12\theta}} \;\le\; {{\tfrac12\tan\theta}}",
         ground, role="text", size="math_sm",
-        seg_roles={r"\tfrac12\sin\theta": "accent", r"\tfrac12\theta": "concept",
+        seg_roles={r"\tfrac12\sin\theta": "accent", r"\tfrac12\theta": "strategy",
                    r"\tfrac12\tan\theta": "success"})
     row = VGroup(dst1, dst2, dst3)
     ineq.next_to(row, DOWN, buff=0.55)
@@ -306,7 +306,7 @@ def sector_inequality(spec, ctx, blocks):
     _centre_in_zone(title, full)
 
     # legibility pads under the three dimension labels that land on the 0.88-opaque fills
-    # (theta on concept, sin theta on amber, tan theta on green: 1.1-1.5:1 contrast, A6). A
+    # (theta on strategy, sin theta on amber, tan theta on green: 1.1-1.5:1 contrast, A6). A
     # bg-coloured BackgroundRectangle goes into the label's own stage group right before the
     # label (same z-index 5 -> drawn under it, revealed with it). Built AFTER _centre_in_zone
     # so a pad can never move the figure: `full` is already placed (its centre measured
@@ -864,7 +864,7 @@ def chord_vs_arc(spec, ctx, blocks):
     mut = T.color(ground, "muted")
     blue = T.color(ground, "secondary")
     amber = T.color(ground, "accent")
-    concept = T.color(ground, "concept")
+    strategy = T.color(ground, "strategy")
 
     R = 2.00
     TH = 1.25            # resting angle (~72 deg): chord/arc differ by 24%, which reads
@@ -898,7 +898,9 @@ def chord_vs_arc(spec, ctx, blocks):
     th = ValueTracker(TH)
     foot = np.array([R * np.cos(TH), 0.0, 0.0])
     # 2026-09-13 colour-axis unification (11/18/24): sin=accent/amber, cos=secondary/blue,
-    # theta objects=concept/ochre -- was sin=secondary/blue, cos=success/green, theta=accent.
+    # theta objects=strategy/violet -- was sin=secondary/blue, cos=success/green, theta=accent;
+    # theta then briefly concept/ochre, moved to strategy/violet same day (second call) because
+    # ochre sat too close in hue to accent/amber.
     sin_leg = Line(foot, R * _u(TH), color=amber, stroke_width=6.0)
     cos_leg = Line(np.zeros(3), foot, color=blue, stroke_width=6.0)
     # both labels sit where NO swing position can reach them (right of the widest foot /
@@ -910,8 +912,8 @@ def chord_vs_arc(spec, ctx, blocks):
     stage_nudge = VGroup(cos_leg, sin_leg, lab_sin, lab_cos)
 
     # -- stage 3: the arc above the chord ----------------------------------------------
-    arc = Arc(radius=R, start_angle=0.0, angle=TH, color=concept, stroke_width=6.0)
-    lab_arc = brand.math_line(r"\theta", ground, role="concept", size="label")
+    arc = Arc(radius=R, start_angle=0.0, angle=TH, color=strategy, stroke_width=6.0)
+    lab_arc = brand.math_line(r"\theta", ground, role="strategy", size="label")
     lab_arc.move_to((R + 0.40) * _u(TH / 2))
     stage_arc = VGroup(arc, lab_arc)
 
@@ -923,10 +925,10 @@ def chord_vs_arc(spec, ctx, blocks):
                      np.array([BAR_X + R * np.sin(TH), 1.34, 0.0]),
                      color=amber, stroke_width=7.0)
     bar_arc = Line(np.array([BAR_X, 0.68, 0.0]),
-                   np.array([BAR_X + R * TH, 0.68, 0.0]), color=concept, stroke_width=7.0)
+                   np.array([BAR_X + R * TH, 0.68, 0.0]), color=strategy, stroke_width=7.0)
     lab_bc = brand.math_line(r"|\sin\theta|", ground, role="accent", size="label")
     lab_bc.next_to(bar_chord, RIGHT, buff=0.16)
-    lab_ba = brand.math_line(r"|\theta|", ground, role="concept", size="label")
+    lab_ba = brand.math_line(r"|\theta|", ground, role="strategy", size="label")
     lab_ba.next_to(bar_arc, RIGHT, buff=0.16)
     ineq = brand.math_line(r"|\sin\theta| \le |\theta|", ground, role="text", size="math_sm")
     ineq.next_to(bar_arc, DOWN, buff=0.55).align_to(base, LEFT)
