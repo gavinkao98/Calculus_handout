@@ -58,6 +58,7 @@ from manim import (
 )
 
 from pipeline import brand
+from pipeline import focus
 from pipeline import pacing
 from pipeline import timing as TM
 from pipeline.blocks import Block, play_block
@@ -336,7 +337,11 @@ def sector_inequality(spec, ctx, blocks):
     # circle, and over the figure it hides only the thing it is restating -- the three
     # peeled glyphs and the inequality stay readable underneath it. (Centred on `full` it
     # landed between the figure and glyph (2), covering neither and colliding with both.)
-    er = 0.92
+    # r 0.92 -> 1.15: with the figure underneath now fully covered (see the panel below),
+    # the aside had a third of the frame to itself and was still drawn at inset size. R2
+    # asked for 1.4x on the main circle; this is the same move on the circle that is
+    # actually on screen, stopped where the panel would start eating the glyph (1) column.
+    er = 1.15
     eO = np.array([scaffold.get_center()[0], scaffold.get_center()[1] + 0.25, 0.0])
     e_circle = Circle(radius=er, color=mut, stroke_width=1.8).move_to(eO)
     e_axis = Line(eO + (er + 0.35) * LEFT, eO + (er + 0.35) * RIGHT,
@@ -377,8 +382,21 @@ def sector_inequality(spec, ctx, blocks):
     # aside's own caption -- measured: the caption's box lands on glyph (1)'s "1/2 sin theta".
     # A ground-coloured panel under the whole aside settles it, the same move the rollout
     # used for labels crossed by lines. Built LAST and inserted FIRST so it is behind.
-    e_panel = BackgroundRectangle(VGroup(e_circle, e_axis, e_caption),
-                                  color=T.color(ground, "bg"), fill_opacity=0.95, buff=0.28)
+    # fill_opacity 1.0, and sized to the FIGURE, not to the aside. Both halves of that
+    # were measured off the render, not guessed: at 0.95 the region fills under the panel
+    # kept 4.1% of their signal, which on a 270-unit teal over a 30-unit ground is a
+    # perfectly legible second figure (R2 must ML1, "ghosting"); and the parts of the
+    # construction that reached past the aside's own bounding box -- the y-axis, the O/1/A
+    # labels, the top-left arc -- were never under the panel at all. The right-hand glyphs
+    # and the inequality stay OUTSIDE it and stay readable at the storyboard's dim.
+    # buff 0.12, not the usual 0.28: the construction's own `tan theta` label already sits
+    # 0.24 u from glyph (1)'s left tip, so anything wider would clip the glyph the panel is
+    # supposed to leave alone. Padding costs nothing here -- a ground-coloured slab at full
+    # opacity is INVISIBLE except where it covers something, so there is no edge to breathe.
+    e_panel = BackgroundRectangle(VGroup(scaffold, src_inner, src_sector, src_outer,
+                                         chip_inner, chip_sector, chip_outer,
+                                         e_circle, e_axis, e_caption),
+                                  color=T.color(ground, "bg"), fill_opacity=1.0, buff=0.12)
     # ABOVE the figure, or it is not an overlay: the regions are z 1-3 and the chips z 7-8,
     # so a panel at the default z=0 sits behind everything it is supposed to cover (first
     # render showed the aside's circle drawn straight over glyph (1), caption on top of two
@@ -389,6 +407,17 @@ def sector_inequality(spec, ctx, blocks):
     evenness = VGroup(e_panel, e_circle, e_axis, e_live, e_caption)
 
     IN_SECONDS, OUT_SECONDS = 0.7, 0.35     # entrance (circle+axis, caption) / exit fade
+    # The three peeled glyphs and the inequality are the only content the panel does NOT
+    # cover, and for the aside to own the frame they have to fall back (R2: "三個複本與
+    # 不等式降亮到 30%"). It is done HERE rather than by the storyboard's `focus:` because
+    # scene.py applies a focus after the beat's reveal -- correct for a half-second fade,
+    # useless for a reveal that IS the beat: the dim landed after the aside had already
+    # faded out (measured: the glyph fills held 100% of their brightness for the whole
+    # aside, then flickered for 0.8 s at the end of the scene). Folded into the entrance
+    # and exit plays, so it costs the beat nothing. `fade` in and save_state/restore out,
+    # never set_opacity either way -- the (1)(2)(3) badges are hollow rings and a flat
+    # opacity fills them in (see focus.apply).
+    backdrop = VGroup(dst1, dst2, dst3, ineq)
 
     def _evenness_anim(scene, mob, _ground) -> float:
         """Swing +theta -> -theta -> +theta, twice, filling whatever beat this lands on.
@@ -400,7 +429,9 @@ def sector_inequality(spec, ctx, blocks):
         beat (measured: scene 06 went from -0.27 s under to +0.53 s over)."""
         total = TM.beat_run_time(scene, 6.0)
         t0 = _elapsed(scene)
-        scene.play(FadeIn(e_panel), FadeIn(e_circle), FadeIn(e_axis), run_time=0.4)
+        backdrop.save_state()
+        scene.play(FadeIn(e_panel), FadeIn(e_circle), FadeIn(e_axis),
+                   backdrop.animate.fade(1.0 - focus.DIM_OPACITY), run_time=0.4)
         scene.add(e_live)
         scene.play(FadeIn(e_caption), run_time=0.3)
         swing = max((total - IN_SECONDS - OUT_SECONDS) / 2.0, 0.8)
@@ -408,7 +439,7 @@ def sector_inequality(spec, ctx, blocks):
             scene.play(e_ang.animate.set_value(-th), run_time=swing,
                        rate_func=there_and_back)
         # the aside has done its job; the figure underneath gets the frame back
-        scene.play(FadeOut(mob), run_time=OUT_SECONDS)
+        scene.play(FadeOut(mob), backdrop.animate.restore(), run_time=OUT_SECONDS)
         return _elapsed(scene) - t0
 
     def _peel(src, chip):
@@ -1402,7 +1433,11 @@ def ratio_readouts(spec, ctx, blocks):
     def _ratio(t):
         return 1.0 if abs(t) < 1e-9 else float(np.sin(t) / t)
 
-    axes = Axes(x_range=[X0, X1, 1.0], y_range=[0.0, 1.18, 0.5],
+    # y top 1.18 -> 1.32: at 1.18 the axis ARROW TIP sat directly over the open circle at
+    # (0, 1) -- the one mark this scene cannot afford to obscure, since "undefined at
+    # theta = 0" is its whole point (visual frame audit). Keeping the tips and moving the
+    # ceiling up is better than dropping the tips, which every other graph in the deck has.
+    axes = Axes(x_range=[X0, X1, 1.0], y_range=[0.0, 1.32, 0.5],
                 x_length=7.6, y_length=2.0, tips=True,
                 axis_config={"color": mut, "stroke_width": 1.6, "include_ticks": False})
     # stop at pi exactly: past it the ratio goes negative, off the bottom of this y range
@@ -1557,9 +1592,53 @@ def continuity_template(spec, ctx, blocks):
         scene.play(TransformMatchingShapes(ghost, mob),
                    run_time=min(max(total * 0.55, 1.2), 8.0))
         scene.add(mob)
+        _mark_factors(scene)
         return _elapsed(scene) - t0
 
     ids["proof.1"].anim = _fill_second
+
+    # -- proof.0 keeps its WRITE ------------------------------------------------
+    # The row was split into {{...}} segments so the box below has something to surround.
+    # `pacing.block_parts` reads two submobjects as "a block with parts to walk", which
+    # would turn "the row is written as it is read" into two fades -- so name the write.
+    ids["proof.0"].anim = lambda scene, mob, _g: pacing.paced_write(scene, mob)
+
+    # -- the half-sum factor, marked (R2 round-18 must, ML3) ---------------------
+    # Segment 1 of each row IS the half-sum factor (see the storyboard's {{...}}). The beat
+    # says "in each, the half-sum factor never exceeds one in size" and nothing on screen
+    # said WHICH piece that was: box both, drop the rest of each row back, and hang one
+    # shared bound off the pair. Built at play time, not here, because the rows are still
+    # being positioned while hooks run.
+    #
+    # R2 asked for the boxed factors to "become 1" on the next beat. Not done, deliberately:
+    # replacing them in place would leave `cos x - cos x_0 = -2 sin(half-diff) . 1` on screen,
+    # which is false -- the factor is BOUNDED by one, not equal to it. The boxes instead
+    # leave as proof.2's genuine inequality row arrives, and the existing `focus.indicate`
+    # flashes both rows there, so the beat still points back at them.
+    marks: list = []
+
+    def _mark_factors(scene) -> None:
+        rows = [ids["proof.0"].mobject, ids["proof.1"].mobject]
+        if any(len(r.submobjects) < 2 for r in rows):
+            return                                   # un-segmented: nothing to address
+        boxes = VGroup(*[SurroundingRectangle(r.submobjects[1], color=amber,
+                                              stroke_width=2.4, buff=0.09) for r in rows])
+        bound = brand.math_line(r"|\,\cdot\,|\le 1", ground, role="accent", size="label")
+        bound.next_to(boxes, RIGHT, buff=0.34)
+        rest = VGroup(*[s for r in rows for i, s in enumerate(r.submobjects) if i != 1])
+        # multiplicative fade in, snapshot/restore out -- focus.apply's contract, for the
+        # same reason: a flat opacity paints over anything deliberately transparent.
+        rest.save_state()
+        marks.extend((boxes, bound, rest))
+        scene.play(*[Create(b) for b in boxes],
+                   rest.animate.fade(0.55), run_time=1.1)
+        scene.play(FadeIn(bound), run_time=0.5)
+
+    def _release_factors(scene) -> None:
+        if not marks:
+            return
+        boxes, bound, rest = marks
+        scene.play(FadeOut(boxes), FadeOut(bound), rest.animate.restore(), run_time=0.6)
 
     # -- the half-gap number line (lower right; the proof column keeps the left) --
     HALF_W = 2.15                       # half the line's length
@@ -1592,6 +1671,12 @@ def continuity_template(spec, ctx, blocks):
                       Line(b + 0.07 * UP, b + 0.07 * DOWN, color=amber, stroke_width=2.0))
 
     def _x_label():
+        # Once x has arrived, its label would sit exactly on top of x_0's and the two
+        # would render as a permanent glyph pile in the scene's LAST frame (visual frame
+        # audit, V2 blocking). x and x_0 coincide by then, so one label is the honest
+        # picture: drop this one as the gap closes.
+        if gap.get_value() < 0.08:
+            return VGroup()
         return brand.math_line("x", ground, role="text", size="label").next_to(
             _x_pt(), UP, buff=0.16)
 
@@ -1640,6 +1725,7 @@ def continuity_template(spec, ctx, blocks):
 
     def _show_half(scene, mob, _ground) -> float:
         t0 = _elapsed(scene)
+        _release_factors(scene)
         _play_stock(scene, stock_p2, mob, _ground)
         scene.add(half_group)
         scene.play(FadeIn(lab_half), run_time=0.45)
@@ -1672,6 +1758,9 @@ def continuity_template(spec, ctx, blocks):
             scene.play(gap.animate.set_value(0.0), run_time=walk, rate_func=smooth)
         else:
             gap.set_value(0.0)
+        # the bracket has collapsed to nothing, so its label is naming an object that is no
+        # longer there -- take it with it (visual frame audit advisory)
+        scene.play(FadeOut(lab_half), run_time=0.4)
         return _elapsed(scene) - t0
 
     qed_block.anim = _close_gap

@@ -37,7 +37,7 @@ from __future__ import annotations
 
 from typing import Any
 
-DIM_OPACITY = 0.35       # what a dimmed element fades back to (R2 asked for "40% 壓暗")
+DIM_OPACITY = 0.35       # the FACTOR a dimmed element is scaled by (R2 asked for "40% 壓暗")
 FADE_SECONDS = 0.4       # long enough to read as a shift of attention, short enough to
                          # stay inside the beat it belongs to
 INDICATE_SECONDS = 0.8   # rule 3: "短暫換高亮色並微放大再回復（約 1 s）"
@@ -78,14 +78,17 @@ def apply(scene, by_id: "dict[str, Any]", wanted: "list[str]",
     anims = []
     for b in sorted(to_dim):
         mob = by_id[b].mobject
-        # Snapshot BEFORE dimming and restore from that, never `set_opacity(1.0)`:
-        # set_opacity forces fill AND stroke to the given value on every family member,
-        # so restoring to 1.0 would fill in anything deliberately hollow. Caught on the
-        # first render of this primitive -- the (1)(2)(3) region badges are rings drawn
-        # with fill_opacity=0, and "restoring" them turned two of them into solid discs
-        # with their digits buried.
+        # `set_opacity` is wrong in BOTH directions here: it forces fill AND stroke to a
+        # flat value on every family member, so it paints over anything deliberately
+        # hollow. The (1)(2)(3) region badges are rings drawn with fill_opacity=0 --
+        # restoring them with set_opacity(1.0) turned two into solid discs with their
+        # digits buried (caught on this primitive's first render), and dimming them with
+        # set_opacity(DIM_OPACITY) did exactly the same at 35% (scene 06's `tri_outer`
+        # beat, caught 2026-09-13). So: snapshot and restore on the way back, and `fade`
+        # on the way in -- manim's multiplicative form, which scales each family member's
+        # own opacities and therefore cannot make an invisible part visible.
         mob.save_state()
-        anims.append(mob.animate.set_opacity(DIM_OPACITY))
+        anims.append(mob.animate.fade(1.0 - DIM_OPACITY))
     anims += [by_id[b].mobject.animate.restore() for b in sorted(to_restore)]
     scene.play(*anims, run_time=FADE_SECONDS)
     return target

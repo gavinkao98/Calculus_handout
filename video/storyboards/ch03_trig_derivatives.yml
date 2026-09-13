@@ -195,8 +195,9 @@ scenes:
       - { at: ineq, dim: [], indicate: [tri_inner, sector, tri_outer] }
       # 偶函數離題移到最後（R6／四鏡同指，2026-09-13 使用者核准；講義把它放在圖之前，這是
       # 刻意的影片／講義差異——書可以跳著讀，影片不能，19 秒的離題卡在主圖之前就是擋路）。
-      # 它現在覆蓋在已完成的圖上，所以整張圖壓暗當背景，小單位圓獨佔注意力。
-      - { at: evenness, dim: [circle, frame, apex, tri_inner, sector, tri_outer, ineq] }
+      # 它覆蓋在已完成的圖上：主圖整個被 hook 的不透明底板蓋掉，右邊三個複本與不等式則由
+      # hook 自己壓暗。這裡不能用 `focus:`——scene.py 是「先放 reveal、再套 focus」，而這一拍的
+      # reveal 就是整拍，壓暗會落在小圓已經淡出之後（實測：整段亮度沒動過，最後 0.8 秒才閃一下）。
     # 規則 1：07 只帶走 [circle, frame, apex]；其餘在場尾先淡出（exit），不靠硬切消失。
     exit: [evenness, tri_inner, sector, tri_outer, ineq]
     source: "chapter3-print-standalone.html SS3.1 . Figure 3.1 (sector-inequality) + area prose"
@@ -336,10 +337,11 @@ scenes:
     part: { current: 2, total: 2 }
     ref: md:continuity_argument
     covers: [cos_identity, sin_identity, bound, qed]     # proof.0/1/2 + qed (all shown)
-    paced: [proof.0]                 # 15-17 s beat: the row is written as it is read
-    # proof.1 與 qed 退出 paced：兩者的 reveal 都被 hook 換成 callable（pacing 只升級 stock
+    # 三拍都不走 paced：proof.1 與 qed 的 reveal 都被 hook 換成 callable（pacing 只升級 stock
     # reveal），各自有自己的填滿方式——proof.1 是由 proof.0 變形過去，qed 是「寫完最後一列
-    # ＋畫數線＋把 x 走進 x₀」，那段步行本身就把拍子的剩餘時間吃掉。
+    # ＋畫數線＋把 x 走進 x₀」，那段步行本身就把拍子的剩餘時間吃掉；proof.0 為了讓 hook 框得到
+    # 半和因子而分了段，block_parts 會把「兩個 submobject」讀成「有段可走」而改走兩次 fade，
+    # 所以由 hook 直接指名 pacing.paced_write——這一列仍然是「隨旁白書寫」，行為不變。
     # 規則 3：proof.2「Drop it to its largest size, one」講的是上面兩列的半和因子，閃兩列。
     focus:
       - { at: proof.2, dim: [], indicate: [proof.0, proof.1] }
@@ -368,8 +370,11 @@ scenes:
       $\sin x\to\sin x_0$ -- both continuous everywhere.
     statement: "Fix $x_0$: how far can $\\cos x,\\ \\sin x$ move?"
     proof:
-      - "$\\cos x-\\cos x_0=-2\\sin\\frac{x-x_0}{2}\\,\\sin\\frac{x+x_0}{2}$"
-      - "$\\sin x-\\sin x_0=\\phantom{-}2\\cos\\frac{x+x_0}{2}\\,\\sin\\frac{x-x_0}{2}$"
+      # {{…}} 分段：把「半和因子」切成自己的 submobject，hook 才框得到它（R2 must ML3）。
+      # 每個 {{ 前面都要留一個空白——manim 只在字串開頭或空白後才認分段起點，texparts 照抄；
+      # 寫成 }}{{ 會被靜靜併回一段並改變排版。量過：有空白時兩列寬度到小數 4 位完全不變。
+      - "$ {{\\cos x-\\cos x_0=-2\\sin\\frac{x-x_0}{2}\\,}} {{\\sin\\frac{x+x_0}{2}}} $"
+      - "$ {{\\sin x-\\sin x_0=\\phantom{-}2}} {{\\cos\\frac{x+x_0}{2}}} {{\\,\\sin\\frac{x-x_0}{2}}} $"
       - "$|\\cos x-\\cos x_0|,\\ |\\sin x-\\sin x_0|\\le 2|\\sin\\frac{x-x_0}{2}|$"
     qed: "$x\\to x_0\\ \\Rightarrow\\ \\cos x\\to\\cos x_0,\\ \\sin x\\to\\sin x_0$"
 

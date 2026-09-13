@@ -15,9 +15,10 @@ from pipeline import schema as S       # noqa: E402
 
 
 class FakeMob:
-    """Mirrors the manim contract focus.apply relies on: set_opacity / save_state /
-    restore. `hollow` stands in for any deliberately-transparent part (the (1)(2)(3)
-    badge rings): set_opacity clobbers it, restore must bring it back."""
+    """Mirrors the manim contract focus.apply relies on: fade / save_state / restore.
+    `hollow` stands in for any deliberately-transparent part (the (1)(2)(3) badge rings).
+    `set_opacity` is kept because it is the trap: it writes a flat value over the whole
+    family and so clobbers `hollow`, which is why neither direction of a focus may use it."""
     def __init__(self, hollow=0.0):
         self.opacity = 1.0
         self.hollow = hollow
@@ -28,6 +29,14 @@ class FakeMob:
         self.opacity = v
         self.hollow = v            # manim sets fill AND stroke on the whole family
         return ("set_opacity", self, v)
+
+    def fade(self, darkness):
+        # manim's VMobject.fade: scales each family member's OWN opacities, so a part
+        # that is transparent on purpose stays transparent.
+        factor = 1.0 - darkness
+        self.opacity *= factor
+        self.hollow *= factor
+        return ("fade", self, darkness)
 
     def save_state(self):
         self._saved = (self.opacity, self.hollow)
@@ -118,15 +127,19 @@ def test_apply_restores_what_is_no_longer_wanted():
     assert by_id["b"].mobject.opacity == F.DIM_OPACITY
 
 
-def test_restore_brings_back_the_original_opacities_not_a_flat_one():
-    """The regression this primitive shipped with on its first render: restoring with
-    set_opacity(1.0) fills in anything deliberately hollow (the region badges are rings
-    with fill_opacity=0), so two of the three (1)(2)(3) badges came back as solid discs
-    with their digits buried. Restore must be save_state/restore, not a flat value."""
+def test_a_hollow_part_stays_hollow_through_a_dim_and_a_restore():
+    """Both directions, one defect. Restoring with set_opacity(1.0) fills in anything
+    deliberately hollow -- the region badges are rings with fill_opacity=0 -- so two of the
+    three (1)(2)(3) badges came back as solid discs with their digits buried; that was fixed
+    with save_state/restore on the first render of this primitive. The DIM had the same hole
+    and kept it: set_opacity(DIM_OPACITY) writes 0.35 into a ring's fill and makes it a disc,
+    which is what scene 06's (1) and (2) were doing at the `tri_outer` beat (2026-09-13).
+    A dim is multiplicative -- `fade` -- so it can never paint an invisible part visible."""
     by_id = {"ring": FakeBlock(hollow=0.0)}
     scene = FakeScene(10.0)
     dimmed = F.apply(scene, by_id, ["ring"], set())
-    assert by_id["ring"].mobject.hollow == F.DIM_OPACITY, "dim touches the hollow part"
+    assert by_id["ring"].mobject.opacity == F.DIM_OPACITY, "the visible part dims"
+    assert by_id["ring"].mobject.hollow == 0.0, "a hollow part must STAY hollow while dimmed"
     F.apply(scene, by_id, [], dimmed)
     assert by_id["ring"].mobject.opacity == 1.0
     assert by_id["ring"].mobject.hollow == 0.0, "a hollow part must come back hollow"
@@ -270,7 +283,7 @@ if __name__ == "__main__":
     test_scene_focus_reads_entries_and_empty_dim_means_restore()
     test_apply_dims_only_the_named_blocks()
     test_apply_restores_what_is_no_longer_wanted()
-    test_restore_brings_back_the_original_opacities_not_a_flat_one()
+    test_a_hollow_part_stays_hollow_through_a_dim_and_a_restore()
     test_empty_dim_restores_everything()
     test_apply_is_a_no_op_when_nothing_changes()
     test_unknown_block_id_is_ignored_at_play_time()

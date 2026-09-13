@@ -56,7 +56,7 @@ def write_seconds(mob: Any, total: float) -> float:
     return min(total, WRITE_LEAD_SECONDS + WRITE_SECONDS_PER_GLYPH * glyphs)
 
 
-def _paced_write(scene, mob) -> float:
+def paced_write(scene, mob) -> float:
     """One formula row, drawn while the narration reads it."""
     total = TM.beat_run_time(scene, 0.0)
     if total <= 0.0:                       # off-beat: the caller wants the stock length
@@ -77,7 +77,7 @@ def paced_reveal(scene, mob, _ground) -> float:
     parts = block_parts(mob)
     n = len(parts)
     if n == 1:
-        return _paced_write(scene, mob)
+        return paced_write(scene, mob)
     spent = walk(scene, parts, TM.beat_run_time(scene, FADE_SECONDS * n))
     scene.add(mob)
     return spent
