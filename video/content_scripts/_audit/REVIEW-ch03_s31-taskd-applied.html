@@ -38,7 +38,7 @@ color:#5c5442;font-family:monospace;margin-right:5px}
 </style></head><body><main><h1>§3.1 本輪驗收報告 — Task D、兩支新 hook、六條視覺 advisory、divider accent</h1>
 <p class="lede">使用者 2026-09-13 裁決「四件都同意，一次都做完」。本報告逐條呈現實際寫進去的
 內容、量測到的數字，以及<b>沒做完的部分與原因</b>。</p>
-<p class="meta">2026-09-13 ｜ commit <code>19d2eb6</code>…<code>3f31562</code> ｜
+<p class="meta">2026-09-13 ｜ commit <code>19d2eb6</code>…<code>7f7cbd1</code> ｜
 成片 <code>output/ch03/s3.1/ch03_trig_derivatives_mimo.mp4</code>（17.5 分，1080p，真 Dean 音檔）｜
 pack <code>output/ch03/s3.1/rewatch_pack_after17/</code></p><h2>0. 一頁摘要</h2>
 <div class="card ok"><h4>做完並驗過的</h4><ul>
@@ -54,7 +54,7 @@ pack <code>output/ch03/s3.1/rewatch_pack_after17/</code></p><h2>0. 一頁摘要<
 <code>sizecheck</code> 0 error／1 既有 warn、<code>derive_spoken --check</code> parity OK、
 標籤相交量測六場全 0。</li></ul></div>
 <div class="card bad"><h4>沒做完的（要你裁決）</h4><ul>
-<li><b>三個場的最長靜止仍超過 12 s</b>：04（25.8 s）、09（15.5 s）、23（12.8 s）。見 §6。</li>
+<li><b>三個場的最長靜止仍超過 12 s</b>：04（25.8 s）、09（15.2 s）、23（12.8 s）。見 §6。</li>
 <li><b>全節字級</b>（行內小分數 16–20 px）：真正的解會動到每個 deck 的每個模板。見 §4.6。</li></ul></div>
 <div class="card warn"><h4>帳</h4><p><b>15 次 billed MiMo 呼叫</b>（核准 12＋10＝22），
 其中 <b>9 次浪費</b>在兩個坑；兩次都被 <code>--max-billed-calls</code> 擋住，<b>舊音檔一次都沒被
@@ -187,19 +187,31 @@ manifest 的 <code>audio_file</code>／<code>scene_number</code> 指過去之後
 <div class="card ok"><p><b>兩次超支都被 <code>--max-billed-calls</code> 擋在「做下一次呼叫之前」，
 舊 manifest 與 WAV 原封不動</b>（27 場、895.8 秒、時間戳停在跑 TTS 之前，逐項驗過）。
 那支旗標正是上一輪 13 次事故之後加的。兩條教訓已寫進 RUNBOOK。</p></div><h2>6. 驗收：最長靜止（0.05% 細門檻）</h2>
-<div class="card bad"><h4>五個 content 場被 Task D 推過 12 s 線，兩個已修、三個沒修</h4>
-<p>成因單一而清楚：<b>對齊講義讓這些拍子長了 6–35 秒，而畫面上仍然只有一次 reveal</b>。</p>
+<div class="card bad"><h4>五個 content 場被 Task D 推過 12 s 線，三個已修、三個沒修</h4>
+<p>成因單一而清楚：<b>對齊講義讓這些拍子長了 6–35 秒，而畫面上仍然只有一次 reveal</b>。
+（場 12 是第六個：旁白沒變，是我這輪新寫的 hook 自己沒填滿最後一拍。）</p>
 <table><tr><th>場</th><th class="n">本輪旁白增量</th><th class="n">最長靜止</th><th>處置</th></tr>
 <tr><td>04 <code>difference_quotient_for_sine</code></td><td class="n">+34.8 s</td>
 <td class="n"><b>25.8 s</b></td><td>未修</td></tr>
 <tr><td>06 <code>sector_inequality</code></td><td class="n">+13.4 s</td>
-<td class="n">20.8 → <b>8.8 s</b></td><td><span class="tag g">原語 7</span></td></tr>
+<td class="n">20.8 → <b>8.8 s</b></td><td><span class="tag g">原語 7 走 <code>{…}</code> 分段</span></td></tr>
 <tr><td>09 <code>continuity_argument</code></td><td class="n">0（加的是 hook）</td>
-<td class="n"><b>15.5 s</b></td><td>未修</td></tr>
+<td class="n"><b>15.2 s</b></td><td>未修</td></tr>
+<tr><td>12 <code>limit_not_identity</code></td><td class="n">0（加的是 hook）</td>
+<td class="n">12.5 → <b>6.8 s</b></td><td><span class="tag g">θ=π 讀數沿曲線走</span></td></tr>
 <tr><td>23 <code>shm_compute</code></td><td class="n">+6.5 s</td>
 <td class="n"><b>12.8 s</b></td><td>未修（超線 0.8 s）</td></tr>
 <tr><td>26 <code>recap</code></td><td class="n">+10.6 s</td>
-<td class="n">20.2 → <b>10.5 s</b></td><td><span class="tag g">原語 7</span></td></tr></table>
+<td class="n">20.2 → <b>10.5 s</b></td><td><span class="tag g">原語 7 走卡片兩行</span></td></tr></table>
+<p><b>兩個可重用的手法</b>（本輪學到的）：① hook 裡的 block 若是 callable anim，
+<code>pacing.apply</code> 會跳過它，但可以直接把 <code>anim=pacing.paced_reveal</code> 接上去——
+只要那個 mobject 有 2–8 個 submobject（<code>{…}</code> 分段正好），它就會走完整拍。
+② 「讀數／落點」不要用淡入，用 ValueTracker <b>走</b>過去，<code>run_time = beat_run_time − 1.0</code>
+就按構造填滿拍子。</p>
+<p class="note"><b>量測上的坑：</b>同一支 pack 對場 12 前後兩次跑出 8.0 s 與 12.5 s——差別是上游
+場 06 長度變了約 1 秒、場界位移，讓硬切有時落在取樣窗內把靜止段截斷。<b>「最長靜止」這個欄位
+會因為場界而偏樂觀</b>；數字跳動時要自己看 change events 算（該場 events 停在 +9.5、場長 23.8，
+實際死區 14.3 s，8.0 那次是僥倖）。</p>
 <p><b>為什麼另外三個不硬修：</b>場 04 的畫面<b>已經滿了</b>——量測：四列算式從 y+1.26 排到 −3.27，
 加不了第五列。那 26 秒的死區正好是本輪新增的 u／v 來源敘述，NFA 早就列為 advisory
 （「15 秒全程只有聲音」）。真正的解是照 NFA 建議做一塊<b>覆蓋層</b>（比照場 06 的偶函數 aside），
@@ -208,7 +220,7 @@ manifest 的 <code>audio_file</code>／<code>scene_number</code> 指過去之後
 死區那一拍的 reveal 都是 callable，原語 7 接不上。<b>本輪不自行擴張範圍，交裁決。</b></p></div>
 <h3>全 27 場</h3>
 <table><tr><th class="n">#</th><th>場</th><th class="n">最長靜止（fine）</th><th></th></tr>
-<tr><td class="n">01</td><td><code>intro</code></td><td class="n">1.5 s</td><td></td></tr><tr><td class="n">02</td><td><code>divider_limit</code></td><td class="n">5.2 s</td><td></td></tr><tr><td class="n">03</td><td><code>why_trig_is_different</code></td><td class="n">8.5 s</td><td></td></tr><tr style="background:#fdf3f3"><td class="n">04</td><td><code>difference_quotient_for_sine</code></td><td class="n">25.8 s</td><td> <span class="tag b">超線</span></td></tr><tr><td class="n">05</td><td><code>divider_squeeze</code></td><td class="n">5.2 s</td><td></td></tr><tr style="background:#f2f9f4"><td class="n">06</td><td><code>sector_inequality</code></td><td class="n">8.8 s</td><td> <span class="tag g">本輪修</span></td></tr><tr><td class="n">07</td><td><code>squeeze_to_the_bound</code></td><td class="n">8.2 s</td><td></td></tr><tr><td class="n">08</td><td><code>continuity_statement_sin_limit</code></td><td class="n">7.0 s</td><td></td></tr><tr style="background:#fdf3f3"><td class="n">09</td><td><code>continuity_argument</code></td><td class="n">15.5 s</td><td> <span class="tag b">超線</span></td></tr><tr><td class="n">10</td><td><code>fundamental_limit</code></td><td class="n">9.0 s</td><td></td></tr><tr><td class="n">11</td><td><code>squeeze_graph</code></td><td class="n">7.2 s</td><td></td></tr><tr><td class="n">12</td><td><code>limit_not_identity</code></td><td class="n">8.0 s</td><td></td></tr><tr><td class="n">13</td><td><code>radians_essential</code></td><td class="n">8.0 s</td><td></td></tr><tr><td class="n">14</td><td><code>companion_limit</code></td><td class="n">9.2 s</td><td></td></tr><tr><td class="n">15</td><td><code>divider_derivatives</code></td><td class="n">5.2 s</td><td></td></tr><tr><td class="n">16</td><td><code>derivative_of_sine</code></td><td class="n">8.2 s</td><td></td></tr><tr><td class="n">17</td><td><code>derivative_of_cosine</code></td><td class="n">11.5 s</td><td></td></tr><tr><td class="n">18</td><td><code>slope_equals_height</code></td><td class="n">9.5 s</td><td></td></tr><tr><td class="n">19</td><td><code>derivative_cycle</code></td><td class="n">8.2 s</td><td></td></tr><tr><td class="n">20</td><td><code>divider_apply</code></td><td class="n">5.2 s</td><td></td></tr><tr><td class="n">21</td><td><code>all_six_tan_sec</code></td><td class="n">6.5 s</td><td></td></tr><tr><td class="n">22</td><td><code>all_six_cot_csc</code></td><td class="n">10.8 s</td><td></td></tr><tr style="background:#fdf3f3"><td class="n">23</td><td><code>shm_compute</code></td><td class="n">12.8 s</td><td> <span class="tag b">超線</span></td></tr><tr><td class="n">24</td><td><code>shm_stacked_graphs</code></td><td class="n">11.5 s</td><td></td></tr><tr><td class="n">25</td><td><code>toward_the_chain_rule</code></td><td class="n">9.0 s</td><td></td></tr><tr style="background:#f2f9f4"><td class="n">26</td><td><code>recap</code></td><td class="n">10.5 s</td><td> <span class="tag g">本輪修</span></td></tr><tr><td class="n">27</td><td><code>outro</code></td><td class="n">2.8 s</td><td></td></tr></table>
+<tr><td class="n">01</td><td><code>intro</code></td><td class="n">1.5 s</td><td></td></tr><tr><td class="n">02</td><td><code>divider_limit</code></td><td class="n">5.2 s</td><td></td></tr><tr><td class="n">03</td><td><code>why_trig_is_different</code></td><td class="n">8.5 s</td><td></td></tr><tr style="background:#fdf3f3"><td class="n">04</td><td><code>difference_quotient_for_sine</code></td><td class="n">25.8 s</td><td> <span class="tag b">超線</span></td></tr><tr><td class="n">05</td><td><code>divider_squeeze</code></td><td class="n">5.2 s</td><td></td></tr><tr style="background:#f2f9f4"><td class="n">06</td><td><code>sector_inequality</code></td><td class="n">8.8 s</td><td> <span class="tag g">本輪修</span></td></tr><tr><td class="n">07</td><td><code>squeeze_to_the_bound</code></td><td class="n">8.2 s</td><td></td></tr><tr><td class="n">08</td><td><code>continuity_statement_sin_limit</code></td><td class="n">7.0 s</td><td></td></tr><tr style="background:#fdf3f3"><td class="n">09</td><td><code>continuity_argument</code></td><td class="n">15.2 s</td><td> <span class="tag b">超線</span></td></tr><tr><td class="n">10</td><td><code>fundamental_limit</code></td><td class="n">9.0 s</td><td></td></tr><tr><td class="n">11</td><td><code>squeeze_graph</code></td><td class="n">7.2 s</td><td></td></tr><tr style="background:#f2f9f4"><td class="n">12</td><td><code>limit_not_identity</code></td><td class="n">6.8 s</td><td> <span class="tag g">本輪修</span></td></tr><tr><td class="n">13</td><td><code>radians_essential</code></td><td class="n">8.0 s</td><td></td></tr><tr><td class="n">14</td><td><code>companion_limit</code></td><td class="n">9.2 s</td><td></td></tr><tr><td class="n">15</td><td><code>divider_derivatives</code></td><td class="n">5.2 s</td><td></td></tr><tr><td class="n">16</td><td><code>derivative_of_sine</code></td><td class="n">8.2 s</td><td></td></tr><tr><td class="n">17</td><td><code>derivative_of_cosine</code></td><td class="n">11.5 s</td><td></td></tr><tr><td class="n">18</td><td><code>slope_equals_height</code></td><td class="n">9.5 s</td><td></td></tr><tr><td class="n">19</td><td><code>derivative_cycle</code></td><td class="n">8.2 s</td><td></td></tr><tr><td class="n">20</td><td><code>divider_apply</code></td><td class="n">5.2 s</td><td></td></tr><tr><td class="n">21</td><td><code>all_six_tan_sec</code></td><td class="n">6.5 s</td><td></td></tr><tr><td class="n">22</td><td><code>all_six_cot_csc</code></td><td class="n">10.8 s</td><td></td></tr><tr style="background:#fdf3f3"><td class="n">23</td><td><code>shm_compute</code></td><td class="n">12.8 s</td><td> <span class="tag b">超線</span></td></tr><tr><td class="n">24</td><td><code>shm_stacked_graphs</code></td><td class="n">11.5 s</td><td></td></tr><tr><td class="n">25</td><td><code>toward_the_chain_rule</code></td><td class="n">9.0 s</td><td></td></tr><tr style="background:#f2f9f4"><td class="n">26</td><td><code>recap</code></td><td class="n">10.5 s</td><td> <span class="tag g">本輪修</span></td></tr><tr><td class="n">27</td><td><code>outro</code></td><td class="n">2.8 s</td><td></td></tr></table>
 <p class="note">coarse（0.2%）欄位看不見文字動畫，INDEX 的判讀說明已載明「兩者不一致時相信細的、
 去看幀」。例：場 06 修完 coarse 27.2 s／fine 8.8 s。</p>
 <h3>其他閘</h3>
