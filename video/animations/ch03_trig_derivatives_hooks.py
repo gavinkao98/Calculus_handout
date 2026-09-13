@@ -484,7 +484,28 @@ def sector_inequality(spec, ctx, blocks):
     # line. Its three terms are already `{{...}}` segments, so primitive 7 can walk them
     # across the beat: each term arrives as the narration names it. (`pacing.apply` only
     # upgrades STOCK reveals, and this one is a callable, so it is wired here by hand.)
-    out.append(Block("ineq", ineq, anim=pacing.paced_reveal, static=False, layer="graph"))
+    def _ineq_anim(scene, mob, _ground) -> float:
+        """`paced_reveal`, but leaving room for the flash that follows it.
+
+        This beat carries BOTH a paced reveal and a `focus[].indicate` (rule 3: the three
+        regions flash so the viewer can pair them with the three terms). scene.py plays the
+        reveal first and the flash after, and a paced reveal fills its whole beat by
+        definition -- so the flash always landed 0.8 s PAST the end of the narration. It is
+        the last unresolved `[sync]` overrun in the deck (06 +0.457 s after the pipeline-
+        level timing work), and it is a choreography decision, not a pipeline bug: the beat
+        is asked to hold four events in the time of three. Reserving the flash's share here
+        keeps both -- the terms still arrive one per sentence, and the flash still ties them
+        to the regions, now inside the beat it belongs to.
+        """
+        t0 = _elapsed(scene)
+        parts = pacing.block_parts(mob)
+        budget = TM.beat_run_time(scene, pacing.FADE_SECONDS * len(parts))
+        spent = pacing.walk(scene, parts, max(budget - focus.INDICATE_SECONDS,
+                                              pacing.FADE_SECONDS * len(parts)))
+        scene.add(mob)
+        return _spent(scene, t0, spent)
+
+    out.append(Block("ineq", ineq, anim=_ineq_anim, static=False, layer="graph"))
     return out
 
 
