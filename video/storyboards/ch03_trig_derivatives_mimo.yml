@@ -35,7 +35,7 @@ meta:
   derived_from:
     inputs:
     - path: ch03_trig_derivatives.yml
-      sha256: 0f2122a54135cd7a1b790595cf2420785649d7f189fbdf427268e1d2e3b6c561
+      sha256: 3197b1a34203e53cd80f26ef1ec0e442717fbe7b993652e212545efa6390f17e
     - path: ../content_scripts/ch03_trig_derivatives.spoken.yml
       sha256: 57b72fd07fc8e2962cccf0885c6b45a301270829891f3d4ca5803eb1dfee15b1
 scenes:
@@ -504,9 +504,17 @@ scenes:
     '
   statement: 'Fix $x_0$: how far can $\cos x,\ \sin x$ move?'
   proof:
-  - $ {{\cos x-\cos x_0=-2\sin\frac{x-x_0}{2}\,}} {{\sin\frac{x+x_0}{2}}} $
-  - $ {{\sin x-\sin x_0=\phantom{-}2}} {{\cos\frac{x+x_0}{2}}} {{\,\sin\frac{x-x_0}{2}}} $
-  - $|\cos x-\cos x_0|,\ |\sin x-\sin x_0|\le 2|\sin\frac{x-x_0}{2}|$
+  - tex: $ {{\cos x-\cos x_0=-2}} {{\sin\frac{x-x_0}{2}}} {{\,\sin\frac{x+x_0}{2}}} $
+    seg_roles:
+      \sin\frac{x-x_0}{2}: accent
+      \,\sin\frac{x+x_0}{2}: strategy
+  - tex: $ {{\sin x-\sin x_0=\phantom{-}2}} {{\cos\frac{x+x_0}{2}}} {{\,\sin\frac{x-x_0}{2}}} $
+    seg_roles:
+      \cos\frac{x+x_0}{2}: strategy
+      \,\sin\frac{x-x_0}{2}: accent
+  - tex: $ {{|\cos x-\cos x_0|,\ |\sin x-\sin x_0|\le}} {{2|\sin\frac{x-x_0}{2}|}} $
+    seg_roles:
+      2|\sin\frac{x-x_0}{2}|: accent
   qed: $x\to x_0\ \Rightarrow\ \cos x\to\cos x_0,\ \sin x\to\sin x_0$
 - id: fundamental_limit
   kind: content
