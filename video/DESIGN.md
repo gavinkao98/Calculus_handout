@@ -619,6 +619,67 @@ V/A code**。
   `meta.fontfloor_enforce` 才升 error）浮現過小文字。判斷層：承載值小到不可讀 → `V4`（blocking）；小但可辨
   → `A6` 扣分，並補一條「以手機寬度檢核次要文字」的尺標。
 
+## 設計系統規則落地：LayoutRules L1–L3／MathRules M1–M3（2026-09-14 T3）
+
+設計畫布 [`_audit/design-template-system/LayoutRules.dc.html`](_audit/design-template-system/LayoutRules.dc.html)
+（版面四條 L1–L4）與 [`MathRules.dc.html`](_audit/design-template-system/MathRules.dc.html)（數學五條
+M1–M5）是 §3.1 成片 rewatch 之後訂下的設計法。**九條裡六條可以寫成確定性檢查**，本輪落進
+[`sizecheck.py`](pipeline/sizecheck.py)。**分流表（哪三條只能人審、各歸哪個既有判斷閘）在
+[`REVIEW_GATES.md`](REVIEW_GATES.md) §一 層 6**；本節寫的是落地那六條的**判準、門檻、以及門檻為什麼是這個數字**。
+
+**六條全部 warn-default，一條都不預設 error。** 理由：deck 全部早於規則，一上來就 error 只會讓人用
+`--skip-sizecheck` 把整個 sizecheck 關掉，連既有的 11 項一起失效。升級路徑是**逐節 opt-in**：
+`meta.layout_enforce: true` 把 L 系升成 error、`meta.mathtype_enforce: true` 把 M 系升成 error
+（形狀比照 [`pedagogy.assumptions_registry_issues`](pipeline/pedagogy.py) 的 `sev = "error" if enforce else "warn"`）。
+**改預設的條件**：某一節開了旗標、跑完一整輪零誤報，**下一輪**才拿出來討論（T3 本輪明確不改預設）。
+
+| 規則 | 判準（函式） | 門檻／常數 | 為什麼是這個門檻 |
+|---|---|---|---|
+| **L1** 結論最重 | `_conclusion_weight_issues`：`result`／`qed` 區塊的最大 authored px vs 其餘 body 區塊的最大 authored px | `L1_WEIGHT_RATIO = 1.15` | 規則原文寫 `>=`（嚴格）。但 `theorem_proof` 的 `statement` 卡是 44 px、`qed` 行是 43 px——**1 px 的「反轉」沒有人看得見**，嚴格比較會讓每一場帶 qed 的證明都噴 warn。規則舉證的真實反轉是 30% 級距（結論掉到 rail 階 34 vs statement 44＝1.29；今天的 payoff 62 vs body 48 也是 1.29），所以 1.15 兩邊都分得開 |
+| **L2** 下三分之一不得空置 | `_bottom_band_issues`：body 區塊 bbox 聯集 ∩ 下三分之一 ÷ 該帶面積 | `L2_BAND_FRAC = 1/3`、`L2_MIN_FILL = 0.15` | **門檻就是規則原文的 0.15，沒有調過。** 用 bbox 聯集近似墨覆蓋是**刻意高估**（bbox 恆 ≥ 框內的墨），所以「連 bbox 都不到 15%」比規則要求的更強——只會少報，不會誤報 |
+| **L3** 右欄有條件展開 | `_main_width_issues`：body 區塊的水平總跨距 ÷ 幀寬；不足時要求 `aside:` 或置中 | `L3_MAIN_W_FRAC = 0.58`、`L3_CENTER_TOL = 0.6u` | 0.58 是規則原文。`0.6u` 的置中容差＝圖／表天生置中（實測 `cx = 0.00`），左掛的文字欄實測 `cx = −2.7…−6.0u`，兩群相差一個數量級，容差落在中間任何值結果都一樣 |
+| **M1** 數學行不得混入散文 | `_math_register_issues`：`\text{}`／`\mbox{}`，或控制序列剝掉後仍有連續 ≥2 個多字母單字 | 兩個豁免（見下） | 規則原文沒有門檻，只有形狀。誤報全出在**範圍**而不是門檻，所以校準的是範圍 |
+| **M2** rail 只有兩種語域 | `_rail_register_issues`：一個 `reason` 同時有 `$…$` 與裸英文字 | 無門檻 | 規則原文「整段數學，或整段 sans 小型大寫。不混。」逐字可判 |
+| **M3** 運算元正體 | `_operator_upright_issues`：已知運算元名寫成裸字母序列（少 `\`） | `_UPRIGHT_OPS` 名單 | 只取原文可判定的那一半；完整正斜體判斷歸人審（分流表） |
+
+**M1 的範圍是這一輪最花時間的校準，兩個豁免都寫成測試：**
+
+1. **只查「渲成 display 數學行」的欄位。** `derivation`／`worked_example` 的鏈列（`steps[].math`／
+   `result.math`／`check.math`／舊 `lines[].tex`）一律走 `brand.math_line`，恆在範圍內——而且**正是這些列有
+   規則要你把說明搬進去的 reason rail**。`definition_math.math[]` 也走 `math_line`，但 `math_line` 有**文件寫明的
+   混排分支**（`"if $f(x)=0$ then $x=a$"` → 文字模式 `Tex`），那是散文行不是數學行，因此只收 display 形態。
+   `theorem_proof.proof[]` 走的是 `brand.prose`：**整列一個 `$…$` 才是 display 數學行**，其餘是作者寫的散文句
+   （`"Take any two distinct inputs in the interval $[a,b]$."`），查它等於在罰模板照設計運作。
+   未收範圍的還有 `statement:`（散文可以是公式，混排是它的本職）、graph 曲線標籤、`procedure_steps.worked[]`。
+   `sizecheck._math_fields` 的 docstring 逐條寫出這個邊界。
+2. **`\underbrace{X}_{\text{label}}` 不算。** 開在 sub／superscript 群組裡的字串是**掛在式子下方的標籤**，
+   不是坐在行內的散文——它本身就已經是規則要的那個動作（把字移出行）。`_SCRIPT_LABEL` 在兩個偵測器之前剝掉。
+
+**L1 的量測有一個 manim 陷阱，值得單獨記：** 不能用 manim 公開的 `font_size` getter
+（`height / initial_height / SCALE_FACTOR_PER_FONT_POINT`）。凡是用 `substrings_to_isolate` 建的 `MathTex`
+（**每一個 `{{…}}` 段、每一個 deck `color_map` 命中**都走這條）都會在 `initial_height` 取樣**之後**重建
+submobject，於是 getter 拿重建後的高度去比未重建的基準——`_demo_tex_parts` 的
+`{{\lim}} {{\frac{h+h^2}{h}}}` 那一列實測報 **102 px**，實際授權字級是 48 px（2.1 倍）。
+`sizecheck._authored_font_px` 改讀 manim 在建構時記下的 `_font_size`（不受重建影響），
+校準前 23 deck 有 9 個假 L1 warn，校準後 **0 個**。
+**連帶發現（本輪不修，屬另案）：** 既有的 `_effective_font_px` 仍走公開 getter，`_floor_issues` 因此
+在這類節點上**高估**字級——方向是少報 floor warn，不是誤報，但值得另開一輪處理
+（見 [`KICKOFF-shared-layer-v1.md`](KICKOFF-shared-layer-v1.md) §8）。
+
+**23 deck 校準結果（139 個 content 場，全部 warn、error 行逐字不變）：**
+L1 **0**／L2 **63**／L3 **7**／M1 **22**／M2 **30**／M3 **0**，合計 122 條。
+逐條都能指出違反在哪（deck→場→欄位）。兩個數字值得留著當基準：
+
+- **L1 = 0 不是規則沒生效，是 T2 之後 storyboard 表面已經做不出違反**——payoff 階 62 px 高於任何 body 區塊
+  能被授權的字級，模板也不會把結論縮小。L1 因此是**擋未來模板／hook 迴歸**的閘（hook 自建 `MathTex`
+  可以是任意字級），不是擋撰稿錯誤的閘；它的違反案例只能用合成區塊測（`_selftest_layout_rules.py`）。
+- **M3 = 0**：現有 deck 的 `\sin`／`\lim` 全部寫對。fixture 證明偵測器會動。
+
+回歸網＝[`pipeline/_selftest_layout_rules.py`](pipeline/_selftest_layout_rules.py) ＋
+fixture [`storyboards/_fixtures/layout_rules.yml`](storyboards/_fixtures/layout_rules.yml)：
+fixture 的六個場把**每一條規則的違反與乾淨兩側都釘住**（EXPECT 是 scene × rule 的完整矩陣，
+沒列到的規則必須靜默），另加純函式探針釘住 M1–M3 的偵測器邊界與 L1 的幾何。
+
 ## 內容分量變異：容量契約三層架構（2026-06-21 設計拍板）
 
 **這是讓「同一套模板套用到之後所有章節」成立的權威契約。** 問題：同一個模板在不同章節被餵進來的

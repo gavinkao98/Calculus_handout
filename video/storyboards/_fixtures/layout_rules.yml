@@ -1,0 +1,160 @@
+# LAYOUT / MATH RULES fixture (T3, 2026-09-14) -- NOT a real section; underscore-prefixed and
+# under _fixtures/ so it never enters a chapter build and never joins the 23-deck report diff.
+#
+# Purpose: pin the six deterministic design-system rules sizecheck gained in T3 (LayoutRules
+# L1-L3, MathRules M1-M3) with a VIOLATING and a CLEAN case each, so a threshold or a detector
+# that silently stops firing turns _selftest_layout_rules.py red. The expected verdict for every
+# (scene x rule) pair lives in that selftest's EXPECT table -- read the two together.
+#
+# Design of the four `derivation` scenes: they share ONE chain (five rows, two of them tall, that
+# reach into the bottom third and span past 58% of the frame width, so L2 and L3 are satisfied)
+# and differ in exactly ONE field each -- the rail register, the math lines, the operator
+# spelling. A scene therefore isolates the rule it is named for. The content is deliberately
+# synthetic: the rules are about SHAPE, and a fixture that also had to be pedagogically true
+# would be harder to steer into an exact violation.
+#
+# Known unrelated noise: every chain scene also raises the PRE-EXISTING safe-margin advisory on
+# its `result` (the answer glow's halo dips ~0.2u under the bottom safe margin). It is not one of
+# the six rules and the selftest reads only the rule marks, so it is left alone rather than
+# tuned away.
+
+meta:
+  id: layout_rules
+  chapter: "Fixture"
+  chapter_title: "Design-System Rules"
+  section: "0.0"
+  title: "Layout / Math Rules Fixture"
+  language: en
+  theme: midnight
+  voice: Kore
+  video: { w: 1920, h: 1080, fps: 30 }
+  sections:
+    - { id: "0.0", title: "Layout / Math Rules Fixture" }
+
+scenes:
+
+  # -- CLEAN on all six --------------------------------------------------------------------
+  # The control. A five-row chain that reaches the bottom third and spans the content measure,
+  # rows that are pure math, reasons that keep one register, and a `result` band at the payoff
+  # tier -- nothing for any of the six rules to say.
+  - id: chain_clean
+    kind: content
+    template: derivation
+    accent: example
+    source: "synthetic fixture (T3) -- not handout content"
+    title: "A Chain That Breaks No Rule"
+    say: |
+      This chain is the control case.
+      {show step.0} It opens on the difference quotient.
+      {show step.1} Common denominator.
+      {show step.2} The numerator simplifies.
+      {show step.3} Cancel the factor.
+      {show result} And the limit closes it.
+    steps:
+      - { math: "\\dfrac{1}{h}\\left(\\dfrac{1}{2+h} - \\dfrac{1}{2}\\right)", reason: "difference quotient" }
+      - { math: "= \\dfrac{2-(2+h)}{2h(2+h)}", reason: "common denominator" }
+      - { math: "= \\dfrac{-h}{2h(2+h)}", reason: "cancel the factor" }
+      - { math: "= \\dfrac{-1}{2(2+h)}", reason: "$h \\ne 0$" }
+    result: { math: "= -\\dfrac{1}{4}", reason: "the limit" }
+
+  # -- M2 violation: one reason speaks both registers ---------------------------------------
+  # Identical to the control except `steps[2].reason`, which pairs a running verb with a math
+  # span -- the "write $h=2\cdot(h/2)$" shape the rule card names.
+  - id: rail_mixed_register
+    kind: content
+    template: derivation
+    accent: example
+    source: "synthetic fixture (T3) -- not handout content"
+    title: "A Rail That Mixes Registers"
+    say: |
+      Same chain, one reason rewritten.
+      {show step.0} It opens on the difference quotient.
+      {show step.1} Common denominator.
+      {show step.2} The numerator simplifies.
+      {show step.3} Cancel the factor.
+      {show result} And the limit closes it.
+    steps:
+      - { math: "\\dfrac{1}{h}\\left(\\dfrac{1}{2+h} - \\dfrac{1}{2}\\right)", reason: "difference quotient" }
+      - { math: "= \\dfrac{2-(2+h)}{2h(2+h)}", reason: "common denominator" }
+      - { math: "\\dfrac{-h}{2h(2+h)}", reason: "cancel $h$" }
+      - { math: "\\dfrac{-1}{2(2+h)}", reason: "$h \\ne 0$" }
+    result: { math: "= -\\dfrac{1}{4}", reason: "the limit" }
+
+  # -- M1 violation: prose inside the math line (both detectors) -----------------------------
+  # `steps[2]` carries an explicit \text{} run; `steps[3]` carries bare running words in
+  # parentheses -- the exact shape the rule card draws ("(chord <= arc)" hanging off a bound).
+  - id: math_line_carries_prose
+    kind: content
+    template: derivation
+    accent: example
+    source: "synthetic fixture (T3) -- not handout content"
+    title: "A Math Line Carrying Prose"
+    say: |
+      Same chain, with the explanation left on the line.
+      {show step.0} It opens on the difference quotient.
+      {show step.1} Common denominator.
+      {show step.2} The reason rides along in a text run.
+      {show step.3} And again as bare words.
+      {show result} And the limit closes it.
+    steps:
+      - { math: "\\dfrac{1}{h}\\left(\\dfrac{1}{2+h} - \\dfrac{1}{2}\\right)", reason: "difference quotient" }
+      - { math: "= \\dfrac{2-(2+h)}{2h(2+h)}", reason: "common denominator" }
+      - { math: "\\dfrac{-h}{2h(2+h)} \\quad \\text{h not zero}", reason: "cancel the factor" }
+      - { math: "\\dfrac{-1}{2(2+h)} \\quad (stays negative)", reason: "$h \\ne 0$" }
+    result: { math: "= -\\dfrac{1}{4}", reason: "the limit" }
+
+  # -- M3 violation: operator names written as bare italic letters ---------------------------
+  - id: operators_set_italic
+    kind: content
+    template: derivation
+    accent: example
+    source: "synthetic fixture (T3) -- not handout content"
+    title: "Operators Set As Variables"
+    say: |
+      Same chain, with the operator name typed as letters.
+      {show step.0} It opens on the difference quotient.
+      {show step.1} Common denominator.
+      {show step.2} The numerator simplifies.
+      {show step.3} The operator loses its backslash.
+      {show result} And the limit closes it.
+    steps:
+      - { math: "\\dfrac{1}{h}\\left(\\dfrac{1}{2+h} - \\dfrac{1}{2}\\right)", reason: "difference quotient" }
+      - { math: "= \\dfrac{2-(2+h)}{2h(2+h)}", reason: "common denominator" }
+      - { math: "\\dfrac{-h}{2h(2+h)}", reason: "cancel the factor" }
+      - { math: "lim_{h\\to 0} \\dfrac{-1}{2(2+h)}", reason: "$h \\ne 0$" }
+    result: { math: "= -\\dfrac{1}{4}", reason: "the limit" }
+
+  # -- L2 + L3 violation: one short line, high and hard left ---------------------------------
+  # A single-line callout leaves the bottom third empty (L2) and occupies well under 58% of the
+  # frame width while hanging off the left spine with no `aside:` open (L3).
+  - id: thin_column_high
+    kind: content
+    template: callout
+    type: caution
+    source: "synthetic fixture (T3) -- not handout content"
+    title: "One Short Line"
+    say: |
+      {show body} One short line, and nothing else on the frame.
+    body: "Watch the sign."
+
+  # -- L1 tolerance control (and an L2 violation) ---------------------------------------------
+  # theorem_proof sets its `statement` card at the `statement` tier (44 px) and its `qed` line at
+  # the `step` tier (43 px measured): a 1 px inversion nobody can see. L1 must stay SILENT here --
+  # that is what L1_WEIGHT_RATIO is calibrated for. It is also a two-line proof with a rail
+  # statement, so its bottom third is empty and L2 correctly fires.
+  - id: statement_just_over_qed
+    kind: content
+    template: theorem_proof
+    source: "synthetic fixture (T3) -- not handout content"
+    title: "A Statement A Hair Over Its Close"
+    statement: "$\\sin\\theta \\le \\theta$"
+    scaffold:
+      motive: "We need the bound before the squeeze can close."
+    say: |
+      {show proof.0} Start from the arc.
+      {show proof.1} Compare it with the chord.
+      {show qed} And the bound follows.
+    proof:
+      - "$0 \\le \\theta$"
+      - "$|\\sin\\theta| \\le |\\theta|$"
+    qed: "So the bound holds."
