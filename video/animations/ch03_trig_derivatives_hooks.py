@@ -1171,10 +1171,14 @@ _CUE = {
 }
 
 
-def _draft_line(tex: str, ground: str, y: float):
-    """One line of the scene-04 draft, left-flush in the indented draft column."""
+def _draft_line(tex: str, ground: str, y: float, *, x: float = _DRAFT_X):
+    """One line of a scratch draft, left-flush in an indented draft column.
+
+    Shared by scene 04 and scene 17 (`cosine_identity_draft`). *x* defaults to scene 04's
+    own column, so its existing call sites are unchanged; scene 17 passes the column it
+    reads off its own proof chain."""
     mob = brand.math_line(tex, ground, role="text", size="math_sm")
-    mob.move_to([_DRAFT_X, y, 0], aligned_edge=LEFT)
+    mob.move_to([x, y, 0], aligned_edge=LEFT)
     return mob
 
 
@@ -1364,6 +1368,153 @@ def difference_quotient_for_sine(spec, ctx, blocks):
 
     ids["step.2"].anim, ids["step.2"].anim_seconds = _step2_anim, FADE * 3
     ids["result"].anim, ids["result"].anim_seconds = _result_anim, FADE * 4
+    return blocks
+
+
+# ============================================================ hook 7b
+# cosine_identity_draft (scene 17) -- scene 04's step.0 draft, moved to a theorem_proof
+# scene. R2 director lens, round 19 (ML4 must): beat 3 (+11.0-22.5 s) is the narration
+# "obtained the same way as the first one, by expanding cos(u+v) - cos(u-v)" spoken over a
+# screen where not one glyph moves -- 11.5 s of measured stillness, the film's worst, and
+# the beginner who does not follow the words is left with an identity that fell out of the
+# sky. That is exactly the fault scene 04 exists to avoid, so this is the same device: the
+# derivation happens WHERE the narration puts it, as a temporary draft in the band
+# proof.1 / proof.2 / qed will occupy, which is empty for the whole of this beat.
+#
+# The draft is scratch work beside the chain, not a fourth row of it: `text` ink at math_sm
+# (`brand.math_line`, METHODOLOGY §5), one indent in from the chain's left edge, no semantic
+# hue. It is built inside the hook, never becomes a Block, and is cleared before
+# {show proof.1} needs the space, so every layout gate still measures the terminal frame it
+# measured before. proof.0's own reveal is WRAPPED, not replaced: the stock
+# `_reveal_with_label` (the PROOF eyebrow riding in with the row) plays first and reports
+# its own seconds, then the draft runs in the rest of the beat.
+_C_INDENT = 0.5                    # the proof chain's left edge plus one indent
+# Scene 04 established u and v; "the same way as the first one" is the narration POINTING at
+# that substitution, so the draft recalls it in one line instead of re-deriving it.
+_C_SUBS = r"u=\frac{A+B}{2},\quad v=\frac{A-B}{2}"
+_C_START = r"\cos(u+v)-\cos(u-v)"
+# `{{...}}` segments so the two `\cos u\cos v` are addressable as one unit for the cancel
+# (SPEC-motion-language 規則 2 的兩段式消去); the expand itself is glyph-matched, as in 04.
+_C_EXPANDED = (r"{{(}} {{\cos u\cos v}} {{-\sin u\sin v)-(}} "
+               r"{{\cos u\cos v}} {{+\sin u\sin v)}}")
+_C_CANCEL_SEGS = (1, 3)
+_C_PRODUCT = r"-2\sin u\sin v"
+_C_RHS = r"-2\sin\frac{A+B}{2}\,\sin\frac{A-B}{2}"      # proof.0's own right-hand side
+# The beat's own words, from a forced alignment of `beats/17_derivative_of_cosine/03_proof_0.wav`
+# (stable-ts base.en, the aligner `pipeline/scene_align.py` uses; this beat was re-synthesised
+# for Task D and carries no `alignment` block in the manifest). Beat-relative seconds as a
+# FRACTION of the beat run time (11.84 s of audio - 0.6 s paced tail = 11.24 s), so the draft
+# tracks the narration rather than a metronome. The last phrase is still NAMING the source
+# expression while the draft expands it: 5.8 s of the 11.8 s beat is spent reading
+# "cos(u+v) - cos(u-v)" aloud, and a draft that waited for the full stop would have 0.5 s
+# left for five stages. Writing slightly ahead of the tongue is what a lecturer's chalk does.
+_C_CUE = {
+    "subs":     0.320,   #  3.60  "obtained the same way as the first one,"  (3.54-5.10)
+    "expand":   0.491,   #  5.52  "by expanding ..."                         (5.52-)
+    "terms":    0.601,   #  6.75  "... cosine of the quantity u plus v,"     (5.98-8.46)
+    "cancel":   0.738,   #  8.30  the two cos u cos v: framed, dimmed, gone
+    "leaving":  0.824,   #  9.26  the survivors close up into -2 sin u sin v
+    "handoff":  0.891,   # 10.02  the product IS proof.0's right-hand side
+    "clear":    0.962,   # 10.81  band emptied well before {show proof.1}
+}
+
+
+def cosine_identity_draft(spec, ctx, blocks):
+    from pipeline.templates import derivation
+
+    ground = ctx["ground"]
+    ids = _by_id(blocks)
+    step0 = ids["proof.0"]
+    row = step0.mobject
+    row_eq = derivation._eq_core(row) or row
+    stock_reveal = step0.anim            # _reveal_with_label(PROOF eyebrow); wrapped, not replaced
+
+    # The draft column and its two lines are read off the REAL chain, so the band is exactly
+    # the space proof.1 / proof.2 will take and nothing has to be re-measured by hand.
+    draft_x = row.get_left()[0] + _C_INDENT
+    y_subs = ids["proof.1"].mobject.get_center()[1]
+    y_work = ids["proof.2"].mobject.get_center()[1]
+
+    subs = _draft_line(_C_SUBS, ground, y_subs, x=draft_x)
+    work = _draft_line(_C_START, ground, y_work, x=draft_x)
+    expanded = _draft_line(_C_EXPANDED, ground, y_work, x=draft_x)
+    product = _draft_line(_C_PRODUCT, ground, y_work, x=draft_x)
+    # Where the draft's product belongs: proof.0's own right-hand side. Built at the row's ink
+    # and size and right-aligned to the row, so the flown copy lands ON the line it justifies.
+    landed = brand.math_line(_C_RHS, ground, role="text", size="step")
+    landed.move_to(row_eq.get_right(), aligned_edge=RIGHT)
+
+    def _proof0_anim(scene, mob, g) -> float:
+        """The stock reveal, then the draft, cut to the narration's own cue words."""
+        total = TM.beat_run_time(scene, 11.24)
+        # `t` stays the NOMINAL cue clock the `hold(...)` calls schedule against: the cut
+        # points are fractions of `total`, so they must not drift with the frame rounding.
+        # What the BEAT is told is the renderer's own clock instead (see `_elapsed`).
+        t0 = _elapsed(scene)
+        t = _play_stock(scene, stock_reveal, mob, g)
+
+        def at(cue):
+            return total * _C_CUE[cue]
+
+        def play(*anims, run_time):
+            nonlocal t
+            rt = max(run_time, 0.25)
+            scene.play(*anims, run_time=rt)
+            t += rt
+
+        def hold(until):
+            nonlocal t
+            if until > t:
+                scene.wait(until - t)
+                t = until
+
+        # (1) "obtained the same way as the first one" -- the substitution scene 04 made, recalled.
+        hold(at("subs"))
+        play(FadeIn(subs, shift=0.1 * UP), run_time=0.45)
+
+        # (2) "by expanding cos(u+v) - cos(u-v) ... with the angle-sum formulas" -- the same
+        #     line rewriting itself, not a second line arriving finished.
+        hold(at("expand"))
+        play(Write(work), run_time=1.05)
+        hold(at("terms"))
+        play(TransformMatchingShapes(work, expanded), run_time=0.9)
+
+        # (3) The two cos u cos v are framed (WHICH two), dimmed, then gone, and only then do
+        #     the survivors close up -- the two-stage elimination of SPEC rule 2, in place.
+        scene.remove(expanded)
+        gone = VGroup(*[expanded.submobjects[i] for i in _C_CANCEL_SEGS])
+        keep = VGroup(*[m for i, m in enumerate(expanded.submobjects)
+                        if i not in _C_CANCEL_SEGS])
+        scene.add(keep, gone)
+        boxes = VGroup(*[SurroundingRectangle(s, color=T.color(g, "hairline_strong"),
+                                              buff=0.07, stroke_width=2.0) for s in gone])
+        hold(at("cancel"))
+        play(Create(boxes), run_time=0.4)
+        play(gone.animate.set_color(T.color(g, "muted")), run_time=0.28)
+        play(FadeOut(gone), FadeOut(boxes), run_time=0.28)
+        # The substitution line is spent and sits on the flight path, so it leaves with the
+        # close-up instead of costing the beat a play of its own.
+        hold(at("leaving"))
+        play(TransformMatchingShapes(keep, product), FadeOut(subs), run_time=0.75)
+
+        # (4) The product is proof.0's right-hand side, so a copy goes and says so.
+        hold(at("handoff"))
+        flyer = product.copy()
+        scene.add(flyer)
+        play(TransformMatchingShapes(flyer, landed), run_time=0.8)
+
+        # (5) Clear the band well before {show proof.1} needs it. proof.0's own RHS is
+        #     underneath `landed`, untouched.
+        hold(at("clear"))
+        play(FadeOut(landed), FadeOut(product), run_time=0.42)
+        hold(total)
+        return _spent(scene, t0, max(total, t))
+
+    step0.anim = _proof0_anim
+    # The forced plays alone (the stock reveal, the substitution, the write, three morphs, the
+    # cancel's three, the flight, the clear): what make.py's short-beat warning should compare
+    # against if this beat is ever re-cut shorter.
+    step0.anim_seconds = 5.8
     return blocks
 
 
