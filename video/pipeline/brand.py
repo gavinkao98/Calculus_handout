@@ -392,7 +392,7 @@ def _prose_lines(text: str, ground: str, role: str, size: str,
             line_strs.extend(_wrap_mixed(seg, fsz, max_width))
     if not line_strs:
         return VGroup()
-    mobs = [Tex(_escape_prose(ls), color=col, font_size=fsz) for ls in line_strs]
+    mobs = [_tex_with_map(_escape_prose(ls), ground, col, fsz) for ls in line_strs]
     if len(mobs) == 1:
         return mobs[0]
     grp = VGroup(*mobs)
@@ -458,7 +458,7 @@ def heading_rich(text: str, ground: str, *, role: str = "primary", size: str = "
             pieces.append(p)
         else:
             pieces.append(r"\textbf{" + _tex_text(p) + "}")
-    mob = Tex("".join(pieces), color=T.color(ground, role), font_size=_text_fs(size))
+    mob = _tex_with_map("".join(pieces), ground, T.color(ground, role), _text_fs(size))
     if max_width is not None and mob.width > max_width:
         _clamp_shrink(mob, max_width, T.fs(size) / T.PX_TO_FS)
     return mob
@@ -564,6 +564,74 @@ def _tint_segments(mob, src: str, segments: "list[str]", ground: str, seg_roles)
             part.set_color(T.color(ground, roles[seg]))
 
 
+def _rgb01(hexcolor: str) -> "tuple[float, float, float]":
+    """A palette hex ('#RRGGBB') as the 0-1 triple `\\special{color push rgb ...}` wants."""
+    h = hexcolor.lstrip("#")
+    return tuple(int(h[i:i + 2], 16) / 255 for i in (0, 2, 4))
+
+
+def _inject_color_specials(src: str, ground: str) -> "tuple[str, bool]":
+    """Colour-map tokens inside every ``$...$`` span of *src*, by wrapping the hit token in
+    a dvisvgm ``color`` push/pop special (the dvips driver's colour-special format; a plain
+    LaTeX ``\\special`` primitive, no package needed -- manim already relies on dvisvgm raw
+    specials for its own part markers, see ``_join_tex_strings_with_unique_deliminters``).
+    Returns ``(new_src, hit)``; ``hit`` is False (``new_src is src``) when the table is empty
+    or no span contains a mapped token, so callers can take the old single-colour path."""
+    keys = list(_COLOR_MAP)
+    if not keys:
+        return src, False
+    hit = False
+    out: list[str] = []
+    last = 0
+    for m in re.finditer(r"\$[^$]*\$", src):
+        out.append(src[last:m.start()])
+        inner = m.group(0)[1:-1]
+        pieces = texparts.split_tokens(inner, keys)
+        if any(key is not None for _, key in pieces):
+            hit = True
+            buf = []
+            for piece, key in pieces:
+                if key is None:
+                    buf.append(piece)
+                else:
+                    r, g, b = _rgb01(T.color(ground, _COLOR_MAP[key]))
+                    buf.append(rf"\special{{color push rgb {r:.4f} {g:.4f} {b:.4f}}}"
+                               f"{piece}" r"\special{color pop}")
+            out.append("$" + "".join(buf) + "$")
+        else:
+            out.append(m.group(0))
+        last = m.end()
+    out.append(src[last:])
+    return ("".join(out), True) if hit else (src, False)
+
+
+def _tex_with_map(src: str, ground: str, col: str, fsz: float):
+    """A mixed text+math ``Tex`` line (words with inline ``$math$``), colour-table tokens
+    tinted inside their ``$...$`` span. ``_math_tex``'s ``*parts`` trick doesn't apply here:
+    cutting a ``$...$`` span into separate manim parts would leave its delimiters unbalanced.
+    Instead the colour rides inside the compiled LaTeX itself (``_inject_color_specials``):
+    a mapped token's glyphs come back from the SVG already coloured, and ``Tex``'s own
+    colouring (``SingleStringMathTex.init_colors``: a glyph that isn't black already keeps
+    its colour, everything else takes ``self.color``) paints the rest *col* -- so ``color=``
+    is passed exactly as before and the injected glyphs are simply left alone (verified
+    2026-09-13: geometry is byte-identical to the uninjected source, a zero-width special).
+    No table, or no span contains a mapped token -> plain ``Tex(src, color=col)``, byte for
+    byte. A mapped token that is a ``\\frac``/``\\sqrt`` **unbraced** argument makes the
+    coloured source refuse to compile (same class of failure as ``_math_tex``) -> fall back
+    to one colour, printed once per *src*."""
+    new_src, hit = _inject_color_specials(src, ground)
+    if not hit:
+        return Tex(src, color=col, font_size=fsz)
+    try:
+        return Tex(new_src, color=col, font_size=fsz)
+    except ValueError as exc:
+        if src not in _warned_splits:
+            _warned_splits.add(src)
+            print(f"[color_map] {src}: LaTeX refused the colour injection "
+                  f"({type(exc).__name__}); rendered in one colour")
+        return Tex(src, color=col, font_size=fsz)
+
+
 def math_line(tex: str, ground: str, *, role: str = "math", size: str = "math",
               seg_roles=None):
     """A math (or math+text) line, recoloured. newtx (Times) serif.
@@ -577,10 +645,10 @@ def math_line(tex: str, ground: str, *, role: str = "math", size: str = "math",
       -> Tex (text mode).  Passing this to MathTex would nest math mode inside
       align* and crash ("Missing }"), which is the bug this guards against.
 
-    The two MathTex forms honour ``{{...}}`` segments, the deck's colour table and
-    *seg_roles* (whole-segment colours; see _math_tex); the Tex form does not -- a cut inside
-    a ``$...$`` span leaves the delimiters unbalanced, so a sentence with inline math stays
-    one colour.
+    The two MathTex forms honour ``{{...}}`` segments and *seg_roles* (whole-segment
+    colours; see _math_tex); the Tex form does not (a segment cut leaves a ``$...$``
+    span's delimiters unbalanced) but DOES honour the deck's colour table, token by
+    token inside each span (``_tex_with_map``; 2026-09-13).
     """
     col = T.color(ground, role)
     fsz = T.fs(size)
@@ -588,7 +656,7 @@ def math_line(tex: str, ground: str, *, role: str = "math", size: str = "math",
     if stripped.startswith("$") and stripped.endswith("$") and stripped.count("$") == 2:
         return _math_tex(stripped[1:-1], ground, col, fsz, seg_roles)
     if "$" in tex:
-        return Tex(tex, color=col, font_size=fsz)
+        return _tex_with_map(tex, ground, col, fsz)
     return _math_tex(tex, ground, col, fsz, seg_roles)
 
 

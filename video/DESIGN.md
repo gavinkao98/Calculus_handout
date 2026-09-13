@@ -935,9 +935,23 @@ plot 沒寫 `color`／`color_role` 而 `label` 含表中 token 時，預設 role
 sin 的色），曲線與標籤一起變；明寫的 role 不動。`color_role` 決定整列底色，色表只覆蓋命中的 token。
 `schema._color_map_issues`：表必須是 mapping、key 非空、value 是 palette role——`theme.color` 對未知 role
 **靜默退 `primary`**，這裡把它講出來；warn-default，`meta.color_map_enforce: true` 才擋 render。
-**已知限制：** (a) 混排句不上色（多個 `$…$` 的 `Tex` 路徑、`_prose_lines`、`heading_rich`）。(b) 表中 token
-若是 `\frac`／`\sqrt` 的**無括號**引數（`\frac h2`），LaTeX 拒編 → 該行退回單色並印一行 `[color_map] …
-rendered in one colour`（每個 src 一次，不炸 render）；寫 `\frac{h}{2}`。
+**混排句也吃色表（dvisvgm color special 注入；2026-09-13，round17 task B）。** `math_line` 的混排分支／
+`_prose_lines`／`heading_rich`（多個 `$…$` 的 `Tex` 路徑）不能像 `MathTex(*parts)` 那樣切 part——切開
+`$…$` 會讓分隔符不平衡——改在每個 span 內對命中 token 包一層 dvips driver 的 color special：
+`\special{color push rgb R G B}…\special{color pop}`（純 LaTeX primitive `\special`，不需任何巨集套件；
+manim 自己組 part 標記也是用 dvisvgm raw special，見 `tex_mobject.py`
+`_join_tex_strings_with_unique_deliminters`），實作 `brand._tex_with_map`（三個入口共用，內部呼叫
+`_inject_color_specials`）。`Tex(...)` 照常傳 `color=`，不用另外挑色比對：manim 的
+`SingleStringMathTex.init_colors` 本來就是「glyph 若非黑色（LaTeX 預設）就保留原色，其餘才套用
+`self.color`」——命中 token 從 SVG 解析回來已經是注入色，其餘 glyph 才被塗成行色（2026-09-13 以實機探測
+驗證：`\special{color push/pop}` 在文字模式與數學模式內皆合法、跨字元各自獨立、不影響任何幾何測量）。
+special 零寬，幾何逐 byte 不變——含 `_wrap_mixed` 的斷行判斷，那發生在注入之前，讀的是原始文字。沒有色
+表、或該行沒有命中，就是原本的單色 `Tex`，逐 byte 相同（`_selftest_color_map`
+`test_no_table_leaves_a_mixed_line_untouched_and_geometry_never_moves`、
+`test_prose_lines_two_line_wrap_matches_geometry_with_and_without_the_table`）。
+**已知限制：** 表中 token 若是 `\frac`／`\sqrt` 的**無括號**引數（`\frac h2`），注入 special 讓那個引數不
+再是單一 token，LaTeX 拒編 → 該行退回單色並印一行 `[color_map] … rendered in one colour`（每個 src 一
+次，不炸 render；`_math_tex`／`_tex_with_map` 皆適用）；寫 `\frac{h}{2}`。
 
 **`{{…}}` 分段（derivation 列的 `math`）——一段一個 submobject。** 例：
 `"{{\sin(x+h) - \sin x}} = {{2\cos(x+h/2)}} {{\sin(h/2)}}"`。規則同 manim：`{{` 只在字串開頭或**空白之後**
