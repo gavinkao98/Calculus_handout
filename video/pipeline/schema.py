@@ -285,29 +285,18 @@ def _proof_row_issues(sid: str, scene: dict) -> "list[tuple[str, str]]":
     return issues
 
 
-def _derivation_issues(sid: str, scene: dict) -> "list[tuple[str, str]]":
-    """derivation rows' `anim: cancel` + `cancel: [i, ...]` and `frame: true` (kickoff T3-3 /
-    T2-2). A cancel index points into the PREVIOUS row's `{{...}}` segments, so it needs a
-    previous row, that row needs segments, and every index must fall inside them -- an index
-    that misses is an IndexError mid-render, a `cancel:` without `anim: cancel` (or a `frame`
-    on a plain reveal) is silently inert. Errors: each is always a mistake. theorem_proof's
-    `proof[]` dict rows get the same treatment via _proof_row_issues (rollout T1-3)."""
-    if scene.get("template") == "theorem_proof":
-        return _proof_row_issues(sid, scene)
-    if scene.get("template") != "derivation":
-        return []
+def _row_anim_issues(rows: "list[tuple[str, dict]]") -> "list[tuple[str, str]]":
+    """`anim: cancel` + `cancel: [i, ...]` and `frame: true` on ONE list of morph-chain rows,
+    given as (where, row) in the template's own order. A cancel index points into the
+    PREVIOUS row's `{{...}}` segments, so it needs a previous row, that row needs segments,
+    and every index must fall inside them -- an index that misses is an IndexError
+    mid-render, a `cancel:` without `anim: cancel` (or a `frame` on a plain reveal) is
+    silently inert. Errors: each is always a mistake.
+
+    Shared by `derivation` and `worked_example`, whose row grammar is the same field-for-
+    field and whose morph mechanism is literally the same code (templates/worked_example.py
+    imports derivation's `_transform_anim` / `_cancel_anim`)."""
     from pipeline import texparts
-    rows: list[tuple[str, dict]] = []      # (where, row) in the template's order; check has a fixed reveal
-    if scene.get("steps") is not None or scene.get("result") is not None:
-        for j, st in enumerate(scene.get("steps") or []):
-            rows.append((f"{sid}.steps[{j}]", st if isinstance(st, dict) else {"math": st}))
-        if scene.get("result") is not None:
-            r = scene["result"]
-            rows.append((f"{sid}.result", r if isinstance(r, dict) else {"math": r}))
-    else:
-        for j, ln in enumerate(scene.get("lines") or []):
-            ln = ln if isinstance(ln, dict) else {"tex": ln}
-            rows.append((f"{sid}.lines[{j}]", {**ln, "math": ln.get("tex", "")}))
     issues: list[tuple[str, str]] = []
     for j, (where, row) in enumerate(rows):
         anim = row.get("anim")
@@ -340,6 +329,91 @@ def _derivation_issues(sid: str, scene: dict) -> "list[tuple[str, str]]":
     return issues
 
 
+def _derivation_issues(sid: str, scene: dict) -> "list[tuple[str, str]]":
+    """derivation's morph-chain rows (kickoff T3-3 / T2-2) -> _row_anim_issues. The chain is
+    `steps[] -> result` (a `check` row has a fixed reveal), or the back-compat `lines[]`.
+    theorem_proof's `proof[]` dict rows get the same treatment via _proof_row_issues
+    (rollout T1-3); worked_example's go through _worked_example_issues."""
+    if scene.get("template") == "theorem_proof":
+        return _proof_row_issues(sid, scene)
+    if scene.get("template") != "derivation":
+        return []
+    return _row_anim_issues(_chain_rows(sid, scene))
+
+
+def _chain_rows(sid: str, scene: dict) -> "list[tuple[str, dict]]":
+    """(where, row) for the morph chain, in the template's order: structured `steps[]` then
+    `result`, else the back-compat `lines[]` (whose `tex` stands in for `math`)."""
+    rows: list[tuple[str, dict]] = []
+    if scene.get("steps") is not None or scene.get("result") is not None:
+        for j, st in enumerate(scene.get("steps") or []):
+            rows.append((f"{sid}.steps[{j}]", st if isinstance(st, dict) else {"math": st}))
+        if scene.get("result") is not None:
+            r = scene["result"]
+            rows.append((f"{sid}.result", r if isinstance(r, dict) else {"math": r}))
+    else:
+        for j, ln in enumerate(scene.get("lines") or []):
+            ln = ln if isinstance(ln, dict) else {"tex": ln}
+            rows.append((f"{sid}.lines[{j}]", {**ln, "math": ln.get("tex", "")}))
+    return rows
+
+
+def _worked_example_issues(sid: str, scene: dict) -> "list[tuple[str, str]]":
+    """worked_example's own required / forbidden fields, plus the shared row-anim checks.
+
+    * `prompt` is REQUIRED (D4): no problem on screen is not a worked example -- the very
+      gap `_common.example_head` was built to close.
+    * `result` (the answer band) is REQUIRED (D4) unless this is a non-final page of a
+      `part: {current, total}` split, where the answer has not arrived yet.
+    * a row takes no `reason` and the template takes no back-compat `lines[]` (D2): the
+      right rail here belongs to `strategy:` / `notes:`, which is the SAME column
+      derivation spends on per-row reasons, and the two cannot both have it. A row's
+      reasoning goes to `strategy:`, `notes:` or the narration.
+      (`result.reason` is exempt -- there it is the answer band's mono tag, not a rail
+      annotation.)
+    """
+    if scene.get("template") != "worked_example":
+        return []
+    issues: list[tuple[str, str]] = []
+    if not isinstance(scene.get("prompt"), str) or not scene["prompt"].strip():
+        issues.append(("error", f"{sid}.prompt: required non-empty string -- a worked example "
+                                f"shows its problem (DESIGN.md 'Worked-example 題目結構')"))
+    if scene.get("lines") is not None:
+        issues.append(("error", f"{sid}.lines: worked_example has no back-compat `lines[]`; "
+                                f"use steps[] + result"))
+    part = scene.get("part")
+    try:   # "not the LAST page" -- not the same question as the masthead's "(CONT.)"
+        may_omit = (isinstance(part, dict)
+                    and int(part.get("current", 1)) < int(part.get("total", 1)))
+    except (TypeError, ValueError):
+        may_omit = False
+    if scene.get("result") is None and not may_omit:
+        issues.append(("error", f"{sid}.result: required -- the answer band is the frame's "
+                                f"heaviest element; only a continuation page "
+                                f"(part.current < part.total) may omit it"))
+    reason_rows = [(f"{sid}.steps[{j}]", st) for j, st in enumerate(scene.get("steps") or [])]
+    reason_rows.append((f"{sid}.check", scene.get("check")))
+    for where, row in reason_rows:
+        if isinstance(row, dict) and row.get("reason") is not None:
+            issues.append(("error", f"{where}.reason: worked_example gives the right rail to "
+                                    f"`strategy:` / `notes:`, so a row takes no reason -- move "
+                                    f"it to strategy / notes / the narration"))
+    strategy = scene.get("strategy")
+    if strategy is not None and (not isinstance(strategy, str) or not strategy.strip()):
+        issues.append(("error", f"{sid}.strategy: must be a non-empty string"))
+    notes = scene.get("notes")
+    if notes is not None:
+        if not isinstance(notes, list):
+            issues.append(("error", f"{sid}.notes: must be a list of {{math, text?, ref?}}"))
+        else:
+            for j, note in enumerate(notes):
+                if (not isinstance(note, dict) or not isinstance(note.get("math"), str)
+                        or not note["math"].strip()):
+                    issues.append(("error", f"{sid}.notes[{j}].math: required non-empty string "
+                                            f"(a rail note leads with the factor it is about)"))
+    return issues + _row_anim_issues(_chain_rows(sid, scene))
+
+
 def _seg_roles_issues(sid: str, scene: dict) -> "list[tuple[str, str]]":
     """derivation rows' `seg_roles: {segment tex: palette role}` (kickoff rollout T2-1): a
     whole `{{...}}` segment in one role colour. Each key must be one of the row's segments
@@ -348,9 +422,10 @@ def _seg_roles_issues(sid: str, scene: dict) -> "list[tuple[str, str]]":
     falls back to primary on an unknown role), so it is said here. Errors: each is always a
     mistake. steps[i] / result / check / lines[] dict rows; theorem_proof's `proof[]` dict
     rows get the same three checks (rollout T2-3), their `tex` field standing in for
-    derivation's `math`."""
+    derivation's `math`. worked_example's rows are derivation's row grammar verbatim, so
+    they take the structured branch unchanged."""
     template = scene.get("template")
-    if template not in ("derivation", "theorem_proof"):
+    if template not in ("derivation", "theorem_proof", "worked_example"):
         return []
     from pipeline import texparts
     from pipeline.visuals import theme
@@ -468,6 +543,7 @@ def schema_storyboard(data) -> "list[tuple[str, str]]":
             issues += _carry_issues(sid, scene, scene.get("say"), scenes, i)
             issues += _exit_issues(sid, scene)
             issues += _derivation_issues(sid, scene)
+            issues += _worked_example_issues(sid, scene)
             issues += _seg_roles_issues(sid, scene)
         elif "pauses" in scene:
             issues.append(("error", f"{sid}: 'pauses' is a content-scene field "

@@ -386,7 +386,9 @@ def _capacity_issues(scene: dict, blocks) -> "list[tuple[str, str]]":
     if not header_bottoms:
         return []
     zone_top = min(header_bottoms)
-    zone_h = zone_top - (-T.FRAME_H / 2 + T.SAFE_MARGIN + extra_bottom)
+    floor_y = -T.FRAME_H / 2 + T.SAFE_MARGIN     # the frame's own bottom safe margin
+    zone_floor = floor_y + extra_bottom          # ... raised by any reserved bottom band
+    zone_h = zone_top - zone_floor
     if zone_h <= 0.5:
         return []
 
@@ -401,6 +403,18 @@ def _capacity_issues(scene: dict, blocks) -> "list[tuple[str, str]]":
             left = float(mob.get_left()[0])
             top, bottom = float(mob.get_top()[1]), float(mob.get_bottom()[1])
         except Exception:  # noqa: BLE001
+            continue
+        # A block that sits wholly INSIDE the band the template reserved (extra_bottom)
+        # IS that reserved content -- counting it as a zone row too would charge it twice:
+        # once as the room taken out of the zone, once as a row that must fit what is
+        # left. The double charge was invisible while the only pinned element had its own
+        # x-bucket (procedure's worked strip is centred), but worked_example's answer band
+        # is flush left on SPINE_X, in the step column's own bucket, so every scene with
+        # one read as over capacity by roughly the band's own height. "Wholly inside"
+        # means BOTH edges: a row that merely spilled down into the band (an over-capacity
+        # chain) breaks the bottom edge and is still counted, so the split warn it exists
+        # to raise still fires.
+        if extra_bottom and top <= zone_floor + 1e-6 and bottom >= floor_y - 1e-6:
             continue
         if top - bottom <= 1e-6:
             continue

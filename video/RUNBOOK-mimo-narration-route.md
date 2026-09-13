@@ -64,9 +64,10 @@ DECK: <填，如 ch01_precise_limit>      SECTION: <填，如 §1.6>
   （成片旁另出 `<stem>.timeline.json`／`.vtt`／`.chapters.txt` sidecar；真音檔路徑另 two-pass loudnorm 到 house
   -19 LUFS；離線聽感驗收＝`python video/pipeline/listening_pack.py --manifest <…/manifest.json>`。）
 - **合成單位 `--unit`（scene-level TTS＋forced alignment，2026-07-05；batch-2 全 template＋rung 3 於 2026-07-06；設計見 DESIGN.md「Manifest schema 2」）：**
-  `tts.py` 預設 `--unit auto`——**全部 content template（9 個，單一源＝`pipeline/template_names.py:CONTENT_TEMPLATES`）**：
+  `tts.py` 預設 `--unit auto`——**全部 content template（10 個，單一源＝`pipeline/template_names.py:CONTENT_TEMPLATES`）**：
   `callout`／`definition_math`／`derivation`／`graph`／`procedure_steps`／`recap_cards`／`sign_chart`／`theorem_proof`／
-  `value_table`（2026-07-11 T3 補齊 procedure_steps/value_table/sign_chart——原手維護 allowlist 只有 6/9；parity
+  `value_table`／`worked_example`（2026-07-11 T3 補齊 procedure_steps/value_table/sign_chart——原手維護 allowlist 只有 6/9；
+  2026-09-13 新增 worked_example，9→10；parity
   selftest 守 registry 一致）走 scene-level（一場一次合成、`stable-ts` 回推 beat 時序、
   per-scene validation，過不了自動回退 beat）。要全走舊路用 `--unit beat`；單一場強制 scene 用 `--unit scene`。
   **紀律：scene-level 真合成只在 narration lock＋NFA 之後**（「改一個字→整場重合成」的 blast radius 由 lock 吃掉）；

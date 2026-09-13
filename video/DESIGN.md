@@ -172,6 +172,7 @@ Demo storyboard 在 `storyboards/_demo_*.yml`。
 | `theorem_proof` | gold-bar 面板 statement + 藍點 proof steps + 綠 QED | `statement`、`proof[]`（字串，或 `{tex, anim: transform, frame}` dict 列）、`qed` | `proof.N`、`qed`、`statement`（寫了 `{show statement}` 才動態；`PROOF` 小標跟 `proof.0` 同進） |
 | `procedure_steps` | 01/02 藍數字步驟 + 底部圓角 worked strip | `steps[{text,math}]`、`worked[]` | `math.N`、`worked` |
 | `derivation` ★ | **統一數學系統**：式子左欄 + reason rail（dotted leader）+ amber ∴ result + 綠 ✓ check | `steps[{math, reason?, anim?}]`、`result:{math, reason?, anim?}`、`check:{math, reason?}`；**或** back-compat `lines[]`（`anim: highlight` → result）、`statement`。`anim: transform` ＝原地改寫（見下方 motion primitive 節） | `step.N`/`result`/`check`（或 `line.N`）、`statement`（寫了 `{show statement}` 才動態） |
+| `worked_example` ★ | **例＋解**（講義的 `workedexample` 容器）：題目當 masthead ＋ `SOLUTION` 步驟鏈 ＋ 右 rail（策略／notes）＋ 釘在下三分之一的**答案框**（62 px，畫面最重）。列文法＝`derivation` 逐字相同但**不收 `reason`**（rail 給了 strategy／notes）。詳見下方專節 | `prompt`(必填)、`result:{math, reason?}`(必填,續頁除外)、`steps[{math, anim?, frame?, cancel?, seg_roles?, color_role?, mark?}]`、`check`、`number`、`title`(tagline)、`strategy`、`notes[{math, text?, ref?}]`、`notes_label` | `step.N`／`result`／`check`／`strategy`／`note.N`（`strategy`／`note.N` 寫了 `{show …}` 才動態；`result` 恆動態） |
 | `callout` ★ | Remark / Caution / Note：eyebrow `[ TYPE n.n ]`＋title masthead，body 文字置於標題下方（色隨 type：remark 藍／caution 紅／note 琥珀）；`body` 字串→散文、list→條列（同色圓點）。同 `definition_math` 走 `scene_head`＋`place_body`（2026-06-29 改版，見下） | `type: remark\|caution\|note`、`number`(opt)、`title`、`body`(字串或 list) | `body` |
 | `graph` ★ | **統一 graph 引擎**：`mode: single`（一張全幅 plot）或 `mode: 2up`（兩張並排比較） | single：`axes`、`plots[]`、`annotations[]`；2up：`left`/`right` `{axes, plots, caption, verdict}`、`annotations[]`。plot kind＝`function`／`line`／`band`／`point`／`sweep`（游標掃描，見下方 motion primitive 節） | single：`annotation.N`、`plot.N`(`reveal:true`；`sweep` 恆為動態)；2up：`caption.left/right`、`left.plot.N`/`right.plot.N`、`annotation.N` |
 | `value_table` | 數值 limit 表 / formula grid（punchline 欄／列鋪 scene accent 同色 tint + 抬升 ink） | `header[]`、`rows[][]`、`reveal: rows\|cols`、`accent_col`/`accent_row`、`statement` | `row.N` 或 `col.N` |
@@ -478,6 +479,77 @@ freeform 人讀標籤、不被解析為 provenance**（provenance 只認 `ref:`�
 
 把關：[`lint._example_missing_prompt`](pipeline/lint.py) 對「`derivation` 場的 `source` 指到 handout『Example N.N』卻無 `prompt:`」**warn**（advisory，不擋 build；待全章補齊後可升為 error）。
 
+**2026-09-13 起「是課本 Example」有專屬模板 `worked_example`**（見下節）：它把上述 masthead 收進自己的模板檔，
+再補 `derivation`＋`prompt:` 缺的兩件事——**答案框**與**策略 rail**。既有的 `derivation`＋`prompt:` 場不受影響、
+不強制遷移（`example_head` 與 `lint._example_missing_prompt` 原樣保留）。
+
+**兩者的分工（怎麼選）：**
+
+- **`derivation` ＋ `prompt:` ＝合法的輕量形態**：有題目、但畫面上**只要那條推導鏈**——不需要答案框、
+  不需要策略 rail，理由用逐列 `reason` 的 dotted leader 交代就夠。
+- **`worked_example` ＝課本例題的完整形狀**：需要**答案框**（結論是畫面最重元素）、**策略 rail**
+  （一句話說為什麼這樣下手）、或**逐項 `notes:`**（每個因子 → 它的去向 → `ref:` 出處引用）時用它。
+  列不收 `reason`——右 rail 同一欄已經給了 `strategy:`／`notes:`。
+- **既有 9 個 `derivation`＋`prompt:` 例題場（§3.1 四場、§3.2 五場）＝不遷移**
+  （2026-09-13 裁決；遷移要重 derive `_mimo`、reveal id 改名會讓 beat 級 TTS reuse 失配）。
+  遷移是另一輪的事，見 [`KICKOFF-shared-layer-v1.md`](KICKOFF-shared-layer-v1.md) §7「明確不做」。
+
+## Worked-example 模板 `worked_example`（2026-09-13）
+
+**為什麼另開一個模板：** 全書 935 個語意塊裡 `workedexample`（例＋解）有 **220 個（24%）**，是單一最大宗，
+但影片產線只能借 `derivation`＋`prompt:`。借來的形狀缺三件事：① 右 rail 被逐列 `reason` 佔住，沒地方放「策略」；
+② 沒有答案框，**結論不是畫面上最重的元素**（違反版面規則 1）；③ 題號與 `title` 無處安放（`example_head` 直接忽略 `title`）。
+視覺依據＝設計畫布 [`_audit/design-template-system/WorkedExample.dc.html`](_audit/design-template-system/WorkedExample.dc.html)。
+
+**版面（Lectern）：** masthead（`[ EXAMPLE 3.1 ]` chip＋`title` 小字 tagline／右上 `part` 指示 → 題目 → 細線 → `SOLUTION`）
+→ 步驟欄左齊 `SPINE_X`、彈性撐開；右 rail 左緣 `RAIL_X`（左側一條直線）＝`strategy` 上段＋`notes` 下段；
+答案框滿 `CONTENT_W`、底邊釘底安全邊界、答案 **62 px** 語意色、右端 mono tag。**有答案框的場不畫角落 motif**
+（motif 是用來壓住空的右下角，而答案框已經把那個角落填滿）。
+
+**欄位契約**（列文法與 `derivation` **逐字相同**，`steps[]`／`result`／`check` 收 `{math, anim, frame, cancel, seg_roles, color_role, mark}`；
+模板直接 import `derivation` 的 `_eq_mob`／`_transform_anim`／`_cancel_anim`／常數，所以 `{{…}}` 分段、`meta.color_map`、
+`seg_roles`、`paced:` 的行為一致，derivation 改了這裡自動跟）：
+
+| 欄位 | 必填 | 說明 |
+|---|:--:|---|
+| `prompt` | ✅ | 題目。**沒題目不是例題**（schema error）。 |
+| `result` | ✅* | 答案框；`reason` ＝右端 tag 字（預設 `answer`）。*唯一例外＝`part.current < part.total` 的續頁（答案還沒到）。 |
+| `number` | | `"3.1"` → eyebrow `[ EXAMPLE 3.1 ]`；省略則 `[ EXAMPLE ]`。 |
+| `title` | | chip 右側的小字 tagline（`caption` 30 px），**不是標題**；critic 仍用它當場景標籤。 |
+| `strategy` | | 右 rail 上段（`STRATEGY` 小標＋散文）。 |
+| `notes` / `notes_label` | | 右 rail 下段，每項 `{math, text?, ref?}`；`ref` 是靠右的藍色 mono 引用 tag。`notes_label` 預設 `notes`，跟 `note.0` 一起進場（比照 `theorem_proof` 的 `PROOF` 小標跟 `proof.0`）。 |
+| `steps[]` / `check` | | 步驟鏈；`check` 得綠 ✓。**列不收 `reason`**（schema error）——右 rail 給 `strategy`／`notes`，與 derivation 的 reason rail 是同一欄，不能並存；理由進 `strategy:`／`notes:`／旁白。**不收 back-compat `lines[]`**（schema error）。 |
+| `accent` | | **省略＝`example`（practice 綠）**——它就是講義的 `workedexample` 容器，講義裡永遠綠。 |
+| `scaffold` | | 比照 `derivation` 掛在 SOLUTION 之下。`statement` 不收（`prompt` 就是題目）。 |
+
+**reveal id：** `step.N`／`result`／`check`／`strategy`／`note.N`。`strategy`／`note.N` 預設 static（開場就在），
+`say` 寫了 `{show …}` 才動態（同 `statement` 的 `_common.reveals` 慣例）；**`result` 恆動態**（它是 payoff，
+不該從 t=0 就擺在題目底下）。變形鏈＝`steps[] → result`（同 derivation），`check` 固定 stock reveal。
+
+**容量（L2）：** `capacity_meta(spec)` 回**兩個** `ColumnPlan`——步驟欄（`min_pitch` ＝ derivation 的 `MIN_PITCH`）＋
+rail 欄（`min_pitch=RAIL_GAP`，`x_bucket=round(RAIL_X)`），兩條獨立流各自被稽核。`extra_bottom` ＝答案框高＋間距，
+**由模板自己的答案框 helper 量出來**（放置與稽核同一個數）。配套改了 `sizecheck._capacity_issues` 一處：
+**完全落在 `extra_bottom` 保留帶內的 block 不再計入縱向堆疊**——否則答案框會被算兩次（一次是從 zone 挖掉的空間、
+一次又當成要塞進剩餘 zone 的一列），使每個有答案框的場都誤報「拆頁」。只有「整塊都在保留帶內」才跳過，
+**溢出到保留帶的列（下緣穿出底安全邊界）照算**，所以真正超量的場仍然會 warn。
+
+**兩處刻意偏離 mockup：**
+
+1. **列一律左齊 `SPINE_X`，不做 mockup 的 `=` 對齊欄。** 要做 `=` 對齊欄，得嘛改 `sizecheck._capacity_issues`
+   以 `round(left)` 分欄的做法（會動到既有 deck 的容量判定），得嘛在每列塞一段看不見的幾何（`paced` 與
+   derivation 的 `_rail` 都會把它當內容走一遍）。正典 deck 的續行 `= …` 左齊已經是 house look。
+2. **列寬超過步驟欄寬 → `build` 直接 `raise ValueError`（點名該列、寬多少、上限多少、三條出路：拆列／縮題／拿掉 rail）**，
+   不縮字。版面規則 3 只在主內容佔寬 <58% 時才展開右欄（`RAIL_COL=7` ＝ 58.3%），而本專案已明確否決 auto-fit 縮字
+   （見下方容量契約）：超量是 authoring 決策。sizecheck 會以「could not build scene」把它報成 error。**沒有 rail 時**
+   步驟欄吃滿 `CONTENT_W`，過寬回到反應式（`sizecheck._overflow_issues`），與其餘模板一致。
+
+**稽核模組接線：** `template_names.CONTENT_TEMPLATES`（tts `--unit auto` allowlist 自動跟）、
+`schema._worked_example_issues`（上表的 error）＋`_seg_roles_issues`＋與 derivation 共用的 `_row_anim_issues`、
+`step_coverage._SCOPED_TEMPLATES`、`provenance._present_text_fields`（`strategy` 與 `notes.i.text` 是上畫面教學文字，
+走 `ref:`／`refs:`）。`pedagogy._MOTIVE_TEMPLATES` **不加**（`prompt` 就是 motive）。
+demo／回歸稿＝[`storyboards/_demo_worked_example.yml`](storyboards/_demo_worked_example.yml)（四場：完整形狀／無 rail／
+容量超量／分頁續頁），selftest＝`pipeline/_selftest_worked_example.py`。
+
 ## 內容分量自適應 ＋ 多頁拆分（2026-06-21）
 
 固定 body zone（≈5u）要容納 1–7 列的內容。原則：**字型保持統一，用「間距帶＋拆分」吸收差異**，
@@ -681,6 +753,7 @@ slope-from-definition computation）需要 7–9：
 | 內容形狀 | 模板 | 單頁容量預算 | 超量動作（DENSE） | 稀疏動作（SPARSE） |
 |---|---|---|---|---|
 | 連續推導鏈 | `derivation` | fraction 列：無 statement ~5、有 statement ~4；single 列 ~7 | 按邏輯階段切 `part:`，不硬切等號 | fill_gap 自動；勿加廢列 |
+| 例題（題目＋解＋答） | `worked_example` | 62 px 答案框固定佔下三分之一，SOLUTION 之下只剩 ≈2.9–3.3u：步驟 ≈2 個分數列（答案為單行式時 3 列）或 ≈4 個單行列；rail 一行策略句＋≤2 條 notes（實測 2026-09-13：mockup 的 4 列是 38 px 靜態圖，影片字級放不進去） | 按邏輯階段切 `part:`，答案框留到末頁（續頁可省 `result`）；rail 存在時列過寬會 raise——拆列／縮題／拿掉 rail | 拿掉 rail 讓步驟欄滿寬（D8）；勿加廢列 |
 | 陳述＋符號式 | `definition_math` | statement ≤3 行＋math ≤4 列 | 拆 part 或把長鏈改 derivation 景 | 掛 `aside` 卡（L3） |
 | 命題＋證明 | `theorem_proof` | proof ≤4 步＋qed（一般步 2–3；fraction 步更保守） | >4 步拆 statement＋proof 兩場、超頁 `part:` | statement-only 走 card＋aside 兩欄 |
 | 離散步驟 | `procedure_steps` | 3–4 步、math ≤5u 寬 | 拆 part；長式改 derivation | ——（步驟自然 ≥3） |

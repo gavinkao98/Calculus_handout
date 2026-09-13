@@ -33,6 +33,7 @@ from . import (
     sign_chart,
     theorem_proof,
     value_table,
+    worked_example,
 )
 
 Builder = Callable[[dict[str, Any], dict[str, Any]], "list[Block]"]
@@ -48,6 +49,7 @@ REGISTRY: dict[str, Builder] = {
     "theorem_proof": theorem_proof.build,
     "recap_cards": recap_cards.build,
     "value_table": value_table.build,
+    "worked_example": worked_example.build,
     "intro": intro.build,
     "outro": outro.build,
 }
