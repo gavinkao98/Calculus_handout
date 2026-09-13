@@ -14,6 +14,7 @@ import argparse
 import base64
 import json
 import os
+import shutil
 import sys
 import time
 from dataclasses import dataclass
@@ -477,32 +478,161 @@ def merged_manifest(prior: dict[str, Any] | None, fresh: dict[str, Any],
     return out
 
 
-def build_reuse_index(manifest: dict[str, Any] | None) -> dict[str, dict[str, Any]]:
+# (scene_id, beat text_hash, occurrence of that hash within the scene) -- see build_reuse_index.
+BeatReuseKey = tuple[str, str, int]
+
+
+def _prune_empty_dir(directory: Path) -> None:
+    """rmdir the directory iff it is now empty. Never an error otherwise: a sibling beat
+    may still live there, and a leftover directory is cosmetic, not a failure."""
+    try:
+        if directory.is_dir() and not any(directory.iterdir()):
+            directory.rmdir()
+    except OSError:
+        pass
+
+
+def _relocate(src: Path, dst: Path) -> bool:
+    """Move one audio artifact onto the path today's deck wants. True iff it moved.
+
+    Copy-then-delete rather than ``os.replace``: the copy is what protects BILLED audio
+    (there is no instant at which zero copies exist, even across a crash), and the delete
+    is what keeps the old scene-number directory from lingering as unmanaged audio --
+    an orphan WAV under a stale ``NN_`` prefix is exactly what ``overwrite_guard``'s
+    "WAVs exist but no manifest accounts for them" branch refuses to run over. The delete
+    only happens once the copy is on disk at the same size.
+
+    A missing source is a no-op: the recorded path is still rewritten so the manifest stays
+    internally consistent, and ``make.py --reuse-audio``'s freshness check reports the
+    missing WAV either way (it would have been missing under the old name too)."""
+    if not src.exists() or src.resolve() == dst.resolve():
+        return False
+    dst.parent.mkdir(parents=True, exist_ok=True)
+    shutil.copy2(src, dst)
+    if dst.exists() and dst.stat().st_size == src.stat().st_size:
+        src.unlink()
+        _prune_empty_dir(src.parent)
+    return True
+
+
+def _renumber_path(value: Any, scene_id: str, old_number: int, new_number: int) -> Any:
+    """Rewrite the ``NN_<scene_id>`` prefix in every component of a recorded artifact path
+    (``beats/17_sceneA/01_x.wav``, ``scenes/17_sceneA.wav``, ``align/17_sceneA.words.json``).
+    Rewriting the RECORDED string rather than rebuilding from output_dir keeps a run that
+    used ``--output-dir`` in its own layout. Non-strings and non-matches pass through."""
+    if not isinstance(value, str) or not value:
+        return value
+    old_prefix, new_prefix = f"{old_number:02d}_{scene_id}", f"{new_number:02d}_{scene_id}"
+    parts, hit = list(Path(value).parts), False
+    for i, part in enumerate(parts):
+        if part == old_prefix or part.startswith(old_prefix + "."):
+            parts[i], hit = new_prefix + part[len(old_prefix):], True
+    return str(Path(*parts)) if hit else value
+
+
+def _renumber_entry(entry: dict[str, Any], scene_id: str, old_number: int, new_number: int,
+                    *, relocate: bool) -> dict[str, Any]:
+    """A copy of `entry` stamped with `new_number`, with every path-encoded artifact
+    (scene WAV, align sidecars, beat WAVs) renamed -- and moved, unless `relocate` is off."""
+    updated = {**entry, "scene_number": new_number}
+
+    def fix(container: dict[str, Any], key: str) -> None:
+        old = container.get(key)
+        new = _renumber_path(old, scene_id, old_number, new_number)
+        if new == old:
+            return
+        container[key] = new
+        if relocate:
+            _relocate(Path(old), Path(new))
+
+    fix(updated, "audio_file")
+    if isinstance(updated.get("alignment"), dict):
+        alignment = dict(updated["alignment"])
+        fix(alignment, "words_file")
+        fix(alignment, "aligned_file")
+        updated["alignment"] = alignment
+    if isinstance(updated.get("beats"), list):
+        beats = []
+        for beat in updated["beats"]:
+            beat = dict(beat)
+            fix(beat, "audio_file")
+            beats.append(beat)
+        updated["beats"] = beats
+    print(f"[tts] renumbered {scene_id}: scene {old_number:02d} -> {new_number:02d} "
+          f"(current storyboard order)", flush=True)
+    return updated
+
+
+def renumber_scenes(manifest: dict[str, Any], scene_numbers: dict[str, int],
+                    *, relocate: bool = True) -> dict[str, Any]:
+    """Re-stamp every entry's ``scene_number`` from the CURRENT storyboard's full-deck
+    order -- 1-based over every scene, intro/divider/content/outro all taking a number,
+    the same counting ``rewatch_pack.py`` and ``critic.py`` use -- and move any artifact
+    whose path encodes the old number.
+
+    Fresh entries already carry today's numbering; entries CARRIED OVER by a ``--scene``
+    subset merge carry whatever the deck looked like when they were last synthesized. On
+    2026-09-13 that left ``derivative_of_cosine`` and ``slope_equals_height`` both numbered
+    17 in one manifest and the critic's frame extractor collided on the number. A scene id
+    is part of every artifact name, so renumbering can never make two scenes collide on a
+    path, and the order in which entries are processed does not matter."""
+    out: list[dict[str, Any]] = []
+    for entry in manifest.get("scenes", []):
+        new_number = scene_numbers.get(entry.get("scene_id"))
+        old_number = entry.get("scene_number")
+        if new_number is None or not isinstance(old_number, int) or old_number == new_number:
+            out.append(entry)
+        else:
+            out.append(_renumber_entry(entry, entry["scene_id"], old_number, new_number,
+                                       relocate=relocate))
+    return {**manifest, "scenes": out}
+
+
+def build_reuse_index(manifest: dict[str, Any] | None) -> dict[BeatReuseKey, dict[str, Any]]:
+    """Beat reuse index keyed by CONTENT: ``(scene_id, beat text_hash, occurrence)`` ->
+    the prior WAV plus the identity it was synthesized under.
+
+    This used to be keyed by the beat's OUTPUT PATH, which is
+    ``beats/<NN scene_number>_<scene_id>/<NN index>_<reveal>.wav`` -- a name that encodes
+    the deck's scene ORDER and the beat's reveal id, neither of which has anything to do
+    with what the voice says. So two edits that changed not one spoken word still shifted
+    every path and re-billed whole scenes (both measured 2026-09-13): (a) reordering
+    scenes bumps <NN scene_number> for everything after the move, (b) adding or removing a
+    ``{show}`` marker renames that beat and renumbers the ones after it. Content-addressing
+    makes "same scene, same words, same voice" the reuse test it was always meant to be;
+    the WAV is then moved onto whatever path today's deck wants (``_relocate``).
+
+    ``occurrence`` settles the rare case of two beats with identical text inside one scene:
+    prior beats are numbered in manifest order, new ones in storyboard order, so the n-th
+    such beat pairs with the n-th prior one and no WAV is handed out twice.
+    """
     if not manifest:
         return {}
-    shared = {
-        "backend": manifest.get("backend"),
-        "model": manifest.get("model"),
-        "voice": manifest.get("voice"),
-        "style": manifest.get("style"),
-    }
-    index: dict[str, dict[str, Any]] = {}
+    shared = {k: manifest.get(k) for k in ("backend", "model", "voice", "style")}
+    index: dict[BeatReuseKey, dict[str, Any]] = {}
     for scene in manifest.get("scenes", []):
+        scene_id = scene.get("scene_id")
+        seen: dict[str, int] = {}
         for beat in scene.get("beats", []):
-            audio_file = beat.get("audio_file")
-            if not audio_file:
+            audio_file, beat_hash = beat.get("audio_file"), beat.get("text_hash")
+            if not scene_id or not audio_file or not beat_hash:
                 continue
-            index[str(Path(audio_file).resolve())] = {
-                **shared,
-                "text_hash": beat.get("text_hash"),
-            }
+            occurrence = seen.get(beat_hash, 0)
+            seen[beat_hash] = occurrence + 1
+            index[(scene_id, beat_hash, occurrence)] = {**shared, "audio_file": audio_file}
     return index
 
 
 def build_scene_reuse_index(manifest: dict[str, Any] | None) -> dict[str, dict[str, Any]]:
     """Reuse index keyed by scene_id, from a prior manifest's scene_aligned entries.
     Carries what §3 freshness needs so TTS can be skipped when only downstream
-    (reveal/beat-count) changed. (Per-beat build_reuse_index stays for the beat path.)"""
+    (reveal/beat-count) changed. (Per-beat build_reuse_index stays for the beat path.)
+
+    It also carries the alignment sidecar paths, because the scene WAV and both sidecars
+    are named ``<NN scene_number>_<scene_id>`` -- the same scene-order-encoding naming the
+    beat path had. Keying by scene_id was always right about WHICH audio belongs to this
+    scene; adopt_prior_scene_artifacts is what moves it onto today's number so the
+    freshness check can find it after a deck reorder."""
     if not manifest:
         return {}
     shared = {k: manifest.get(k) for k in ("backend", "model", "voice", "style")}
@@ -510,13 +640,51 @@ def build_scene_reuse_index(manifest: dict[str, Any] | None) -> dict[str, dict[s
     for scene in manifest.get("scenes", []):
         if scene.get("narration_mode") != "scene_aligned":
             continue
+        alignment = scene.get("alignment")
+        alignment = alignment if isinstance(alignment, dict) else {}
         out[scene.get("scene_id")] = {
             **shared,
             "scene_text_hash": scene.get("scene_text_hash"),
             "audio_file": scene.get("audio_file"),
             "audio_seconds": scene.get("audio_seconds"),
+            "words_file": alignment.get("words_file"),
+            "aligned_file": alignment.get("aligned_file"),
         }
     return out
+
+
+def adopt_prior_scene_artifacts(
+    prior: dict[str, Any] | None, *, scene_wav: Path, words_file: Path, aligned_file: Path,
+) -> tuple[dict[str, Any] | None, str | None]:
+    """Move a prior scene_aligned scene's artifacts onto TODAY's scene number.
+    Returns (prior with its recorded paths rewritten, the WAV's old path or None).
+
+    Why this is needed even though the index is keyed by scene_id: the WAV lives at
+    ``scenes/<NN scene_number>_<scene_id>.wav`` and the sidecars at
+    ``align/<NN>_<scene_id>.{words,aligned}.json``, and scene_reuse_ok used to be handed
+    today's path. So a reordered deck found nothing there and re-synthesized a scene whose
+    words had not changed -- the same class of re-bill the beat path had, one level up.
+    Relocating first makes the freshness check ask about the audio that actually exists.
+
+    Unconditional (not gated on the reuse verdict): when the text DID change, the scene is
+    re-synthesized to a temp and promoted onto scene_wav only after gates pass, so the
+    moved file is never lost before a good replacement exists -- and moving it means no
+    orphan WAV is left behind under the stale number. Same copy -> verify size -> delete ->
+    prune rule as the beat path. Paths that are not non-empty strings are skipped (the
+    manifest's own output, but an alignment block is not type-validated by
+    read_manifest_status, so this stays defensive)."""
+    if not prior:
+        return prior, None
+    updated, moved_from = dict(prior), None
+    for key, dst in (("audio_file", scene_wav), ("words_file", words_file),
+                     ("aligned_file", aligned_file)):
+        src = prior.get(key)
+        if not isinstance(src, str) or not src:
+            continue
+        if _relocate(Path(src), dst) and key == "audio_file":
+            moved_from = src
+        updated[key] = str(dst)
+    return updated, moved_from
 
 
 def scene_reuse_ok(prior: dict[str, Any] | None, plan: dict[str, Any], scene_wav: Path,
@@ -541,26 +709,32 @@ def scene_reuse_ok(prior: dict[str, Any] | None, plan: dict[str, Any], scene_wav
 
 
 def reusable_existing_beat(
-    output_path: Path,
     request: TTSRequest,
     *,
     backend_name: str,
-    reuse_index: dict[str, dict[str, Any]],
-) -> tuple[bool, str]:
-    prior = reuse_index.get(str(output_path.resolve()))
+    reuse_index: dict[BeatReuseKey, dict[str, Any]],
+    key: BeatReuseKey,
+) -> tuple[Path | None, str]:
+    """(prior WAV this beat can adopt, "") or (None, reason). The text hash is IN the key,
+    so a hit already means "same scene, same words"; what is left to check is the synthesis
+    identity and that the file is still on disk. Where that WAV must end up is the caller's
+    business -- reuse no longer depends on it already being at the right path."""
+    prior = reuse_index.get(key)
     if prior is None:
-        return False, "no matching prior manifest entry"
+        return None, "no prior beat with this text in this scene (text changed, or new beat)"
     expected = {
         "backend": backend_name,
         "model": request.model,
         "voice": request.voice,
         "style": request.style,
-        "text_hash": text_hash(request.text),
     }
-    for key, value in expected.items():
-        if prior.get(key) != value:
-            return False, f"{key} changed"
-    return True, ""
+    for field, value in expected.items():
+        if prior.get(field) != value:
+            return None, f"{field} changed"
+    src = Path(prior["audio_file"])
+    if not src.exists():
+        return None, f"prior WAV is gone ({src})"
+    return src, ""
 
 
 def build_backend(args: argparse.Namespace) -> TTSBackend:
@@ -599,16 +773,23 @@ def synthesize_beat(
     reuse_existing: bool,
     empty_seconds: float,
     backend_name: str,
-    reuse_index: dict[str, dict[str, Any]],
+    reuse_index: dict[BeatReuseKey, dict[str, Any]],
+    reuse_key: BeatReuseKey | None = None,
 ) -> SynthesizedBeat:
-    if output_path.exists() and reuse_existing:
-        reusable, reason = reusable_existing_beat(
-            output_path,
+    if reuse_existing and reuse_key is not None:
+        src, reason = reusable_existing_beat(
             request,
             backend_name=backend_name,
             reuse_index=reuse_index,
+            key=reuse_key,
         )
-        if reusable:
+        if src is not None:
+            moved = _relocate(src, output_path)
+            # consume the entry: one prior WAV is handed out at most once, so two beats
+            # with identical text in a scene pair off by index instead of sharing a take.
+            reuse_index.pop(reuse_key, None)
+            if moved:
+                print(f"[tts] reused {output_path.name} (moved from {src})", flush=True)
             return SynthesizedBeat(duration=wav_duration(output_path))
         print(f"[tts] not reusing {output_path.name}: {reason}; synthesizing", flush=True)
 
@@ -639,7 +820,7 @@ def synthesize_scene(
     scene_number: int,
     output_dir: Path,
     args: argparse.Namespace,
-    reuse_index: dict[str, dict[str, Any]],
+    reuse_index: dict[BeatReuseKey, dict[str, Any]],
     scene_reuse_index: dict[str, dict[str, Any]] | None = None,
 ) -> dict[str, Any]:
     """Dispatch a content scene to the beat- or scene-level synthesis path (--unit).
@@ -672,7 +853,7 @@ def _synthesize_scene_beats(
     scene_number: int,
     output_dir: Path,
     args: argparse.Namespace,
-    reuse_index: dict[str, dict[str, Any]],
+    reuse_index: dict[BeatReuseKey, dict[str, Any]],
 ) -> dict[str, Any]:
     voice = args.voice or default_voice_for_model(meta)
     scene_id = scene["id"]
@@ -689,8 +870,12 @@ def _synthesize_scene_beats(
     manifest_beats: list[dict[str, Any]] = []
     timeline = 0.0
 
+    seen_hashes: dict[str, int] = {}
     for beat in beats:
         beat_path = beat_dir / f"{beat['index']:02d}_{safe_stem(beat['reveal'] or beat['id'])}.wav"
+        beat_hash = text_hash(beat["text"])
+        occurrence = seen_hashes.get(beat_hash, 0)
+        seen_hashes[beat_hash] = occurrence + 1
         synth = synthesize_beat(
             backend,
             TTSRequest(
@@ -704,6 +889,7 @@ def _synthesize_scene_beats(
             empty_seconds=args.empty_beat_seconds,
             backend_name=backend.name,
             reuse_index=reuse_index,
+            reuse_key=(scene_id, beat_hash, occurrence),
         )
         duration = synth.duration
         beat_paths.append(beat_path)
@@ -713,7 +899,7 @@ def _synthesize_scene_beats(
             "audio_seconds": round(duration, 3),
             "start_seconds": round(timeline, 3),
             "end_seconds": round(timeline + duration, 3),
-            "text_hash": text_hash(beat["text"]),
+            "text_hash": beat_hash,
         }
         if synth.raw_audio_seconds is not None:
             beat_entry["raw_audio_seconds"] = round(synth.raw_audio_seconds, 3)
@@ -988,13 +1174,25 @@ def _synthesize_scene_aligned(*, backend, meta, scene, scene_number, output_dir,
     words_file = align_dir / f"{scene_number:02d}_{scene_id}.words.json"
     aligned_file = align_dir / f"{scene_number:02d}_{scene_id}.aligned.json"
 
+    # Bring the prior scene's artifacts onto TODAY's number FIRST: their names encode the
+    # scene order, so after a reorder the freshness check below would otherwise look at an
+    # empty path and re-bill a scene whose words never changed.
+    prior_scene, moved_from = adopt_prior_scene_artifacts(
+        scene_reuse_index.get(scene_id), scene_wav=scene_wav,
+        words_file=words_file, aligned_file=aligned_file)
+
     # (§3) reuse: if the existing WAV is fresh, skip TTS and just re-map+re-validate (free).
-    if scene_reuse_ok(scene_reuse_index.get(scene_id), plan, scene_wav,
+    if scene_reuse_ok(prior_scene, plan, scene_wav,
                       backend_name=backend.name, voice=voice, args=args):
+        if moved_from:
+            print(f"[tts] reused {scene_wav.name} (moved from {moved_from})", flush=True)
         entry = _align_and_gate(plan, scene_wav, scene_number, words_file, aligned_file,
                                 args, audio_file=scene_wav, promote_from=None)
         if entry["validation"]["status"] in ("pass", "pass_with_warnings"):
             return entry   # else fall through to resynth
+    elif moved_from:
+        print(f"[tts] {scene_id}: prior scene audio moved onto {scene_wav.name} "
+              f"(from {moved_from}) but is not reusable; synthesizing", flush=True)
 
     # synthesize to a TEMP wav, align+gate, promote onto scene_wav only if gates pass.
     tmp_wav = scene_wav.with_name(scene_wav.name + ".tmp")
@@ -1047,9 +1245,12 @@ def main() -> int:
                             force_clobber=args.force_clobber)
     identity_diff = status == "ok" and any((existing or {}).get(k) != intended.get(k)
                                            for k in _IDENTITY_KEYS)
-    # reuse index only when asked AND identity unchanged (R3-B2) AND not a dry-run
-    # (dry-run writes nothing and never reads these -- don't build unused indexes).
-    use_reuse = args.reuse_existing and not identity_diff and not args.dry_run
+    # Reuse index only when asked AND identity unchanged (R3-B2). A DRY-RUN builds it too
+    # -- read-only, nothing written or moved -- because the whole point of dry-run is to
+    # answer "does this edit cost anything?" BEFORE the call is made, and with the
+    # content key that answer is now "no" for a pure {show}/scene-order edit. The dry-run
+    # branch below says loudly when that zero depends on --reuse-existing being passed.
+    use_reuse = (args.reuse_existing or args.dry_run) and not identity_diff
     reuse_index = build_reuse_index(existing) if use_reuse else {}              # per-beat (beat path)
     scene_reuse_index = build_scene_reuse_index(existing) if use_reuse else {}  # per-scene (scene path)
     if args.reuse_existing and existing is None:
@@ -1061,17 +1262,26 @@ def main() -> int:
 
     content_count = sum(1 for scene in scenes if scene.get("kind", "content") == "content")
     beat_count = sum(len(scene_beats(scene)) for scene in scenes if scene.get("kind", "content") == "content")
+    all_scenes = data["scenes"]
+    scene_numbers = {scene["id"]: index for index, scene in enumerate(all_scenes, start=1)}
     if args.dry_run:
         # dry-run is read-only: never enforce the guard (R3-A1 -- the quote flow needs
         # dry-run to still print an estimate), but surface that a real run WOULD abort.
         if abort:
             print(f"[dry-run] NOTE: a real run WOULD abort -> {abort}")
-        # planned = first-round calls; worst = incl. fallback ladder. Both IGNORE
-        # --reuse-existing (reuse can only lower actual calls; never overstate the quote).
-        # Empty beats write silence without hitting the backend (synthesize_beat:539),
-        # so they count 0 calls. Scene unit: 1 synth + budget billed rungs 2-3 + one
-        # billed beat per NON-EMPTY beat at the terminal (F6/T3-2).
-        rows, planned, worst, est_secs = [], 0, 0, 0.0
+        # `plan` = first-round calls, reuse APPLIED: the reuse test is now content-addressed
+        # (scene_id + text hash + identity), so "I only moved a {show} marker / reordered
+        # scenes" shows up here as 0 before any money moves. `reuse` = billable units the
+        # existing audio already covers; `no-reuse` on the TOTAL line is the same count with
+        # reuse ignored, so the pessimistic quote is still on screen. `worst` stays
+        # reuse-BLIND for scene-unit scenes (a reused WAV can still fail re-alignment and
+        # fall down the ladder) and equals `plan` for beat-unit scenes (no ladder there).
+        # Empty beats write silence without hitting the backend, so they count 0 calls.
+        # Scene unit: 1 synth + budget billed rungs 2-3 + one billed beat per NON-EMPTY
+        # beat at the terminal (F6/T3-2).
+        from pipeline import scene_align as SA     # manim-free; pure functions on this path
+        sim_index = dict(reuse_index)              # consumed like the real run, on a copy
+        rows, planned, worst, est_secs, no_reuse = [], 0, 0, 0.0, 0
         for scene in scenes:
             if scene.get("kind", "content") != "content":
                 continue
@@ -1081,18 +1291,49 @@ def main() -> int:
             est_secs += sum(estimate_seconds(b["text"]) if (b.get("text") or "").strip()
                             else args.empty_beat_seconds for b in beats)
             if unit == "scene":
-                p, wc = 1, 1 + args.fallback_budget + len(nonempty)
+                # A real run relocates the prior WAV onto today's number before its
+                # freshness check; dry-run moves nothing, so it asks about the path the
+                # WAV is at NOW -- otherwise a reordered deck would be quoted for calls
+                # the real run will not make.
+                prior_scene = scene_reuse_index.get(scene["id"]) or {}
+                scene_wav = Path(prior_scene.get("audio_file") or (
+                    output_dir / "scenes" / f"{scene_numbers[scene['id']]:02d}_{scene['id']}.wav"))
+                covered = int(scene_reuse_ok(
+                    prior_scene or None, SA.build_scene_plan(scene), scene_wav,
+                    backend_name=args.backend, voice=voice, args=args))
+                p, wc, p0 = 1 - covered, 1 + args.fallback_budget + len(nonempty), 1
             else:
-                p = wc = len(nonempty)
-            planned += p; worst += wc
-            rows.append((scene["id"], unit, len(beats), len(nonempty), p, wc))
+                covered, seen = 0, {}
+                for beat in beats:
+                    beat_hash = text_hash(beat["text"])
+                    occurrence = seen.get(beat_hash, 0)
+                    seen[beat_hash] = occurrence + 1
+                    if not (beat.get("text") or "").strip():
+                        continue
+                    key = (scene["id"], beat_hash, occurrence)
+                    src, _ = reusable_existing_beat(
+                        TTSRequest(text=beat["text"], model=args.model, voice=voice,
+                                   style=args.style),
+                        backend_name=args.backend, reuse_index=sim_index, key=key)
+                    if src is not None:
+                        sim_index.pop(key, None)
+                        covered += 1
+                p = wc = len(nonempty) - covered
+                p0 = len(nonempty)
+            planned += p; worst += wc; no_reuse += p0
+            rows.append((scene["id"], unit, len(beats), len(nonempty), covered, p, wc))
         print(f"[dry-run] backend={args.backend} model={args.model} voice={voice} unit={args.unit} "
-              f"(planned counts IGNORE --reuse-existing)")
-        print(f"[dry-run] {'scene':<30}{'unit':<7}{'beats':>6}{'calls':>6}{'plan':>5}{'worst':>7}")
-        for sid, unit, nb, nc, p, wc in rows:
-            print(f"[dry-run] {sid:<30}{unit:<7}{nb:>6}{nc:>6}{p:>5}{wc:>7}")
+              f"(prior manifest: {'reusable' if reuse_index or scene_reuse_index else 'none/unusable'})")
+        print(f"[dry-run] {'scene':<30}{'unit':<7}{'beats':>6}{'calls':>6}{'reuse':>6}{'plan':>5}{'worst':>7}")
+        for sid, unit, nb, nc, rc, p, wc in rows:
+            print(f"[dry-run] {sid:<30}{unit:<7}{nb:>6}{nc:>6}{rc:>6}{p:>5}{wc:>7}")
         print(f"[dry-run] TOTAL content-scenes={len(rows)}  planned first-round calls={planned}  "
-              f"worst-case incl. fallback ladder={worst}  est narration ~{est_secs/60:.1f} min")
+              f"(no-reuse: {no_reuse})  worst-case incl. fallback ladder={worst}  "
+              f"est narration ~{est_secs/60:.1f} min")
+        if planned < no_reuse and not args.reuse_existing:
+            print(f"[dry-run] NOTE: planned={planned} ASSUMES --reuse-existing. Without that "
+                  f"flag the reuse index is empty and this run bills {no_reuse} calls "
+                  f"(2026-09-12: that omission is exactly how 13 calls got spent).")
         return 0
     if abort:
         raise SystemExit(f"[tts] {abort}")
@@ -1114,8 +1355,6 @@ def main() -> int:
         "scenes": [],
     }
 
-    all_scenes = data["scenes"]
-    scene_numbers = {scene["id"]: index for index, scene in enumerate(all_scenes, start=1)}
     print(
         f"synthesizing {beat_count} beat(s) across {content_count} content scene(s) "
         f"with backend={backend.name}, model={args.model}, voice={voice}",
@@ -1153,6 +1392,10 @@ def main() -> int:
         # (identity already vetted by the T2a preflight guard; merged_manifest re-checks
         # as a backstop). `existing` is the prior manifest read at the top of main().
         manifest = merged_manifest(existing, manifest, [s["id"] for s in all_scenes])
+    # Every entry gets TODAY's full-deck scene number: the freshly synthesized ones already
+    # have it, the ones a subset merge carried over from the prior manifest may not (that
+    # is how two scenes both ended up numbered 17 on 2026-09-13).
+    manifest = renumber_scenes(manifest, scene_numbers)
     write_manifest(manifest_path, manifest)
     print(f"[done] wrote {manifest_path}", flush=True)
     return 0
