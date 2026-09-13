@@ -288,7 +288,14 @@ def sector_inequality(spec, ctx, blocks):
         lab = brand.math_line(lab_tex, ground, role=role, size="label")
         lab.next_to(whole, DOWN, buff=0.28)
         badge = _badge(n, o[0] + R / 2, badge_col)   # centred over the slot, equal height
-        return VGroup(shape, *nested, lab, badge)
+        g = VGroup(shape, *nested, lab, badge)
+        # `_peel` used to read these back BY POSITION (mob[0], mob[1:-2], mob[-2], mob[-1]).
+        # Glyph ② now carries a derivation line as well (see `sector_area` below), and a
+        # block's mobject is also what `exit:` fades and `focus:` dims -- so the line has
+        # to be IN the group, and the group can no longer be indexed from its ends. The
+        # parts are named here instead of counted there; nothing else changes.
+        g._peel_parts = (shape, list(nested), lab, badge)
+        return g
 
     dst1 = _slot(O1, _tri(O1, B_off, amber, MAIN_FOP, 3),
                  r"\tfrac12\sin\theta", "accent", 1, amber)
@@ -298,6 +305,27 @@ def sector_inequality(spec, ctx, blocks):
     dst3 = _slot(O3, _tri(O3, C_off, green, MAIN_FOP, 1),
                  r"\tfrac12\tan\theta", "success", 3, green,
                  nested=[_sec(O3, strategy, MAIN_FOP, 2), _tri(O3, B_off, amber, MAIN_FOP, 3)])
+
+    # -- glyph ②: the one area that has to be COMPUTED (six-lens must, beat 5) ---
+    # `1/2 theta` hung under the peeled sector as a finished label and the step the
+    # narration actually speaks -- "the fraction theta over two pi of the disc" -- was
+    # nowhere on screen. Of the three areas it is the only one that is not read straight
+    # off a base and a height, and it is the ONE place in the film where the radian
+    # convention is load-bearing: the sector is 1/2 theta only because theta is measured
+    # in radians, which is what scene 13's "radians are structural" later leans on. Left
+    # in the audio it becomes a formula to memorise. Written in two stages inside the
+    # same beat (see `_peel`'s `derive`): the fraction of the disc, then its value.
+    # It goes INTO dst2 so the scene's `exit:` fade and the `focus:` dims carry it with
+    # the glyph it belongs to; `_slot` names its parts so the extra member is harmless.
+    sector_area = brand.math_line(
+        r"{{\left(\tfrac{\theta}{2\pi}\right)\cdot\pi\cdot 1^{2}}} {{=}} {{\tfrac12\theta}}",
+        ground, role="text", size="label",
+        seg_roles={r"\tfrac12\theta": "strategy"})
+    sector_area.next_to(dst2, DOWN, buff=0.22)
+    dst2.add(sector_area)
+    # stage 1 = the fraction of the disc, stage 2 = "= 1/2 theta" (the `=` rides with the
+    # value it introduces rather than arriving on a step of its own).
+    sector_stages = (sector_area[0], VGroup(*sector_area[1:]))
 
     # the three terms in the three regions' colours (SPEC rule 5 "same quantity, same
     # colour"; rollout T2-2; 2026-09-13 colour-axis unification, second call: sin=accent/amber,
@@ -313,8 +341,44 @@ def sector_inequality(spec, ctx, blocks):
     row = VGroup(dst1, dst2, dst3)
     ineq.next_to(row, DOWN, buff=0.55)
 
+    # -- the two regions the `ineq` beat NAMES but never pointed at (must A) ------
+    # That beat says "you can see exactly what each one adds: the corner piece A B C is
+    # what the outer triangle adds to the inner one, and inside it sits the sliver between
+    # the chord A B and the arc" -- and then holds a frozen picture for 8.2 s (the longest
+    # still in the film at the 0.05% threshold; the paced walk's two `\le` glyphs are too
+    # small to register as motion, so its five steps read as three, 8 s apart). Both named
+    # regions are small and neither reacts, so a first-time viewer has nowhere to look.
+    # SPEC-motion-language rule 3: trace the boundary, brighten the region, drop the rest
+    # of the figure -- never a camera move.
+    #
+    # The corner piece IS triangle A B C: B lies on OC, so OAC = OAB + ABC. The sliver is
+    # the circular segment between chord AB and the arc (sector minus OAB), which really
+    # does sit inside it -- the narration's claim is a fact about these two shapes.
+    # Both are SUBSETS of regions already in `full`, so putting them in it cannot move the
+    # layout (their points are interior to src_outer / src_sector); they ride along with
+    # _centre_in_zone instead of being rebuilt off the stale pre-centring coordinates,
+    # the same trap the evenness aside works around with `scaffold.get_center()`.
+    def _annot(shape, col):
+        """(outline, wash) for one region: its own boundary in its own colour, drawn by
+        `Create` so the stroke TRAVELS it, over a light wash that lifts the fill."""
+        shape.set_stroke(color=col, width=6.0, opacity=1.0).set_fill(opacity=0.0)
+        shape.set_z_index(12)
+        wash = shape.copy().set_stroke(width=0.0).set_fill(color=text, opacity=0.22)
+        wash.set_z_index(11)
+        return shape, wash
+
+    arc_AB = Arc(radius=R, start_angle=0.0, angle=th, arc_center=O)
+    arc_AB.add_line_to(A)                            # ...and back along the chord B->A
+    corner_edge, corner_wash = _annot(Polygon(A, B, C), green)
+    sliver_edge, sliver_wash = _annot(arc_AB, strategy)
+    annot = VGroup(corner_wash, corner_edge, sliver_wash, sliver_edge)
+    # what the sliver's moment drops to ANNOT_DIM: the construction and its three fills,
+    # i.e. everything of the main figure except the two lit outlines, which are not in it.
+    main_figure = VGroup(scaffold, src_inner, src_sector, src_outer,
+                         chip_inner, chip_sector, chip_outer)
+
     full = VGroup(scaffold, src_inner, src_sector, src_outer,
-                  chip_inner, chip_sector, chip_outer, dst1, dst2, dst3, ineq)
+                  chip_inner, chip_sector, chip_outer, dst1, dst2, dst3, ineq, annot)
     _centre_in_zone(title, full)
 
     # legibility pads under the three dimension labels that land on the 0.88-opaque fills
@@ -451,13 +515,13 @@ def sector_inequality(spec, ctx, blocks):
         scene.play(FadeOut(mob), backdrop.animate.restore(), run_time=OUT_SECONDS)
         return _spent(scene, t0, total)
 
-    def _peel(src, chip):
+    def _peel(src, chip, derive=()):
         def anim(scene, mob, ground):
-            # [shape, *nested, label, badge] -- `nested` is the smaller regions this glyph
-            # contains (empty for glyph ①); they arrive with the label, so the flown copy
-            # is still the one region this beat is about.
-            shape, label, badge = mob[0], mob[-2], mob[-1]
-            nested = list(mob[1:-2])
+            # `nested` is the smaller regions this glyph contains (empty for glyph ①);
+            # they arrive with the label, so the flown copy is still the one region this
+            # beat is about. Named by `_slot`, not indexed off the group's ends -- glyph ②
+            # carries a derivation line too (must B).
+            shape, nested, label, badge = mob._peel_parts
             t0 = _elapsed(scene)
             scene.play(FadeIn(src), run_time=0.4)            # region appears on the left
             scene.add(src)
@@ -469,7 +533,14 @@ def sector_inequality(spec, ctx, blocks):
             # figure's own ①②③ chip appears, tying the two halves together.
             scene.play(FadeIn(label, shift=0.08 * UP), FadeIn(badge), FadeIn(chip),
                        *[FadeIn(m) for m in nested], run_time=0.32)
-            return _spent(scene, t0, 1.52)
+            spent = 1.52
+            # glyph ②'s area derivation walks whatever is left of the beat (primitive 7),
+            # so its two stages arrive with the two halves of the sentence instead of
+            # landing together inside the peel's first 1.5 s of a 6.3 s beat.
+            if derive:
+                total = TM.beat_run_time(scene, spent + pacing.FADE_SECONDS * len(derive))
+                spent += pacing.walk(scene, list(derive), max(total - spent, 0.0))
+            return _spent(scene, t0, spent)
         return anim
 
     out.append(Block("circle", stage_circle, anim=_draw, static=False, layer="graph"))
@@ -477,24 +548,78 @@ def sector_inequality(spec, ctx, blocks):
     out.append(Block("frame", stage_frame, anim=_draw, static=False, layer="graph"))
     out.append(Block("apex", stage_apex, anim=_draw, static=False, layer="graph"))
     out.append(Block("tri_inner", dst1, anim=_peel(src_inner, chip_inner), static=False, layer="graph"))
-    out.append(Block("sector", dst2, anim=_peel(src_sector, chip_sector), static=False, layer="graph"))
+    out.append(Block("sector", dst2, anim=_peel(src_sector, chip_sector, derive=sector_stages),
+                     static=False, layer="graph"))
     out.append(Block("tri_outer", dst3, anim=_peel(src_outer, chip_outer), static=False, layer="graph"))
     # The inequality lands on a beat that grew to ~22 s when the corner-piece sentence
     # was added (Task D), and a single fade left 20.8 s of still picture -- over the 12 s
     # line. Its three terms are already `{{...}}` segments, so primitive 7 can walk them
     # across the beat: each term arrives as the narration names it. (`pacing.apply` only
     # upgrades STOCK reveals, and this one is a callable, so it is wired here by hand.)
+    #
+    # Where the beat's three moments sit, as shares of the beat's BUDGET (the beat minus
+    # the indicate + focus reservation and the paced tail, which is why they read
+    # .38/.53/.76 rather than the raw .36/.49/.71). Taken from the locked narration's own
+    # word counts for this beat -- 73 words over 22.7 s: the three terms are all named
+    # inside the first 36% ("...one half sine theta, then one half theta, then one half
+    # tangent theta"), "the corner piece A B C" starts at 49%, "and inside it sits the
+    # sliver" at 71%, and "the whole argument hangs on that one picture" is the last 11%,
+    # which is where the figure comes back whole.
+    WALK_SHARE, CORNER_AT, SLIVER_AT = 0.38, 0.53, 0.76
+    TRACE_SECONDS, ANNOT_OUT_SECONDS = 0.8, 0.4     # rule 3 "約 1 s" / temporary-annotation exit
+    ANNOT_DIM = 0.45                                # what the rest of the figure drops to
+    ANNOT_SECONDS = 2 * TRACE_SECONDS + ANNOT_OUT_SECONDS
+
     def _ineq_anim(scene, mob, _ground) -> float:
-        """`paced_reveal`, plain -- the beat's `focus[].indicate` (rule 3: the three regions
-        flash so the viewer can pair them with the three terms) that follows this reveal is
-        now reserved generically by `scene.py`/`timing.beat_run_time` (every beat pairing a
-        beat-filling reveal with an indicate hits the same trap; this one was the first and
-        used to reserve the flash's share by hand here -- now redundant, since `beat_run_time`
-        already leaves it out of the budget this asks for)."""
+        """Walk the inequality's terms while the narration names them, then POINT at the
+        two regions the rest of the beat talks about.
+
+        The walk alone (what this used to be) is honest about the terms but leaves the
+        back two thirds of a 22.7 s beat holding a finished picture -- and the beat's own
+        words there are "you can see exactly what each one adds", naming two regions that
+        do nothing. So each phrase gets its region traced (rule 3: stroke the boundary,
+        brighten it, never move the camera) and the SAME-COLOURED cell on the right
+        flashed with it (rule 5: the corner piece is what the outer triangle adds, so it
+        pairs with glyph ③; the sliver is what the sector adds, so it pairs with ②). The
+        sliver's moment also drops the rest of the figure to ANNOT_DIM, and the last play
+        gives the whole picture back on "the whole argument hangs on that one picture".
+        The annotations are temporary, so they leave with it: the scene's final frame --
+        what the layout and visual gates read -- is unchanged.
+
+        The beat's `focus[].indicate` and its focus fade are reserved generically by
+        `scene.py`/`timing.beat_run_time`, so the budget asked for here already leaves
+        them out."""
         t0 = _elapsed(scene)
         parts = pacing.block_parts(mob)
-        spent = pacing.walk(scene, parts, TM.beat_run_time(scene, pacing.FADE_SECONDS * len(parts)))
+        total = TM.beat_run_time(scene, pacing.FADE_SECONDS * len(parts) + ANNOT_SECONDS)
+        spent = pacing.walk(scene, parts, total * WALK_SHARE)
         scene.add(mob)
+
+        def _hold_to(mark: float) -> None:
+            """Wait until *mark* seconds into the beat; never rewinds."""
+            nonlocal spent
+            gap = max(mark - spent, 0.0)
+            if gap:
+                scene.wait(gap)
+                spent += gap
+
+        _hold_to(total * CORNER_AT)
+        scene.play(Create(corner_edge), FadeIn(corner_wash),
+                   Indicate(dst3, scale_factor=focus.INDICATE_SCALE, color=text),
+                   run_time=TRACE_SECONDS)
+        spent += TRACE_SECONDS
+        _hold_to(total * SLIVER_AT)
+        # `fade` in, `save_state`/`restore` out -- never `set_opacity` either way: the
+        # ①②③ badges are hollow rings and a flat opacity fills them in (focus.apply).
+        main_figure.save_state()
+        scene.play(Create(sliver_edge), FadeIn(sliver_wash),
+                   Indicate(dst2, scale_factor=focus.INDICATE_SCALE, color=text),
+                   main_figure.animate.fade(1.0 - ANNOT_DIM),
+                   run_time=TRACE_SECONDS)
+        spent += TRACE_SECONDS
+        _hold_to(total - ANNOT_OUT_SECONDS)
+        scene.play(FadeOut(annot), main_figure.animate.restore(), run_time=ANNOT_OUT_SECONDS)
+        spent += ANNOT_OUT_SECONDS
         return _spent(scene, t0, spent)
 
     out.append(Block("ineq", ineq, anim=_ineq_anim, static=False, layer="graph"))
