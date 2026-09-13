@@ -242,9 +242,9 @@ scenes:
     # 跨場攜帶（原語 5 物件面；SPEC-motion-language 規則 1）：06 的單位圓不重生——開場就在
     # 上一場末幀的位置，第一拍飛去右上角縮成 inset，當這一列列不等式的「那張圖」常駐提醒。
     carry:
-      - { from: sector_inequality, block: [circle, frame, apex], as: carried.circle, to: { corner: top_right, scale: 0.5 } }
-    # scale 0.35→0.5（2026-09-13）：試點縮圖的 sinθ／tanθ 標籤 7–9 px 讀不到（R2 A6）；0.5 落在標題右側的空檔，
-    # 不碰 motive（x 到 1020 px）也不碰第一列 rail。
+      - { from: sector_inequality, block: [circle, frame, apex], as: carried.circle, to: { corner: top_right, scale: 0.62 } }
+    # scale 0.35→0.5→0.62（2026-09-13 合併版視覺幀稽核）：0.5 時角落單位圓的標籤仍只有約 10 px 讀不到；
+    # 0.62 落在標題右側的空檔，不碰 motive（x 到 1020 px）也不碰第一列 rail（sizecheck 覆核）。
     # 規則 3：check 那拍旁白「from sinθ ≤ θ we also get…」指回 step.0，閃一下。
     focus:
       - { at: check, dim: [], indicate: [step.0] }
@@ -452,7 +452,9 @@ scenes:
       # the bottom of the plot chasing a curve that is not drawn there.
       # x_to 0.02→0.12（2026-09-13）：inset 把停在 0.02 的實心追蹤點放大成「蓋住空心圈」，正好
       # 與旁白「the ratio is undefined there」相反（R2 must）；停在 0.12 讓點與空心圈在鏡片裡分開。
-      - { kind: sweep, x_from: 1.55, x_to: 0.12, seconds: 7.5, follow: [0, 1, 2], gap: [1, 0], leave: cursor, color_role: accent }
+      # x_to 0.12→0.25（2026-09-13 合併版視覺幀稽核）：0.12 時游標仍停在空心點旁約 35 px、兩個
+      # 同色記號並排易讀成同一點；0.25 拉開夠看的間距，鏡片裡的分離也更清楚。
+      - { kind: sweep, x_from: 1.55, x_to: 0.25, seconds: 7.5, follow: [0, 1, 2], gap: [1, 0], leave: cursor, color_role: accent }
     # 規則 3 試點：放大鏡看 θ→0 附近的夾縫（主圖不縮放）；sweep 播放時鏡片內游標同步。
     # 已知：鏡片是 plot 的靜態終態，(0,1) 的空心點會比主圖早出現在鏡片裡。
     inset:
@@ -812,7 +814,9 @@ scenes:
     # 規則 1：23 推出的 s''=−s 不重生，開場就在、第一句飛到右下角（右上角是標題「Height, Velocity,
     # Acceleration」的地盤）；規則 3：mirror 那拍「hold the bottom graph against the top」把中間那條壓暗。
     carry:
-      - { from: shm_compute, block: result, as: carried.shm, to: { corner: bottom_left, scale: 0.45 } }
+      - { from: shm_compute, block: result, as: carried.shm, to: { corner: bottom_left, scale: 0.6 } }
+    # scale 0.45→0.6（2026-09-13 合併版視覺幀稽核）：結論列 s''=-s 只有約 18 px 讀不到；0.6 以不碰
+    # 下方 t=π/2／t=3π/2 guide 標籤與 Acceleration 欄名為準（sizecheck 覆核＋抽幀確認）。
     focus:
       - { at: mirror, dim: [g_v] }
     source: "chapter3-print-standalone.html SS3.1 . Figure 3.4 (shm-triple)"

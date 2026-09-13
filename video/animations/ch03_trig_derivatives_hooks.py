@@ -474,11 +474,14 @@ def slope_equals_height(spec, ctx, blocks):
     # few labelled ticks, not a full number line). No tick glyph at x=0 -- it would
     # sit on the y-axis; the "0" label alone anchors the origin.
     xticks = VGroup()
-    for xv, xlab, draw_tick in [(0.0, "0", False), (np.pi / 2, r"\tfrac{\pi}{2}", True), (np.pi, r"\pi", True)]:
+    # pi's buff 0.20->0.30（2026-09-13 合併版視覺幀稽核）：m=-1 的綠切線在 x=pi 附近下探，0.20 時
+    # 劃過標籤；其餘兩刻度不在任何切線的路徑上，維持原 buff。
+    for xv, xlab, draw_tick, buff in [(0.0, "0", False, 0.20), (np.pi / 2, r"\tfrac{\pi}{2}", True, 0.20),
+                                       (np.pi, r"\pi", True, 0.30)]:
         p = axes.c2p(xv, 0.0)
         if draw_tick:
             xticks.add(Line(p + 0.09 * UP, p + 0.09 * DOWN, color=mut, stroke_width=2.0))
-        t = MathTex(xlab, color=mut, font_size=T.fs("label")).next_to(p, DOWN, buff=0.20)
+        t = MathTex(xlab, color=mut, font_size=T.fs("label")).next_to(p, DOWN, buff=buff)
         if xv == 0.0:
             # the origin's label sits under the y-AXIS, which then runs straight through
             # the glyph. Slide it clear -- to the RIGHT, not to the usual left: the m=1
@@ -1795,11 +1798,13 @@ def shm_device(spec, ctx, blocks):
     acc_arrow = always_redraw(_acc_arrow)
     displacement = always_redraw(_displacement)
 
-    vel_label = brand.math_line("s'", ground, role="secondary", size="label")
+    # size "label"(30px)->"math_sm"(40px)（2026-09-13 合併版視覺幀稽核）：s/s'/s'' 三個裝置標籤
+    # 單一字母的有效字級只有約 18-22 px，升一階讀得到。
+    vel_label = brand.math_line("s'", ground, role="secondary", size="math_sm")
     vel_label.move_to(CEIL + ARM * RIGHT + 0.32 * UP)
-    acc_label = brand.math_line("s''", ground, role="success", size="label")
+    acc_label = brand.math_line("s''", ground, role="success", size="math_sm")
     acc_label.move_to(CEIL + ARM * LEFT + 0.32 * UP)
-    s_label = brand.math_line("s", ground, role="accent", size="label")
+    s_label = brand.math_line("s", ground, role="accent", size="math_sm")
     s_label.next_to(EQ + 0.85 * RIGHT, RIGHT, buff=0.12)
 
     device = VGroup(ceiling, hatch, equilibrium, spring, weight, vel_arrow, acc_arrow,
