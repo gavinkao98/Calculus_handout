@@ -265,14 +265,16 @@ scenes:
     # 規則 2：{{…}} 分段＋對位變形。step.1 從 step.0 變形（÷ sinθ），result 從 step.1 變形——`1` 這一段
     # 從左端跑到右端，「取倒數把鏈翻過來」就是看得見的動作；`frame: true` 讓變動前先框住上一列。
     # 兩列都留在 paced 裡：morph 1.6 s 之後 leader／reason 鋪在拍子剩餘時間（T1-1），拍子不再空等。
-    # 規則 5：三項各自繼承 06 三塊區域的色（藍＝內三角／琥珀＝扇形／綠＝外三角），取倒數後顏色左右對調。
+    # 規則 5：三項各自對應 06 三塊區域的色軸（2026-09-13 使用者裁決：琥珀＝sin／赭＝theta／綠＝tan）；
+    # 色跟著詞義走、不跟著欄位——sin 衍生（sinθ／「1」）＝accent，theta 衍生（θ／θ÷sinθ／sinθ÷θ）＝
+    # concept，tan 衍生（tanθ／1÷cosθ／cosθ）＝success，取倒數後三項在列內左右換位置但顏色不變。
     steps:
       - { math: "{{\\sin\\theta}} \\;\\le\\; {{\\theta}} \\;\\le\\; {{\\tan\\theta}}", reason: "multiply areas by $2$",
-          seg_roles: { "\\sin\\theta": secondary, "\\theta": accent, "\\tan\\theta": success } }
+          seg_roles: { "\\sin\\theta": accent, "\\theta": concept, "\\tan\\theta": success } }
       - { math: "{{1}} \\;\\le\\; {{\\frac{\\theta}{\\sin\\theta}}} \\;\\le\\; {{\\frac{1}{\\cos\\theta}}}", reason: "$\\div\\sin\\theta$, $\\tan=\\tfrac{\\sin}{\\cos}$", anim: transform, frame: true,
-          seg_roles: { "1": secondary, "\\frac{\\theta}{\\sin\\theta}": accent, "\\frac{1}{\\cos\\theta}": success } }
+          seg_roles: { "1": accent, "\\frac{\\theta}{\\sin\\theta}": concept, "\\frac{1}{\\cos\\theta}": success } }
     result: { math: "{{\\cos\\theta}} \\;\\le\\; {{\\frac{\\sin\\theta}{\\theta}}} \\;\\le\\; {{1}} \\qquad (0<\\theta<\\frac{\\pi}{2})", reason: "reciprocate -- reverses", anim: transform, frame: true,
-              seg_roles: { "\\cos\\theta": success, "\\frac{\\sin\\theta}{\\theta}": accent, "1": secondary } }
+              seg_roles: { "\\cos\\theta": success, "\\frac{\\sin\\theta}{\\theta}": concept, "1": accent } }
     check:  { math: "0 \\;\\le\\; \\lvert\\sin\\theta\\rvert \\;\\le\\; \\lvert\\theta\\rvert", reason: "kept for later" }
 
   # 7 ------------------- Proposition 3.1 (part 1/2): statement + lim sin theta = 0

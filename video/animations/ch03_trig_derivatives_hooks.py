@@ -121,21 +121,21 @@ def sector_inequality(spec, ctx, blocks):
 
     text = T.color(ground, "text")
     mut = T.color(ground, "muted")
-    blue = T.color(ground, "secondary")
     amber = T.color(ground, "accent")
     green = T.color(ground, "success")
+    concept = T.color(ground, "concept")
 
     def _tri(o, apex_off, col, fop, z):
         return Polygon(o, o + np.array([R, 0.0, 0.0]), o + apex_off,
                        color=col, fill_opacity=fop, stroke_width=2.5).set_z_index(z)
 
-    def _sec(o, fop, z):
+    def _sec(o, col, fop, z):
         return AnnularSector(inner_radius=0.0, outer_radius=R, angle=th,
-                             start_angle=0.0, arc_center=o, color=amber,
+                             start_angle=0.0, arc_center=o, color=col,
                              fill_opacity=fop, stroke_width=2.5).set_z_index(z)
 
-    # Main-figure fills stack OPAQUE (not translucent): OAB (blue) sits inside
-    # the sector (amber), which sits inside OAC (green), so painting largest-
+    # Main-figure fills stack OPAQUE (not translucent): OAB (amber) sits inside
+    # the sector (concept), which sits inside OAC (green), so painting largest-
     # first at increasing z-index (outer=1 -> sector=2 -> inner=3) lets each
     # later fill fully mask the part of the one below it -- three clean colour
     # bands (the ring between sector/outer edges) instead of the old low-alpha
@@ -212,10 +212,10 @@ def sector_inequality(spec, ctx, blocks):
     # z-order LARGEST region first (bottom) so each later, smaller, opaque fill
     # fully covers the part of the bigger one it sits inside -- outer (z=1)
     # under sector (z=2) under inner (z=3) leaves three distinct colour rings:
-    # green (OAC-only) / amber (sector-only) / blue (OAB), not a translucent blend.
+    # green (OAC-only) / concept (sector-only) / amber (OAB), not a translucent blend.
     src_outer = _tri(O, C_off, green, MAIN_FOP, 1)
-    src_sector = _sec(O, MAIN_FOP, 2)
-    src_inner = _tri(O, B_off, blue, MAIN_FOP, 3)
+    src_sector = _sec(O, concept, MAIN_FOP, 2)
+    src_inner = _tri(O, B_off, amber, MAIN_FOP, 3)
 
     # ①②③ chips anchored IN the main figure's three regions (not just the right
     # glyphs), so a paused viewer can map region -> formula directly on the
@@ -234,12 +234,12 @@ def sector_inequality(spec, ctx, blocks):
         num.move_to(ring.get_center()).set_z_index(8)
         return VGroup(ring, num)
 
-    chip_inner = _chip(R * np.array([0.605, 0.158, 0.0]), blue, 1)
+    chip_inner = _chip(R * np.array([0.605, 0.158, 0.0]), amber, 1)
     # smaller radius: the sector-only sliver between chord AB and the arc is only
     # ~0.12u deep regardless of R, so a full-size chip would bleed equally into
-    # both neighbours; a tighter ring keeps it legibly "on the amber band."
+    # both neighbours; a tighter ring keeps it legibly "on the concept band."
     chip_sector = _chip(R * np.array([np.cos(0.52 * th), np.sin(0.52 * th), 0.0]),
-                        amber, 2, radius=0.10)
+                        concept, 2, radius=0.10)
     chip_outer = _chip(R * np.array([0.947, 0.716, 0.0]), green, 3)
 
     # -- right: three peeled shapes on one baseline (true relative size) ---------
@@ -260,10 +260,10 @@ def sector_inequality(spec, ctx, blocks):
     # same opaque stack, at the same MAIN_FOP, as the source figure on the left.
     #
     # Why (2026-09-13 visual audit): the source figure's opaque stacking leaves each region
-    # showing only its own RING, so amber on the left is the crescent -- what the sector
+    # showing only its own RING, so concept on the left is the crescent -- what the sector
     # ADDS -- while glyph ② was the WHOLE sector, and badges ①②③ asserted the two were the
     # same thing. Rollout T2-2 then painted the inequality's three terms in the same three
-    # colours, which makes the mismatch load-bearing: the amber term is 1/2 theta, the whole
+    # colours, which makes the mismatch load-bearing: the concept term is 1/2 theta, the whole
     # sector. Nesting the glyphs makes both readings true at once -- the colour is still the
     # increment, the badge and the outline are the whole area, and "each region sits inside
     # the next" (the narration's own words) becomes something the row SHOWS rather than
@@ -275,23 +275,25 @@ def sector_inequality(spec, ctx, blocks):
         badge = _badge(n, o[0] + R / 2, badge_col)   # centred over the slot, equal height
         return VGroup(shape, *nested, lab, badge)
 
-    dst1 = _slot(O1, _tri(O1, B_off, blue, MAIN_FOP, 3),
-                 r"\tfrac12\sin\theta", "secondary", 1, blue)
-    dst2 = _slot(O2, _sec(O2, MAIN_FOP, 2),
-                 r"\tfrac12\theta", "accent", 2, amber,
-                 nested=[_tri(O2, B_off, blue, MAIN_FOP, 3)])
+    dst1 = _slot(O1, _tri(O1, B_off, amber, MAIN_FOP, 3),
+                 r"\tfrac12\sin\theta", "accent", 1, amber)
+    dst2 = _slot(O2, _sec(O2, concept, MAIN_FOP, 2),
+                 r"\tfrac12\theta", "concept", 2, concept,
+                 nested=[_tri(O2, B_off, amber, MAIN_FOP, 3)])
     dst3 = _slot(O3, _tri(O3, C_off, green, MAIN_FOP, 1),
                  r"\tfrac12\tan\theta", "success", 3, green,
-                 nested=[_sec(O3, MAIN_FOP, 2), _tri(O3, B_off, blue, MAIN_FOP, 3)])
+                 nested=[_sec(O3, concept, MAIN_FOP, 2), _tri(O3, B_off, amber, MAIN_FOP, 3)])
 
     # the three terms in the three regions' colours (SPEC rule 5 "same quantity, same
-    # colour"; rollout T2-2): each `{{...}}` segment is one term and seg_roles paints it
-    # whole -- over the deck's theta token colour -- so a term reads as ONE tinted unit
-    # matching the shape above it, instead of the chain falling back to white.
+    # colour"; rollout T2-2; 2026-09-13 colour-axis unification: sin=accent/amber,
+    # theta=concept/ochre, tan=success/green): each `{{...}}` segment is one term and
+    # seg_roles paints it whole -- over the deck's theta token colour -- so a term reads
+    # as ONE tinted unit matching the shape above it, instead of the chain falling back
+    # to white.
     ineq = brand.math_line(
         r"{{\tfrac12\sin\theta}} \;\le\; {{\tfrac12\theta}} \;\le\; {{\tfrac12\tan\theta}}",
         ground, role="text", size="math_sm",
-        seg_roles={r"\tfrac12\sin\theta": "secondary", r"\tfrac12\theta": "accent",
+        seg_roles={r"\tfrac12\sin\theta": "accent", r"\tfrac12\theta": "concept",
                    r"\tfrac12\tan\theta": "success"})
     row = VGroup(dst1, dst2, dst3)
     ineq.next_to(row, DOWN, buff=0.55)
@@ -301,7 +303,7 @@ def sector_inequality(spec, ctx, blocks):
     _centre_in_zone(title, full)
 
     # legibility pads under the three dimension labels that land on the 0.88-opaque fills
-    # (theta on amber, sin theta on blue, tan theta on green: 1.1-1.5:1 contrast, A6). A
+    # (theta on concept, sin theta on amber, tan theta on green: 1.1-1.5:1 contrast, A6). A
     # bg-coloured BackgroundRectangle goes into the label's own stage group right before the
     # label (same z-index 5 -> drawn under it, revealed with it). Built AFTER _centre_in_zone
     # so a pad can never move the figure: `full` is already placed (its centre measured
@@ -346,7 +348,10 @@ def sector_inequality(spec, ctx, blocks):
     def _e_height():
         pt = _e_point()
         foot = np.array([pt[0], eO[1], 0.0])
-        col = blue if e_ang.get_value() >= 0 else green
+        # both half-chords are sin values (+theta and -theta), so they share the sin
+        # colour (accent) and split on brightness instead of borrowing an unrelated
+        # role (2026-09-13 colour-axis unification).
+        col = amber if e_ang.get_value() >= 0 else mut
         return Line(foot, pt, color=col, stroke_width=4.0)
 
     def _e_dot():
@@ -851,7 +856,7 @@ def chord_vs_arc(spec, ctx, blocks):
     mut = T.color(ground, "muted")
     blue = T.color(ground, "secondary")
     amber = T.color(ground, "accent")
-    green = T.color(ground, "success")
+    concept = T.color(ground, "concept")
 
     R = 2.00
     TH = 1.25            # resting angle (~72 deg): chord/arc differ by 24%, which reads
@@ -884,19 +889,21 @@ def chord_vs_arc(spec, ctx, blocks):
     # -- stage 2: the two legs, live under the theta tracker ---------------------------
     th = ValueTracker(TH)
     foot = np.array([R * np.cos(TH), 0.0, 0.0])
-    sin_leg = Line(foot, R * _u(TH), color=blue, stroke_width=6.0)
-    cos_leg = Line(np.zeros(3), foot, color=green, stroke_width=6.0)
+    # 2026-09-13 colour-axis unification (11/18/24): sin=accent/amber, cos=secondary/blue,
+    # theta objects=concept/ochre -- was sin=secondary/blue, cos=success/green, theta=accent.
+    sin_leg = Line(foot, R * _u(TH), color=amber, stroke_width=6.0)
+    cos_leg = Line(np.zeros(3), foot, color=blue, stroke_width=6.0)
     # both labels sit where NO swing position can reach them (right of the widest foot /
     # below the axis), so they never need an updater and never cross the arc.
-    lab_sin = brand.math_line(r"\sin\theta", ground, role="secondary", size="label")
+    lab_sin = brand.math_line(r"\sin\theta", ground, role="accent", size="label")
     lab_sin.move_to(np.array([R * np.cos(TH - NUDGE) + 0.42, 0.80, 0.0]))
-    lab_cos = brand.math_line(r"\cos\theta", ground, role="success", size="label")
+    lab_cos = brand.math_line(r"\cos\theta", ground, role="secondary", size="label")
     lab_cos.move_to(np.array([0.50, -0.40, 0.0]))
     stage_nudge = VGroup(cos_leg, sin_leg, lab_sin, lab_cos)
 
     # -- stage 3: the arc above the chord ----------------------------------------------
-    arc = Arc(radius=R, start_angle=0.0, angle=TH, color=amber, stroke_width=6.0)
-    lab_arc = brand.math_line(r"\theta", ground, role="accent", size="label")
+    arc = Arc(radius=R, start_angle=0.0, angle=TH, color=concept, stroke_width=6.0)
+    lab_arc = brand.math_line(r"\theta", ground, role="concept", size="label")
     lab_arc.move_to((R + 0.40) * _u(TH / 2))
     stage_arc = VGroup(arc, lab_arc)
 
@@ -906,12 +913,12 @@ def chord_vs_arc(spec, ctx, blocks):
                       color=mut, stroke_width=1.4, dash_length=0.06)
     bar_chord = Line(np.array([BAR_X, 1.34, 0.0]),
                      np.array([BAR_X + R * np.sin(TH), 1.34, 0.0]),
-                     color=blue, stroke_width=7.0)
+                     color=amber, stroke_width=7.0)
     bar_arc = Line(np.array([BAR_X, 0.68, 0.0]),
-                   np.array([BAR_X + R * TH, 0.68, 0.0]), color=amber, stroke_width=7.0)
-    lab_bc = brand.math_line(r"|\sin\theta|", ground, role="secondary", size="label")
+                   np.array([BAR_X + R * TH, 0.68, 0.0]), color=concept, stroke_width=7.0)
+    lab_bc = brand.math_line(r"|\sin\theta|", ground, role="accent", size="label")
     lab_bc.next_to(bar_chord, RIGHT, buff=0.16)
-    lab_ba = brand.math_line(r"|\theta|", ground, role="accent", size="label")
+    lab_ba = brand.math_line(r"|\theta|", ground, role="concept", size="label")
     lab_ba.next_to(bar_arc, RIGHT, buff=0.16)
     ineq = brand.math_line(r"|\sin\theta| \le |\theta|", ground, role="text", size="math_sm")
     ineq.next_to(bar_arc, DOWN, buff=0.55).align_to(base, LEFT)

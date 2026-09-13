@@ -222,6 +222,15 @@ definition＝赭、theorem＝藍，影片卻是 definition＝藍、theorem＝琥
 `calcbook.sty` 並比對色相（DARK 容差 4°）——**任一條產線動了自己的色軸，這支會紅**，不會讓兩線
 靜默漂開。
 
+**影片層物件色慣例（2026-09-13 使用者裁決）。** 上面的 `accent` 軸管的是「這一場是什麼卡類型」；
+hook 手繪幾何裡「這個物件代表哪個三角函數量」是另一條正交的軸，全片統一照 11／18／24 三場已有的
+用法：`secondary` 藍＝cos、`accent` 琥珀＝sin、`success` 綠＝斜率／加速度／tan；θ 本身（弧、扇形、
+θ 標籤等「角度物件」）一律 `concept` 赭（`meta.color_map` 已把 `\theta` token 設 concept）。
+06 `sector_inequality`／07 `squeeze_to_the_bound`／08 `chord_vs_arc` 三場原本各自一套配色，
+本輪對齊到這條軸。**已知取捨：** `accent`（琥珀）與 `concept`（赭）色相相近，兩者相鄰時（如 08
+的 sin 半弦緊挨著 θ 弧）主要靠明度／飽和度分辨，不靠色相——若要拉開只能換 θ 的顏色，留待下一個
+裁決點，這一輪不動。
+
 ### Eyebrow 字卡 resolver（`scene_role`；2026-07-01）
 
 **兩條正交的軸。** eyebrow 字卡（`[ DEFINITION ]` 等）與顏色是**兩件事**：`accent` 決定**顏色**（`blocks.ACCENT_ROLE`），`scene_role` 決定**字卡**。字卡標的是「這格是什麼**教學 beat**」，不是「什麼數學物件」——對定理格兩者重合，但對開場／動機／直覺這類 exposition beat 兩者分岔，字卡不該硬套形式標籤。
