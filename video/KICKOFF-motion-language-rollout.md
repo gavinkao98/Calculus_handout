@@ -125,6 +125,9 @@ theorem_proof 的 `proof[]` 列沒有 `anim: transform`——16／17（sine／co
 
 ## 5. 驗收（機器閘全免費；人閘一個）
 
+> **2026-09-13 執行結果：** 1 ✅ T1（`e9226ad`）／T2（`f1bbe6d`）合併後 `run_selftests` **40/40**（38＋T1 的 `_selftest_proof_transform`＋另一 session 的 `_selftest_figure_labels`）、`doctor --smoke` 與開工前逐字相同；2 ✅ schema 0 error、sizecheck 0 error／1 既有 warn、`derive_spoken --check` parity OK；3 ✅ 21 場口語 hash 逐字相同，12（scene_aligned）與 24（beats；beat-1 WAV 依 reveal 改名後才命中 reuse index）重對映收據 `backend_calls: 0`；4 ✅ 27 場 1080p 三次 render（首渲染→24 角落壓 motif、08 V10→回歸），`[stillness]` 誠實後 18 條 advisory 全在 6.3–10.7 s；5 ✅ 視覺幀稽核首輪 **1 blocking**（08 proof 列走 prose 路徑、θ 白 vs 圖赭）→ 改純 math 列後回歸 **0**，advisory 6＋2；6 ✅ `rewatch_pack_after16` 21 場 fine 最長靜止 **全 ≤ 11.5 s**（vs ⑬：04 9.0→7.2、06 9.8→8.2、07 10.0→8.2、08 10.5→7.0、09 11.0→9.8、10 11.8→9.0、14 12.0→9.2、16 9.5→8.2、17 10.8→9.2、21 9.0→6.5、22 11.5→10.8、23 9.8→8.5、24 11.8→11.5）；7 ⚠ R2 Opus 盲審 27 場：**good 9／ok 13／weak 5／bad 0**（試點四場 04／06／07／11 全部 good），must 2／should 22／nice 4，`by_rule` ML1 3／ML2 4／ML3 1／ML4 7／ML5 3——⑬ 的兩條 must（09／12「該有圖」）關掉 12（carry 帶進主圖），09 仍在，**新增 23 shm_compute「彈簧與重物沒畫出來」**（內容提案、同類）；8 ✅ [`REVIEW-ch03_s31-motion-language-rollout.html`](content_scripts/_audit/REVIEW-ch03_s31-motion-language-rollout.html)；9 ⏳ 成片 `output/ch03/s3.1/ch03_trig_derivatives_mimo__rollout16.mp4` 已交使用者（42.5 MiB，只在桌面 app 可見）。
+> 執行中的偏離：04 的 carry 放棄（右上無空位）；24 的 carry 改 `bottom_left`（`bottom_right` 壓品牌 motif，sizecheck 不查 decoration 層）；carry 角落水平錨改內容 gutter（`70efe7d`，成片渲染於其前）；theorem_proof dict 列的 `seg_roles` 傳遞未做（無場用到）。
+
 1. T1／T2 合併後 `run_selftests.py` 全綠、`doctor --smoke` 與開工前逐字相同（除既有 pdftotext FAIL）。
 2. `schema.py`／`sizecheck.py` 正典 deck 0 error；`derive_spoken --check` parity OK；`_mimo` 重 derive。
 3. 零計費證明：改了 marker 的場 `scene_text_hash` 逐字相同 → `tts.py --backend mimo --reuse-existing --scene <ids> --no-billing` 收據 `backend_calls: 0`。
@@ -141,7 +144,15 @@ theorem_proof 的 `proof[]` 列沒有 `anim: transform`——16／17（sine／co
 
 ## 7. Backlog（本輪發現）
 
-（執行後填）
+- **R2 must ×2（皆「這裡該有圖」內容提案）：** 09 `continuity_argument` 全片最長死區、「界塌到 0」只寫不演（另一 session 已認領 `continuity_template` hook）；23 `shm_compute` 全片唯一物理情境沒畫彈簧與重物（未認領）。
+- **色軸跨場打架（R2 ML5 pattern）：** 08 hook 藍＝sin 半弦／綠＝cos，而 11／18／24 藍＝cos、琥珀＝sin；08 的 sin 不能改琥珀（弧 θ 已用琥珀，accent≈concept 色相）——這是 Direction B 色軸的取捨，要使用者裁決。
+- **prose 行內 θ 不吃色表（視覺閘 advisory 跨 03／07／10／11／12／14 六幀）：** deck 級修法＝在 `$…$` 內對命中 token 注入 dvisvgm `\special{color push/pop}`（不切 part，`Tex(color=None)` 後只補底色），三處入口 `math_line` 混排分支／`_prose_lines`／`heading_rich`。
+- **角落複本可讀性：** 07／12 標籤 11–14 px、24 整列 18／12 px（V4／A6 advisory）——`carry` 加「只帶 eq／去標籤」選項或 scale ≥ 0.6；07 carry_in 前 1.4 s 單位圓 y 軸戳進 motive（carry 飛行從 t=0 起或 motive 延後）；24 carried 列整列 success 綠（可加 `seg_roles`）。
+- **`[stillness]` 18 條 6.3–10.7 s：** theorem_proof 的 transform 列無 rail 可鋪（16／17／10 morph 後停 8–9 s）、09 proof.2 10.7 s、recap 四卡 7–9 s、25 statement 9.1 s——選項：`pauses:`／statement 閃爍／qed 提早；`_reveal_with_label` 未 paced 時固定 0.5 s 仍回 None（T1 順帶發現）。
+- theorem_proof dict 列的 `seg_roles` 傳遞＋`_seg_roles_issues` 擴到 theorem_proof（契約列了、本輪無場用到）。
+- 06 主圖太小（⑮ R2 must）仍未動；另一 session 已把右側三個 glyph 改疊層。
+- rewatch coarse 0.2% 對書寫動畫盲（R2 引 09「coarse 41.2 s」，fine 9.8 s）：pack 已雙門檻並列，考慮 INDEX 更醒目或 R2 prompt 明講只信 fine。
+- 另一 session 的「Tex bbox × 線段取樣求相交」量測已成 `_selftest_figure_labels`（`029ac95`）；建議升成 sizecheck 閘（REVIEW_GATES 自標的盲點）。
 
 ## 8. DoD
 
