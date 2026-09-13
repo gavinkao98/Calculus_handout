@@ -13,7 +13,7 @@ from __future__ import annotations
 
 from typing import Any, Callable
 
-from manim import DL, DR, UL, UR, VGroup
+from manim import DL, DR, RIGHT, UL, UR, VGroup
 
 from .. import brand
 from .. import narration
@@ -159,7 +159,13 @@ def _apply_carry(spec: dict[str, Any], ctx: dict[str, Any], blocks: "list[Block]
         scale = float(to.get("scale", 1.0))
         seconds = STOCK_ANIM_SECONDS["carry"]
         mob.save_state()          # the carried-in state: where the previous scene left it
-        mob.scale(scale).to_corner(_CARRY_CORNERS[to["corner"]], buff=T.SAFE_MARGIN)
+        corner = _CARRY_CORNERS[to["corner"]]
+        mob.scale(scale).to_corner(corner, buff=T.SAFE_MARGIN)
+        # Horizontally the anchor is the CONTENT gutter, not the safe margin: the brand
+        # rule stands on the left safe margin, so a copy flush to it rode on the line
+        # (shm_stacked_graphs, 2026-09-13 rollout audit); the right side matches so a
+        # corner copy ends where the title/rail column ends. Vertically the safe margin stays.
+        mob.shift((1 if corner is UL or corner is DL else -1) * (T.SIDE_GUTTER - T.SAFE_MARGIN) * RIGHT)
         target = mob.get_center()
 
         def flight(scene, m, _ground, *, s=scale, c=target, t=seconds) -> float:

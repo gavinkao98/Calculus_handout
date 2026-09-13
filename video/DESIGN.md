@@ -1003,7 +1003,7 @@ hook／paced），取該 block 的 mobject `.copy().clear_updaters()`（快照�
 之後、hook 之前，所以 hook 可以改被攜帶物件。鏈可以跨整幕（08 keep 07 從 06 帶來的複本）：終止
 靠「`from` 必須比本場早」，代價是鏈長 k 時 sizecheck 多建 k(k−1)/2 場。
 `to: keep` → static block、layer 沿用來源；**`say` 不可再 `{show <as>}`**（schema error）。
-`to: {corner, scale}` → **建在終態**（角落＋縮放；sizecheck 量的是場末那幀，同 sweep「tracker
+`to: {corner, scale}` → **建在終態**（角落＋縮放——上下貼安全邊界、左右貼內容 gutter，免得左下角的複本騎在品牌直線上；sizecheck 量的是場末那幀，同 sweep「tracker
 建在終點」），`Block.pre_play=restore` 讓 `scene._stage` 開播前把它退回原位，`{show <as>}` 那拍
 `.animate.scale().move_to()` 飛去角落 0.8 s（`timing.STOCK_ANIM_SECONDS["carry"]`）；沒寫
 marker 就落在場末補揭示（schema warn）。被攜帶 block 沿用來源 layer：graph 層在角落不做

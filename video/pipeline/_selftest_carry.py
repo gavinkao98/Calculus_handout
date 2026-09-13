@@ -107,7 +107,7 @@ def test_corner_is_built_at_its_terminal_place_and_pre_play_rewinds_it():
     x0, x1, y0, y1 = _bbox(got.mobject)
     sx0, sx1, sy0, sy1 = _bbox(source.mobject)
     assert abs((x1 - x0) - 0.35 * (sx1 - sx0)) < 1e-3, "built at the scaled size"
-    assert abs(x1 - (T.FRAME_W / 2 - T.SAFE_MARGIN)) < 1e-3, "flush to the safe margin, right"
+    assert abs(x1 - (T.FRAME_W / 2 - T.SIDE_GUTTER)) < 1e-3, "flush to the content gutter, right"
     assert abs(y1 - (T.FRAME_H / 2 - T.SAFE_MARGIN)) < 1e-3, "flush to the safe margin, top"
     assert got.pre_play is not None
     got.pre_play(got.mobject)
