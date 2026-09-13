@@ -1869,9 +1869,13 @@ def difference_quotient_for_sine(spec, ctx, blocks):
 # (`brand.math_line`, METHODOLOGY §5), one indent in from the chain's left edge, no semantic
 # hue. It is built inside the hook, never becomes a Block, and is cleared before
 # {show proof.1} needs the space, so every layout gate still measures the terminal frame it
-# measured before. proof.0's own reveal is WRAPPED, not replaced: the stock
-# `_reveal_with_label` (the PROOF eyebrow riding in with the row) plays first and reports
-# its own seconds, then the draft runs in the rest of the beat.
+# measured before. proof.0's own reveal is WRAPPED, not replaced: the stock reveal plays
+# first and reports its own seconds, then the draft runs in the rest of the beat.
+# (2026-09-14, T5 `ea5cf47`: the PROOF eyebrow is no longer folded into that reveal. It is a
+# Block of its own declaring `reveal_with="proof.0"`, so the player runs it as a RIDER just
+# before the beat's reveal and charges it to `beat_reserved_seconds`. Wrapping still works --
+# this hook only needs whatever `step0.anim` is -- and the eyebrow now survives the override,
+# which is the bug T5 fixed.)
 _C_INDENT = 0.5                    # the proof chain's left edge plus one indent
 # Scene 04 established u and v; "the same way as the first one" is the narration POINTING at
 # that substitution, so the draft recalls it in one line instead of re-deriving it.
@@ -1911,7 +1915,10 @@ def cosine_identity_draft(spec, ctx, blocks):
     step0 = ids["proof.0"]
     row = step0.mobject
     row_eq = derivation._eq_core(row) or row
-    stock_reveal = step0.anim            # _reveal_with_label(PROOF eyebrow); wrapped, not replaced
+    stock_reveal = step0.anim            # the row's own reveal; wrapped, not replaced. Since
+                                         # T5 the PROOF eyebrow is a separate `reveal_with`
+                                         # rider, so it is NOT inside this anim (and is no
+                                         # longer lost when a hook overrides proof.0).
 
     # The draft column and its two lines are read off the REAL chain, so the band is exactly
     # the space proof.1 / proof.2 will take and nothing has to be re-measured by hand.
