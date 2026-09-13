@@ -106,6 +106,57 @@ def test_a_two_part_block_does_not_strand_the_back_half():
     assert max(scene.waits) < 9.0, scene.waits
 
 
+# -- chrome + content blocks (recap_cards.point.N, R2 must round 20) -----------
+
+def _chrome_content_mob(n_parts):
+    """A fake "chrome + content" block: a numeral (chrome) plus *n_parts* content lines,
+    the way recap_cards builds a point row -- declared via _paced_parts/_paced_chrome so
+    block_parts does not see the row's own [chrome, content] as the two parts to walk."""
+    chrome = Dot()
+    parts = [Dot() for _ in range(n_parts)]
+    mob = VGroup(chrome, *parts)     # the row: top-level submobjects are [chrome, *parts]
+    mob._paced_chrome = chrome
+    mob._paced_parts = parts
+    return mob, chrome, parts
+
+
+def test_block_parts_reads_the_declared_split_not_the_top_level_submobjects():
+    """Without the declaration, block_parts would see [chrome, *parts] (2..9 items) and
+    walk the chrome as its own segment. With it, only the declared content parts walk."""
+    mob, chrome, parts = _chrome_content_mob(2)
+    assert P.block_parts(mob) == parts
+    assert P.chrome_of(mob) is chrome
+
+
+def test_chrome_rides_in_with_the_first_content_part_not_alone():
+    """The bug (R2 ML4, round 20): a recap point's numeral revealed alone and held for
+    half the beat before its text ever appeared. The chrome must be in the SAME play as
+    the first content part, and get no play of its own."""
+    mob, chrome, parts = _chrome_content_mob(2)
+    scene = FakeScene(beat_seconds=18.0)
+    P.paced_reveal(scene, mob, "dark")
+    assert len(scene.plays) == 2, scene.plays          # one play per content part, no more
+    assert scene.plays[0] == P.FADE_SECONDS            # first play is not slower/split
+
+
+def test_a_single_content_part_with_chrome_stays_on_the_atomic_write_path():
+    """One content line (no wrap): the declared split still has exactly 1 part, so this
+    goes through paced_write, which draws the WHOLE mob (chrome included) together --
+    already the correct "chrome with first content" behaviour, no extra wiring needed."""
+    mob, chrome, parts = _chrome_content_mob(1)
+    scene = FakeScene(beat_seconds=16.0)
+    P.paced_reveal(scene, mob, "dark")
+    assert len(scene.plays) == 1 and scene.waits == [], (scene.plays, scene.waits)
+
+
+def test_a_plain_block_without_the_split_is_unaffected():
+    """No _paced_parts/_paced_chrome declared: behaviour is byte-for-byte the pre-existing
+    walk (chrome=None is a no-op) -- zero behaviour change for every other deck."""
+    scene = FakeScene(beat_seconds=18.0)
+    P.paced_reveal(scene, _mob(3), "dark")
+    assert len(scene.plays) == 3, scene.plays
+
+
 def test_off_beat_it_falls_back_to_plain_reveals():
     """No beat context (end-of-scene sweep-up, selftests): no invented hold."""
     scene = FakeScene(beat_seconds=None)
@@ -189,6 +240,10 @@ if __name__ == "__main__":
     test_the_walk_spends_the_whole_beat()
     test_the_longest_still_inside_the_beat_is_the_beat_over_n()
     test_a_two_part_block_does_not_strand_the_back_half()
+    test_block_parts_reads_the_declared_split_not_the_top_level_submobjects()
+    test_chrome_rides_in_with_the_first_content_part_not_alone()
+    test_a_single_content_part_with_chrome_stays_on_the_atomic_write_path()
+    test_a_plain_block_without_the_split_is_unaffected()
     test_off_beat_it_falls_back_to_plain_reveals()
     test_apply_rewires_only_the_named_dynamic_blocks()
     test_declared_seconds_are_the_floor_not_the_natural_length()

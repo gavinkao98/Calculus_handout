@@ -897,6 +897,12 @@ paced: [body, result]        # reveal id；其餘照舊
 block 會在前半拍放完、後半拍整片靜止，等於把病灶搬家而不是治好。
 **沒有段可走的 block（單行式子）改為「隨旁白書寫」**：`Write` 跨整拍畫出來，速率有上限
 （`WRITE_SECONDS_PER_GLYPH`），短式子落在長拍上不會被拖成慢動作，剩下的時間照常是 hold。
+**「chrome ＋ 內容」結構的 block（卡框／編號 ＋ 文字，如 `recap_cards.point.N`）** 若不特別
+標記，走法會把 block 自己的頂層 submobjects（chrome、內容）當成兩段逐段走，於是先露出裸
+chrome、晾著它晾到半拍過去內容才出現（R2 must，第 20 輪 ML4：`point.3` 的文字在旁白講了
+9.7 秒後才出現）——模板在 mobject 上標 `_paced_parts=[內容行...]`（真正要逐段走的段）＋
+`_paced_chrome=<chrome mobject>`，`pacing.block_parts`／`walk` 就會把 chrome 併進第一段
+的那次 `play`，之後只逐段走內容行；沒有標記的 block 走法不變。
 實作 [`pipeline/pacing.py`](pipeline/pacing.py)，接在 `build_blocks` 的 hook 之後（所以
 hook 換掉的 mobject 也吃得到）。**只升級 stock reveal**：anim 已經是 callable 的（hook）一律跳過，否則通用的走法會把那支編舞靜靜吃掉；
 `anim: transform`／`cancel` 列則自己讀 `paced`（morph 後 rail 逐段隨讀，見首輪節）。

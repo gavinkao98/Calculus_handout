@@ -894,7 +894,12 @@ scenes:
     refs: { points.0: md:recap, points.1: md:recap, points.2: md:recap, points.3: md:recap }
     # point.3 這一拍因為接收了場 13 移來的度數導數公式而長到約 21 秒，而卡片是一次淡入、
     # 之後畫面不動——量測 20.2 s 最長靜止，破了 12 s 驗收線。paced 讓卡片的兩行隨旁白逐行進場。
-    paced: [point.3]
+    # R2 must（第 20 輪 ML4）：point.3 加了 paced 之後，逐段走的是 row 自己的頂層兩件
+    # （編號、文字整段），於是編號先落地、文字要等半拍才出現——旁白講了 9.7 s 畫面上仍是
+    # 空的編號欄。修法在 recap_cards.build：編號標成 `_paced_chrome`，真正逐段走的是文字
+    # 自己的行（`_paced_parts`），pacing.walk 把 chrome 併進第一行那次 FadeIn。point.0–2
+    # 同款 7–8 s 的「一次淡入之後畫面不動」（round18/19 review 已記，advisory）一併吃下。
+    paced: [point.0, point.1, point.2, point.3]
     source: "chapter3-print-standalone.html SS3.1 . whole-section synthesis"
     title: "Key Takeaways"
     say: |

@@ -40,10 +40,24 @@ WRITE_LEAD_SECONDS = 1.0
 
 
 def block_parts(mob: Any) -> list:
-    """The parts a paced reveal walks: a block's own submobjects when there is a
-    paragraph-sized number of them, else the block itself."""
+    """The parts a paced reveal walks: a block's own declared ``_paced_parts`` when it
+    has a chrome/content split (a card frame or index numeral that must not be walked as
+    its own segment -- see ``chrome_of`` and recap_cards.point.N), else its own
+    submobjects when there is a paragraph-sized number of them, else the block itself."""
+    declared = getattr(mob, "_paced_parts", None)
+    if declared is not None:
+        return list(declared)
     subs = list(getattr(mob, "submobjects", []) or [])
     return subs if 2 <= len(subs) <= PART_LIMIT else [mob]
+
+
+def chrome_of(mob: Any) -> Any:
+    """The furniture (card frame, index numeral, ...) a block declares via
+    ``_paced_chrome`` that is not itself a walked part but must appear together with the
+    FIRST part -- else None. Without this, a "chrome + content" block's own top-level
+    submobjects (chrome, content) get walked as two parts, revealing bare chrome and
+    holding it for half the beat before any content appears."""
+    return getattr(mob, "_paced_chrome", None)
 
 
 def write_seconds(mob: Any, total: float) -> float:
@@ -78,20 +92,26 @@ def paced_reveal(scene, mob, _ground) -> float:
     n = len(parts)
     if n == 1:
         return paced_write(scene, mob)
-    spent = walk(scene, parts, TM.beat_run_time(scene, FADE_SECONDS * n))
+    spent = walk(scene, parts, TM.beat_run_time(scene, FADE_SECONDS * n), chrome=chrome_of(mob))
     scene.add(mob)
     return spent
 
 
-def walk(scene, parts, total: float) -> float:
+def walk(scene, parts, total: float, chrome: Any = None) -> float:
     """Fade *parts* in one at a time, evenly spread over *total* seconds: each part's
     FADE_SECONDS entrance, then its share of whatever hold is left (n gaps, see
     paced_reveal). Shared with the transform / cancel rows, which walk their rail across
-    the REST of the beat after the morph (rollout T1-1). Returns the seconds spent."""
+    the REST of the beat after the morph (rollout T1-1). *chrome* (see chrome_of), when
+    given, rides in on the FIRST part's play instead of getting a part of its own -- a
+    block's card frame or index numeral must appear together with its first content, not
+    alone. Returns the seconds spent."""
     n = len(parts)
     gap = max((total - FADE_SECONDS * n) / n, 0.0)
-    for part in parts:
-        scene.play(FadeIn(part, shift=0.1 * UP), run_time=FADE_SECONDS)
+    for i, part in enumerate(parts):
+        anims = [FadeIn(part, shift=0.1 * UP)]
+        if i == 0 and chrome is not None:
+            anims.append(FadeIn(chrome, shift=0.1 * UP))
+        scene.play(*anims, run_time=FADE_SECONDS)
         if gap:
             scene.wait(gap)
     return FADE_SECONDS * n + gap * n
