@@ -17,6 +17,7 @@ from typing import Any
 
 from manim import Create, FadeIn, RIGHT, UP, Write
 
+from . import timing as TM
 from .visuals import theme as T
 
 
@@ -101,7 +102,21 @@ def play_block(scene, block: Block, ground: str) -> float:
     Returns the wall-clock animation time consumed, so the caller can subtract it
     from a beat's target duration and hold for exactly the remainder (keeping each
     beat's video length equal to its narration clip).
+
+    MEASURED, not summed: `_reveal` below returns each path's NOMINAL seconds (the stock
+    table's constants; whatever a callable reports), and manim rounds every `play` up to a
+    whole frame, so a reveal made of several plays costs more than its nominal. Measuring
+    here makes all three paths -- stock name, paced walk, hook callable -- honest in one
+    place instead of asking each of them to do it (DESIGN.md, "Reveal 的耗時回報契約").
+    The §3.1 hooks measure themselves too; that is harmless, since the outer measurement
+    spans exactly the same interval and therefore returns the same number.
     """
+    t0 = TM.elapsed(scene)
+    return TM.spent(scene, t0, _reveal(scene, block, ground))
+
+
+def _reveal(scene, block: Block, ground: str) -> float:
+    """Play one block's reveal; returns its NOMINAL seconds (see `play_block`)."""
     mob = block.mobject
     anim = block.anim
     accent = T.color(ground, "accent")

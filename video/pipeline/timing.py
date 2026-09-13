@@ -61,6 +61,38 @@ def beat_run_time(scene: Any, fallback: float) -> float:
     return max(float(seconds) - BEAT_PACED_TAIL_SECONDS, BEAT_PACED_MIN_SECONDS)
 
 
+def elapsed(scene: Any) -> "float | None":
+    """The renderer's own wall-clock, or None on a scene that has no renderer.
+
+    A reveal must report what it ACTUALLY consumed, not the sum of its `run_time`s:
+    manim rounds every `play` up to a whole frame, so a reveal made of several plays
+    under-reports by a frame each, the beat then holds for a remainder that is too long,
+    and the scene ends up longer than its narration ([sync] render/audio length).
+
+    None (not 0.0) for "no clock here", so a caller can tell a scene at t=0 apart from
+    the selftests' FakeScene and fall back to a nominal figure. See `spent`.
+
+    PREREQUISITE: `make.py`'s `disable_caching: True`. manim's `renderer.time` advances by
+    the NOMINAL `scene.duration` when an animation is served from cache and only accumulates
+    per rendered frame otherwise, so the whole measure-don't-guess contract silently
+    degrades to nominal values if that flag is ever turned off (DESIGN.md, "Reveal 的耗時
+    回報契約").
+    """
+    clock = getattr(getattr(scene, "renderer", None), "time", None)
+    return float(clock) if isinstance(clock, (int, float)) else None
+
+
+def spent(scene: Any, t0: "float | None", nominal: float) -> float:
+    """What a reveal reports to its beat: measured where there is a clock, *nominal* where
+    there is none. The pipeline selftests drive reveals with a FakeScene that records
+    `run_time`s but has no renderer, and they assert on the returned seconds -- so the
+    nominal budget has to stay the answer off a real render."""
+    t1 = elapsed(scene)
+    if t0 is None or t1 is None:
+        return nominal
+    return t1 - t0
+
+
 def text_hash(text: str) -> str:
     return hashlib.sha256(text.encode("utf-8")).hexdigest()[:16]
 

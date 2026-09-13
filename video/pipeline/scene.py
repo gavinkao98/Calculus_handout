@@ -5,9 +5,11 @@ the DARK canvas. Background and the palette templates pull from are both chosen
 from the scene kind here.
 
 Reveal timing is audio-driven: when ``beat_durations`` is supplied (from the TTS
-manifest), each beat holds for exactly its measured narration-clip length, minus
-the reveal animation already spent. Without it, ``estimate_seconds`` (word count)
-stands in -- the alignment model is identical, only the clock changes.
+manifest), each beat ends exactly one narration clip after the one before it --
+the hold runs until the CUMULATIVE target, read off ``renderer.time``, so manim's
+per-play frame rounding cannot accumulate (see ``_play_content``). Without it,
+``estimate_seconds`` (word count) stands in -- the alignment model is identical,
+only the clock changes.
 """
 from __future__ import annotations
 
@@ -21,11 +23,30 @@ from .blocks import accent_role, play_block
 from .narration import estimate_seconds, parse_say
 from .templates import build_blocks
 from .timing import (EXIT_FADE_SECONDS, MIN_BEAT_HOLD_SECONDS, SCENE_LEAD_SECONDS,
-                     SCENE_TAIL_SECONDS)
+                     SCENE_TAIL_SECONDS, elapsed)
 from .visuals import theme as T
 
 LIGHT_KINDS = {"intro", "outro"}
 MIN_HOLD = MIN_BEAT_HOLD_SECONDS  # floor so long reveal animation never yields negative wait
+
+
+def dim_ids(spec: dict[str, Any], target: str, wanted: "list[str]") -> "list[str]":
+    """A beat's `dim` list, minus the beat's OWN reveal target.
+
+    Since the focus now runs BEFORE the reveal, dimming the block this same beat reveals
+    would have `focus.apply` snapshot it (`save_state`) while it is still off screen -- and
+    a later `dim: []` would then `restore()` it back to invisible, with no error anywhere.
+    `schema._focus_issues` rejects such an entry outright (it is always a typo); this is the
+    second line of defence for a spec that dodged the gate.
+    """
+    out = []
+    for block_id in wanted:
+        if block_id == target:
+            print(f"[focus] {spec.get('id', '?')}: focus[at={target}].dim names its own "
+                  f"reveal target {target!r}; skipped (it is not on screen yet)", flush=True)
+        else:
+            out.append(block_id)
+    return out
 
 
 class LessonScene(Scene):
@@ -63,8 +84,9 @@ class LessonScene(Scene):
 
         self.wait(SCENE_LEAD_SECONDS)
 
+        narration_end = None
         if kind == "content":
-            self._play_content(blocks, by_id, ground)
+            narration_end = self._play_content(blocks, by_id, ground)
         elif kind == "intro":
             self._play_intro(blocks, ground, float(self.spec.get("duration", 6.0)))
         elif kind == "outro":
@@ -72,7 +94,7 @@ class LessonScene(Scene):
         else:
             self._play_timed(blocks, ground, float(self.spec.get("duration", 3.0)))
 
-        self._tail(kind, by_id)
+        self._tail(kind, by_id, narration_end)
 
     def _stage(self, blocks) -> None:
         """The opening frame: every static block, plus any dynamic block with a
@@ -85,22 +107,35 @@ class LessonScene(Scene):
                 block.pre_play(block.mobject)
                 self.add(block.mobject)
 
-    def _tail(self, kind, by_id) -> None:
+    def _tail(self, kind, by_id, narration_end=None) -> None:
         """The SCENE_TAIL_SECONDS hold. `exit: [<block id>...]` (content scenes) fades those
         blocks out INSIDE the hold (EXIT_FADE_SECONDS), so what the next scene does not
         carry leaves before the cut while the clip length -- what the render/audio sync
         audit measures -- is unchanged. NB: the LAST frame, which critic.py / scratch_frames
         read as the scene's "fullest frame", is then the post-exit frame. An id naming no
-        block is skipped (sizecheck errors on it before render, as for focus.dim)."""
+        block is skipped (sizecheck errors on it before render, as for focus.dim).
+
+        *narration_end* (content scenes on a real render) is the renderer clock the last
+        beat was aligned to, so the hold can end SCENE_TAIL_SECONDS after the NARRATION --
+        which is exactly what the sync audit measures -- instead of adding a flat second to
+        wherever the scene happened to get to. Two things land between the last beat and
+        here and neither is narration time: `_play_content`'s closing focus restore
+        (FADE_SECONDS, on any scene that dimmed something) and a final beat that overran
+        and fell back on MIN_HOLD. Both used to push the whole clip long; they are absorbed
+        by the hold now, the same way the `exit` fade already is."""
         exits = (self.spec.get("exit") or []) if kind == "content" else []
         mobs = [by_id[i].mobject for i in exits if i in by_id]
         if mobs:
             self.play(*[FadeOut(m) for m in mobs], run_time=EXIT_FADE_SECONDS)
-            self.wait(SCENE_TAIL_SECONDS - EXIT_FADE_SECONDS)
+        now = elapsed(self)
+        if narration_end is None or now is None:
+            self.wait(SCENE_TAIL_SECONDS - (EXIT_FADE_SECONDS if mobs else 0.0))
         else:
-            self.wait(SCENE_TAIL_SECONDS)
+            self.wait(max(narration_end + SCENE_TAIL_SECONDS - now, MIN_HOLD))
 
-    def _play_content(self, blocks, by_id, ground) -> None:
+    def _play_content(self, blocks, by_id, ground) -> "float | None":
+        """Play the beats; returns the renderer clock the narration ends on (None off a
+        real render), which `_tail` holds SCENE_TAIL_SECONDS past."""
         revealed: set[str] = set()
         beats = parse_say(self.spec.get("say", ""))
         durations = self.beat_durations
@@ -112,6 +147,16 @@ class LessonScene(Scene):
         indicate_color = T.color(ground, f"{accent_role(self.spec)}_ink" if self.spec.get("accent")
                                  else "amber_ink")
         dimmed: set[str] = set()
+        # Beat holds are aligned to a CUMULATIVE target rather than each beat holding for
+        # `its own length - what its reveal consumed`. manim rounds both a `play` and a
+        # `wait` up to a whole frame, so the per-beat form leaves every beat a fraction of
+        # a frame long and an 8-beat scene a quarter-second long -- exactly the residue the
+        # [sync] audit was still reporting after the hooks started measuring themselves.
+        # Reading the renderer's clock before each hold instead means a beat that overran
+        # is paid for by the next one and the error never accumulates. `start` is None off
+        # a real render (the selftests' FakeScene), where the old arithmetic is kept.
+        start = elapsed(self)
+        elapsed_target = 0.0
         for index, beat in enumerate(beats):
             target = beat.reveal
             consumed = 0.0
@@ -125,38 +170,36 @@ class LessonScene(Scene):
             else:
                 target_seconds = estimate_seconds(beat.text)
             self.beat_seconds = target_seconds
-            # A `dim: []` entry is a pure restore: nothing is being dimmed, so there is
-            # nothing left to protect by waiting for the reveal, and the whole point is
-            # putting everything back for the viewer to compare across THIS beat -- not
-            # just whatever is left of it once the beat's OWN reveal returns. When that
-            # reveal is paced across nearly the entire beat (motion primitive 7 -- e.g.
-            # ch03 06's `ineq`, which walks three terms across a 20+ s beat), the normal
-            # reveal-then-focus order strands the restore in the final FADE_SECONDS:
-            # measured on a mock render, the dimmed copies stayed dimmed through the
-            # whole beat and only snapped back right before the next one started
-            # (2026-09-13). That is the same architecture problem the `evenness` hook
-            # already documents and works around by folding its own fade into its
-            # reveal; a restore-only entry can dodge it here instead, by running before
-            # the reveal rather than after it.
-            restore_only = target in focus_plan and not focus_plan[target]
-            if restore_only:
+            # The focus runs BEFORE the beat's own reveal. It used to run after, on the
+            # reasoning that a just-revealed block earns full attention before anything
+            # dims -- but what a `dim` dims is never the block being revealed, it is the
+            # OTHER part of the screen that the narration has just steered away from, and
+            # it says so in its FIRST sentence. Waiting for the reveal strands the focus at
+            # the tail of the beat whenever that reveal fills the beat (a paced walk, a
+            # hook): ch03 06's `ineq` restore snapped back only as the next beat started,
+            # and ch03 24's `mirror` beat ("hold the bottom graph against the top") left the
+            # velocity row lit until the beat's midpoint, because its hook reveal runs ~5 s
+            # of an 11.5 s beat. `indicate` stays after the reveal -- it flashes blocks to
+            # point at them rather than steering attention away from one.
+            if target in focus_plan:
                 before = dimmed
-                dimmed = focus.apply(self, by_id, focus_plan[target], dimmed)
+                wanted = dim_ids(self.spec, target, focus_plan[target])
+                dimmed = focus.apply(self, by_id, wanted, dimmed)
                 if dimmed != before:
                     consumed += focus.FADE_SECONDS
             if target and target in by_id and target not in revealed:
                 consumed += play_block(self, by_id[target], ground)
                 revealed.add(target)
-            if target in focus_plan and not restore_only:
-                before = dimmed
-                dimmed = focus.apply(self, by_id, focus_plan[target], dimmed)
-                if dimmed != before:
-                    consumed += focus.FADE_SECONDS
             if target in indicate_plan:
                 consumed += focus.indicate(self, by_id, indicate_plan[target], indicate_color)
-            # Each beat's video length should equal its narration clip; the reveal
-            # animation already ran inside that window, so only hold the remainder.
-            self.wait(max(target_seconds - consumed, MIN_HOLD))
+            # Each beat's video length should equal its narration clip, so hold until the
+            # cumulative target instead of for `this beat - what it consumed` (see `start`).
+            elapsed_target += target_seconds
+            now = elapsed(self)
+            if start is None or now is None:
+                self.wait(max(target_seconds - consumed, MIN_HOLD))
+            else:
+                self.wait(max(start + elapsed_target - now, MIN_HOLD))
         self.beat_seconds = None
         # Leave the scene un-focused: the final frame (what the visual gates read, and
         # what a viewer sits on through the tail) must match the un-focused render.
@@ -164,6 +207,7 @@ class LessonScene(Scene):
         for block in blocks:
             if not block.static and block.id not in revealed:
                 play_block(self, block, ground)
+        return None if start is None else start + elapsed_target
 
     def _play_timed(self, blocks, ground, duration: float) -> None:
         dynamic = [b for b in blocks if not b.static]

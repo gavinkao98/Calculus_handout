@@ -76,6 +76,14 @@ def _focus_issues(sid: str, scene: dict, say) -> "list[tuple[str, str]]":
                                     f"(use [] to restore everything)"))
         elif any(not isinstance(d, str) or not d for d in dim):
             issues.append(("error", f"{where}.dim: every entry must be a non-empty block id"))
+        elif isinstance(at, str) and at and at in dim:
+            # The focus is applied BEFORE the beat's reveal (scene.py), so dimming the block
+            # this beat reveals would snapshot it while it is still off screen and a later
+            # `dim: []` would restore it to invisible. Always a typo -- what an author means
+            # is "dim everything ELSE", which is what leaving `at` out of the list says.
+            issues.append(("error", f"{where}.dim {at!r}: is this entry's own `at`; the dim "
+                                    f"runs before that beat's reveal, so the block is not on "
+                                    f"screen yet (drop it -- dim the OTHER blocks)"))
         # `indicate` (the rule-3 flash variant, focus.py): optional; ids exist only once
         # the template has built, so like `dim` they are cross-checked in sizecheck.
         if "indicate" in item:
