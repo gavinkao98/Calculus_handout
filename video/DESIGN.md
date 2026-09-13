@@ -864,7 +864,10 @@ hook 佔 11.5 秒拍的前 ~5 秒）實測速度列到拍中才暗。`indicate` 
 為 `None`），`timing.beat_run_time` 讀它、保留 `BEAT_PACED_TAIL_SECONDS=0.6` 的尾巴、
 不低於 `BEAT_PACED_MIN_SECONDS=0.8`。callable 簽章沒變，既有 hook 不受影響。
 **這是唯一能填滿 20 秒長拍的一類原語**（品質補強輪 ⑧：`longest_still_seconds` 與 verdict
-的相關性 −0.82，而 `static_ratio` 只有 −0.18）。
+的相關性 −0.82，而 `static_ratio` 只有 −0.18）。**同一拍若還有 reveal 之後才播的固定長度
+動畫（`focus[].indicate`），`scene._play_content` 會在 reveal 前把它的秒數存進
+`scene.beat_reserved_seconds`，`beat_run_time` 一併扣掉（2026-09-13 五輪，通則化 ch03 06
+`ineq` 拍原本在 hook 內手動扣的特例）。
 
 ### motion primitive：`paced:`／`{show scaffold.*}`（2026-09-13 三輪）
 
@@ -910,6 +913,9 @@ focus:
 0.8 s 閃爍長度不同）；`consumed` 加上秒數。它是一次性動作不是狀態：沒有東西要還原，`dim` 語意不變
 （每筆仍取代壓暗集合，要保留就重列）。`schema._focus_issues` 擋非 list、同一筆 `dim`∩`indicate`；
 `sizecheck` 擋不存在的 id（比照 `dim`）。實作 [`pipeline/focus.py`](pipeline/focus.py) `scene_indicate`／`indicate`。
+**一拍若同時排 `paced`／`seconds: beat` 這類填滿整拍的 reveal，`_play_content` 會在 reveal 前
+把這 0.8 s 存進 `scene.beat_reserved_seconds`，讓那個 reveal 自己少要求 0.8 s 的預算，`indicate`
+才不會被擠到拍尾之後。**
 
 **`inset:`（graph single 模式）——主圖不縮放的放大鏡。**
 

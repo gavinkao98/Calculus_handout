@@ -65,6 +65,12 @@ class FakeScene:
         self.plays.append((len(anims), kw.get("run_time")))
         self.anims.append(anims)
 
+    def wait(self, seconds):
+        pass
+
+    def add(self, *mobs):
+        pass
+
 
 def _by_id(*names):
     return {n: FakeBlock() for n in names}
@@ -93,6 +99,38 @@ def test_pacing_is_opt_in_only():
     is `seconds: beat` on one plot, not a global re-timing."""
     assert TM.STOCK_ANIM_SECONDS["write"] == 0.7
     assert TM.STOCK_ANIM_SECONDS["transform"] == 1.2
+
+
+# -- beat_reserved_seconds: a beat-filling reveal leaves room for its own indicate --
+
+def test_beat_run_time_subtracts_beat_reserved_seconds():
+    """`scene.beat_reserved_seconds` (set by `_play_content` before a beat's reveal, when
+    that beat's `focus[].indicate` will play after it) must come straight off the budget a
+    paced reveal asks for, on top of the existing BEAT_PACED_TAIL_SECONDS reservation --
+    the generalisation of what ch03 06's `ineq` hook used to subtract by hand."""
+    without_reserve = TM.beat_run_time(FakeScene(10.0), 3.0)
+    reserved_scene = FakeScene(10.0)
+    reserved_scene.beat_reserved_seconds = 0.8
+    with_reserve = TM.beat_run_time(reserved_scene, 3.0)
+    assert abs(without_reserve - with_reserve - 0.8) < 1e-9, (without_reserve, with_reserve)
+
+
+def test_paced_reveal_stays_inside_the_beat_reserved_for_its_indicate():
+    """A paced (beat-filling) reveal's actual spend must not exceed
+    `beat − BEAT_PACED_TAIL_SECONDS − beat_reserved_seconds`, so a `focus[].indicate` that
+    follows it in the same beat lands inside the beat instead of past it (ch03 06's `ineq`
+    beat is the instance already in the deck, but the trap is generic to any beat pairing
+    a paced reveal with an indicate)."""
+    from manim import Dot, VGroup
+
+    from pipeline import pacing as P
+
+    mob = VGroup(*[Dot() for _ in range(3)])
+    scene = FakeScene(10.0)
+    scene.beat_reserved_seconds = F.INDICATE_SECONDS
+    spent = P.paced_reveal(scene, mob, "dark")
+    budget = 10.0 - TM.BEAT_PACED_TAIL_SECONDS - F.INDICATE_SECONDS
+    assert spent <= budget + 1e-9, (spent, budget)
 
 
 # -- primitive 4: focus ----------------------------------------------------------
@@ -362,6 +400,34 @@ def test_a_dim_that_names_its_own_beats_reveal_is_skipped_and_warned():
     assert "row" in out and "s24" in out, out
 
 
+def test_play_content_sets_beat_reserved_seconds_only_for_the_beat_with_indicate():
+    """`scene.beat_reserved_seconds` must equal `focus.INDICATE_SECONDS` while the beat
+    that carries a `focus[].indicate` plays its OWN reveal -- set before that reveal, so a
+    beat-filling reveal already asks `timing.beat_run_time` for a shorter budget -- 0 in a
+    beat with no indicate, and 0 again once the scene has finished walking its beats."""
+    from manim import Square       # `plain` is flashed below -- real Indicate() typechecks it
+
+    reserved_at_reveal = {}
+
+    def _reveal(name):
+        def reveal(scene, mob, ground):
+            reserved_at_reveal[name] = scene.beat_reserved_seconds
+            return 0.0
+        return reveal
+
+    by_id = {"plain": Block(id="plain", mobject=Square(), anim=_reveal("plain")),
+             "ineq": Block(id="ineq", mobject=FakeMob(), anim=_reveal("ineq"))}
+    log = []
+    scene = _run_play_content(
+        {"say": "{show plain} one two {show ineq} three four",
+         "focus": [{"at": "ineq", "dim": [], "indicate": ["plain"]}]},
+        by_id, log)
+
+    assert reserved_at_reveal["plain"] == 0.0, "no indicate on this beat"
+    assert reserved_at_reveal["ineq"] == F.INDICATE_SECONDS, "this beat's own indicate"
+    assert scene.beat_reserved_seconds == 0.0, "reset once the scene has finished its beats"
+
+
 # -- schema validation -----------------------------------------------------------
 
 def _focus_errs(scene, say):
@@ -437,6 +503,8 @@ if __name__ == "__main__":
     test_long_beat_fills_the_beat_minus_a_tail()
     test_short_beat_is_not_compressed_below_the_floor()
     test_pacing_is_opt_in_only()
+    test_beat_run_time_subtracts_beat_reserved_seconds()
+    test_paced_reveal_stays_inside_the_beat_reserved_for_its_indicate()
     test_scene_focus_reads_entries_and_empty_dim_means_restore()
     test_apply_dims_only_the_named_blocks()
     test_apply_restores_what_is_no_longer_wanted()
@@ -451,6 +519,7 @@ if __name__ == "__main__":
     test_indicate_is_free_when_nothing_matches()
     test_every_focus_entry_runs_before_the_beats_own_reveal()
     test_a_dim_that_names_its_own_beats_reveal_is_skipped_and_warned()
+    test_play_content_sets_beat_reserved_seconds_only_for_the_beat_with_indicate()
     test_schema_accepts_indicate_next_to_dim()
     test_schema_rejects_a_malformed_indicate()
     test_schema_rejects_indicating_a_block_the_same_entry_dims()
