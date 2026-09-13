@@ -154,7 +154,7 @@ scenes:
       hangs on just two facts -- continuity, and that fundamental limit. We
       secure both now.
     steps:
-      - { math: "\\sin A-\\sin B = 2\\cos\\frac{A+B}{2}\\,\\sin\\frac{A-B}{2}", reason: "sum-to-product ($A=u+v$, $B=u-v$)" }
+      - { math: "\\sin A-\\sin B = 2\\cos\\frac{A+B}{2}\\,\\sin\\frac{A-B}{2}", reason: "sum-to-product" }
       - { math: "\\sin(x+h)-\\sin x = 2\\cos\\!\\left(x+\\frac h2\\right)\\sin\\frac h2", reason: "$A=x+h,\\ B=x$", anim: transform }
       - { math: "\\frac{\\sin(x+h)-\\sin x}{h} = \\cos\\!\\left(x+\\frac h2\\right)\\cdot\\frac{\\sin(h/2)}{h/2}", reason: "write $h=2\\cdot(h/2)$", anim: transform }
     result: { math: "\\cos\\!\\left(x+\\frac h2\\right)\\to\\cos x\\quad\\text{and}\\quad \\frac{\\sin(h/2)}{h/2}\\to 1", reason: "continuity + the limit", anim: transform }
@@ -269,7 +269,7 @@ scenes:
     steps:
       - { math: "{{\\sin\\theta}} \\;\\le\\; {{\\theta}} \\;\\le\\; {{\\tan\\theta}}", reason: "multiply areas by $2$",
           seg_roles: { "\\sin\\theta": secondary, "\\theta": accent, "\\tan\\theta": success } }
-      - { math: "{{1}} \\;\\le\\; {{\\frac{\\theta}{\\sin\\theta}}} \\;\\le\\; {{\\frac{1}{\\cos\\theta}}}", reason: "$\\div\\sin\\theta$, $\\tan=\\sin/\\cos$", anim: transform, frame: true,
+      - { math: "{{1}} \\;\\le\\; {{\\frac{\\theta}{\\sin\\theta}}} \\;\\le\\; {{\\frac{1}{\\cos\\theta}}}", reason: "$\\div\\sin\\theta$, $\\tan=\\tfrac{\\sin}{\\cos}$", anim: transform, frame: true,
           seg_roles: { "1": secondary, "\\frac{\\theta}{\\sin\\theta}": accent, "\\frac{1}{\\cos\\theta}": success } }
     result: { math: "{{\\cos\\theta}} \\;\\le\\; {{\\frac{\\sin\\theta}{\\theta}}} \\;\\le\\; {{1}} \\qquad (0<\\theta<\\frac{\\pi}{2})", reason: "reciprocate -- reverses", anim: transform, frame: true,
               seg_roles: { "\\cos\\theta": success, "\\frac{\\sin\\theta}{\\theta}": accent, "1": secondary } }
@@ -728,9 +728,9 @@ scenes:
       rule, with a constant on top, gives this.
       {show result} Clean it up, and secant's derivative is $\sec x\tan x$.
     steps:
-      - { math: "{{\\frac{d}{dx}\\tan x}} = {{\\frac{(\\cos x)(\\cos x)-(\\sin x)(-\\sin x)}{\\cos^{2} x}}}", reason: "quotient rule on $\\sin x/\\cos x$ ($\\cos x\\neq 0$)" }
+      - { math: "{{\\frac{d}{dx}\\tan x}} = {{\\frac{(\\cos x)(\\cos x)-(\\sin x)(-\\sin x)}{\\cos^{2} x}}}", reason: "quotient rule on $\\tfrac{\\sin x}{\\cos x}$ ($\\cos x\\neq 0$)" }
       - { math: "= {{\\frac{\\cos^{2} x+\\sin^{2} x}{\\cos^{2} x}}} = {{\\frac{1}{\\cos^{2} x}}} = {{\\sec^{2} x}}", reason: "Pythagorean identity", anim: transform, frame: true }
-      - { math: "{{\\frac{d}{dx}\\sec x}} = {{\\frac{0\\cdot\\cos x-1\\cdot(-\\sin x)}{\\cos^{2} x}}}", reason: "quotient rule on $1/\\cos x$" }
+      - { math: "{{\\frac{d}{dx}\\sec x}} = {{\\frac{0\\cdot\\cos x-1\\cdot(-\\sin x)}{\\cos^{2} x}}}", reason: "quotient rule on $\\tfrac{1}{\\cos x}$" }
     result: { math: "= {{\\frac{\\sin x}{\\cos^{2} x}}} = {{\\sec x\\tan x}}", anim: transform }
 
   # 20b ------------------- Example 3.2 (part 2/2): cot' and csc' -- the same move
@@ -757,9 +757,9 @@ scenes:
       {show result} Cleaned up, that is $-\csc x\cot x$ -- and all six are done,
       every one built on $\sin'=\cos$ and $\cos'=-\sin$.
     steps:
-      - { math: "{{\\frac{d}{dx}\\cot x}} = {{\\frac{(-\\sin x)(\\sin x)-(\\cos x)(\\cos x)}{\\sin^{2} x}}}", reason: "quotient rule on $\\cos x/\\sin x$ ($\\sin x\\neq 0$)" }
+      - { math: "{{\\frac{d}{dx}\\cot x}} = {{\\frac{(-\\sin x)(\\sin x)-(\\cos x)(\\cos x)}{\\sin^{2} x}}}", reason: "quotient rule on $\\tfrac{\\cos x}{\\sin x}$ ($\\sin x\\neq 0$)" }
       - { math: "= {{\\frac{-(\\sin^{2} x+\\cos^{2} x)}{\\sin^{2} x}}} = {{-\\frac{1}{\\sin^{2} x}}} = {{-\\csc^{2} x}}", reason: "Pythagorean identity", anim: transform, frame: true }
-      - { math: "{{\\frac{d}{dx}\\csc x}} = {{\\frac{0\\cdot\\sin x-1\\cdot\\cos x}{\\sin^{2} x}}}", reason: "quotient rule on $1/\\sin x$" }
+      - { math: "{{\\frac{d}{dx}\\csc x}} = {{\\frac{0\\cdot\\sin x-1\\cdot\\cos x}{\\sin^{2} x}}}", reason: "quotient rule on $\\tfrac{1}{\\sin x}$" }
     result: { math: "= {{-\\frac{\\cos x}{\\sin^{2} x}}} = {{-\\csc x\\cot x}}", anim: transform }
 
   # 21 ------------------------------- Example 3.3: simple harmonic motion (s'' = -s)
@@ -876,7 +876,9 @@ scenes:
     points:
       - "Fundamental limit: $\\sin\\theta/\\theta \\to 1$ as $\\theta\\to 0$, proved by squeezing areas on the unit circle."
       - "Two core derivatives: $\\sin'=\\cos$ and $\\cos'=-\\sin$."
-      - "The quotient rule delivers all six trig derivatives: $\\tan,\\cot,\\sec,\\csc$."
+      # 「all six」與列出的四個不符，且 $\sin'$、$\cos'$ 不是商法則來的（回歸 NFA advisory，
+      # 2026-09-13）。旁白本來就說 "all the other trig derivatives"，是卡片寫錯，改卡片即可。
+      - "The quotient rule delivers the other four: $\\tan,\\cot,\\sec,\\csc$."
       # D-1b：度數的導數公式從場 13 移到這裡——現在兩條定理都證完了，講它才不是前向參照。
       - "Derivatives of $\\sin$ and $\\cos$ cycle with period four; and it all needs radians --- in degrees $\\tfrac{d}{dx}\\sin(x^{\\circ})=\\tfrac{\\pi}{180}\\cos(x^{\\circ})$."
 

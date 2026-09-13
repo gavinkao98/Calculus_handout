@@ -35,7 +35,7 @@ meta:
   derived_from:
     inputs:
     - path: ch03_trig_derivatives.yml
-      sha256: c7326b188a91a62e294b7d0b675d22b94df4ef4b2547493bbc2a039fff890d90
+      sha256: f67c382ad13cd3c7d2ee6dd2ae402ac4bb0c267c149ed273a96ac3775afc9f81
     - path: ../content_scripts/ch03_trig_derivatives.spoken.yml
       sha256: 57b72fd07fc8e2962cccf0885c6b45a301270829891f3d4ca5803eb1dfee15b1
 scenes:
@@ -183,7 +183,7 @@ scenes:
     '
   steps:
   - math: \sin A-\sin B = 2\cos\frac{A+B}{2}\,\sin\frac{A-B}{2}
-    reason: sum-to-product ($A=u+v$, $B=u-v$)
+    reason: sum-to-product
   - math: \sin(x+h)-\sin x = 2\cos\!\left(x+\frac h2\right)\sin\frac h2
     reason: $A=x+h,\ B=x$
     anim: transform
@@ -374,7 +374,7 @@ scenes:
       \theta: accent
       \tan\theta: success
   - math: '{{1}} \;\le\; {{\frac{\theta}{\sin\theta}}} \;\le\; {{\frac{1}{\cos\theta}}}'
-    reason: $\div\sin\theta$, $\tan=\sin/\cos$
+    reason: $\div\sin\theta$, $\tan=\tfrac{\sin}{\cos}$
     anim: transform
     frame: true
     seg_roles:
@@ -1097,13 +1097,13 @@ scenes:
     '
   steps:
   - math: '{{\frac{d}{dx}\tan x}} = {{\frac{(\cos x)(\cos x)-(\sin x)(-\sin x)}{\cos^{2} x}}}'
-    reason: quotient rule on $\sin x/\cos x$ ($\cos x\neq 0$)
+    reason: quotient rule on $\tfrac{\sin x}{\cos x}$ ($\cos x\neq 0$)
   - math: = {{\frac{\cos^{2} x+\sin^{2} x}{\cos^{2} x}}} = {{\frac{1}{\cos^{2} x}}} = {{\sec^{2} x}}
     reason: Pythagorean identity
     anim: transform
     frame: true
   - math: '{{\frac{d}{dx}\sec x}} = {{\frac{0\cdot\cos x-1\cdot(-\sin x)}{\cos^{2} x}}}'
-    reason: quotient rule on $1/\cos x$
+    reason: quotient rule on $\tfrac{1}{\cos x}$
   result:
     math: = {{\frac{\sin x}{\cos^{2} x}}} = {{\sec x\tan x}}
     anim: transform
@@ -1151,13 +1151,13 @@ scenes:
     '
   steps:
   - math: '{{\frac{d}{dx}\cot x}} = {{\frac{(-\sin x)(\sin x)-(\cos x)(\cos x)}{\sin^{2} x}}}'
-    reason: quotient rule on $\cos x/\sin x$ ($\sin x\neq 0$)
+    reason: quotient rule on $\tfrac{\cos x}{\sin x}$ ($\sin x\neq 0$)
   - math: = {{\frac{-(\sin^{2} x+\cos^{2} x)}{\sin^{2} x}}} = {{-\frac{1}{\sin^{2} x}}} = {{-\csc^{2} x}}
     reason: Pythagorean identity
     anim: transform
     frame: true
   - math: '{{\frac{d}{dx}\csc x}} = {{\frac{0\cdot\sin x-1\cdot\cos x}{\sin^{2} x}}}'
-    reason: quotient rule on $1/\sin x$
+    reason: quotient rule on $\tfrac{1}{\sin x}$
   result:
     math: = {{-\frac{\cos x}{\sin^{2} x}}} = {{-\csc x\cot x}}
     anim: transform
@@ -1348,7 +1348,7 @@ scenes:
   points:
   - 'Fundamental limit: $\sin\theta/\theta \to 1$ as $\theta\to 0$, proved by squeezing areas on the unit circle.'
   - 'Two core derivatives: $\sin''=\cos$ and $\cos''=-\sin$.'
-  - 'The quotient rule delivers all six trig derivatives: $\tan,\cot,\sec,\csc$.'
+  - 'The quotient rule delivers the other four: $\tan,\cot,\sec,\csc$.'
   - Derivatives of $\sin$ and $\cos$ cycle with period four; and it all needs radians --- in degrees $\tfrac{d}{dx}\sin(x^{\circ})=\tfrac{\pi}{180}\cos(x^{\circ})$.
 - id: outro
   kind: outro

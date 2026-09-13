@@ -325,8 +325,12 @@ def sector_inequality(spec, ctx, blocks):
     # on the frame is empty, so the aside is an OVERLAY: the storyboard's `focus:` entry dims
     # the finished figure for this beat and restores it at the end, and the little circle
     # sits over the middle of that figure rather than in a corner.
-    er = 1.05
-    eO = np.array([full.get_center()[0], full.get_center()[1] + 0.30, 0.0])
+    # Centred on the MAIN FIGURE, not the whole layout: the aside is about the same unit
+    # circle, and over the figure it hides only the thing it is restating -- the three
+    # peeled glyphs and the inequality stay readable underneath it. (Centred on `full` it
+    # landed between the figure and glyph (2), covering neither and colliding with both.)
+    er = 0.92
+    eO = np.array([scaffold.get_center()[0], scaffold.get_center()[1] + 0.25, 0.0])
     e_circle = Circle(radius=er, color=mut, stroke_width=1.8).move_to(eO)
     e_axis = Line(eO + (er + 0.35) * LEFT, eO + (er + 0.35) * RIGHT,
                   color=mut, stroke_width=1.4)
@@ -350,11 +354,29 @@ def sector_inequality(spec, ctx, blocks):
 
     e_live = VGroup(always_redraw(_e_radius), always_redraw(_e_height),
                     always_redraw(_e_dot))
+    # Inline slashes, not two \dfrac stacks. The TeX preamble sets \everymath{\displaystyle},
+    # so a stacked fraction renders at DISPLAY size even inside a small line -- measured 4.97u
+    # wide, which pushed the overlay panel past the left safe margin once the aside was
+    # anchored on the figure. (Same reason the rail tags dropped their \tfrac this round.)
     e_caption = brand.math_line(
-        r"\dfrac{\sin(-\theta)}{-\theta} \;=\; \dfrac{\sin\theta}{\theta}",
-        ground, role="text", size="math_sm")
-    e_caption.next_to(e_circle, DOWN, buff=0.42)
-    evenness = VGroup(e_circle, e_axis, e_live, e_caption)
+        r"\sin(-\theta)/(-\theta) \;=\; \sin\theta/\theta",
+        ground, role="text", size="label")
+    e_caption.next_to(e_circle, DOWN, buff=0.34)
+    # An overlay has to COVER what it sits on. Dimming the finished figure (the storyboard's
+    # `focus:` entry for this beat) drops its contrast but leaves its glyph labels behind the
+    # aside's own caption -- measured: the caption's box lands on glyph (1)'s "1/2 sin theta".
+    # A ground-coloured panel under the whole aside settles it, the same move the rollout
+    # used for labels crossed by lines. Built LAST and inserted FIRST so it is behind.
+    e_panel = BackgroundRectangle(VGroup(e_circle, e_axis, e_caption),
+                                  color=T.color(ground, "bg"), fill_opacity=0.95, buff=0.28)
+    # ABOVE the figure, or it is not an overlay: the regions are z 1-3 and the chips z 7-8,
+    # so a panel at the default z=0 sits behind everything it is supposed to cover (first
+    # render showed the aside's circle drawn straight over glyph (1), caption on top of two
+    # other labels). Panel 9, contents 10.
+    e_panel.set_z_index(9)
+    for _m in (e_circle, e_axis, e_live, e_caption):
+        _m.set_z_index(10)
+    evenness = VGroup(e_panel, e_circle, e_axis, e_live, e_caption)
 
     IN_SECONDS, OUT_SECONDS = 0.7, 0.35     # entrance (circle+axis, caption) / exit fade
 
@@ -368,7 +390,7 @@ def sector_inequality(spec, ctx, blocks):
         beat (measured: scene 06 went from -0.27 s under to +0.53 s over)."""
         total = TM.beat_run_time(scene, 6.0)
         t0 = _elapsed(scene)
-        scene.play(FadeIn(e_circle), FadeIn(e_axis), run_time=0.4)
+        scene.play(FadeIn(e_panel), FadeIn(e_circle), FadeIn(e_axis), run_time=0.4)
         scene.add(e_live)
         scene.play(FadeIn(e_caption), run_time=0.3)
         swing = max((total - IN_SECONDS - OUT_SECONDS) / 2.0, 0.8)

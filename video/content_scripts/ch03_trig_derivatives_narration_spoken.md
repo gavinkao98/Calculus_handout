@@ -29,6 +29,9 @@
 | $(\sqrt[3]{x-2})^3$ / $(f^{-1}(x))^2$ | “…, **all cubed**” / “…, **all squared**” | 外層次方蓋整體。 |
 | 分數 $\tfrac{a}{b}$ | “a over b”（簡單分數念 “one half / one quarter / nine-fifths”…） | |
 | 複雜分數（分子或分母含乘積／根號） | “…, all over …” 或 “… divided by the quantity …” | 例：$\tfrac{1}{2\sqrt2}$→“one over the quantity two root two”（“the quantity” 群組分母、防 (1/2)√2 誤聽）；$-\tfrac{2\sqrt5}{5}$→“negative two root five over five”（兩種群組同值、免 quantity）（NFA §1.2 D5）。 |
+| 分子整個是和／差 $\tfrac{A+B}{2}$ | “**the quantity** A plus B, **all over** two” | 絕不念 “A plus B over two”（會被聽成 $A+\tfrac B2$）。注意與下一列方向相反：這一列是**和在分子內**。（§3.1 Task D 實證的 D3 blocking） |
+| 加法在分數外 $x+\tfrac h2$ | “x plus **one half** h” | 絕不念 “x plus h over two”（會被聽成 $\tfrac{x+h}2$）。（§3.1 gate-2 實證的 D3 blocking） |
+| 函數的和／差引數 $\sin(u+v)$ | “sine of **the quantity** u plus v” | 絕不念 “sine of u plus v”（會被聽成 $(\sin u)+v$）。$\sin\tfrac h2$ → “sine of h over two” 在**有上下文與畫面支撐時**可省群組詞，否則念 “sine of one half h”。（§3.1 Task D 實證的 D3 blocking） |
 | 區間 $[a,b]$ / $(a,b)$ | “the (open) interval from a to b” | |
 | 座標點 $(a,b)$ | **“the point with coordinates a and b”** | 無視覺符號時最清楚。 |
 | $\pi/2$、$\arcsin$… | “pi over two”、“arcsine of …” | 反三角直接念 arc-名。 |
