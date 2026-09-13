@@ -61,6 +61,11 @@ class LessonScene(Scene):
     # ("圖跟旁白長") reads this via timing.beat_run_time(); every stock animation ignores
     # it and keeps its fixed duration.
     beat_seconds: float | None = None
+    # How much of the CURRENT beat is already spoken for by something fixed-length that
+    # plays AFTER the reveal (today: a `focus[].indicate` flash) -- 0 outside a beat, or
+    # in a beat with no indicate. `timing.beat_run_time` subtracts this from a beat-filling
+    # reveal's budget so that later animation lands inside the beat instead of past it.
+    beat_reserved_seconds: float = 0.0
 
     def construct(self) -> None:
         if self.spec is None:
@@ -170,6 +175,16 @@ class LessonScene(Scene):
             else:
                 target_seconds = estimate_seconds(beat.text)
             self.beat_seconds = target_seconds
+            # `indicate` (below) always plays AFTER this beat's reveal, so a reveal that
+            # fills the whole beat via `timing.beat_run_time` (a paced walk, a hook's own
+            # sweep) must leave the flash's INDICATE_SECONDS unspent up front, or the flash
+            # lands past the narration's end (ch03 06's `ineq` beat -- paced reveal + rule-3
+            # indicate in one beat -- was the first to hit this and had its own local
+            # reservation before `beat_run_time` grew this generic one). Set BEFORE the
+            # reveal below so it is in effect while that reveal asks for its budget; 0 in a
+            # beat with no indicate.
+            self.beat_reserved_seconds = (focus.INDICATE_SECONDS if indicate_plan.get(target)
+                                          else 0.0)
             # The focus runs BEFORE the beat's own reveal. It used to run after, on the
             # reasoning that a just-revealed block earns full attention before anything
             # dims -- but what a `dim` dims is never the block being revealed, it is the
@@ -201,6 +216,7 @@ class LessonScene(Scene):
             else:
                 self.wait(max(start + elapsed_target - now, MIN_HOLD))
         self.beat_seconds = None
+        self.beat_reserved_seconds = 0.0
         # Leave the scene un-focused: the final frame (what the visual gates read, and
         # what a viewer sits on through the tail) must match the un-focused render.
         focus.apply(self, by_id, [], dimmed)

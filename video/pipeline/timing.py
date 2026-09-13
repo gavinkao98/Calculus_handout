@@ -53,12 +53,18 @@ def beat_run_time(scene: Any, fallback: float) -> float:
     *fallback* is used whenever the beat length is unknown -- outside a beat (the
     end-of-scene sweep-up), or when a caller plays a block directly (selftests, the
     timed intro/outro path). Reserves BEAT_PACED_TAIL_SECONDS so the completed figure
-    holds for a moment instead of finishing exactly as the narration stops.
+    holds for a moment instead of finishing exactly as the narration stops -- and, when
+    this beat also has something fixed-length queued to play AFTER the reveal (today:
+    a `focus[].indicate` flash), `scene.beat_reserved_seconds` (set by `scene.py` before
+    the reveal) so that fixed cost is left in the beat instead of overrunning it. Any
+    caller that fills the whole beat -- `paced_reveal`, `_paced_write`, a `seconds: beat`
+    sweep, a hook's own `TM.beat_run_time` -- gets this for free.
     """
     seconds = getattr(scene, "beat_seconds", None)
     if seconds is None:
         return float(fallback)
-    return max(float(seconds) - BEAT_PACED_TAIL_SECONDS, BEAT_PACED_MIN_SECONDS)
+    reserved = getattr(scene, "beat_reserved_seconds", 0.0) or 0.0
+    return max(float(seconds) - reserved - BEAT_PACED_TAIL_SECONDS, BEAT_PACED_MIN_SECONDS)
 
 
 def elapsed(scene: Any) -> "float | None":
