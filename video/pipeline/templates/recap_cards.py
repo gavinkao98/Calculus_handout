@@ -55,6 +55,17 @@ def build(spec: dict[str, Any], ctx: dict[str, Any]) -> list[Block]:
         first_line = txt.submobjects[0] if isinstance(txt, VGroup) and txt.submobjects else txt
         idx.next_to(first_line, LEFT, buff=0.34)
         row = VGroup(idx, txt)
+        # A `paced:` walk (pacing.block_parts) would otherwise see this row's own two
+        # top-level submobjects -- idx, txt -- as the "parts" to walk, revealing the bare
+        # numeral alone and holding it for half the beat before the text ever appears
+        # (R2 must, round 20 ML4: point.3's text landed 9.7 s into its narration, an
+        # empty numbered slot on screen the whole time). The numeral is chrome, not a
+        # walkable segment -- it must appear WITH the first content line. Declaring the
+        # walk's real parts (txt's own lines, or txt itself when it does not wrap) and
+        # this row's chrome separately lets pacing.block_parts/walk fold the numeral into
+        # the first play instead of treating it as its own part.
+        row._paced_chrome = idx
+        row._paced_parts = list(txt.submobjects) if isinstance(txt, VGroup) else [txt]
         row.move_to([left, y_cursor, 0], aligned_edge=UL)
         y_cursor -= row.height + pt_gap
         blocks.append(Block(f"point.{i}", row, anim="fade", static=False))
