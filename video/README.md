@@ -277,6 +277,7 @@ python video\pipeline\critic.py --storyboard video\storyboards\<deck>.yml --scen
 ```
 
 - **`--per scene`（預設）** 每場景抽**最滿幀**；`--per beat` 每 beat 一張（看漸進、較貴）。
+- **`--out <dir>`** 指定輸出目錄（預設仍是 `output/ch<NN>/s<X.Y>/critic`／`critic_mimo`）；`--dry-run`／`--confirm` 都寫到該目錄。**開跑前一律先清空該目錄的 `frames/`**——留底＝一次完整輸出，不會跟前一輪的舊幀混在一起；要保留某一輪的結果就換一個 `--out` 路徑另存，不要在同一個目錄上疊加。**同一個輸出目錄同一時間只能一人跑**，兩個 session 平行測同一節時各自給 `--out` 分開。
 - **MiMo-V2.5 公測免費（估值＝$0）**，但仍屬外部 API，依 [CLAUDE.md](../CLAUDE.md) 批次前須先報量徵同意；`--dry-run` 看幀數＋token 量（不送請求）。
 - provider＝小米官方 `api.xiaomimimo.com/v1`（OpenAI 相容、model `mimo-v2.5`、auth header `api-key`）。
 - **A1 Element Layout / V2 相撞** 要特別看 graph label：`$y=f(x)$`、`$y=x$`、座標標籤等不可壓在線、點、空心點或 guide marker 上（蓋住資訊＝V2 blocking）；這類圖內 label collision 即使 `sizecheck` 不一定自動抓到。
