@@ -520,9 +520,8 @@ scenes:
     # 現在畫這張圖——同一組軸、同一個 x 刻度（弧度 0／0.5／1），琥珀 $y=\sin x$ 爬到 0.96，
     # caution 紅 $y=\sin(x^\circ)$ 只到 0.023（貼著 x 軸的平線）；紅線在旁白說 "switch to
     # degrees" 那一刻從琥珀線塌平下去。
-    # 代價：sizecheck 的 G3 `_sparse_issues` 只量 `body` 這一個 block 的高度，看不到 hook 加的
-    # `layer: graph` 圖，所以拿掉 sparse_ok 之後它會回報「single-block fill 18% < 35%」——
-    # 那是量測盲點，不是稀疏（body zone 現在被圖填到剩上下各 0.11u）。advisory，不擋 render。
+    # G3 稀疏檢查已改成量 body zone 全 block 聯集（含 hook 加的 layer: graph 圖，2026-09-13
+    # sizecheck-sparse），本場不再報 single-block fill；body zone 被圖填到剩上下各 0.11u。
     hook: "animations.ch03_trig_derivatives_hooks:degrees_flatten"
     paced: [body]                    # 15.1 s beat：兩行 caution 逐行讀；hook 包一層、圖的各階段插在兩行之間
     source: "chapter3-print-standalone.html SS3.1 . Caution (radian convention)"
