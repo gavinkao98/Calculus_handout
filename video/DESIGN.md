@@ -788,7 +788,8 @@ reveal 既不在 `paced:`、也沒有 `pauses:` 條目、動畫也不是 callabl
 `timing.stock_animation_seconds` 對 callable 回 `getattr(anim, "fixed_seconds", None)`，所以「1.2 s 的 `transform`
 接 10 s hold」現在會被抓；真的在填拍的 callable（hook／sweep／`seconds: beat`／paced 走法）仍是 `None`＝免檢。
 beat-paced sweep 的 `Block.anim_seconds` 是佈局 placeholder 3.0，不能拿來當真實動畫長度。
-三個門檻的分工：**6 s＝這道 authoring advisory、12 s＝`rewatch_pack` 量測閘（品質補強輪 ⑧）、REWATCH R4
+三個門檻的分工：**6 s＝這道 authoring advisory、12 s＝`rewatch_pack` 量測閘（品質補強輪 ⑧；2026-09-13 起為硬閘：
+`rewatch_pack --gate-still 12`、超線印 `[still-gate] FAIL` 並 exit 1，驗收定義見 [`REVIEW_GATES.md`](REVIEW_GATES.md) §六）、REWATCH R4
 模型判讀**（對齊見 [`KICKOFF-motion-language-gaps.md`](KICKOFF-motion-language-gaps.md) T5）。
 
 **`anim: transform`（derivation 的 `steps[i]` / `result`）——原地改寫。**
@@ -1118,7 +1119,10 @@ helper 播 0.55 s 卻回報 0.65 s（**多報**），它所在的場就比旁白
 **剩下的殘餘是「內容本來就比旁白長」**，非時序 bug：一拍用 `paced` 填滿（`beat − 0.6`）之後
 再接 `indicate`（0.8 s）就一定超過該拍，超出的部分只能由 `MIN_HOLD` 與場尾吸收；全 deck `[sync]`
 已零警告（六場 sum|delta| 2.35→0.54 後，最後一條 06 由 indicate 預算扣除清掉，機制見 `focus[].indicate`
-段的 `beat_reserved_seconds`）。
+段的 `beat_reserved_seconds`）。**2026-09-13 起 render 後的實測影音長度是硬閘**：`make.py` 的 `_audit_render_sync`
+以 ffprobe 實測每個 content 場，偏差超過 `SYNC_HARD_GATE_FRAMES`＝2 影格（fps 亦由 ffprobe 對成品實測、不是猜的）
+即 ERROR、**compose 前 abort**（原為 warn；render 前的短拍啟發式仍是 warn）——閘的完整定義見
+[`REVIEW_GATES.md`](REVIEW_GATES.md) §一 層 6 與 §六。
 
 **寫法**（`animations/ch03_trig_derivatives_hooks.py` 是現行範例）：
 

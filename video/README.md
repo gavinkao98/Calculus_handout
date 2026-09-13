@@ -37,7 +37,7 @@ video/
     provenance.py      OTF 確定性層：`md:`／`doc:` ref 解析（doc 錨池＝凍結 legacy standalone ∪ `.tex` label key）
     source_rev.py      內容稿↔講義源 freshness stamp（LOCKED 稿標頭 `source_rev`；drift 只 WARN＝§8 觸發器）
     run_selftests.py   從任一 cwd 跑全部 `_selftest_*.py`（統一 `-m pipeline.<name>`），任一紅即非零 exit
-    rewatch_pack.py    看片評審輸入：成片 → 逐場 contact sheet（每格標時間＋此刻旁白）＋時間軸 md＋靜止統計（REWATCH 多鏡評審共用；離線）
+    rewatch_pack.py    看片評審輸入：成片 → 逐場 contact sheet（每格標時間＋此刻旁白）＋時間軸 md＋靜止統計（REWATCH 多鏡評審共用；離線）；兼 12 s 最長靜止硬閘 `--gate-still`（exit 1）與 A/B 同基線檢查 `--baseline`（exit 2）
     _selftest_*.py     各模組離線自測（平鋪 assert、無 pytest；`_selftest_capacity.py`＝容量契約回歸網）
     critic.py          render 後視覺 gate2：抽幀 → MiMo-V2.5 依 VISUAL-FRAME 判定（外部 API、公測免費）
     review_pack.py     工程鏡 packet 組裝（gate1 Claude／gate2 Codex 讀；離線、無 API）
@@ -208,7 +208,7 @@ python tools\doctor.py --smoke                                # 環境健檢＋�
 
 > 為何兩支都要：doctor 原本只驗工具鏈，2026-08-10 佈局重構後正典 deck 過不了自己的 provenance 閘、一個 selftest 同因變紅，doctor 卻仍報影片線 ✅（[`_audit/REVIEW-pipeline-assessment-2026-09-07.html`](_audit/REVIEW-pipeline-assessment-2026-09-07.html) F1／F4）。`--smoke` 抓 deck 級閘、runner 抓模組級回歸；兩者都綠才算「產線綠」。
 
-**看片評審（REWATCH，2026-09-12 試行、尚未常設）**——render 後、以觀眾的方式審成片品質（時間、停留、畫面有沒有動、跟不跟得上）：`python video/pipeline/rewatch_pack.py --deck <deck>` 先把成片翻成模型讀得了的 pack（`output/<ch>/<sec>/rewatch_pack/`），再依 [`content_scripts/_audit/REWATCH-REVIEW-RUBRIC.md`](content_scripts/_audit/REWATCH-REVIEW-RUBRIC.md) 派五鏡（初學者×2／動畫導演／教學設計／節奏剪輯／講師，跨 Gemini／Claude 模型家族，agy＋subagent）獨立盲審，合成為 standalone HTML 供裁決。advisory、永不 blocking。
+**看片評審（REWATCH，2026-09-12 首用；2026-09-13 起＝里程碑審，一節收斂時跑一次，見 [`REVIEW_GATES.md`](REVIEW_GATES.md) §六）**——render 後、以觀眾的方式審成片品質（時間、停留、畫面有沒有動、跟不跟得上）：`python video/pipeline/rewatch_pack.py --deck <deck>` 先把成片翻成模型讀得了的 pack（`output/<ch>/<sec>/rewatch_pack/`）——**同一支腳本帶 12 s 最長靜止硬閘**：`--gate-still <seconds>`（預設 12.0）只審 content 場、用 0.05% 細門檻的最長靜止，超線印 `[still-gate] FAIL` 並 exit 1、全過印 `[still-gate] PASS`；新舊 A/B 要比對時加 `--baseline <pack dir>`，兩包 pack 的來源 mp4 fps／畫面尺寸不同就拒絕、exit 2（不同 fps 會得出假結論）。再依 [`content_scripts/_audit/REWATCH-REVIEW-RUBRIC.md`](content_scripts/_audit/REWATCH-REVIEW-RUBRIC.md) 派五鏡（初學者×2／動畫導演／教學設計／節奏剪輯／講師，跨 Gemini／Claude 模型家族，agy＋subagent）獨立盲審，合成為 standalone HTML 供裁決。**五鏡評審本身 advisory、永不 blocking**（會擋的是上述確定性的 `--gate-still`）。
 
 **解析度慣例**：測試／預覽用 1080p（`make.py --quality high`，預設），正式交付才 4K（`--quality 4k`，依 `meta.video`，未設預設 4K60）。版面與解析度無關，1080p 測試與 4K master 構圖逐像素相同。（agent 預設一律 1080p、除非使用者要求，見根 [`CLAUDE.md`](../CLAUDE.md)；§3.1 真 4K final 另議見 [`REBUILD_STATUS.md`](REBUILD_STATUS.md)。）
 
@@ -237,7 +237,7 @@ python video\make.py          --storyboard video\storyboards\<deck>_mimo.yml --r
 - `tts.py --backend mimo`：OpenAI 相容 `/chat/completions`，待唸文字放 `assistant`；預設 `MIMO_MODEL=mimo-v2.5-tts`（builtin 模型）、`MIMO_VOICE=Dean`（經 `audio.voice` 選定）、`MIMO_STYLE`＝空（builtin 路線不送 persona/style prompt）。**2026-07-05 起 voice-design 模型與「Calm Professor」persona 已退役，唯一路線＝builtin voice Dean。** `MimoTTSBackend` 預設裁 beat 頭尾靜音（留 0.08s）。新 manifest 會記錄每 beat 的 `raw_audio_seconds`、`trimmed_audio_seconds`、`trimmed_silence_seconds`，方便追查 MiMo padding/裁切。
 - 要試聽別的 builtin voice 時手動指定，例如 `python video\pipeline\mimo_preview.py --spoken <..._narration_spoken.md> --voice Mia`。
 - `make.py --reuse-audio`：跳過 mock synth、直接讀 `tts.py` 的真 manifest render。非 reuse 但偵測到真 manifest 會**拒絕用 mock 覆蓋**；reuse 時也會 fail fast 檢查 deck id、scene、beat count、`{show}` target、`text_hash`、WAV 存在與 WAV 時長，避免 storyboard 改了卻沿用舊 take。
-- 同步 guard：`make.py` render 前會警告短 beat / reveal-only beat（例如連續 `{show a} {show b}` 造成 0.45s 靜音 beat，但 reveal 動畫本身較長）；render 後會用 ffprobe 檢查每個 content scene 的 video 長度是否足以容納 `lead + narration`，並提示 video 與 `lead + audio + tail` 的偏差。
+- 同步 guard：`make.py` render 前會警告短 beat / reveal-only beat（例如連續 `{show a} {show b}` 造成 0.45s 靜音 beat，但 reveal 動畫本身較長）——**這一道仍是 warn**；render 後會用 ffprobe 檢查每個 content scene 的 video 長度是否足以容納 `lead + narration`，並比對 video 與 `lead + audio + tail` 的偏差——**這一道自 2026-09-13 起是硬閘**：偏差超過 `SYNC_HARD_GATE_FRAMES`＝2 影格（fps 由 ffprobe 對成品實測）即 ERROR、compose 前 abort（原為 warn）。閘的定義見 [`REVIEW_GATES.md`](REVIEW_GATES.md) §一 層 6 與 §六。
 - 同步常數集中在 `pipeline/timing.py`：`SCENE_LEAD_SECONDS` 同時供 `scene.py`、`make.py`、`critic.py` 使用，避免 compose offset / critic 抽幀時間與實際場景 lead 漂移。
 - 只想聽聲音不要影片：`python video\pipeline\mimo_preview.py --spoken <..._narration_spoken.md>`（逐單元串成 `preview.wav`；`--dry-run` 不呼叫 API、`--smoke` 只合首段）。
 - **MiMo 非決定性**：同文字每次合成是不同 take（±~10% 長度），重跑不保證同長度；要鎖定某 take 就別重合成。
@@ -277,7 +277,7 @@ python video\pipeline\critic.py --storyboard video\storyboards\<deck>.yml --scen
 ```
 
 - **`--per scene`（預設）** 每場景抽**最滿幀**；`--per beat` 每 beat 一張（看漸進、較貴）。
-- **`--out <dir>`** 指定輸出目錄（預設仍是 `output/ch<NN>/s<X.Y>/critic`／`critic_mimo`）；`--dry-run`／`--confirm` 都寫到該目錄。**開跑前一律先清空該目錄的 `frames/`**——留底＝一次完整輸出，不會跟前一輪的舊幀混在一起；要保留某一輪的結果就換一個 `--out` 路徑另存，不要在同一個目錄上疊加。**同一個輸出目錄同一時間只能一人跑**，兩個 session 平行測同一節時各自給 `--out` 分開。
+- **`--out <dir>`** 指定輸出目錄（預設仍是 `output/ch<NN>/s<X.Y>/critic`／`critic_mimo`）；`--dry-run`／`--confirm` 都寫到該目錄。**開跑前一律先清空該目錄的 `frames/`**——留底＝一次完整輸出，不會跟前一輪的舊幀混在一起；要保留某一輪的結果就換一個 `--out` 路徑另存，不要在同一個目錄上疊加。**同一個輸出目錄同一時間只能一人跑**，兩個 session 平行測同一節時各自給 `--out` 分開。「逐輪隔離留底」已列進輪次協定的開工清單（[`REVIEW_GATES.md`](REVIEW_GATES.md) §六 6.4）。
 - **MiMo-V2.5 公測免費（估值＝$0）**，但仍屬外部 API，依 [CLAUDE.md](../CLAUDE.md) 批次前須先報量徵同意；`--dry-run` 看幀數＋token 量（不送請求）。
 - provider＝小米官方 `api.xiaomimimo.com/v1`（OpenAI 相容、model `mimo-v2.5`、auth header `api-key`）。
 - **A1 Element Layout / V2 相撞** 要特別看 graph label：`$y=f(x)$`、`$y=x$`、座標標籤等不可壓在線、點、空心點或 guide marker 上（蓋住資訊＝V2 blocking）；這類圖內 label collision 即使 `sizecheck` 不一定自動抓到。
