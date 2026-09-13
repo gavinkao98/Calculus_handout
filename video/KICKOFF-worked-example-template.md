@@ -113,4 +113,8 @@ selftest 全綠、基線比對逐字相同、`doctor --smoke` 逐字相同、moc
 - **驗收：** `run_selftests` 40→41 全綠；22 個既有 deck × schema／lint／sizecheck 66 份輸出逐字相同；`doctor --smoke` 逐字相同；試點 mock render `[sync]`／`[stillness]` clean、抽幀自檢；零計費、正典 deck 未動。
 - **報告：** [`_audit/REVIEW-worked-example-template-applied.html`](_audit/REVIEW-worked-example-template-applied.html)（產生器 `_audit/_gen/worked_example_template.gen.py`＋digest）。
 - **交裁決：** ① 單頁容量（48 px 步驟階下每頁約 2 個分數列，mockup 的 4 列放不進去——建議維持規則 5、用 `part:` 分頁）；② 正典 §3.1 三題要不要遷到新模板（另案）。
+- **裁決結果（2026-09-13 主對話定案；asr-24 轉使用者過目，未推翻即生效）：**
+  - **① 單頁容量＝維持規則 5**（步驟 48 px、答案 62 px），長解法一律用 `part:` 分頁、**答案框留在末頁**（D4 的續頁例外已支援）。**不**給 `worked_example` 另開 40 px 步驟階——那與規則 5「取消 `math_sm 40`」及容量契約「字級恆定不可協商」正面相撞。
+  - **② 正典 §3.1 三題（`ex:3.1`–`ex:3.3`）＝不遷移。** 依據＝[`KICKOFF-shared-layer-v1.md`](KICKOFF-shared-layer-v1.md) §7「明確不做（本輪）」已列「`worked_example` 對既有 9 個 `derivation` + `prompt:` 場的遷移」；`derivation`＋`prompt:` 是合法的輕量形態，遷移另案再議（§8 backlog 有記）。
+  - 附帶：D6 的 **62／34 raw px** 是本模板內的常數，**共用層 v1 的 T2 會把它升成 `theme._SCALE_PX` 的具名 token**（T4-5 回歸時模板改讀 token）。
 - **未做：** `=` 對齊欄（D3）、填色 chip／外框 SOLUTION pill（全模板共用樣式）、`statement` 的 schema error、§7.1 其餘項目。

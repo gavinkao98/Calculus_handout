@@ -176,15 +176,17 @@ severity ∈ {`error`, `warn`}；`make.py` 有 error 即 abort（`--skip-sizeche
   新 template 只要回 `list[Block]`，原語 1（`{show}`）／4（`focus:`）／5（`carry:`）／7（`paced:`）
   **自動適用**；原語 2（`anim: transform`）與 3（`sweep`／`inset`）是 `derivation`／`graph` 各自實作的，
   **新 template 想要就得自己接**。
-- **回歸 deck 清單（2026-09-13）：`storyboards/` 共 22 個 `.yml`** ＝ 18 個 `_demo_*.yml`
+- **回歸 deck 清單：T4 併入前 22 個、併入後 23 個 `.yml`**（2026-09-13）＝ 18 個 `_demo_*.yml`
   （`aside`／`asymptote`／`capacity`／`carry`／`color_map`／`derivation`／`graph_compare`／`graph_muted`／
   `graph_reveal`／`inset`／`label_overlap`／`multipage`／`registers`／`sign_chart`／`tall_rows`／
   `tex_parts`／`theorem_regime`／`value_table`）＋ `ch01_inverse_functions`／`ch03_chain_rule`／
-  `ch03_trig_derivatives`／`ch03_trig_derivatives_mimo`。
+  `ch03_trig_derivatives`／`ch03_trig_derivatives_mimo`，**＋ T4 新增的 `_demo_worked_example`（第 23 個）**。
   **`REBUILD_STATUS.md` 品質補強輪 ⑦ 寫的「18 個 deck」是 2026-09-12 的數字**，
   之後輪 ⑭ 新增了 `_demo_color_map`／`_demo_inset`／`_demo_carry`／`_demo_tex_parts` 四個。
-  **本輪的零行為改變證據要蓋 22 個。**
-- **`pipeline/_selftest_*.py` 目前 42 支**（`run_selftests.py --list` 實測 2026-09-13）。
+  **T1–T3 的零行為改變證據要蓋 23 個**（T4 併入前的 Phase 0 基線只有 22 個；`_demo_worked_example`
+  的基線＝T4 併入後那次）。
+- **`pipeline/_selftest_*.py`：T4 併入前 42 支、併入後 43 支**（多了 `_selftest_worked_example`；
+  `run_selftests.py --list` 實測 2026-09-13）。
 
 ### 2.5 例題現況（T4 的真正起點；**與 §7.1 的描述不同，以此為準**）
 
@@ -223,6 +225,27 @@ severity ∈ {`error`, `warn`}；`make.py` 有 error 即 abort（`--skip-sizeche
   ② `WHAT EACH FACTOR DOES` 逐因子欄（每個因子 → 它的極限 → 引用 `PROP 3.2` 這種出處）
   ③ 底部 `ANSWER` 結論帶（帶語意色、字級最大）。
   **T4 要做的是這三樣，不是重寫 `example_head`。**
+
+> **⚠ 本節（§2.5）與 §5 T4 原是在不知道 `worked_example` 已有一條完成分支的情況下寫的。
+> 2026-09-13 該分支（`claude/unruffled-antonelli-db3c3e`，5 commit）已併入 main，
+> 以下以落地現況為準——契約全文見 [`KICKOFF-worked-example-template.md`](KICKOFF-worked-example-template.md)
+> 的 D1–D14 與 §7，驗收報告見 [`_audit/REVIEW-worked-example-template-applied.html`](_audit/REVIEW-worked-example-template-applied.html)。**
+>
+> - **欄位名以落地為準（不是本節上文的 factors／answer）：**
+>   `strategy:`（字串，rail 上段）／`notes: [{math, text, ref}]`＋`notes_label:`（rail 下段，`ref` 是靠右的藍色引用 tag）／
+>   **`result: {math, reason}`＝答案框**（`reason` 是答案框右端的 mono tag 字，預設 `answer`）。
+>   另有 `prompt:`（必填）、`number:`／`title:`（tagline）、`steps[]`／`check`、`part:`、`scaffold:`。
+> - **reveal id：** `step.N`／`result`／`check`／`strategy`／`note.N`
+>   （`strategy`／`note.N` 寫了 `{show …}` 才動態；`result` 恆動態）。
+> - **masthead 是模板內自建**（D10），但**沿用 `example_head` 的五個 block id**
+>   （`eyebrow`／`part`／`prompt`／`solrule`／`sollead`），所以 `sizecheck` 的 `HEADER` 集合與
+>   `scene_spine` 找 `prompt` 都不用改；`_common.example_head` 本體一行未動。
+> - **D14 已含完整的稽核模組清單**（`template_names`／`schema._worked_example_issues`＋`_seg_roles_issues`＋
+>   與 derivation 共用的 `_row_anim_issues`／`step_coverage._SCOPED_TEMPLATES`／`provenance._present_text_fields`；
+>   `pedagogy._MOTIVE_TEMPLATES` 與 `lint` 判定不加）——**T4-1 的「先列清單」交付物已由該分支完成**。
+> - **`sizecheck._capacity_issues` 有一處配套改動**（子代理的契約外判斷，已覆核接受）：
+>   **完全落在 `extra_bottom` 保留帶內的 block 不計入縱向堆疊**，否則答案框會被算兩次、每個有答案框的場都誤報拆頁；
+>   溢出保留帶的列照算。證據＝22 個既有 deck 的 `sizecheck` 輸出逐字相同。
 - §3.1 deck 統計：27 場＝`intro` 1／`divider` 4／**`content` 21**／`outro` 1；
   content 模板分布 `derivation` 6／`theorem_proof` 5／`graph` 4／`definition_math` 3／`callout` 2／`recap_cards` 1。
   `meta`：`fontfloor_enforce`／`coverage_enforce`／`otf_enforce`/`pedagogy_enforce` 皆 `True`，
@@ -288,8 +311,10 @@ severity ∈ {`error`, `warn`}；`make.py` 有 error 即 abort（`--skip-sizeche
 ## 4. Phase 0 — 基線（~40 分鐘，其中 render 0 次）
 
 > 基線存 **repo 外**（例如 `%TEMP%\shared-layer-v1-baseline\`），不要進版控。
-
-- [ ] **P0-1** `python video/pipeline/run_selftests.py` 全綠（預期 42/42），
+>
+> **⚠ 數字已因 T4 併入而變**（2026-09-13）：**T4 併入 main 之後**重跑 Phase 0 的話，
+> P0-1 是 **43/43**、P0-2 是 **23 個 deck**。下方寫的 42／22 是 T4 併入**之前**的基線
+> （T4 自己的零行為改變證據就是對那份 22 deck 基線做的，66 份報表逐字相同）。
       `python tools/doctor.py --smoke` 9/9；**兩份 stdout 存成 `before-selftests.txt`／`before-smoke.txt`**。
       worktree 內跑不到 `--smoke` 時改在主 checkout 跑（§2.6）。
 - [ ] **P0-2** **22 個 deck 的三份報表逐 deck 存底**（`before/<deck>.{schema,lint,sizecheck}.txt`）。
@@ -465,6 +490,13 @@ severity ∈ {`error`, `warn`}；`make.py` 有 error 即 abort（`--skip-sizeche
 
 ### T4 — `worked_example` 新模板（可與 T1–T3 並行；派 **opus**）
 
+> **狀態（2026-09-13 回寫）：T4-1～T4-4、T4-6 ✅ 已由分支 `claude/unruffled-antonelli-db3c3e`
+> 完成並併入 main；T4-2 的 RUNBOOK「9 個 → 10 個」那句 ✅ 由本次併入的補缺 commit 補上；
+> 只剩 T4-5 ⏳（等 T1／T2 merge 後做）。** 本小節以下的條文是**開工前**寫的，
+> 部分敘述（欄位名 `factors:`／`answer:`、reveal id `factor.N`／`answer`）與落地不符——
+> **一律以 §2.5 的回寫框、[`KICKOFF-worked-example-template.md`](KICKOFF-worked-example-template.md)
+> D1–D14 與 §7 為準**，下方逐條已標注。
+
 **契約（這是 T4 的成功標準，開工前先確認每一條都懂）：**
 
 1. **storyboard 欄位要對得上講義的 `envexample` 結構**（§2.5）：題目（一句話，可帶 (a)(b)）＋
@@ -480,8 +512,10 @@ severity ∈ {`error`, `warn`}；`make.py` 有 error 即 abort（`--skip-sizeche
    不要另寫一套（Karpathy §2）。
 4. **比現況多的只有三樣**（§2.5）：`strategy:` 策略卡、`factors:` 逐因子欄（含出處引用）、
    `answer:` 結論帶。現有的 `[ EXAMPLE ] ＋題目＋細線＋SOLUTION` 由 `_common.example_head` 供應，**照用**。
+   → **落地更正（D10／D14）：** 欄位名是 **`notes:`**（不是 `factors:`）與 **`result:`**（不是 `answer:`）；
+   masthead **在模板檔內自建**、只沿用 `example_head` 的五個 block id，`example_head` 本體未動。
 
-- [ ] **T4-1 先列清單，再寫 code。** 開工第一件事是把「**各稽核模組要不要改**」逐個列出來並判定，
+- [x] **T4-1 先列清單，再寫 code。✅（分支已做，D14 就是那份清單）** 開工第一件事是把「**各稽核模組要不要改**」逐個列出來並判定，
       寫進 commit body。至少要看這幾個（每個都 grep 一次它有沒有 dispatch on `template`）：
       `pipeline/schema.py`（`:295-360` 有 `derivation`／`theorem_proof` 專屬檢查）、
       `pipeline/lint.py`（`:112-115` graph mode dispatch、`:241` derivation prompt、`:368` theorem statement）、
@@ -489,21 +523,28 @@ severity ∈ {`error`, `warn`}；`make.py` 有 error 即 abort（`--skip-sizeche
       `pipeline/pedagogy.py`、`pipeline/step_coverage.py`、`pipeline/provenance.py`、
       `pipeline/example_coverage.py`、`pipeline/critic.py`／`review_pack.py`／`rewatch_pack.py`。
       **判「不用改」的也要寫出來**，這份清單本身就是交付物。
-- [ ] **T4-2 registry 兩處同步 ＋ RUNBOOK 那句。**
+- [x] **T4-2 registry 兩處同步 ＋ RUNBOOK 那句。✅**（registry 兩處＝分支 `c79372c`；
+      RUNBOOK 那句＝本次併入的補缺 commit）
       `pipeline/templates/__init__.py` 的 `REGISTRY` ＋ `pipeline/template_names.py` 的
       `CONTENT_TEMPLATES`（否則 `_selftest_template_registry` 紅）；
       `RUNBOOK-mimo-narration-route.md:67` 的「全部 content template（9 個）」→ 10 個。
-- [ ] **T4-3 紅測試先行。** `pipeline/_selftest_worked_example.py`（新）：
+- [x] **T4-3 紅測試先行。✅**（`_selftest_worked_example.py`，28 支 assert）
+      `pipeline/_selftest_worked_example.py`（新）：
       ① registry parity（既有 selftest 自動涵蓋）；
       ② 必填欄位缺了要有明確錯誤（不是 `KeyError`）；
-      ③ `{show}` 目標 id 集合＝契約寫的那組（`step.N`／`strategy`／`factor.N`／`answer`）；
-      ④ `answer` 的字級 ≥ 同場任何 `step.N`（這條與 T3 的 L1 是同一條規則，**在這裡先自證**）。
-- [ ] **T4-4 `_demo_worked_example.yml` 回歸 deck。** 用 `ex:3.1`（`companion_limit`，
+      ③ `{show}` 目標 id 集合＝契約寫的那組（**落地＝`step.N`／`result`／`check`／`strategy`／`note.N`**，
+      本行原寫的 `factor.N`／`answer` 是開工前的暫名）；
+      ④ `result` 的字級 ≥ 同場任何 `step.N`（這條與 T3 的 L1 是同一條規則，**在這裡先自證**）。
+- [x] **T4-4 `_demo_worked_example.yml` 回歸 deck。✅**（四場：完整形狀／`no_rail`／`capacity_over`／`multipage_p1`）
+      用 `ex:3.1`（`companion_limit`，
       mockup 畫的就是它）當內容——**只放到 demo deck 裡，不要動 `ch03_trig_derivatives*.yml`**。
       它是第 23 個 deck，加進 §3/§6 的報表清單。
-- [ ] **T4-5 最後對 v1 字體字級回歸。** T1／T2 merge 之後，重跑 T4-3 與 demo deck 的三份報表＋抽幀；
-      `answer` 用的是 T2 的「結論 62 px」那一階，**不要在 T4 裡自己寫 raw px**。
-- [ ] **T4-6 文檔同輪。** `DESIGN.md` §Template catalog 加一列（教學形狀／payload 欄位／reveal target）＋
+- [ ] **T4-5 最後對 v1 字體字級回歸。⏳（本輪唯一未完成的 T4 子項）** T1／T2 merge 之後，
+      重跑 T4-3 與 demo deck 的三份報表＋抽幀，並跑 `visual-frame-audit`（免費 gate 1）；
+      `result` 的 62 px 與 rail 的 34 px **目前是 `worked_example.py` 內的模板常數**（D6），
+      **T2 要把它們升成 `theme._SCALE_PX` 的具名 token，模板改讀 token、不再自帶 raw px**。
+- [x] **T4-6 文檔同輪。✅**（`DESIGN.md` Template catalog 一列＋專節＋Authoring Playbook 一列、`README.md`）
+      `DESIGN.md` §Template catalog 加一列（教學形狀／payload 欄位／reveal target）＋
       `README.md` 模板段；`DESIGN.md:465` 的「Worked-example 題目結構」節要說清楚
       **`derivation` + `prompt:` 與 `worked_example` 的分工**（什麼時候用哪個；舊場要不要遷移——
       建議**不遷移**，`derivation` + `prompt:` 是合法的輕量形態，遷移是另一輪的事）。
@@ -513,10 +554,13 @@ severity ∈ {`error`, `warn`}；`make.py` 有 error 即 abort（`--skip-sizeche
   ＋T4-1 清單判定要改的稽核模組。
 - **不准動：** 任何正典 deck、`_common.example_head`（照用，不要改它的形狀）、
   `example_coverage.py`、`derivation.py` 的既有行為（可以 import 重用，不可改）。
+  **落地例外（已覆核接受）：`sizecheck._capacity_issues` 改了一處保留帶規則**——見 §2.5 的回寫框。
 - **零行為改變怎麼證明：** 22 個既有 deck 的三份報表逐字相同（新 template 沒人用＝零影響）；
-  `_selftest_template_registry` 綠；新增的第 23 個 deck 自己的報表 0 error。
-- **DoD：** T4-1 清單交付、T4-3 綠、`run_selftests` 全綠（43 支）、demo deck mock render 過全部閘、
-  `visual-frame-audit` 對 demo 幀 0 blocking、文檔同輪。
+  `_selftest_template_registry` 綠；新增的第 23 個 deck 自己的報表**除了刻意超量的 `capacity_over`
+  壓測場之外 0 error**（實測 2 error／3 warn 全落在該場）。
+  **✅ 併入 main 時複驗：66 份報表逐字相同、`_demo_worked_example` 2 error／3 warn 全在 `capacity_over`。**
+- **DoD：** T4-1 清單交付 ✅、T4-3 綠 ✅、`run_selftests` 全綠（43 支）✅、demo deck mock render 過全部閘 ✅、
+  `visual-frame-audit` 對 demo 幀 0 blocking ⏳（併 T4-5 一起做）、文檔同輪 ✅。
 
 ---
 
@@ -533,7 +577,10 @@ severity ∈ {`error`, `warn`}；`make.py` 有 error 即 abort（`--skip-sizeche
    - `[still-gate]`：`python video/pipeline/rewatch_pack.py --deck ch03_trig_derivatives_mimo
      --gate-still 12 --out <新 pack> --baseline %TEMP%\shared-layer-v1-baseline\rewatch_pack_v0`。
      **fps／畫面尺寸與基線不同會 exit 2 什麼都不寫**——所以第 1 步的 `--quality high` 不能改。
-3. **確定性閘**：`schema`／`lint`／`sizecheck` **0 error**；
+3. **確定性閘**：`schema`／`lint`／`sizecheck` ——**正典 deck 0 error；`_demo_*` 壓測 fixture
+   （`_demo_capacity`／`_demo_aside`／`_demo_multipage`／`_demo_tall_rows`，以及 T4 的
+   `_demo_worked_example` 中刻意超量的 `capacity_over` 場）的刻意 error 要與 Phase 0 基線逐字相同**
+   ——這些 fixture 存在的意義就是讓閘報錯，「0 error」對它們是錯的驗收標準；
    `python video/pipeline/run_selftests.py` 全綠；`python tools/doctor.py --smoke` 9/9；
    **23 個 deck 的三份報表對 Phase 0 做 diff**，逐條分類成「意圖不變＝必須逐字相同」與
    「意圖改變＝附幀對照」。
@@ -575,7 +622,7 @@ severity ∈ {`error`, `warn`}；`make.py` 有 error 即 abort（`--skip-sizeche
   這個事實要寫進 `ENVIRONMENT.md`，免得下一個人再查一次。
 - **mockup 的數學字體是 Source Serif 4**（`DirectionB.dc.html:14`），與落地的 Latin Modern 不同。
   設計畫布與 code 之間的這個落差應該回寫進 `_audit/design-template-system/README.md` 的「已知限制」。
-- **`RUNBOOK-mimo-narration-route.md:67` 寫死「9 個」**——這種硬寫數字的地方值得全面掃一次
+- **`RUNBOOK-mimo-narration-route.md:67` 寫死「9 個」**（2026-09-13 T4 併入時已改 10）——這種硬寫數字的地方值得全面掃一次
   （`REVIEW_GATES.md`／`README.md`／`REBUILD_STATUS.md` 裡的 deck 數、selftest 數同理；
   本檔 §2.4 已記錄「18 → 22」這個漂移）。
 - **`meta.example_coverage_enforce` 未開**（§7.2 open item）。§3.2 開工時是自然的時機。
@@ -597,9 +644,10 @@ severity ∈ {`error`, `warn`}；`make.py` 有 error 即 abort（`--skip-sizeche
    - `_audit/design-template-system/README.md`：四項的落地狀態（§7.1 那行「都還沒做」要改）。
 3. **`REBUILD_STATUS.md` 記一條「共用層 v1 凍結」**（日期、四個 commit hash），
    並**明文宣告**：凍結後任何共用層改動一律走工具線（§1 的框內規則逐字抄過去）。
-4. **驗收數字**：`run_selftests` 全綠（預期 45 支：42 ＋ T1／T3／T4 各一）、
-   `doctor --smoke` 9/9、23 deck `sizecheck` 0 error、`[sync]` 0、`[still-gate]` PASS、
-   `visual-frame-audit` 21 場 0 blocking、人閘通過。
+4. **驗收數字**：`run_selftests` 全綠（預期 **45 支＝43（已含 T4 的 `_selftest_worked_example`）＋T1＋T3**）、
+   `doctor --smoke` 9/9、**23 deck `sizecheck`：正典 deck 0 error；`_demo_*` 壓測 fixture
+   （含 `_demo_worked_example` 的 `capacity_over`）的刻意 error 與 Phase 0 基線逐字相同**、
+   `[sync]` 0、`[still-gate]` PASS、`visual-frame-audit` 21 場 0 blocking、人閘通過。
 
 ### 預估（工時／render 次數）
 

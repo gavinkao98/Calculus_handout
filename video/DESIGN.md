@@ -483,6 +483,17 @@ freeform 人讀標籤、不被解析為 provenance**（provenance 只認 `ref:`�
 再補 `derivation`＋`prompt:` 缺的兩件事——**答案框**與**策略 rail**。既有的 `derivation`＋`prompt:` 場不受影響、
 不強制遷移（`example_head` 與 `lint._example_missing_prompt` 原樣保留）。
 
+**兩者的分工（怎麼選）：**
+
+- **`derivation` ＋ `prompt:` ＝合法的輕量形態**：有題目、但畫面上**只要那條推導鏈**——不需要答案框、
+  不需要策略 rail，理由用逐列 `reason` 的 dotted leader 交代就夠。
+- **`worked_example` ＝課本例題的完整形狀**：需要**答案框**（結論是畫面最重元素）、**策略 rail**
+  （一句話說為什麼這樣下手）、或**逐項 `notes:`**（每個因子 → 它的去向 → `ref:` 出處引用）時用它。
+  列不收 `reason`——右 rail 同一欄已經給了 `strategy:`／`notes:`。
+- **既有 9 個 `derivation`＋`prompt:` 例題場（§3.1 四場、§3.2 五場）＝不遷移**
+  （2026-09-13 裁決；遷移要重 derive `_mimo`、reveal id 改名會讓 beat 級 TTS reuse 失配）。
+  遷移是另一輪的事，見 [`KICKOFF-shared-layer-v1.md`](KICKOFF-shared-layer-v1.md) §7「明確不做」。
+
 ## Worked-example 模板 `worked_example`（2026-09-13）
 
 **為什麼另開一個模板：** 全書 935 個語意塊裡 `workedexample`（例＋解）有 **220 個（24%）**，是單一最大宗，
