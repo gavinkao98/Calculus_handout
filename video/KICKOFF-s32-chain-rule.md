@@ -419,7 +419,7 @@ mock 是靜音 WAV、beats 模式、離線；`make.py` 會拒絕用 mock 覆蓋�
 
 | 欄 | §3.2 的數字（依 §2.3 實測推算，執行前以 `--dry-run` 實跑覆蓋） |
 |---|---|
-| 合成單位 | `--unit auto` ⇒ 全部 9 個 content template 走 **scene-level＋forced alignment** |
+| 合成單位 | `--unit auto` ⇒ 全部 **10** 個 content template 走 **scene-level＋forced alignment**（2026-09-13 加了 `worked_example`；單一源＝`pipeline/template_names.py:CONTENT_TEMPLATES`） |
 | 場數 | **22 個 content 場** |
 | 音訊秒數 | **≈ 725 s**（1,677 字 ÷ 138.8 wpm × 60；§3.1 實測語速） |
 | 預期 billed call | **22**（一場一次，reuse 為 0） |

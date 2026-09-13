@@ -45,7 +45,8 @@
 
 > **任何共用層改動一律走工具線。** 共用層＝`pipeline/templates/`、`pipeline/visuals/theme.py`、
 > `pipeline/brand.py`、`pipeline/sizecheck.py`、`pipeline/blocks.py`、原語相關模組
-> （`focus.py`／`pacing.py`／`texparts.py`／`stillness.py`）。走工具線的意思是：
+> （`focus.py`／`pacing.py`／`texparts.py`／`stillness.py`），**再加 `pipeline/scene.py`**
+> （2026-09-14 補列：T5 動過它，見 §5 T5）。走工具線的意思是：
 > **紅測試先行 → 全 deck 零行為改變證據 → 一個 worktree 一個 commit**，
 > **不在某一節的對話裡順手改**。某節需要共用層改動時，開一個工具線的 task，不要就地動手。
 
@@ -339,11 +340,25 @@ severity ∈ {`error`, `warn`}；`make.py` 有 error 即 abort（`--skip-sizeche
 > 必須對**最終字級**校準。T4 動的是一個新檔，與 T1–T3 零重疊，可同時開發，**但最後要對 v1 的
 > 字體字級回歸一次**。
 
-### T1 — 字體換 Instrument Sans（先做；派 **opus**）
+### T1 — 字體換 Instrument Sans（先做；派 **opus**）✅
+
+> **狀態（2026-09-14）：✅ 全數完成，commit `74b88ca`、merge `edb457c`（opus 子代理、worktree、一個 commit）。**
+> **落地＝** 三個靜態字重（Regular／SemiBold／Bold）＋`OFL.txt`＋`autoinst` 生成的 pdflatex `texmf`
+> vendored 在 [`pipeline/fonts/instrument-sans/`](pipeline/fonts/instrument-sans/)；preamble `plex-sans`→`InstrumentSans`
+> （`lmodern`／`plex-mono` 未動）；`TEXT_SCALE` 1.3102→**1.2748**、`_WIDTH_K` 0.00507→**0.00521**；
+> 新增 `pipeline/_selftest_text_metrics.py`。
+> **Medium（500）未 vendoring**——`autoinst` 沒有 500 的 NFSS 權重碼，且現役 code 零 call site。
+> **路徑解析改用 MiKTeX 使用者層級註冊**（環境變數路線走不通：`dvisvgm` 只讀它預設找到的第一個 map 檔、
+> manim 呼叫它時不帶 `--font-map`）＝`initexmf --register-root=<repo>\video\pipeline\fonts\instrument-sans\texmf`
+> ＋`miktex fontmaps configure`，由 `tools/setup.ps1` 冪等執行、`tools/doctor.py` 三項檢查、
+> `ENVIRONMENT.md` ③／①b 寫齊；**重生字型需 Strawberry Perl**（msys perl 缺 `Pod::Usage`）。
+> **稽核＝** 3 場 `visual-frame-audit` 0 blocking、3 場長段落 wrap 壓測無溢出；
+> **唯一新增可見缺點＝bold 標題詞間距偏緊**（§8 backlog ③）。
 
 **為什麼先做：** 它是唯一會改變所有文字度量的一項。放在後面做＝T2 的字級與 T3 的閘門檻全部作廢重來。
 
-- [ ] **T1-0 開工第一件事：把範圍與代價攤開給使用者，等回答。**（Karpathy §1，不要默默選一個）
+- [x] **T1-0 開工第一件事：把範圍與代價攤開給使用者，等回答。✅（2026-09-13 使用者裁決：Instrument Sans、
+      數學維持 Latin Modern、mono 維持 Plex Mono、vendoring 進 repo）**（Karpathy §1，不要默默選一個）
   1. **mockup 的數學字體也換了**（`DirectionB.dc.html:14` `Source Serif 4`）。
      本 task 預設**只換文字（Instrument Sans），數學維持 Latin Modern**——理由是
      `PX_TO_FS` 是數學錨、換數學字體會連帶動所有版面 zone，且 `lmodern` 在 preamble 標了 locked。
@@ -355,11 +370,11 @@ severity ∈ {`error`, `warn`}；`make.py` 有 error 即 abort（`--skip-sizeche
   3. **退路**：使用者若不想動字型鏈，本機已有 CTAN 套件的 sans 候選是
      `sourcesanspro`／`firasans`／`raleway`（實測 `.sty` 都在），換字只要改 preamble 一行＋重校兩個常數。
      **把這個便宜選項講出來，不要自己決定。**
-- [ ] **T1-1 preamble 切換。** 只改 `pipeline/_bootstrap.apply_tex_template()` 的 `:73-87`：
+- [x] **T1-1 preamble 切換。✅** 只改 `pipeline/_bootstrap.apply_tex_template()` 的 `:73-87`：
       `plex-sans` → 新字（`plex-mono` 的 eyebrow 是否同步換，一併在 T1-0 問）。
       **`lmodern`、`\familydefault=\sfdefault`、`microtype`、`\everymath{\displaystyle}`、
       三個 `\DeclareMathOperator` 一律不動。**
-- [ ] **T1-2 重校兩個常數（不是一個）。** 照 `content_scripts/_audit/PLAN-routeA-plex-latex.md:98-120`
+- [x] **T1-2 重校兩個常數（不是一個）。✅**（量到 `TEXT_SCALE` 1.2748、`_WIDTH_K` 0.00521）照 `content_scripts/_audit/PLAN-routeA-plex-latex.md:98-120`
       Task 2 的量測配方（那是 Plex 上一次換字時用過的、已驗證的方法）：
       ```python
       # bootstrap()（已套新 preamble）之後：
@@ -381,16 +396,17 @@ severity ∈ {`error`, `warn`}；`make.py` 有 error 即 abort（`--skip-sizeche
       ② 換字後 `_text_fs(size)` 渲出來的 **cap height 仍是 0.006624 u/px**（→ 決定 `TEXT_SCALE`）；
       ③ `estimate_text_width` 必須**略高於**真實 advance（→ `_WIDTH_K` 的 +2%）。
       量測腳本寫進 scratchpad（一次性、量完刪，比照 Route A 的做法），量到的值與腳本輸出貼進 commit body。
-- [ ] **T1-3 紅測試先行。** 新增 `pipeline/_selftest_text_metrics.py`：
+- [x] **T1-3 紅測試先行。✅**（**不變式② 落地時改成「校準句 ≥ 真寬、代表句 ≥ 94%」**——逐句上界連 Plex 的
+      舊常數都過不了，估寬器本來就是統計近似）新增 `pipeline/_selftest_text_metrics.py`：
       ① `Tex('H').height / 100.0 * TEXT_SCALE * PX_TO_FS` 落在 `0.006624 ± 2%`（cap height 不變式）；
       ② 對一組固定字串，`estimate_text_width(s, fs) >= Tex(s).width`（估寬不得低估，否則 wrap 溢出）；
       ③ `Tex` 真的用到新字族（查 preamble 字串即可，避免脆弱的 glyph 比對）。
       **先讓它在舊常數下紅（②會紅在新字上），再改常數讓它綠。**
-- [ ] **T1-4 抽幀＋稽核。** 三場 mock render（`theorem_proof` 的 `continuity_statement_sin_limit`、
+- [x] **T1-4 抽幀＋稽核。✅**（3 場 0 blocking；另跑 3 場長段落 wrap 壓測無溢出）三場 mock render（`theorem_proof` 的 `continuity_statement_sin_limit`、
       `derivation` 的 `difference_quotient_for_sine`、`graph` 的 `squeeze_graph`），
       抽最終幀，派 `visual-frame-audit` subagent（免費 gate 1）看 V1–V10。
       **重點看 wrap**：`_WIDTH_K` 若校偏，最先炸的是 recap／annotation 的長行。
-- [ ] **T1-5 go／no-go 人閘（本輪唯一中途停點）。** 三張新幀＋P0-4 的三張舊幀並排交使用者，
+- [x] **T1-5 go／no-go 人閘（本輪唯一中途停點）。✅ 使用者給 go——採用 Instrument Sans。** 三張新幀＋P0-4 的三張舊幀並排交使用者，
       **由使用者決定採用新字或退回 Plex**。
       **退回也要留下校準方法**：即使 no-go，T1-2 的量測腳本與 T1-3 的 selftest 留著
       （它們守的是「換字必須重校兩個常數」這條契約，與選哪個字無關），
@@ -405,34 +421,49 @@ severity ∈ {`error`, `warn`}；`make.py` 有 error 即 abort（`--skip-sizeche
 - **DoD：** T1-3 綠、`run_selftests` 全綠、三場幀 `visual-frame-audit` 0 blocking、
   使用者在 T1-5 給出 go 或 no-go 且結果已落地、文檔同輪補齊。
 
-### T2 — 數學字級收成三階＋取消 `math_sm 40`（對最終字體做；派 **opus**）
+### T2 — 數學字級收成三階＋取消 `math_sm 40`（對最終字體做；派 **opus**）✅
+
+> **狀態（2026-09-14）：✅ 全數完成，commit `f2b0813`、merge `c9792ea`（opus 子代理、worktree、一個 commit）。**
+> **落地＝** `math_conclusion 62`／`math 48`／`math_rail 34`；**`math_sm` 直接刪除、不留 alias**；
+> 兩個 A/B 開放值定死＝**`prose_sm 38`、`tag 32`**；`derivation` 的 raw `size=54` 與
+> `worked_example` 的 raw 62／34 一併**升成具名 token**（模板不再自帶 raw px）；
+> call site `pipeline/` 9 處＋`animations/` hooks 30 處；`_selftest_type_scale` 擴 4 條。
+> **零行為改變證據＝** 23 deck 的 `schema`／`lint` 逐字相同；`ch03_chain_rule` 多一條 advisory warn
+> （qed 越安全邊界 0.04u）。9 場 `visual-frame-audit` **0 blocking**、2 條 V4 advisory
+> （`squeeze_graph` 的 `\tfrac` 內列實效約 24 px 低於 floor 26；`derivative_cycle` 環心 `d/dx` 34 vs 同幀 48）
+> ＋14 條 A 級。
+>
+> **⚠ 已知例外（本輪唯一沒收乾淨的）：`ch01_inverse_functions`（版面回歸 deck）的 `invert_a_rational`，
+> 其 `check` 行因結論階 62 出框＝1 error。** 變因隔離證實**純由 62 造成**（不是 T1 的字體、不是 T3 的新規則）。
+> **主對話裁決＝62 不退、修在 deck 側**——已用 `spawn_task` 另開 chip
+> 「修 ch01 deck `invert_a_rational` 結論階 62 出框」，不在本輪處理（§8 backlog ⑤）。
 
 **規則來源**（`_audit/design-template-system/MathRules.dc.html` 規則 5 逐字）：
 > 數學字級只有三階：**conclusion 62 px／body 48 px／rail·inline 34 px**。
 > 取消 `math_sm 40` 這一階——實測它與 48 在螢幕上分不出來，只製造不一致。
 
-- [ ] **T2-1 決定三階怎麼映射到 `_SCALE_PX`，寫進 commit body。** 現況 → 目標：
+- [x] **T2-1 決定三階怎麼映射到 `_SCALE_PX`，寫進 commit body。✅（三階＋`prose_sm 38`／`tag 32` 一次定死）** 現況 → 目標：
       結論 `derivation.py:136` 的 **raw `size=54` → 62**（並且**升成具名 token**，不要再 raw px）；
       body `math 48` 不動；rail/inline **`math_sm 40` → 34**。
       同時把兩個 A/B 開放值定死：**`prose_sm` 35→?（開放值 35 或 38）**、**`tag` 30→?（開放值 30 或 32）**
       ——使用者說的「放大併案」就是這兩個。34 這一階與 `prose_sm`／`tag` 的關係要在此講清楚
       （三者會不會撞成同一個數字？撞了就該合併成一個 token）。
-- [ ] **T2-2 紅測試先行。** 擴充 `pipeline/_selftest_type_scale.py`（它已經在守 `statement` 階）：
+- [x] **T2-2 紅測試先行。✅** 擴充 `pipeline/_selftest_type_scale.py`（它已經在守 `statement` 階）：
       新增「數學階只有三個值」的斷言——把 `pipeline/templates/` 下所有
       `brand.math_line(..., size=X)` 與 `T.fs(X)` 的 `X` 收集起來，assert 它們落在三階
       ∪ `{MIN_FONT_FLOOR 相關的例外}`。**先讓它紅**（現況有 40／54／raw px 落單）。
-- [ ] **T2-3 逐處改。** §2.2 列的 call site：`pipeline/` 內 7 處 `math_sm`（graph 5／theorem_proof 1／
+- [x] **T2-3 逐處改。✅（照建議不保留 alias，直接刪鍵；落地實數＝`pipeline/` 9 處、hooks 30 處）** §2.2 列的 call site：`pipeline/` 內 7 處 `math_sm`（graph 5／theorem_proof 1／
       sign_chart 1／procedure_steps 2）、`prose_sm` 4 處、`tag` 4 處；
       `animations/` 內約 20 處（三個 hook 檔）。**`math_sm` 這個鍵要不要保留成 alias**：
       建議**不保留**（`_SCALE_PX` 已有一堆 back-compat alias，再加一個違反 Karpathy §2），
       改成刪掉 → 所有 call site 一次改完 → `KeyError` 就是編譯期的閘。
-- [ ] **T2-4 `MIN_FONT_FLOOR` 關係要檢查。** floor 是 **26 px**；新的 rail 階 34 px 與
+- [x] **T2-4 `MIN_FONT_FLOOR` 關係要檢查。✅（§3.1 deck 未新增 floor error）** floor 是 **26 px**；新的 rail 階 34 px 與
       `tag`／`eyebrow 26` 的距離變近。逐項確認：
       ① `derivation.py:382` 的 `floor_px = T._SCALE_PX["tag"] if result else _REASON_PX` 仍成立；
       ② `graph.py:406` 的 `default_label_size` 從 `math_sm`(40) 降到 34 之後，**曲線標籤仍 ≥ 刻度**
       （`graph.py:87,116,123` 的刻度尺寸），這是 P-A1 的既有契約；
       ③ 現有 `fontfloor_enforce: true` 的 §3.1 deck **不得新增任何 floor error**。
-- [ ] **T2-5 會動到的 deck 與幀對照。** 用 `math_sm`／`prose_sm`／`tag` 的 deck＝
+- [x] **T2-5 會動到的 deck 與幀對照。✅（9 場幀稽核 0 blocking／2 條 V4 advisory；ch01 的 1 error 另案，見上方狀態框）** 用 `math_sm`／`prose_sm`／`tag` 的 deck＝
       `ch01_inverse_functions`、`ch03_trig_derivatives{,_mimo}`、`ch03_chain_rule`、
       以及 `_demo_graph_*`／`_demo_sign_chart`／`_demo_value_table`／`_demo_registers`／`_demo_aside`。
       **意圖改變**的 deck 全部抽最終幀與 P0-4／P0-2 的基線並排；
@@ -446,7 +477,20 @@ severity ∈ {`error`, `warn`}；`make.py` 有 error 即 abort（`--skip-sizeche
 - **DoD：** T2-2 綠、`run_selftests` 全綠、§3.1 deck `sizecheck` 0 error 且 floor warn 不增、
   幀對照交付、`DESIGN.md` 型階表同輪改對。
 
-### T3 — 把版面 4 條／數學 5 條裡能自動的寫進 `sizecheck`（派 **opus**）
+### T3 — 把版面 4 條／數學 5 條裡能自動的寫進 `sizecheck`（派 **opus**）✅
+
+> **狀態（2026-09-14）：✅ 全數完成，commit `8a81530`、merge `02a22c4`（opus 子代理、worktree、一個 commit）。**
+> **分流定案＝** L1／L2／L3／M1／M2／M3 **六條落地、全部 warn-default**（`meta.layout_enforce` 開才把 L 系升
+> error／abort、`meta.mathtype_enforce` 升 M 系，兩者預設關）；**L4（`layout:` 佔比宣告）與 M4（∎ 視覺）判
+> 「只能人審」**並各自歸到 VISUAL-FRAME 的 A1／A7 與 A2／A4（有家、不是無主）；**M5 由 T2 的
+> `_selftest_type_scale` 覆蓋、不重寫成 sizecheck 規則**。新增 `pipeline/_selftest_layout_rules.py`
+> ＋ fixture `storyboards/_fixtures/layout_rules.yml`。
+> **零行為改變證據＝** 23 deck 的 `schema`／`lint` 逐字相同、`sizecheck` 的 **31 行 error 逐字相同**、
+> 既有 **43 條 warn** 全部保留；新 warn **122 條全是 warn**（L2 63／M2 30／M1 22／L3 7／L1 0／M3 0），
+> **§3.1 正典 deck 只增 4 條 L2**。
+> **校準時查到的一個 manim 事實：公開的 `font_size` getter 對 `substrings_to_isolate`（`{{}}`／`color_map`
+> 命中）切出來的節點失真**，L1 因此改讀 `_font_size`；**既有的 `_effective_font_px` 仍用公開 getter
+> （會低報 floor warn）——外科手術原則，本輪不順手改，見 §8 backlog ②。**
 
 **第一步是分流，不是寫 code。** 逐條判「可自動／只能人審」，把判斷寫進 commit body 與 `REVIEW_GATES.md`。
 下表是本檔作者的初判，**開工時要自己覆核**（規則原文在 `_audit/design-template-system/LayoutRules.dc.html`
@@ -464,18 +508,18 @@ severity ∈ {`error`, `warn`}；`make.py` 有 error 即 abort（`--skip-sizeche
 | M4 | ∎ 是字形不是元件（現在渲成綠色圓角方框） | — | **只能人審**（是 `brand.glyph("qed")` 的視覺做法問題，不是可量的幾何）→ 改法進 §8，或併進 T2 的字級輪一起看幀 |
 | M5 | 數學字級只有三階 | — | **已由 T2 的 selftest 覆蓋**，不必再寫成 sizecheck 規則 |
 
-- [ ] **T3-1 逐條分流定案**（上表覆核＋理由），寫進 commit body。**判「只能人審」的要說清楚為什麼**，
+- [x] **T3-1 逐條分流定案 ✅**（上表覆核＋理由；定案表落在 [`REVIEW_GATES.md`](REVIEW_GATES.md) §一 層 6 的 `sizecheck` 列與其下方分流表），寫進 commit body。**判「只能人審」的要說清楚為什麼**，
       並確認它在既有的判斷閘裡有家（VISUAL-FRAME 的 V／A 維度，或 pedagogy）。
-- [ ] **T3-2 每條可自動的規則一個紅測試。** `pipeline/_selftest_layout_rules.py`（新）：
+- [x] **T3-2 每條可自動的規則一個紅測試。✅** `pipeline/_selftest_layout_rules.py`（新）：
       每條規則一組 fixture（一個違反、一個不違反），**先紅再綠**。
       fixture 用 `storyboards/_fixtures/` 既有慣例，不要動正典 deck。
-- [ ] **T3-3 實作，全部 warn-default ＋ 各自的 `meta.*_enforce`。**
+- [x] **T3-3 實作，全部 warn-default ＋ 各自的 `meta.*_enforce`。✅（旗標名照建議＝`meta.layout_enforce`／`meta.mathtype_enforce`）**
       照 `pedagogy.assumptions_registry_issues` 的形狀（`sev = "error" if enforce else "warn"`，
       **沒宣告就回 `[]`**）。旗標名建議 `meta.layout_enforce`（L 系）與 `meta.mathtype_enforce`（M 系），
       比照 `fontfloor_enforce` 接在 `sizecheck.check_scenes` 尾段。
-- [ ] **T3-4 校準到零誤報。** 對 22 個 deck 跑一遍，**每一條 warn 都要能說出「這是真的違反」**。
+- [x] **T3-4 校準到零誤報。✅（實際對 23 個 deck 校準；新 warn 122 條逐條有理由，§3.1 正典 deck 只增 4 條 L2）** 對 22 個 deck 跑一遍，**每一條 warn 都要能說出「這是真的違反」**。
       說不出來的就是門檻錯了，改門檻不要改 deck。
-- [ ] **T3-5 升硬閘要等一節驗證後。** 本輪**只上 warn-default**；
+- [x] **T3-5 升硬閘要等一節驗證後。✅（本輪未改任何預設）** 本輪**只上 warn-default**；
       `meta.<flag>_enforce: true` 由 §3.2 那一節開工時自己決定要不要開，
       開了跑完一節沒誤報，下一輪才考慮改預設。**不要在本輪把任何新規則設成預設 error。**
 - **改哪些檔：** `pipeline/sizecheck.py`、`pipeline/_selftest_layout_rules.py`（新）、
@@ -488,11 +532,18 @@ severity ∈ {`error`, `warn`}；`make.py` 有 error 即 abort（`--skip-sizeche
 - **DoD：** 分流表定案、每條可自動規則一支紅→綠測試、22 deck 零誤報、
   `REVIEW_GATES.md` §一 `sizecheck` 列同輪更新、`run_selftests` 全綠。
 
-### T4 — `worked_example` 新模板（可與 T1–T3 並行；派 **opus**）
+### T4 — `worked_example` 新模板（可與 T1–T3 並行；派 **opus**）✅
 
-> **狀態（2026-09-13 回寫）：T4-1～T4-4、T4-6 ✅ 已由分支 `claude/unruffled-antonelli-db3c3e`
-> 完成並併入 main；T4-2 的 RUNBOOK「9 個 → 10 個」那句 ✅ 由本次併入的補缺 commit 補上；
-> 只剩 T4-5 ⏳（等 T1／T2 merge 後做）。** 本小節以下的條文是**開工前**寫的，
+> **狀態（2026-09-14 更新）：✅ 全數完成。** T4-1～T4-4、T4-6 由既有分支
+> `claude/unruffled-antonelli-db3c3e`（模板本體 `c79372c`）完成，以 `e66f9e7` 併入、補缺 `2e4d3b9`、
+> merge `9ed2560`（T4-2 的 RUNBOOK「9 個 → 10 個」那句就在補缺 commit 裡）；
+> **T4-5 對 v1 字體字級的回歸＝`50bf2fa`、merge `e52506f`**（sonnet 子代理；demo 的策略句縮成一行以符 rail 容錯，
+> 選測與 demo deck 三份報表重跑綠）。**demo 三場**（不含刻意超量的 `capacity_over` fixture）
+> `visual-frame-audit` **0 blocking、2 advisory**；模板層另有 polish 九項，列在
+> [`KICKOFF-worked-example-template.md`](KICKOFF-worked-example-template.md) §7（並見 §8 backlog ⑦）。
+> **兩條裁決已定：① 單頁容量維持規則 5（步驟 48、答案 62），長解法用 `part:` 分頁、答案框留末頁；
+> ② 正典 §3.1 三題（`ex:3.1`–`ex:3.3`）不遷移。**
+> 本小節以下的條文是**開工前**寫的，
 > 部分敘述（欄位名 `factors:`／`answer:`、reveal id `factor.N`／`answer`）與落地不符——
 > **一律以 §2.5 的回寫框、[`KICKOFF-worked-example-template.md`](KICKOFF-worked-example-template.md)
 > D1–D14 與 §7 為準**，下方逐條已標注。
@@ -561,7 +612,23 @@ severity ∈ {`error`, `warn`}；`make.py` 有 error 即 abort（`--skip-sizeche
   壓測場之外 0 error**（實測 2 error／3 warn 全落在該場）。
   **✅ 併入 main 時複驗：66 份報表逐字相同、`_demo_worked_example` 2 error／3 warn 全在 `capacity_over`。**
 - **DoD：** T4-1 清單交付 ✅、T4-3 綠 ✅、`run_selftests` 全綠（43 支）✅、demo deck mock render 過全部閘 ✅、
-  `visual-frame-audit` 對 demo 幀 0 blocking ⏳（併 T4-5 一起做）、文檔同輪 ✅。
+  `visual-frame-audit` 對 demo 幀 0 blocking ✅（2026-09-14 隨 T4-5 跑，三場 0 blocking／2 advisory）、文檔同輪 ✅。
+
+### T5 — `theorem_proof` 的 PROOF 字卡改獨立 block（本輪臨時收進；派 **opus**）✅
+
+> **狀態（2026-09-14）：✅ 完成，commit `ea5cf47`、merge `44b1b5a`（opus 子代理、worktree、一個 commit）。**
+> **不在原始四項之內**——由 §3.1 里程碑審 session 在看場 09 的幀時發現，屬共用層（`blocks.py`／`scene.py`），
+> 依「凍結後的規則」不能就地在那條線改，故當場收進工具線本輪。
+
+- **缺陷：** `theorem_proof` 的 `proof_label`（PROOF 字卡）原本**折進 `proof.0` 那一列的 anim 裡**，
+  於是**只要 hook 覆寫了該列的 anim，字卡就從未上場**——幀上看得到證明第一行、看不到 PROOF 字卡，
+  而既有的閘一條都不會紅（版面沒變、schema／lint／sizecheck 都不查「某個 block 有沒有真的播出來」）。
+- **機制：** 改成**獨立 Block ＋ `Block.reveal_with`**——`blocks.py` 加 1 個欄位、`scene.py` 6 行，
+  字卡與 `proof.0` **同拍進場**、不再寄生在別人的 anim 上；hook 怎麼覆寫那一列都掉不了。
+- **紅測試：** 新增 `pipeline/_selftest_theorem_proof_label.py`（先紅後綠）。
+- **零行為改變證據：** 23 deck 的 **69 份報表逐字相同**；**場 09 的 after 幀只差字卡那一塊**（逐像素比對）。
+- **改哪些檔：** `pipeline/blocks.py`、`pipeline/scene.py`、`pipeline/_selftest_theorem_proof_label.py`（新）。
+  → **`scene.py` 因此加進「凍結後的規則」的共用層清單**（§1 框、`REBUILD_STATUS.md` 同步）。
 
 ---
 
@@ -630,25 +697,72 @@ severity ∈ {`error`, `warn`}；`make.py` 有 error 即 abort（`--skip-sizeche
 - **9 個既有 `derivation` + `prompt:` 例題場的遷移**（§3.1 四場、§3.2 五場）：
   等 `worked_example` 在一節跑順再議。
 
+### 本輪（2026-09-13～14）做完之後新增的 backlog
+
+> 以下九條都是**本輪落地時查到、但刻意不在本輪修**的（外科手術原則）。認領時各自一個工具線 task。
+
+1. **`\tfrac`／`\frac` 內縮的 floor 盲點。** `sizecheck._effective_font_px` 還原的是 authored px，
+   **看不到 scriptstyle 的內縮係數**，所以「含分數的標籤」的 floor 閘等於不設防——
+   標成 34 px 的 graph 標籤，其分子分母的實效字級可以掉到 26 px 的 floor 以下而一條 warn 都不出。
+   **實例：`squeeze_graph` 的 34 px 標籤，內列量到約 24 px**（T2 的 V4 advisory）。
+2. **`_effective_font_px` 用的是 manim 公開 `font_size` getter，對 `substrings_to_isolate` 節點高估。**
+   `{{}}` 分段與 `meta.color_map` 命中都會走 `substrings_to_isolate`，那些節點的公開 getter 失真，
+   於是 **floor warn 被低報**。T3 為了 L1 已改讀 `_font_size`，**既有的 muted／floor 檢查沒有同步**
+   （外科手術原則，不在 T3 裡順手改）。修它是一個共用層改動，要走工具線、要有全 deck 零行為改變證據。
+3. **bold 標題（Instrument Sans）詞間距偏緊。** T1 之後唯一新增的可見缺點（3 場幀稽核點名）。
+   可在 vendored 的 `.sty` 或 `_bootstrap` 的 preamble 調 `\fontdimen2`（interword space）處理；
+   動它會改所有 bold 標題的 wrap，要重跑 T1-3 的估寬不變式。
+4. **derivation 的結論階 62 把 reason 欄右推、leader 可能只剩兩點。**
+   實例＝`difference_quotient_for_sine`。模板層的修法＝給 leader 設**最少點數**，或給 reason 欄設**最小寬**
+   （目前兩者都沒有，寬度全由結論列剩下多少決定）。
+5. **`ch01_inverse_functions` 的 `invert_a_rational` 結論階 62 出框（1 error）。**
+   變因隔離證實純由 62 造成；主對話裁決 62 不退、修在 deck 側，**已用 `spawn_task` 開成獨立 chip**。
+6. **L4 `layout:` 佔比宣告欄位、M4 ∎ 字形化。** T3 判「只能人審」的兩條（§7「明確不做」也列了）。
+   L4 可自動的只有「宣告了就要跟宣告一致」，但 storyboard 目前沒有這個欄位；
+   M4 是 `brand.glyph("qed")` 的視覺做法問題（現在渲成綠色圓角方框），不是可量的幾何。
+7. **`worked_example` 模板層 polish 九項。** 全部列在
+   [`KICKOFF-worked-example-template.md`](KICKOFF-worked-example-template.md) §7「demo 幀稽核」那段
+   （masthead 細線跨場漂移、兩欄不同起跑線、`check` 的位置與揭示順序、rail ref tag 比它註解的公式搶眼、
+   notes 的 text 欄無共用欄位、垂直超量壓到答案框、續頁下三分之一空置、`caption 30/ink_2` 是 rail 最弱承載字、
+   答案框高度貼合內容）。其中 `caption 30/ink_2` 那條是**共用層 token 的性質**，不是這個模板的私事。
+8. **環境 flake：`latex.exe`／`dvisvgm.exe` 偶發掛死。** 成因＝MiKTeX 的 fndb 被別的 process 鎖住；
+   症狀＝`media/Tex` 不再增長、selftest runner 0 輸出（不是報錯，是靜靜卡住）。
+   **紀律：同一個工作樹絕不並行跑兩個 deck 的報表或 build pass**——`media/Tex` 的競態會偽裝成 `sizecheck` error。
+9. **`_selftest_theorem_regime` 用 `"band" in msg` 撈 finding。** 於是 `sizecheck` 的新訊息**不得含 band 這個字**
+   （T3 已避開），這是一條隱形的耦合。值得改成結構化比對（比對 finding 的 code／severity，而不是訊息字串）。
+
 ---
 
 ## 9. 完成定義（DoD）
 
-1. **四項全部進 `main`**：T1（或 T1 的 no-go 結論＋校準方法留存）、T2、T3、T4 各一個 commit。
-2. **文檔同輪補齊：**
-   - `DESIGN.md`：§Template catalog 加 `worked_example` 一列、§Worked-example 題目結構說明兩者分工、
-     §型階與量測表改成三階、§Text rendering 的字族。
-   - `README.md`：模板段加 `worked_example`、§文字渲染的字族。
-   - `REVIEW_GATES.md` §一 層 6 的 `sizecheck` 列：新規則與 `meta.*_enforce` 旗標。
-   - `ENVIRONMENT.md`／`tools/doctor.py`／`requirements.lock`：**只在真的裝了字型時才動**。
-   - `RUNBOOK-mimo-narration-route.md:67`：9 → 10。
-   - `_audit/design-template-system/README.md`：四項的落地狀態（§7.1 那行「都還沒做」要改）。
-3. **`REBUILD_STATUS.md` 記一條「共用層 v1 凍結」**（日期、四個 commit hash），
+> **逐項結算（2026-09-14）：1 ✅／2 ✅（逐檔核過）／3 ✅（＝本 commit）／4 ⏳（§6 未跑）。**
+
+1. **四項全部進 `main` ✅**：T1（或 T1 的 no-go 結論＋校準方法留存）、T2、T3、T4 各一個 commit。
+   **實際落地＝五個**（＋本輪臨時收進的 T5）：T1 `74b88ca`／merge `edb457c`、T2 `f2b0813`／merge `c9792ea`、
+   T3 `8a81530`／merge `02a22c4`、T4 `c79372c`（經 `e66f9e7`＋`2e4d3b9`／merge `9ed2560`）＋T4-5 `50bf2fa`／merge `e52506f`、
+   T5 `ea5cf47`／merge `44b1b5a`。T1 是 **go**，不是 no-go。
+2. **文檔同輪補齊 ✅（逐檔核過）：**
+   - ✅ `DESIGN.md`：§Template catalog 加 `worked_example` 一列、§Worked-example 題目結構說明兩者分工、
+     §型階與量測表改成三階、§Text rendering 的字族（＋T3 的 §設計系統規則落地）。
+   - ✅ `README.md`：模板段加 `worked_example`、§文字渲染的字族。
+   - ✅ `REVIEW_GATES.md` §一 層 6 的 `sizecheck` 列：新規則與 `meta.*_enforce` 旗標（＋六條的分流表）。
+   - ✅ `ENVIRONMENT.md`／`tools/doctor.py`／`tools/setup.ps1`：**字型真的裝了**（vendored＋MiKTeX 註冊），
+     故 ③／①b 兩節與 `doctor` 的三項檢查都補齊；`requirements.lock` **未動**（無 pip 面的變更）。
+     2026-09-14 收尾另補：③ 與 ①b 的**摘要表兩列**仍寫著 `plex-sans`／「video 不 vendored 任何字型」，
+     與同檔詳節互相矛盾，已一併改成現況。
+   - ✅ `RUNBOOK-mimo-narration-route.md:67`：9 → 10（在 T4 的補缺 commit `2e4d3b9` 裡）。
+   - ✅ `_audit/design-template-system/README.md`：四項落地狀態表全部 ✅＋hash，「已知限制」補五條。
+3. **`REBUILD_STATUS.md` 記一條「共用層 v1 凍結」✅（＝本 commit）**（日期、四個 commit hash），
    並**明文宣告**：凍結後任何共用層改動一律走工具線（§1 的框內規則逐字抄過去）。
-4. **驗收數字**：`run_selftests` 全綠（預期 **45 支＝43（已含 T4 的 `_selftest_worked_example`）＋T1＋T3**）、
+   實際記的是**五個 task**（T5 臨時收進），且共用層清單**加了 `pipeline/scene.py`**。
+4. **驗收數字 ⏳**：`run_selftests` 全綠（預期 **45 支＝43（已含 T4 的 `_selftest_worked_example`）＋T1＋T3**）、
    `doctor --smoke` 9/9、**23 deck `sizecheck`：正典 deck 0 error；`_demo_*` 壓測 fixture
    （含 `_demo_worked_example` 的 `capacity_over`）的刻意 error 與 Phase 0 基線逐字相同**、
    `[sync]` 0、`[still-gate]` PASS、`visual-frame-audit` 21 場 0 blocking、人閘通過。
+   **現況：`run_selftests` 實際 46 支**（預期的 45 ＋ T5 的 `_selftest_theorem_proof_label`）、回歸 deck 23 個；
+   **§6 的驗收迴圈尚未跑**——`[sync]`／`[still-gate]`／21 場幀稽核／人閘四項，
+   **待 §3.1 里程碑審 session 把 must 修正併進 main 後執行，結果另補一段**。
+   **已知未收乾淨的一項＝`ch01_inverse_functions` 的 `invert_a_rational` 1 error**（§8 backlog ⑤，已開 chip）。
 
 ### 預估（工時／render 次數）
 
