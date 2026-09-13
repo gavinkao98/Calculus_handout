@@ -31,3 +31,4 @@ A–D 各自 commit 合進 main、`run_selftests` 全綠、`doctor --smoke` 與 
 ## 4. 結果
 
 （執行中，2026-09-13）A 色軸 ✅ `c5dd432`→再裁 θ 紫 ✅ `5fd41c8`；B prose θ ✅ `24536f9`；C seg_roles proof ✅ `44ed099`；D 23 彈簧 ✅ `ff8c3d1`（＋拿掉 23 的 indicate，`54e2008`）；另一 session：09 ✅ `3621597`、pack fine 定位 ✅ `e2a29de`；04 覆蓋層（Opus）✅ `e308588`（25.8→7.5 s）。main 閘：selftest 40/40、schema OK、sizecheck 0 error。合併版 render ✅（另一 session）：21 場 fine 最長靜止全 ≤ 12 s；視覺閘 1 blocking（09 標籤重疊，另一 session 修）／advisory 9；R2 good 7／ok 13／weak 7、must 2（06／09，另一 session）。報告 `REVIEW-ch03_s31-round18-dispatch.html`。
+第二次合併（⑲）：視覺 blocking 0、R2 good 6／ok 13／weak 8／must 5（Task D 拉長旁白的畫面缺口）；機制修正四件合入（hooks `_spent`、critic `--out`、tts reuse key、focus 還原順序）。⑳＝03／13／17 Opus hook＋12／24 另一 session。
