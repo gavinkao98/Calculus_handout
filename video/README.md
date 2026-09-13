@@ -148,6 +148,9 @@ kickoff [KICKOFF-motion-language-gaps.md](KICKOFF-motion-language-gaps.md)）：
   `paced:` 裡的 transform／cancel 列 morph 後把 leader／理由逐段鋪在拍子剩餘時間；固定長度的 callable 掛
   `fixed_seconds` 讓 `[stillness]` 看得見；`proof[]` 收 `{tex, anim: transform, frame}` dict 列（規則 2、4）。
 
+五輪（rollout，[KICKOFF-motion-language-rollout.md](KICKOFF-motion-language-rollout.md) T2）：**`seg_roles`**
+（`derivation` 列）——`{{…}}` 段整段上 palette role，段色蓋過段內 token 色表，讓式子的一項與圖上一塊同色（規則 5）。
+
 目前生效的設計決策：
 
 - intro/outro 使用淺色紙張底；教學場景使用暗色藍圖底。

@@ -11,6 +11,7 @@ from pipeline import _bootstrap
 
 _bootstrap.bootstrap()   # derivation imports manim at module level -- bootstrap FIRST
 
+import numpy as np
 from manim import (Create, FadeOut, MathTex, SurroundingRectangle, TransformMatchingShapes,
                    TransformMatchingTex)
 
@@ -83,7 +84,7 @@ def test_segments_and_the_colour_table_nest():
 
 # -- derivation rows -----------------------------------------------------------
 
-def _spec(*, seg: bool, anim1="transform", frame=False, cancel=None):
+def _spec(*, seg: bool, anim1="transform", frame=False, cancel=None, seg_roles=None):
     def s(t):
         return t if seg else t.replace("{{", "").replace("}}", "")
     step1 = {"math": s(r"{{\lim_{h\to 0}}} {{\frac{h}{h}}} \cdot {{(1+h)}}"), "reason": "factor",
@@ -92,6 +93,8 @@ def _spec(*, seg: bool, anim1="transform", frame=False, cancel=None):
         step1["frame"] = True
     if cancel is not None:
         step1["cancel"] = cancel
+    if seg_roles is not None:
+        step1["seg_roles"] = seg_roles
     return {"id": "der", "kind": "content", "template": "derivation", "accent": "example",
             "title": "T", "say": "A. {show step.0} B. {show step.1} C. {show result} D.",
             "steps": [{"math": s(r"{{\lim_{h\to 0}}} {{\frac{h + h^2}{h}}}"), "reason": "start"},
@@ -236,6 +239,98 @@ def test_back_compat_lines_accept_cancel_and_frame():
     assert callable(block.anim) and block.anim_seconds == 1.6
 
 
+# -- seg_roles: a whole segment in one role colour (rollout T2-1; SPEC rule 5) -------
+
+def _hex(mob) -> str:
+    """The RENDERED colour: that of the first family member with points (a MathTexPart
+    wrapper has no points of its own and keeps the default white attribute)."""
+    pts = mob.family_members_with_points()
+    return str((pts[0] if pts else mob).get_color()).lower()
+
+
+def _leaf_colours(mob) -> "list[str]":
+    return [str(p.get_color()).lower() for p in mob.family_members_with_points()]
+
+
+def _c(role: str) -> str:
+    return T.color("dark", role).lower()
+
+
+def test_seg_roles_colour_the_named_segments_whole_and_leave_the_rest():
+    brand.set_color_map(None)
+    m = brand.math_line(r"{{a}} = {{b}}", "dark", seg_roles={"a": "secondary", "b": "success"})
+    assert [_hex(s) for s in m.submobjects] == [_c("secondary"), _c("math"), _c("success")]
+    # a key is the segment's tex stripped; whitespace around the key itself is forgiven
+    m2 = brand.math_line(r"{{ a }} = {{ b }}", "dark", seg_roles={" a ": "secondary"})
+    assert [_hex(s) for s in m2.submobjects] == [_c("secondary"), _c("math"), _c("math")]
+    # the $...$ form takes it too; a line without {{...}} ignores it (schema rejects that)
+    m3 = brand.math_line(r"${{a}} = {{b}}$", "dark", seg_roles={"b": "accent"})
+    assert _hex(m3.submobjects[2]) == _c("accent")
+    plain = brand.math_line("a = b", "dark", seg_roles={"a = b": "success"})
+    assert _hex(plain) == _c("math")
+
+
+def test_a_segment_colour_covers_the_token_table_inside_it():
+    """The author's segment is the semantic unit: its role wins over meta.color_map on a
+    token inside it; the same token in an un-named segment keeps its table colour."""
+    brand.set_color_map({"h": "caution"})
+    try:
+        m = brand.math_line(r"{{\sin(x+h)}} = {{2\cos(x+h/2)}}", "dark",
+                            seg_roles={r"\sin(x+h)": "secondary"})
+    finally:
+        brand.set_color_map(None)
+    assert [s.tex_string for s in m.submobjects] == [r"\sin(x+h)", "=", r"2\cos(x+h/2)"]
+    assert set(_leaf_colours(m.submobjects[0])) == {_c("secondary")}, _leaf_colours(m.submobjects[0])
+    rest = _leaf_colours(m.submobjects[2])
+    assert _c("caution") in rest and _c("secondary") not in rest, rest
+
+
+def test_seg_roles_do_not_move_a_glyph():
+    """Geometry parity: with and without seg_roles every glyph sits at the same place --
+    colour is the only thing that changes (brand level, then through a derivation row)."""
+    brand.set_color_map({"h": "caution"})
+    try:
+        plain = brand.math_line(r"{{\sin(x+h)}} = {{2\cos(x+h/2)}}", "dark")
+        tinted = brand.math_line(r"{{\sin(x+h)}} = {{2\cos(x+h/2)}}", "dark",
+                                 seg_roles={r"\sin(x+h)": "secondary", "=": "accent"})
+    finally:
+        brand.set_color_map(None)
+    a, b = plain.family_members_with_points(), tinted.family_members_with_points()
+    assert len(a) == len(b) > 1
+    for pa, pb in zip(a, b):
+        assert np.allclose(pa.points, pb.points, atol=1e-9)
+    roles = {r"\lim_{h\to 0}": "secondary", r"(1+h)": "success"}
+    ref = D._eq_core(_b(_blocks(seg=True), "step.1").mobject)
+    eq = D._eq_core(_b(_blocks(seg=True, seg_roles=roles), "step.1").mobject)
+    a, b = ref.family_members_with_points(), eq.family_members_with_points()
+    assert len(a) == len(b) > 1
+    for pa, pb in zip(a, b):
+        assert np.allclose(pa.points, pb.points, atol=1e-9)
+
+
+def test_derivation_rows_carry_seg_roles_to_the_equation():
+    roles = {r"\lim_{h\to 0}": "secondary", r"(1+h)": "success"}
+    eq = D._eq_core(_b(_blocks(seg=True, seg_roles=roles), "step.1").mobject)
+    assert [s.tex_string for s in eq.submobjects] == [r"\lim_{h\to 0}", r"\frac{h}{h}", r"\cdot", "(1+h)"]
+    assert [_hex(s) for s in eq.submobjects] == \
+        [_c("secondary"), _c("primary"), _c("primary"), _c("success")]
+    spec = {"id": "der3", "kind": "content", "template": "derivation", "accent": "example",
+            "title": "T", "say": "A. {show step.0} B. {show result} C. {show check} D.",
+            "steps": [{"math": r"{{a}} + {{b}}"}],
+            "result": {"math": r"{{a}} = {{c}}", "seg_roles": {"c": "success"}},
+            "check": {"math": r"{{c}} \ge 0", "seg_roles": {"c": "success"}}}
+    blocks = build_blocks(spec, {"ground": "dark", "meta": _META})
+    for bid in ("result", "check"):
+        eq = D._eq_core(_b(blocks, bid).mobject)
+        hit = [s for s in eq.submobjects if s.tex_string == "c"]
+        assert hit and _hex(hit[0]) == _c("success"), bid
+    lines = {"id": "der4", "kind": "content", "template": "derivation", "accent": "example",
+             "title": "T", "say": "A. {show line.0} B.",
+             "lines": [{"tex": r"{{a}} + {{b}}", "seg_roles": {"b": "accent"}}]}
+    eq = D._eq_core(_b(build_blocks(lines, {"ground": "dark", "meta": _META}), "line.0").mobject)
+    assert [_hex(s) for s in eq.submobjects] == [_c("primary"), _c("primary"), _c("accent")]
+
+
 # -- schema --------------------------------------------------------------------
 
 def _errs(scene):
@@ -289,6 +384,46 @@ def test_schema_storyboard_carries_the_row_check():
                         "steps": [{"math": "{{a}} + {{b}}"},
                                   {"math": "a", "anim": "cancel", "cancel": [5]}]}]}
     assert any(sev == "error" and "cancel[5]" in m for sev, m in S.schema_storyboard(data))
+
+
+def _sr_errs(scene):
+    scene = {"template": "derivation", **scene}
+    return [m for sev, m in S._seg_roles_issues("s1", scene) if sev == "error"]
+
+
+def test_schema_accepts_well_formed_seg_roles_on_every_row_kind():
+    assert _sr_errs({"steps": [{"math": "{{a}} + {{b}}", "seg_roles": {"a": "secondary"}}],
+                     "result": {"math": "{{a}} = {{c}}", "seg_roles": {" c ": "success"}},
+                     "check": {"math": "{{c}} \\ge 0", "seg_roles": {"c": "success"}}}) == []
+    assert _sr_errs({"lines": ["{{a}} + {{b}}", {"tex": "{{a}}", "seg_roles": {"a": "accent"}}]}) == []
+    assert _sr_errs({"steps": [{"math": "a + b"}, {"math": "{{a}}", "anim": "transform"}]}) == []
+
+
+def test_schema_rejects_seg_roles_on_a_row_without_segments():
+    errs = _sr_errs({"steps": [{"math": "a + b", "seg_roles": {"a": "secondary"}}]})
+    assert len(errs) == 1 and "no {{...}} segments" in errs[0], errs
+
+
+def test_schema_rejects_a_key_that_matches_no_segment():
+    errs = _sr_errs({"steps": [{"math": "{{a}} + {{b}}", "seg_roles": {"a + b": "secondary"}}]})
+    assert len(errs) == 1 and "matches no segment" in errs[0] and "'a + b'" in errs[0], errs
+
+
+def test_schema_rejects_a_role_that_is_not_a_palette_role():
+    errs = _sr_errs({"result": {"math": "{{a}} = {{b}}", "seg_roles": {"b": "greenish"}}})
+    assert len(errs) == 1 and "not a palette role" in errs[0], errs
+    errs = _sr_errs({"steps": [{"math": "{{a}} + {{b}}", "seg_roles": ["a"]}]})
+    assert len(errs) == 1 and "mapping" in errs[0], errs
+
+
+def test_schema_seg_roles_is_silent_elsewhere_and_carried_by_the_storyboard_check():
+    assert S._seg_roles_issues("s1", {"template": "theorem_proof",
+                                      "steps": [{"math": "a", "seg_roles": {"a": "x"}}]}) == []
+    data = {"meta": {"id": "d", "section": "1.1"},
+            "scenes": [{"id": "s", "kind": "content", "template": "derivation",
+                        "say": "A {show step.0}",
+                        "steps": [{"math": "{{a}} + {{b}}", "seg_roles": {"z": "secondary"}}]}]}
+    assert any(sev == "error" and "seg_roles['z']" in m for sev, m in S.schema_storyboard(data))
 
 
 if __name__ == "__main__":

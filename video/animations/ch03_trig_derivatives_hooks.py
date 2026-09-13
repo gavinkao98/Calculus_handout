@@ -33,6 +33,7 @@ from manim import (
     AnnularSector,
     Arc,
     Axes,
+    BackgroundRectangle,
     Circle,
     Create,
     DashedLine,
@@ -162,7 +163,9 @@ def sector_inequality(spec, ctx, blocks):
     dots = VGroup(*[Dot(p, radius=0.045, color=text) for p in (O, A, B, C)])
     lO = MathTex("O", color=text, font_size=T.fs("label")).next_to(O, DL, buff=0.10)
     lA = MathTex("A", color=text, font_size=T.fs("label")).next_to(A, DR, buff=0.08)
-    lB = MathTex("B", color=text, font_size=T.fs("label")).next_to(B, UL, buff=0.06)
+    # B's label goes UL of B -- above the OC line, the one direction with no fill under it --
+    # and far enough out (0.14, was 0.06) that it no longer reads as painted on the arc (R2).
+    lB = MathTex("B", color=text, font_size=T.fs("label")).next_to(B, UL, buff=0.14)
     lC = MathTex("C", color=text, font_size=T.fs("label")).next_to(C, RIGHT, buff=0.10)
     arc_th = Arc(radius=0.34, start_angle=0.0, angle=th, arc_center=O,
                  color=text, stroke_width=2.0)
@@ -263,15 +266,32 @@ def sector_inequality(spec, ctx, blocks):
     dst3 = _slot(O3, _tri(O3, C_off, green, 0.40, 2),
                  r"\tfrac12\tan\theta", "success", 3, green)
 
+    # the three terms in the three regions' colours (SPEC rule 5 "same quantity, same
+    # colour"; rollout T2-2): each `{{...}}` segment is one term and seg_roles paints it
+    # whole -- over the deck's theta token colour -- so a term reads as ONE tinted unit
+    # matching the shape above it, instead of the chain falling back to white.
     ineq = brand.math_line(
-        r"\tfrac12\sin\theta \;\le\; \tfrac12\theta \;\le\; \tfrac12\tan\theta",
-        ground, role="text", size="math_sm")
+        r"{{\tfrac12\sin\theta}} \;\le\; {{\tfrac12\theta}} \;\le\; {{\tfrac12\tan\theta}}",
+        ground, role="text", size="math_sm",
+        seg_roles={r"\tfrac12\sin\theta": "secondary", r"\tfrac12\theta": "accent",
+                   r"\tfrac12\tan\theta": "success"})
     row = VGroup(dst1, dst2, dst3)
     ineq.next_to(row, DOWN, buff=0.55)
 
     full = VGroup(scaffold, src_inner, src_sector, src_outer,
                   chip_inner, chip_sector, chip_outer, dst1, dst2, dst3, ineq)
     _centre_in_zone(title, full)
+
+    # legibility pads under the three dimension labels that land on the 0.88-opaque fills
+    # (theta on amber, sin theta on blue, tan theta on green: 1.1-1.5:1 contrast, A6). A
+    # bg-coloured BackgroundRectangle goes into the label's own stage group right before the
+    # label (same z-index 5 -> drawn under it, revealed with it). Built AFTER _centre_in_zone
+    # so a pad can never move the figure: `full` is already placed (its centre measured
+    # unchanged before/after, 2026-09-13).
+    for stage, label in ((stage_frame, lth), (stage_frame, l_sin), (stage_apex, l_tan)):
+        pad = BackgroundRectangle(label, color=T.color(ground, "bg"), fill_opacity=0.72,
+                                  buff=0.04).set_z_index(5)
+        stage.insert(stage.submobjects.index(label), pad)
 
     # -- the evenness aside (beat 0, stage 2; motion primitives 6 + 3) ------------
     # 19 seconds of narration explaining that sin(theta)/theta is EVEN used to play over a
