@@ -363,7 +363,7 @@ def slope_equals_height(spec, ctx, blocks):
     ids = _by_id(blocks)
     axes = ids["axes"].mobject
 
-    amber = T.color(ground, "accent")
+    blue = T.color(ground, "secondary")
     green = T.color(ground, "success")
     mut = T.color(ground, "muted")
 
@@ -383,7 +383,13 @@ def slope_equals_height(spec, ctx, blocks):
         p = axes.c2p(xv, 0.0)
         if draw_tick:
             xticks.add(Line(p + 0.09 * UP, p + 0.09 * DOWN, color=mut, stroke_width=2.0))
-        xticks.add(MathTex(xlab, color=mut, font_size=T.fs("label")).next_to(p, DOWN, buff=0.20))
+        t = MathTex(xlab, color=mut, font_size=T.fs("label")).next_to(p, DOWN, buff=0.20)
+        if xv == 0.0:
+            # the origin's label sits under the y-AXIS, which then runs straight through
+            # the glyph. Slide it clear -- to the RIGHT, not to the usual left: the m=1
+            # tangent leaves the origin down-to-the-left and crosses that spot instead.
+            t.shift(0.26 * RIGHT)
+        xticks.add(t)
 
     # Screen length, not data-space half-width, is held fixed across the three
     # tangents: at this axes' aspect ratio a slope-0 segment of the old fixed
@@ -395,6 +401,13 @@ def slope_equals_height(spec, ctx, blocks):
     x_scale = axes.x_axis.get_unit_size()
     y_scale = axes.y_axis.get_unit_size()
 
+    # The slope label goes PERPENDICULAR to its own tangent, on the side the sine curve is
+    # not (sine is concave here, so that is always the upper side). Straight up/down put
+    # m=1 on top of the y-axis and stacked m=-1 under the pi tick; perpendicular also
+    # spaces the three labels the way the three tangents are angled, so each one reads as
+    # belonging to its segment (2026-09-13 visual audit).
+    LABEL_OFF = 0.95
+
     def tangent(x0, slope):
         dir_len = np.hypot(x_scale, slope * y_scale)
         d = TARGET_LEN / (2.0 * dir_len)
@@ -404,7 +417,8 @@ def slope_equals_height(spec, ctx, blocks):
         lab = brand.math_line("m=%s" % ("1" if slope == 1 else "0" if slope == 0 else "-1"),
                               ground, role="success", size="label")
         anchor = axes.c2p(x0, np.sin(x0))
-        lab.move_to(anchor + (0.62 * UP if slope >= 0 else 0.62 * DOWN))
+        normal = np.array([-slope * y_scale, x_scale, 0.0]) / dir_len   # y-component > 0
+        lab.move_to(anchor + LABEL_OFF * normal)
         return VGroup(seg, lab)
 
     tan_0 = tangent(0.0, 1.0)
@@ -427,15 +441,19 @@ def slope_equals_height(spec, ctx, blocks):
         v_hat = v / np.linalg.norm(v)
         connector = DashedLine(sin_pt + gap * v_hat, cos_pt - gap * v_hat,
                                color=mut, stroke_width=1.6, dash_length=0.07)
-        dot = Dot(cos_pt, radius=DOT_R, color=amber)
-        ml = brand.math_line(lab, ground, role="accent", size="label")
-        if x0 == 0.0:
-            # this dot sits ON the y-axis; a centred label above it would have
-            # the axis line run straight through the text, so offset sideways
-            # (up and clear to the right) instead of stacking straight up.
+        # The read-off dot and its label take the COSINE curve's own colour: they report
+        # cosine's heights, and wearing sine's amber made one hue mean two functions
+        # (2026-09-13 visual audit; SPEC-motion-language 規則 5). Blue is already cosine
+        # in shm_stacked_graphs, so the section now says cosine the same way three times.
+        dot = Dot(cos_pt, radius=DOT_R, color=blue)
+        ml = brand.math_line(lab, ground, role="secondary", size="label")
+        if h == 0.0 or x0 == 0.0:
+            # this dot sits ON an axis (x=0 -> the y-axis; cos x0 = 0 -> the x-axis, where
+            # the cosine curve also crosses); a label stacked straight above it would have
+            # a line run through the text, so offset diagonally into the clear quadrant.
             ml.next_to(dot, UP + RIGHT, buff=0.12)
         else:
-            ml.next_to(dot, UP if h >= 0 else DOWN, buff=0.14)
+            ml.next_to(dot, UP if h > 0 else DOWN, buff=0.14)
         cos_dots.add(VGroup(connector, dot, ml))
 
     out = list(blocks)

@@ -133,11 +133,17 @@ def _axis_ticks(axes: Axes, ac: dict[str, Any], ground: str, plots: list[dict] |
 
 def _add_axis_labels(axes: Axes, ground: str, ac: dict[str, Any]) -> None:
     """Add x/y axis labels near the tips — standard math convention.
-    Disable per-scene with ``axis_labels: false`` in the YAML axes block."""
+
+    The letters default to x/y but are per-scene overridable with ``x_label``/``y_label``
+    in the YAML axes block: a scene whose narration, curve labels and captions all say
+    $\\theta$ must not label its own axis $x$ (2026-09-13 visual audit, squeeze_graph).
+    They go through ``brand.math_line`` like every other formula, so a variable in
+    ``meta.color_map`` is tinted on the axis too. Disable both with ``axis_labels: false``.
+    """
     if ac.get("axis_labels") is False:
         return
-    x_lab = brand.math_line("x", ground, role="text", size="math_sm")
-    y_lab = brand.math_line("y", ground, role="text", size="math_sm")
+    x_lab = brand.math_line(str(ac.get("x_label", "x")), ground, role="text", size="math_sm")
+    y_lab = brand.math_line(str(ac.get("y_label", "y")), ground, role="text", size="math_sm")
     x_lab.next_to(axes.x_axis.get_right(), DOWN, buff=0.1)
     y_lab.next_to(axes.y_axis.get_top(), LEFT, buff=0.1)
     axes.add(x_lab, y_lab)

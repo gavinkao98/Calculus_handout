@@ -365,14 +365,20 @@ scenes:
     axes:
       x_range: [-1.85, 1.85, 0.5]
       y_range: [0, 1.18, 0.5]
-      y_ticks: [{ at: 1, label: "$1$" }]
+      # y 刻度「1」拿掉：它落在 (0,1)，而三條曲線都在那裡收攏，任何放在該高度的字都會被曲線穿過
+      # （量測：746 點落在框內）。同一個「1」已由常數線自己的標籤講了一次，重複且更清楚。
       x_ticks: [{ at: 1.5708, label: "$\\tfrac{\\pi}{2}$" }, { at: -1.5708, label: "$-\\tfrac{\\pi}{2}$" }]
       x_length: 6.4
       y_length: 3.6
+      x_label: "\\theta"      # 旁白、兩條曲線標籤與 caption 全用 θ，軸標不可獨自寫 x（2026-09-13 視覺稽核）
+    # 色軸（規則 5）：cos 由 muted 升為 secondary，與場 18／24 的 cos 同色；常數 1 是參考線，降為 muted。
+    # 原本 cos 灰、常數線藍，等於「會動的那條」比「不動的那條」還不顯眼。
     plots:
-      - { kind: function, expression: "cos(x)", x_range: [-1.5708, 1.5708], color_role: muted, dashed: true, label: "$\\cos\\theta$", reveal: true }
-      - { kind: line, start: [-1.72, 1], end: [1.72, 1], color_role: secondary, label: "$1$", label_point: [1.15, 1.08], reveal: true }
-      - { kind: function, expression: "sin(x)/x", x_range: [-1.72, 1.72], color_role: accent, label: "$\\tfrac{\\sin\\theta}{\\theta}$", label_point: [-0.72, 1.06], reveal: true }
+      # label_point 補上：原本無指定＝貼在曲線端點上，標籤被自己的曲線穿過（量測 716 點落在框內）。
+      - { kind: function, expression: "cos(x)", x_range: [-1.5708, 1.5708], color_role: secondary, dashed: true, label: "$\\cos\\theta$", label_point: [-0.98, 0.40], reveal: true }
+      - { kind: line, start: [-1.72, 1], end: [1.72, 1], color_role: muted, label: "$1$", label_point: [1.15, 1.08], reveal: true }
+      # 1.06 → 0.865：原位置的標籤下緣壓在 y=1 那條常數線上（它橫跨整個 x 範圍，只能往下閃）。
+      - { kind: function, expression: "sin(x)/x", x_range: [-1.72, 1.72], color_role: accent, label: "$\\tfrac{\\sin\\theta}{\\theta}$", label_point: [-1.52, 0.865], reveal: true }
       - { kind: point, point: [0, 1], hollow: true, hollow_reason: "ratio undefined at theta=0 (0/0)", color_role: accent, reveal: true }
       # the cursor the narration describes: it walks theta in toward zero, dragging a dot
       # on each of the three curves and shading the gap it closes. x_to is a hair off zero
@@ -557,8 +563,12 @@ scenes:
       x_length: 7.2
       y_length: 4.0
     plots:
-      - { kind: function, expression: "sin(x)", x_range: [0, 3.3], color_role: accent, label: "$y=\\sin x$", label_point: [1.4, 1.12], reveal: true }
-      - { kind: function, expression: "cos(x)", x_range: [0, 3.3], color_role: muted, dashed: true, label: "$y=\\cos x$", label_point: [2.95, 1.05], reveal: true }
+      # 色軸（規則 5）：amber＝sine、blue＝cosine（與場 24 的 s'=\\cos t 同色）、green＝斜率。
+      # cos 原為 muted 灰虛線，但讀數點與讀數標籤卻是 amber——同一個橘同時代表 sin 曲線與 cos 的值
+      # （2026-09-13 視覺稽核）。cos 升為 secondary 後，hook 的讀數點／標籤跟著同色。
+      # label_point 1.4→0.95：原位置壓在自己的曲線頂與 m=0 切線上（量測：曲線 3105 點落在標籤框內）。
+      - { kind: function, expression: "sin(x)", x_range: [0, 3.3], color_role: accent, label: "$y=\\sin x$", label_point: [0.95, 1.24], reveal: true }
+      - { kind: function, expression: "cos(x)", x_range: [0, 3.3], color_role: secondary, dashed: true, label: "$y=\\cos x$", label_point: [2.95, 1.05], reveal: true }
 
   # 18 -------------------------------------- Remark 3.1: the four-step derivative cycle
   - id: derivative_cycle

@@ -58,6 +58,9 @@ from ._common import (scene_head, example_head, motif_corner, place_body, body_z
 
 _ROW_GAP = 0.40       # between rows (min pitch; expands for tall rows)
 MIN_PITCH = _ROW_GAP  # tightest inter-row gap -- sizecheck's split-capacity trigger reads this
+LEAD_PAD_L = 0.22     # clear space between an equation's right edge and its leader
+LEAD_PAD_R = 0.18     # ... and between the leader and the reason column
+MIN_LEADER = 0.55     # shortest leader that still reads as a connector (~74 px at 1080p)
 _REASON_PX = T._SCALE_PX["prose_sm"]   # 一般 reason 的 authored px（A/B 開放值：35 或 38）
 
 
@@ -305,7 +308,20 @@ def build(spec: dict[str, Any], ctx: dict[str, Any]) -> list[Block]:
     # the link always reads. eq_col_w now only guards the rare chain wide enough to
     # reach the rail -- then that row's leader is skipped.
     eq_col_w = max((e.width for e in eqs), default=0.0)
+    # A chain that reaches the rail used to lose its leader (the `> 0.12` skip below) and
+    # the tag then read as glued to the equation's tail -- 30 px of clear space on
+    # difference_quotient_for_sine's result row, 16 px on companion_limit's first step
+    # (2026-09-13 visual audit). So the rail SHIFTS RIGHT, scene-wide, by just enough to
+    # keep a readable leader on the widest row; a column that stayed straight while its
+    # connector vanished was the actual defect, not the column's x. Capped at
+    # the widest reason's own width so the column can never be starved into shrinking its
+    # text (the tags are already the smallest type in the frame); rows narrower than the
+    # widest just get a longer leader, as before.
     reason_x = RAIL_X
+    widest_reason = max((r.width for r in reasons if r is not None), default=0.0)
+    if widest_reason > 0:
+        need = left_x + eq_col_w + LEAD_PAD_L + MIN_LEADER + LEAD_PAD_R
+        reason_x = max(RAIL_X, min(need, (SPINE_X + CONTENT_W) - widest_reason))
     reason_max_w = (SPINE_X + CONTENT_W) - reason_x
 
     # pre-pass: clamp reason widths, collect row heights (needed to size the chain to
@@ -346,8 +362,8 @@ def build(spec: dict[str, Any], ctx: dict[str, Any]) -> list[Block]:
             # (was a fixed 0.67u stub anchored to the floating rail). A chain wide
             # enough to reach the rail leaves no room -> skip the leader, keep the link
             # implicit by row alignment. opacity 0.6/0.7 (Codex read 0.5/0.55 too faint).
-            lead_start = eq.get_right()[0] + 0.22
-            lead_end = reason_x - 0.18
+            lead_start = eq.get_right()[0] + LEAD_PAD_L
+            lead_end = reason_x - LEAD_PAD_R
             if lead_end - lead_start > 0.12:
                 leader = brand.dotted_leader(
                     lead_end - lead_start, ground,
