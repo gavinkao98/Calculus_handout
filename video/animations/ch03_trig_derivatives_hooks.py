@@ -41,6 +41,7 @@ from manim import (
     Dot,
     FadeIn,
     FadeOut,
+    Indicate,
     Line,
     MathTex,
     Polygon,
@@ -1582,6 +1583,48 @@ def cosine_identity_draft(spec, ctx, blocks):
 # half and CANCELS the h on screen, so the trig row that follows (math.0, already there,
 # already ending in 0/0) reads as the contrast it is meant to be. Same device as hook 7's
 # step.2: the line the narration describes, morphed into the line it becomes.
+#
+# R2 director lens, round 19 (a `must` on the rerun, rule ML2): the exhibit filled the empty
+# half but did not settle the argument. "本場的全部命題就是『代數在這裡失效』…多項式那行用動作
+# 演出了『成功』（h 被消掉），sine 那行卻沒有演出對應的『失敗』" -- math.0 was still written out
+# and held, so the contrast the whole scene exists for lived only in the narration and a first
+# learner saw two similar-looking formulas. So beat 3 (`{show math.0}`, 19.2 s) now TRIES the
+# polynomial's move on the sine quotient and fails at it, in three stages cut to that beat's
+# own words:
+#   A  "…and try the usual move"       quotient written; the numerator is framed as the place
+#                                      to search and the denominator h flashes caution
+#   B  "You cannot simply set h=0"     the h=0 arrow is written; the 0/0 it lands on arrives
+#                                      in caution and settles back to ink on "tells you nothing"
+#   C  "no identity cancels the h"     a caution copy of that h lifts out of the denominator,
+#                                      scans the whole numerator for a partner, takes a cross,
+#                                      and DROPS BACK unchanged -- the cancellation the
+#                                      polynomial row got and this one does not.
+# Caution red is the failure mark only; the semantic axis (blue cos / amber sin / green slope /
+# purple theta) is not borrowed for it. The beat's last frame is math.0 exactly as the template
+# built it -- same tex, same place, same ink -- so sizecheck and the visual gate see what they
+# saw before.
+
+# The choreography has to address four pieces of math.0, which the template builds as ONE
+# MathTex. The cuts are the motion language's `{{...}}` segments (DESIGN.md「{{…}} 分段」;
+# geometry is byte-identical, re-probed on this line at 0.0 max point difference), and they are
+# derived from the storyboard string by replacing the two separators it already contains --
+# the tex is never retyped here, so a storyboard edit flows through, and a line that lost those
+# separators builds one part and fails loudly on the unpack instead of quietly showing the
+# hook's own idea of the formula.
+_M0_ARROW = r"\ \xrightarrow{\ h=0\ }\ "
+# The arrow segment ends in `\ ` and split_segments strips each segment -- which would eat the
+# space and leave a dangling backslash. `{\ }` is the same glue, safe inside a group.
+_M0_ARROW_SEG = r"{{\ \xrightarrow{\ h=0\ }{\ }}}"
+
+
+def _segment_math0(tex: str) -> str:
+    """math.0 cut into `quotient | h=0 arrow | 0/0 | (indeterminate)`."""
+    body = tex.strip()
+    if body.startswith("$") and body.endswith("$"):
+        body = body[1:-1]
+    body = body.replace(_M0_ARROW, "}} " + _M0_ARROW_SEG + " {{")
+    body = body.replace(r"\quad(", "}} {{" + r"\quad(")
+    return "{{" + body + "}}"
 
 
 def why_trig_is_different(spec, ctx, blocks):
@@ -1624,6 +1667,88 @@ def why_trig_is_different(spec, ctx, blocks):
         return _spent(scene, t0, total)
 
     out.append(Block("cancels", body, anim=_cancels_anim, static=False))
+
+    # ---- math.0: try the same move on sine, and fail at it (R2 round 19, ML2) ----------
+    m0 = ids["math.0"]
+    line = brand.math_line(_segment_math0(spec["math"][0]), ground, role="primary")
+    line.move_to(m0.mobject.get_center())
+    quotient, arrow, zero_over_zero, indeterminate = line.submobjects
+
+    # Inside the quotient: the fraction rule is the one glyph that spans the whole row, the
+    # denominator h is the only thing under it, the numerator is everything above it.
+    q_glyphs = quotient.family_members_with_points()
+    rule = max(q_glyphs, key=lambda g: g.width)
+    den_h = min(q_glyphs, key=lambda g: g.get_center()[1])
+    numer = VGroup(*[g for g in q_glyphs if g.get_center()[1] > rule.get_center()[1]])
+
+    caution = T.color(ground, "caution_ink")
+    ink = T.color(ground, "primary")
+    LIFT = 1.3          # the probe h grows while it is out hunting, so a single glyph on
+                        # its own above the line still reads at 1080p
+    hunt = SurroundingRectangle(numer, color=T.color(ground, "hairline_strong"),
+                                buff=0.08, stroke_width=1.6)
+
+    def _quotient_anim(scene, mob, _ground) -> float:
+        """Write the sine quotient, then attempt the polynomial's cancellation on it."""
+        total = TM.beat_run_time(scene, 16.0)
+        t0 = _elapsed(scene)
+
+        def hold(frac: float) -> None:
+            """Wait until *frac* of the beat has gone by -- scheduled against the renderer's
+            own clock, so a play that ran a frame long does not push every later stage off
+            the word it was cut to. A stage that already used up its share waits not at all
+            (manim refuses a wait of 0)."""
+            left = frac * total - (_elapsed(scene) - t0)
+            if left > 1e-3:
+                scene.wait(left)
+
+        # A  "Write down the difference quotient for sin x | and try the usual move"
+        scene.play(Write(quotient), run_time=0.12 * total)
+        hold(0.12)
+        scene.play(Create(hunt), Indicate(den_h, color=caution, scale_factor=1.4),
+                   run_time=0.05 * total)
+        hold(0.21)
+
+        # B  "You cannot simply set h=0 | that gives 0/0 | which tells you nothing"
+        scene.play(FadeOut(hunt), Write(arrow), run_time=0.075 * total)
+        hold(0.35)
+        zero_over_zero.set_color(caution)
+        scene.play(FadeIn(zero_over_zero, scale=1.3), run_time=0.05 * total)
+        hold(0.46)
+        scene.play(zero_over_zero.animate.set_color(ink), FadeIn(indeterminate),
+                   run_time=0.05 * total)
+        hold(0.53)
+
+        # C  "And no identity cancels the h | in the denominator | sin(x+h) simply does not
+        #     break into pieces that conveniently subtract"
+        probe = den_h.copy().set_color(caution)
+        scene.add(probe)
+        lane = numer.get_top()[1] + 0.10 + LIFT * probe.height / 2
+        scene.play(probe.animate.scale(LIFT).move_to([numer.get_left()[0], lane, 0.0]),
+                   run_time=0.06 * total)
+        hold(0.62)
+        scene.play(probe.animate.move_to([numer.get_right()[0], lane, 0.0]),
+                   run_time=0.085 * total, rate_func=linear)
+        hold(0.715)
+        # Beside the probe, not over it: an X centred on a glyph this size just hides it,
+        # and the pair has to read "this h -- no".
+        at = probe.get_center() + 0.36 * RIGHT
+        cross = VGroup(Line(at + 0.15 * DL, at - 0.15 * DL),
+                       Line(at + 0.15 * UL, at - 0.15 * UL)).set_stroke(caution, width=3.2)
+        scene.play(Create(cross), run_time=0.045 * total)
+        hold(0.80)
+        # Nothing was cancelled: the h goes back where it came from, and the line is the
+        # line the template built.
+        scene.play(probe.animate.scale(1 / LIFT).move_to(den_h), FadeOut(cross),
+                   run_time=0.06 * total)
+        scene.play(FadeOut(probe), Indicate(den_h, color=caution, scale_factor=1.3),
+                   run_time=0.045 * total)
+        hold(1.0)
+        scene.add(mob)
+        return _spent(scene, t0, total)
+
+    m0.mobject = line
+    m0.anim = _quotient_anim
     return out
 
 
