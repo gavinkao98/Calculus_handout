@@ -125,6 +125,19 @@ def words_at(t_video: float, beats: list[dict], words: "list[dict] | None") -> t
 
 # ---- motion -------------------------------------------------------------------------
 
+def _beat_at(span: list[float], beats: list[dict]) -> str:
+    """Which beat a still span sits in, as ` (beat 2, proof.1)`. Empty when there are no
+    beats (silent scenes) or the span straddles several."""
+    if not beats:
+        return ""
+    lo, hi = span
+    mid = (lo + hi) / 2.0 - SCENE_LEAD_SECONDS
+    for b in beats:
+        if b["start_seconds"] - 1e-6 <= mid <= b["end_seconds"] + 1e-6:
+            return f" (beat {b['index']}, {b.get('reveal') or 'no reveal'})"
+    return ""
+
+
 def motion_stats(av: Path, duration: float, reveal_times: list[float]) -> dict:
     """Decode at MOTION_FPS in 192x108 grey and measure frame-to-frame change."""
     raw = _run(["ffmpeg", "-v", "error", "-i", str(av), "-an", "-vf",
@@ -135,18 +148,35 @@ def motion_stats(av: Path, duration: float, reveal_times: list[float]) -> dict:
         return {"static_ratio": 1.0, "moving_seconds": 0.0, "longest_still_seconds": duration,
                 "fine_static_ratio": 1.0, "fine_moving_seconds": 0.0,
                 "fine_longest_still_seconds": duration,
-                "events": [], "non_reveal_events": [], "profile": ""}
+                "longest_still_span": [0.0, round(duration, 1)],
+                "fine_longest_still_span": [0.0, round(duration, 1)],
+                "fine_events": [], "events": [], "non_reveal_events": [], "profile": ""}
     d = np.abs(frames[1:] - frames[:-1])
     frac = (d > 12).mean(axis=(1, 2))                      # fraction of pixels that changed
     moving = frac > CHANGE_FRAC
     dt = 1.0 / MOTION_FPS
-    # runs of stillness
-    longest = run = 0
-    for m in moving:
-        run = 0 if m else run + 1
-        longest = max(longest, run)
-    # change events = starts of moving runs
-    events = [round((i + 1) * dt, 2) for i in range(len(moving)) if moving[i] and (i == 0 or not moving[i - 1])]
+
+    def _still(mask):
+        """(longest run in samples, start_s, end_s) -- WHERE it is, not just how long.
+        Reporting only the length is what let a reader locate a dead zone by scanning the
+        coarse event list, which is blind to text being written and therefore points at the
+        wrong beat (2026-09-13, scene 09: two render cycles spent on the wrong one)."""
+        longest = run = start = best_start = 0
+        for i, m in enumerate(mask):
+            if m:
+                run, start = 0, i + 1
+                continue
+            run += 1
+            if run > longest:
+                longest, best_start = run, start
+        return longest, round(best_start * dt, 1), round((best_start + longest) * dt, 1)
+
+    def _starts(mask):
+        return [round((i + 1) * dt, 2) for i in range(len(mask))
+                if mask[i] and (i == 0 or not mask[i - 1])]
+
+    longest, still_a, still_b = _still(moving)
+    events = _starts(moving)
     # a reveal's fade-in registers at the sample just BEFORE its nominal time (1/MOTION_FPS
     # quantisation), so allow -0.3 s of slack or every reveal shows up as a phantom event
     non_reveal = [t for t in events if not any(-0.3 <= t - r <= 1.5 for r in reveal_times)
@@ -159,10 +189,8 @@ def motion_stats(av: Path, duration: float, reveal_times: list[float]) -> dict:
         f = float(frac[i:i + win].max()) if len(frac[i:i + win]) else 0.0
         levels.append(0 if f <= CHANGE_FRAC else min(8, 1 + int(np.log10(f / CHANGE_FRAC) * 3)))
     fine = frac > FINE_CHANGE_FRAC
-    f_longest = f_run = 0
-    for m in fine:
-        f_run = 0 if m else f_run + 1
-        f_longest = max(f_longest, f_run)
+    f_longest, f_still_a, f_still_b = _still(fine)
+    fine_events = _starts(fine)
     return {
         "static_ratio": round(float(1 - moving.mean()), 3),
         "moving_seconds": round(float(moving.sum() * dt), 1),
@@ -170,6 +198,9 @@ def motion_stats(av: Path, duration: float, reveal_times: list[float]) -> dict:
         "fine_static_ratio": round(float(1 - fine.mean()), 3),
         "fine_moving_seconds": round(float(fine.sum() * dt), 1),
         "fine_longest_still_seconds": round(f_longest * dt, 1),
+        "longest_still_span": [still_a, still_b],
+        "fine_longest_still_span": [f_still_a, f_still_b],
+        "fine_events": fine_events,
         "events": events,
         "non_reveal_events": [round(t, 1) for t in non_reveal],
         "profile": "".join(glyphs[l] for l in levels),   # text form (markdown); the sheet draws bars
@@ -366,7 +397,17 @@ def main() -> int:
                  f"moving {mot['moving_seconds']} s; longest still stretch {mot['longest_still_seconds']} s",
                  f"- picture (fine, >0.05% -- catches thin lines and text being written): static "
                  f"{mot['fine_static_ratio'] * 100:.0f}% of the time; moving {mot['fine_moving_seconds']} s; "
-                 f"longest still stretch {mot['fine_longest_still_seconds']} s",
+                 f"longest still stretch {mot['fine_longest_still_seconds']} s "
+                 f"at {mot['fine_longest_still_span'][0]}-{mot['fine_longest_still_span'][1]} s"
+                 + _beat_at(mot["fine_longest_still_span"], beats)
+                 + "  <-- LOCATE DEAD ZONES HERE, not from the coarse events below",
+                 f"- fine change events at "
+                 + (", ".join(f"+{e}" for e in mot.get("fine_events", [])) or "none"),
+                 f"- coarse longest still {mot['longest_still_seconds']} s at "
+                 f"{mot['longest_still_span'][0]}-{mot['longest_still_span'][1]} s"
+                 + _beat_at(mot["longest_still_span"], beats)
+                 + " (the coarse threshold cannot see writing, so this span often MERGES a "
+                 "writing beat with its neighbour -- do not locate from it)",
                  f"- change events at "
                  + (", ".join(f"+{e}" for e in mot["events"]) or "none")
                  + (f"; NOT tied to a reveal: {', '.join(f'+{e}' for e in mot['non_reveal_events'])}"
@@ -413,7 +454,11 @@ def main() -> int:
            "0.2 % of pixels changed, *fine* when more than 0.05 %. At this resolution a glyph is about 2×3 px, so text "
            "being written or a thin line being drawn moves far too few pixels for the coarse threshold and reads as "
            "STILL there while the fine one sees it. **When the two disagree, believe the fine one and look at the "
-           "frames.** `static` = share of the scene where nothing on screen changed; "
+           "frames.** **To LOCATE a dead zone, read the per-scene file's `fine longest still ... at A-B s "
+           "(beat N, <reveal>)` line -- never the coarse `change events` list.** The coarse threshold cannot "
+           "see a beat that is writing a formula, so it merges that beat with its neighbour and points at the "
+           "wrong one (2026-09-13: two render cycles were spent animating the wrong beat of scene 09). "
+           "`static` = share of the scene where nothing on screen changed; "
            "`change events` = moments something started changing; events *not tied to a reveal* mean motion beyond the "
            "fade-in of new text (i.e. an animation). The 2-s profile is a tiny bar chart of change over the scene.", "",
            "| # | scene | title | global start | secs | reveals | static (coarse / fine) | longest still (coarse / fine) | changes not tied to reveals |",
