@@ -1054,6 +1054,40 @@ make.py／sizecheck／scratch_frames／critic 都已佈線），缺了而場有 
 `carry.block` 不存在／`as` 撞 id 以「could not build scene」報 error。回歸樣本
 `storyboards/_demo_carry.yml`（graph → derivation 飛角落 → callout keep）。
 
+### Reveal 的耗時回報契約（`_elapsed`／`_spent`；前提＝`disable_caching`）
+
+`blocks.play_block()` 的契約寫在它自己的 docstring：**回傳「實際消耗的 wall-clock 秒數」**，
+`scene.py` 靠它算 `wait(max(target_seconds - consumed, MIN_HOLD))`，讓每一拍的影像長度等於它的
+旁白。**回傳標稱值（各 `run_time` 相加、或寫死的常數）會壞掉**——manim 把每個 `play` 的 run_time
+向上取到整數影格，一拍播三、四個 `play` 就少報好幾個影格，後面的 `wait` 就多等，整場比旁白長，
+`[sync] render/audio length` 出警告。反向也會發生：曾有 helper 播 0.55 s 卻回報 0.65 s（**多報**），
+它所在的場就比旁白短。兩種錯誤同時存在時還會互相抵銷，讓數字「看起來還好」而掩蓋真正的低報。
+
+**寫法**（`animations/ch03_trig_derivatives_hooks.py` 是現行範例）：
+
+```python
+def _some_reveal(scene, mob, _ground) -> float:
+    t0 = _elapsed(scene)          # scene.renderer.time
+    ...                           # 幾個 scene.play(...)
+    return _spent(scene, t0, <這段的標稱秒數>)
+```
+
+`_spent` 在**沒有 renderer 的 scene**（pipeline selftest 的 `FakeScene`）回傳標稱值——那些測試直接
+assert 回傳的秒數，沒有這層 fallback 會拿到 0.0。所以 hook 一律用 `_spent`，不要裸寫
+`_elapsed(scene) - t0`。
+
+> **前提：`make.py` 的 `disable_caching: True`（`make.py:420`）。**
+> manim 的 `renderer.time` 在動畫**被快取**時是 `+= scene.duration`（標稱值），只有實際 render
+> 才走 `add_frame` 逐影格累積。也就是說**這整套「回報實測」只在關閉快取時才成立**；哪天有人為了
+> 加速把那個旗標打開，`_elapsed` 會**無聲**退化成標稱值，所有 `[sync]` 修正一起失效而且不會有任何
+> 錯誤訊息。要改那個旗標，先把這一節讀完。（`brand.py` 也因為另一個原因依賴它：量測用的 SVG
+> 在開快取時會間歇性地空白。）
+
+歷史：2026-09-13 一輪把 §3.1 hooks 的 12 處 callable 從標稱值遷成實測值，`[sync]` 警告 8 → 6 條、
+`sum|delta|` 2.981 → 2.713（`git log --grep="_spent"`）。殘餘的 6 條落在 `video/pipeline/` 自己——
+`pacing.walk`／`paced_write`／`paced_reveal` 仍回傳標稱值、`play_block` 的 stock 字串分支回傳常數、
+`scene.py` 每拍的 `wait` 各自進位一影格——那些場多半連 `hook:` 都沒有，屬另一輪。
+
 ### Text rendering：prose vs math（no garble）
 
 **Route A（2026-06-24 落地）：所有螢幕文字都走 LaTeX/pdflatex** 以拿到正確 kerning——內文/標題 **IBM Plex Sans**、eyebrow **IBM Plex Mono**、數學 **Latin Modern**。根因：實測 manim `Text`/`MarkupText`（Pango）完全不套 kerning（`W("AVAVAV")`≈各字寬相加），sans 尤其鬆；LaTeX 會 kerning。字體在 TeX preamble 設定（`_bootstrap.apply_tex_template`：`plex-sans`＋`plex-mono`＋`lmodern`＋`microtype`，`familydefault=\sfdefault`，`\everymath{\displaystyle}`），所以本模組不再出現任何 Pango family 名。硬約束：只能 pdflatex（lualatex/xelatex 會破壞 manim 的 `\special{dvisvgm:raw}` 數學子部件定址）。計畫見 [`content_scripts/_audit/PLAN-routeA-plex-latex.md`](content_scripts/_audit/PLAN-routeA-plex-latex.md)。

@@ -417,6 +417,13 @@ def render(meta: dict, scenes: list[dict], manifest: dict, out_dir: Path, qualit
         cfg = {
             "media_dir": str(media_dir),
             "output_file": output_file,
+            # NOT a speed knob -- two things silently depend on it, neither of which
+            # errors when it flips. (1) Reveal timing: `renderer.time` advances by the
+            # NOMINAL `scene.duration` for a cached animation and only accumulates real
+            # quantised frames on an actual render, so every hook that reports what it
+            # consumed (`_spent`) would degrade to nominal seconds and the [sync] work
+            # would quietly come undone. (2) brand.py's measurement SVGs come out
+            # intermittently EMPTY with caching on. See DESIGN.md, "Reveal 的耗時回報契約".
             "disable_caching": True,
             "verbosity": "ERROR",
         }
