@@ -41,6 +41,7 @@ from manim import (
     Dot,
     FadeIn,
     FadeOut,
+    Indicate,
     Line,
     MathTex,
     Polygon,
@@ -725,6 +726,196 @@ def toward_the_chain_rule(spec, ctx, blocks):
 
     ids["math.0"].mobject = trio
     return blocks
+
+
+# ================================================================ hook: degrees_flatten
+# radians_essential (the radian-convention Caution; no book figure) -- R2 director lens,
+# 2026-09-13 round-19 blind review, a `must` tagged ML4: "the narration calls this a
+# structural caution and it is the emptiest frame in the film -- two text fade-ins in
+# 20 s. 'Switch to degrees and the limit becomes pi/180' is a graphical fact you can read
+# in one look (the curve goes flat); saying it in two lines of prose is not saying it."
+#
+# So the fact is drawn, on ONE pair of axes with ONE x scale (x in RADIANS, ticks 0 / 0.5 / 1):
+#   amber (accent -- sine's colour everywhere else in this section)  y = sin x       slope 1
+#   caution red                                                      y = sin(x deg)  slope pi/180
+# Feeding both the SAME numeric x is the whole argument: sin x climbs to ~0.96 over the
+# same span on which sin(x deg) reaches 0.023, i.e. a line lying on the x axis. The red
+# curve is BORN on the amber one and then flattens onto the axis, exactly where the
+# narration says "switch to degrees and the limit is pi over one hundred eighty, not one".
+# No theta anywhere, so no violet; every string goes through brand.* (METHODOLOGY §5).
+#
+# WHY THE FIGURE RIDES THE BODY'S REVEAL. The scene's only marker is `{show body}` and the
+# narration is LOCKED (no new marker: it would split the beat and re-bill the MiMo beats).
+# Of the two options, the wrap is the one scene.py actually supports -- a second Block can
+# only be revealed by its own marker or by the end-of-beats sweep-up, never "later in the
+# same beat" -- so `body`'s reveal is wrapped: the paced walk the storyboard asks for still
+# runs (pacing.apply skips a callable, so `pacing.walk`'s two line-fades are fired here by
+# hand, at the same 0.45 s and the same instants they had before) and the figure's stages
+# are interleaved between and after them, every cue timed off TM.beat_run_time. The figure
+# is still a Block so sizecheck measures the final frame; its own anim is the no-op the
+# sweep-up needs (same contract as shm_device's `device` block).
+_DEG = PI / 180.0      # 0.01745... -- the degree curve's slope at 0, the number this scene is about
+
+
+def degrees_flatten(spec, ctx, blocks):
+    ground = ctx["ground"]
+    ids = _by_id(blocks)
+    body_block = ids["body"]
+    body = body_block.mobject
+
+    amber = T.color(ground, "accent")
+    red = T.color(ground, "caution")
+    mut = T.color(ground, "muted")
+
+    # Unit sizes kept close (2.80 vs 1.95) so "slope 1" is drawn as a ~35 degree diagonal
+    # and the comparison with the flat one is read off the picture, not off the labels.
+    X_MAX = 1.30
+    X_U, Y_U = 2.80, 1.95
+    ax = Axes(x_range=[0, X_MAX, 0.5], y_range=[0, 1.05, 0.5],
+              x_length=X_MAX * X_U, y_length=1.05 * Y_U, tips=False,
+              axis_config={"color": mut, "stroke_width": 1.6, "include_ticks": False})
+
+    ticks = VGroup()
+    for xv, tex in ((0.5, "0.5"), (1.0, "1")):
+        p = ax.c2p(xv, 0.0)
+        ticks.add(Line(p + 0.09 * UP, p + 0.09 * DOWN, color=mut, stroke_width=2.0))
+        ticks.add(brand.math_line(tex, ground, role="muted", size="label")
+                  .next_to(p, DOWN, buff=0.20))
+    # the origin's "0" belongs to BOTH axes, so it goes diagonally out of the corner --
+    # straight down would sit under the y-axis, straight left under the x-axis.
+    ticks.add(brand.math_line("0", ground, role="muted", size="label")
+              .next_to(ax.c2p(0.0, 0.0), DL, buff=0.16))
+    # one y tick, at 1: without it "the amber one reaches ~1" is a claim about an unscaled
+    # picture. Left of the y-axis, the only clear side.
+    py = ax.c2p(0.0, 1.0)
+    ticks.add(Line(py + 0.09 * LEFT, py + 0.09 * RIGHT, color=mut, stroke_width=2.0))
+    ticks.add(brand.math_line("1", ground, role="muted", size="label")
+              .next_to(py, LEFT, buff=0.20))
+    # says which x this is -- the entire caution is that the SAME number means two things
+    unit = brand.math_line(r"x\ \text{in radians}", ground, role="muted", size="label")
+    unit.next_to(ax.c2p(X_MAX / 2.0, 0.0), DOWN, buff=0.50)
+
+    rad = ax.plot(np.sin, x_range=[0, X_MAX], color=amber, stroke_width=4.5)
+    deg = ax.plot(lambda x: np.sin(_DEG * x), x_range=[0, X_MAX], color=red, stroke_width=5.0)
+    deg.set_z_index(3)          # it lies within 7 px of the x axis by the end -- keep it on top
+
+    # Both labels sit to the RIGHT of the plot, each level with its own curve's end
+    # (amber at 0.96, red at 0.02), so nothing is written over a curve and the vertical
+    # gap between the two label stacks IS the gap between the two slopes.
+    def _tag(name_tex, slope_tex, role):
+        return VGroup(brand.math_line(name_tex, ground, role=role, size="math_sm"),
+                      brand.math_line(slope_tex, ground, role=role, size="label")
+                      ).arrange(DOWN, buff=0.16, aligned_edge=LEFT)
+
+    tag_rad = _tag(r"y=\sin x", r"\text{slope }1", "accent")
+    tag_rad.next_to(ax.c2p(X_MAX, np.sin(X_MAX)), RIGHT, buff=0.40)
+    tag_deg = _tag(r"y=\sin(x^{\circ})", r"\text{slope }\tfrac{\pi}{180}", "caution")
+    tag_deg.next_to(ax.c2p(X_MAX, 0.0), RIGHT, buff=0.40)
+    lab_factor = tag_deg[1]     # the pi/180 the last beat flashes
+
+    fig = VGroup(ax, ticks, unit, rad, deg, tag_rad, tag_deg)
+    # the band the body leaves empty: under its last line, down to the bottom safe margin
+    zone_top = body.get_bottom()[1] - 0.34
+    zone_bottom = -T.FRAME_H / 2 + T.SAFE_MARGIN
+    fig.move_to([0.0, (zone_top + zone_bottom) / 2.0, 0.0])
+    # built AFTER the move so it lands on the amber curve: the red copy the flatten starts from
+    ghost = ax.plot(np.sin, x_range=[0, X_MAX], color=red, stroke_width=5.0)
+    ghost.set_z_index(3)
+
+    # -- the beat, cue by cue ---------------------------------------------------
+    # Offsets in seconds into the body beat, measured against the LOCKED MiMo take (beat 2
+    # runs 15.1 s -> TM.beat_run_time = 14.5 s); a different beat length scales them.
+    # Every cue is a word in the narration:
+    #   0.00 body line 1   "Everything here depends on radians"
+    #   0.45 axes + radian ticks
+    #   1.25 y = sin x drawn                    "...radians. / The sector area one half"
+    #   4.30 its slope-1 tag                    "...the limit -- uses radian measure"
+    #   7.30 body line 2                        "Switch" lands at 7.38
+    #   7.75 the red copy is born on the amber curve
+    #   8.15 it flattens onto the axis          "the limit is pi over one hundred eighty"
+    #  10.55 its slope-pi/180 tag               "not one"
+    #  11.85 that factor flashes                "and every formula ... changes with it"
+    #  12.75 the radian curve flashes back      "...we are about to build on it"
+    NOMINAL_BEAT = 14.5
+    CUE = (0.45, 1.25, 4.30, 7.30, 7.75, 8.15, 10.55, 11.85, 12.75)
+    DUR = (0.80, 1.50, 0.90, 0.45, 0.40, 2.40, 0.60, 0.90, 0.90)
+    stock_body = body_block.anim
+
+    def _reveal(scene, mob, _ground) -> float:
+        t0 = _elapsed(scene)
+        total = TM.beat_run_time(scene, NOMINAL_BEAT)
+        s = total / NOMINAL_BEAT            # cue instants stretch with the beat
+        d = min(s, 1.0)                     # a SHORTER beat also compresses the animations
+        clock = [0.0]                       # nominal seconds spent, for scenes with no renderer
+
+        def _play(anim, secs):
+            scene.play(anim, run_time=secs)
+            clock[0] += secs
+
+        def _until(target):
+            used = (_elapsed(scene) - t0) if getattr(scene, "renderer", None) is not None else clock[0]
+            gap = target - used
+            if gap > 0.02:
+                scene.wait(gap)
+                clock[0] += gap
+
+        # the paced walk, done by hand (pacing.apply skips a callable): the prose's last
+        # line still lands where `paced: [body]` put it, on "Switch to degrees".
+        parts = pacing.block_parts(mob)
+        walked = len(parts) >= 2
+        line_at = ([CUE[3] * s * i / (len(parts) - 1) for i in range(len(parts))]
+                   if walked else [])
+
+        def _line(i):
+            if not walked:
+                return
+            _until(line_at[i])
+            _play(FadeIn(parts[i], shift=0.1 * UP), pacing.FADE_SECONDS)
+
+        if walked:
+            _line(0)
+        else:
+            # not the wrapped prose this hook was written for (one unwrapped line): run
+            # whatever the template gave the block and let the figure have the rest.
+            clock[0] += _play_stock(scene, stock_body, mob, _ground)
+        _until(CUE[0] * s)
+        # geometry is drawn, text is faded (house style) -- Create on a Tex traces its
+        # glyph outlines, which on the tick digits reads as a rendering fault mid-beat.
+        _play(Create(ax), DUR[0] * d * 0.6)
+        _play(FadeIn(VGroup(ticks, unit)), DUR[0] * d * 0.4)
+        _until(CUE[1] * s)
+        _play(Create(rad), DUR[1] * d)
+        _until(CUE[2] * s)
+        _play(FadeIn(tag_rad), DUR[2] * d)
+        for i in range(1, len(line_at)):
+            _line(i)
+        _until(CUE[4] * s)
+        _play(FadeIn(ghost), DUR[4] * d)
+        _until(CUE[5] * s)
+        # the collapse itself: a point-for-point morph of sin x onto sin(x deg), so the
+        # curve is seen SINKING onto the axis rather than being swapped for a flat one.
+        _play(ReplacementTransform(ghost, deg), DUR[5] * d)
+        _until(CUE[6] * s)
+        _play(FadeIn(tag_deg), DUR[6] * d)
+        _until(CUE[7] * s)
+        _play(Indicate(lab_factor, color=T.color(ground, "caution_ink"), scale_factor=1.18),
+              DUR[7] * d)
+        _until(CUE[8] * s)
+        _play(Indicate(rad, color=T.color(ground, "amber_ink"), scale_factor=1.06),
+              DUR[8] * d)
+        scene.add(mob, fig)
+        _until(total)
+        return _spent(scene, t0, total)
+
+    body_block.anim = _reveal
+    out = list(blocks)
+    # Never reached through a `{show ...}` marker -- the figure rides the body's beat above.
+    # The Block exists so sizecheck measures the final frame; `static=False` + unrevealed
+    # means scene.py's end-of-beats sweep calls this anim once, so it must be a true no-op
+    # (a real reveal here would fade the finished figure in a second time).
+    out.append(Block("degfig", fig, static=False,
+                     anim=lambda scene, mob, ground: 0.0, layer="graph"))
+    return out
 
 
 # ================================================================ hook 5
