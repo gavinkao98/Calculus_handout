@@ -86,16 +86,24 @@ def _centre_in_zone(title_mob, group, *, bottom_pad: float = 0.45) -> None:
     group.move_to([0, (zone_top + zone_bottom) / 2, 0])
 
 
+# Both report the renderer's clock (see `_spent`), not a constant. They used to claim
+# 0.65 / 0.75 s for a 0.55 / 0.65 s play -- 0.10 s of OVER-report each, the opposite sign
+# to the frame-quantisation loss, which the beat's hold then had to give back: measured on
+# slope_equals_height (three _draw plus one _fade) the scene ran 0.41 s SHORT of its
+# narration. Nothing in the history or the comments makes that 0.10 s deliberate, so it is
+# read as a slip, not padding.
 def _fade(scene, mob, g):
+    t0 = _elapsed(scene)
     scene.play(FadeIn(mob), run_time=0.55)
     scene.add(mob)
-    return 0.65
+    return _spent(scene, t0, 0.55)
 
 
 def _draw(scene, mob, g):
+    t0 = _elapsed(scene)
     scene.play(Create(mob), run_time=0.65)
     scene.add(mob)
-    return 0.75
+    return _spent(scene, t0, 0.65)
 
 
 # ================================================================ hook 1
@@ -449,6 +457,7 @@ def sector_inequality(spec, ctx, blocks):
             # is still the one region this beat is about.
             shape, label, badge = mob[0], mob[-2], mob[-1]
             nested = list(mob[1:-2])
+            t0 = _elapsed(scene)
             scene.play(FadeIn(src), run_time=0.4)            # region appears on the left
             scene.add(src)
             flyer = src.copy()
@@ -459,7 +468,7 @@ def sector_inequality(spec, ctx, blocks):
             # figure's own ①②③ chip appears, tying the two halves together.
             scene.play(FadeIn(label, shift=0.08 * UP), FadeIn(badge), FadeIn(chip),
                        *[FadeIn(m) for m in nested], run_time=0.32)
-            return 1.52
+            return _spent(scene, t0, 1.52)
         return anim
 
     out.append(Block("circle", stage_circle, anim=_draw, static=False, layer="graph"))
@@ -1022,16 +1031,18 @@ def chord_vs_arc(spec, ctx, blocks):
         total = TM.beat_run_time(scene, 2.6)
         a, b = total * 0.45, total * 0.32
         c = max(total - a - b, 0.3)
+        t0 = _elapsed(scene)
         scene.play(FadeIn(VGroup(xax, yax)), Create(circ), run_time=a)
         scene.play(Create(radius), FadeIn(dotP), FadeIn(dotA), FadeIn(labA), run_time=b)
         scene.play(Create(ang), FadeIn(lab_th), run_time=c)
         scene.add(mob)
-        return total
+        return _spent(scene, t0, total)
 
     def _nudge_anim(scene, mob, _ground) -> float:
         """Swing theta about its resting value for the whole beat -- the narration's
         'nudge the angle a little ... they never jump' actually happens on screen."""
         total = TM.beat_run_time(scene, 6.0)
+        t0 = _elapsed(scene)
         scene.play(FadeIn(mob), run_time=0.5)
         radius.add_updater(lambda m: m.put_start_and_end_on(_O(), _P()))
         dotP.add_updater(lambda m: m.move_to(_P()))
@@ -1047,17 +1058,18 @@ def chord_vs_arc(spec, ctx, blocks):
                        rate_func=there_and_back)
         for m in (radius, dotP, sin_leg, cos_leg, ang, lab_th):
             m.clear_updaters()                 # the geometry beats need a still figure
-        return 0.5 + 3 * swing
+        return _spent(scene, t0, 0.5 + 3 * swing)
 
     def _arc_anim(scene, mob, _ground) -> float:
         total = TM.beat_run_time(scene, 3.6)
         a, b = total * 0.26, total * 0.46
         c = max(total - a - b, 0.3)
+        t0 = _elapsed(scene)
         scene.play(sin_leg.animate.set_stroke(width=8.0), run_time=a)   # "the half-chord"
         scene.play(Create(arc), run_time=b)                             # "...than the arc"
         scene.play(FadeIn(lab_arc), run_time=c)
         scene.add(mob)
-        return total
+        return _spent(scene, t0, total)
 
     def _straighten_anim(scene, mob, _ground) -> float:
         """Congruent copies of the chord and the arc lie down on one baseline: same
@@ -1066,6 +1078,7 @@ def chord_vs_arc(spec, ctx, blocks):
         slide = total * 0.16 if docks else 0.0
         a, b = total * 0.40, total * 0.16
         c = max(total - slide - a - b, 0.4)
+        t0 = _elapsed(scene)
         if docks:
             mob.shift(-stage_shift)      # still invisible: the slot travels with the rest
             scene.play(*[p.animate.shift(-stage_shift)
@@ -1076,16 +1089,17 @@ def chord_vs_arc(spec, ctx, blocks):
         scene.play(FadeIn(lab_bc), FadeIn(lab_ba), run_time=b)
         scene.play(FadeIn(ineq, shift=0.1 * UP), run_time=c)
         scene.add(mob)
-        return total
+        return _spent(scene, t0, total)
 
     def _dock(scene, mob, _ground) -> float:
         """The statement card's own reveal, doubling as the figure's cue to shrink back
         into its home slot and stay there as evidence under the proof."""
+        t0 = _elapsed(scene)
         scene.play(FadeIn(mob, shift=0.35 * RIGHT),
                    *[p.animate.scale(1.0 / ZOOM, about_point=big_c).shift(home_c - big_c)
                      for p in parts], run_time=0.9)
         scene.add(mob)
-        return 0.9
+        return _spent(scene, t0, 0.9)
 
     if docks:
         stmt = ids["statement"]
@@ -1202,7 +1216,11 @@ def difference_quotient_for_sine(spec, ctx, blocks):
     def _step0_anim(scene, mob, g) -> float:
         """The row, then the draft, cut to the narration's own cue words (`_CUE`)."""
         total = TM.beat_run_time(scene, 18.0)
+        # `t` stays the NOMINAL cue clock the `hold(...)` calls schedule against: the cut
+        # points are fractions of `total`, so they must not drift with the frame rounding.
+        # What the BEAT is told is the renderer's own clock instead (see `_elapsed`).
         t = 0.0
+        t0 = _elapsed(scene)
 
         def at(cue):
             return total * _CUE[cue]
@@ -1275,7 +1293,7 @@ def difference_quotient_for_sine(spec, ctx, blocks):
         hold(at("clear"))
         play(FadeOut(product), run_time=0.8)
         hold(total)
-        return max(total, t)
+        return _spent(scene, t0, max(total, t))
 
     ids["step.0"].anim = _step0_anim
     # The forced plays alone (the write, six fades, three morphs, the flight): what make.py's
@@ -1299,6 +1317,7 @@ def difference_quotient_for_sine(spec, ctx, blocks):
         total = TM.beat_run_time(scene, 4.2)
         a, b = total * 0.36, total * 0.34
         c = max(total - a - b, 0.6)
+        t0 = _elapsed(scene)
         scene.play(FadeIn(inter, shift=0.1 * UP),
                    step1_row.animate.set_opacity(MUTED_OPACITY), run_time=FADE)
         scene.wait(max(a - FADE, 0.0))
@@ -1310,7 +1329,7 @@ def difference_quotient_for_sine(spec, ctx, blocks):
             scene.play(FadeIn(rail), run_time=FADE)
         scene.wait(max(c - FADE, 0.0))
         scene.add(mob)
-        return total
+        return _spent(scene, t0, total)
 
     # -- beat 5: one factor per clause --------------------------------------------------
     result_row = ids["result"].mobject
@@ -1330,6 +1349,7 @@ def difference_quotient_for_sine(spec, ctx, blocks):
         slots = len(parts_eq.submobjects) + (1 if rail.submobjects else 0)
         total = TM.beat_run_time(scene, FADE * slots)
         share = total / slots
+        t0 = _elapsed(scene)
         scene.play(FadeIn(parts_eq[0], shift=0.1 * UP),
                    step2_row.animate.set_opacity(MUTED_OPACITY), run_time=FADE)
         scene.wait(max(share - FADE, 0.0))
@@ -1340,7 +1360,7 @@ def difference_quotient_for_sine(spec, ctx, blocks):
             scene.play(FadeIn(rail), run_time=FADE)
             scene.wait(max(share - FADE, 0.0))
         scene.add(mob)
-        return total
+        return _spent(scene, t0, total)
 
     ids["step.2"].anim, ids["step.2"].anim_seconds = _step2_anim, FADE * 3
     ids["result"].anim, ids["result"].anim_seconds = _result_anim, FADE * 4
@@ -1390,12 +1410,13 @@ def why_trig_is_different(spec, ctx, blocks):
         total = TM.beat_run_time(scene, 4.0)
         a = total * 0.42
         morph = min(1.3, total * 0.22)
+        t0 = _elapsed(scene)
         scene.play(FadeIn(tag), FadeIn(before, shift=0.1 * UP), run_time=0.55)
         scene.wait(max(a - 0.55, 0.0))
         scene.play(ReplacementTransform(before, after), run_time=morph)
         scene.wait(max(total - a - morph, 0.0))
         scene.add(mob)
-        return total
+        return _spent(scene, t0, total)
 
     out.append(Block("cancels", body, anim=_cancels_anim, static=False))
     return out
@@ -1540,8 +1561,20 @@ def _elapsed(scene) -> float:
     sum of its `run_time`s: manim rounds every `play` up to a whole frame, so a reveal made
     of several plays under-reports by a frame each, the beat then holds for a remainder that
     is too long, and the scene ends up longer than its narration ([sync] render/audio length).
-    Measured on continuity_argument: 3 plays instead of 1 put the scene 0.23-0.33 s over."""
-    return float(getattr(scene.renderer, "time", 0.0))
+    Measured on continuity_argument: 3 plays instead of 1 put the scene 0.23-0.33 s over.
+    Reads 0 on a scene with no renderer (the selftests' FakeScene); `_spent` turns that
+    into the caller's nominal budget."""
+    return float(getattr(getattr(scene, "renderer", None), "time", 0.0))
+
+
+def _spent(scene, t0: float, nominal: float) -> float:
+    """What a reveal reports to its beat: the renderer's clock where there is one, and
+    *nominal* where there is none. The pipeline selftests drive these hooks with a
+    FakeScene that records `run_time`s but has no renderer, and they assert on the
+    returned seconds -- so the nominal budget stays the answer off a real render."""
+    if getattr(scene, "renderer", None) is None:
+        return nominal
+    return _elapsed(scene) - t0
 
 
 def _play_stock(scene, anim, mob, ground) -> float:
