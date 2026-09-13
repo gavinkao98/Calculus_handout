@@ -65,7 +65,7 @@ MIN_PITCH = _ROW_GAP  # tightest inter-row gap -- sizecheck's split-capacity tri
 LEAD_PAD_L = 0.22     # clear space between an equation's right edge and its leader
 LEAD_PAD_R = 0.18     # ... and between the leader and the reason column
 MIN_LEADER = 0.55     # shortest leader that still reads as a connector (~74 px at 1080p)
-_REASON_PX = T._SCALE_PX["prose_sm"]   # 一般 reason 的 authored px（A/B 開放值：35 或 38）
+_REASON_PX = T._SCALE_PX["prose_sm"]   # 一般 reason 的 authored px（A/B 開放值 2026-09-14 定案 38）
 
 
 def capacity_meta(spec: dict[str, Any]) -> list[ColumnPlan]:
@@ -133,7 +133,7 @@ def _eq_mob(row: dict, ground: str, *, role: str):
     seg_roles = row.get("seg_roles")
     if row["kind"] == "result":
         role = str(override) if override else role
-        eq = brand.math_line(row["math"].strip(), ground, role=role, size=54,
+        eq = brand.math_line(row["math"].strip(), ground, role=role, size="math_conclusion",
                              seg_roles=seg_roles)
         # crisper halo (was 3.0/0.45): Codex read the heavy amber glow as fuzzy/embossed.
         return brand.text_glow(eq, ground, role=role, width=2.2, opacity=0.38)

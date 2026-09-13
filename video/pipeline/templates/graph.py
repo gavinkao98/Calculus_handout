@@ -118,14 +118,14 @@ def _axis_ticks(axes: Axes, ac: dict[str, Any], ground: str, plots: list[dict] |
         at, lab = _tick_at_label(item)
         base = axes.x_axis.number_to_point(at)
         mark = Line(base + UP * tlen, base + DOWN * tlen, color=col, stroke_width=2.0)
-        text = brand.math_line(lab, ground, role="text", size="math_sm")
+        text = brand.math_line(lab, ground, role="text", size="math_rail")
         text.next_to(base, DOWN, buff=0.14)
         mobs += [mark, text]
     for item in y_ticks:
         at, lab = _tick_at_label(item)
         base = axes.y_axis.number_to_point(at)
         mark = Line(base + LEFT * tlen, base + RIGHT * tlen, color=col, stroke_width=2.0)
-        text = brand.math_line(lab, ground, role="text", size="math_sm")
+        text = brand.math_line(lab, ground, role="text", size="math_rail")
         text.next_to(base, LEFT, buff=0.14)
         mobs += [mark, text]
     return VGroup(*mobs) if mobs else None
@@ -142,8 +142,8 @@ def _add_axis_labels(axes: Axes, ground: str, ac: dict[str, Any]) -> None:
     """
     if ac.get("axis_labels") is False:
         return
-    x_lab = brand.math_line(str(ac.get("x_label", "x")), ground, role="text", size="math_sm")
-    y_lab = brand.math_line(str(ac.get("y_label", "y")), ground, role="text", size="math_sm")
+    x_lab = brand.math_line(str(ac.get("x_label", "x")), ground, role="text", size="math_rail")
+    y_lab = brand.math_line(str(ac.get("y_label", "y")), ground, role="text", size="math_rail")
     x_lab.next_to(axes.x_axis.get_right(), DOWN, buff=0.1)
     y_lab.next_to(axes.y_axis.get_top(), LEFT, buff=0.1)
     axes.add(x_lab, y_lab)
@@ -403,7 +403,7 @@ def _plot_blocks(spec: dict[str, Any], axes: Axes, ground: str) -> tuple[list[Bl
     ac = spec["axes"]
     x_range = _range(ac["x_range"], 0.5)
     y_range = _range(ac["y_range"], 0.25)
-    default_label_size = str(ac.get("label_size", "math_sm"))   # was "label" (30px) -- carrier >= ticks (P-A1)
+    default_label_size = str(ac.get("label_size", "math_rail"))   # was "label" (30px) -- carrier >= ticks (P-A1)
 
     all_plots = spec.get("plots", [])
     for i, plot in enumerate(all_plots):

@@ -126,7 +126,7 @@ def build(spec: dict[str, Any], ctx: dict[str, Any]) -> list[Block]:
         else:
             axis_parts.append(Line([x, _TICK, 0], [x, -_TICK, 0],
                                    color=text_col, stroke_width=2.0))
-        lab = brand.math_line(label, ground, role="primary", size="math_sm")
+        lab = brand.math_line(label, ground, role="primary", size="math_rail")
         lab.move_to([x, _TICK + 0.30 + lab.height / 2, 0])  # labels above the line,
         axis_parts.append(lab)                              # marks own the space below
 

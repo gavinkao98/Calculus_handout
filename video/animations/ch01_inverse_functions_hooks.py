@@ -99,8 +99,8 @@ def _mapping_column(ground, ins, outs, pairs, caption, arrow_role):
     rows_in = [0.7 - 0.7 * i for i in range(len(ins))] if len(ins) > 1 else [0.0]
     rows_out = [0.7 - 0.7 * i for i in range(len(outs))] if len(outs) > 1 else [0.0]
 
-    in_mobs = [MathTex(s, color=T.color(ground, "text"), font_size=T.fs("math_sm")) for s in ins]
-    out_mobs = [MathTex(s, color=T.color(ground, "text"), font_size=T.fs("math_sm")) for s in outs]
+    in_mobs = [MathTex(s, color=T.color(ground, "text"), font_size=T.fs("math_rail")) for s in ins]
+    out_mobs = [MathTex(s, color=T.color(ground, "text"), font_size=T.fs("math_rail")) for s in outs]
     for m, y in zip(in_mobs, rows_in):
         m.move_to([in_x, y, 0])
     for m, y in zip(out_mobs, rows_out):
@@ -113,7 +113,7 @@ def _mapping_column(ground, ins, outs, pairs, caption, arrow_role):
                   stroke_width=3.0, color=col, max_tip_length_to_length_ratio=0.12)
         arrows.append(a)
 
-    cap = brand.math_line(caption, ground, role="text", size="math_sm")
+    cap = brand.math_line(caption, ground, role="text", size="math_rail")
     body = VGroup(*in_mobs, *out_mobs, *arrows)
     cap.next_to(body, UP, buff=0.42)
     group = VGroup(cap, *in_mobs, *out_mobs, *arrows)
@@ -228,15 +228,15 @@ def composition_identities(spec, ctx, blocks):
     ellB = ellA.copy()
     ellA.move_to([-2.7, 0, 0])
     ellB.move_to([2.7, 0, 0])
-    labA = MathTex("A", color=text_col, font_size=T.fs("math_sm"))
-    labB = MathTex("B", color=text_col, font_size=T.fs("math_sm"))
+    labA = MathTex("A", color=text_col, font_size=T.fs("math_rail"))
+    labB = MathTex("B", color=text_col, font_size=T.fs("math_rail"))
     labA.next_to(ellA, UP, buff=0.14)
     labB.next_to(ellB, UP, buff=0.14)
 
     px = Dot([-2.7, 0.0, 0.0], radius=0.075, color=cyan)
     py = Dot([2.7, 0.0, 0.0], radius=0.075, color=gold)
-    labx = MathTex("x", color=text_col, font_size=T.fs("math_sm"))
-    laby = MathTex("f(x)", color=text_col, font_size=T.fs("math_sm"))
+    labx = MathTex("x", color=text_col, font_size=T.fs("math_rail"))
+    laby = MathTex("f(x)", color=text_col, font_size=T.fs("math_rail"))
     labx.next_to(px, LEFT, buff=0.15)
     laby.next_to(py, RIGHT, buff=0.15)
 
@@ -246,8 +246,8 @@ def composition_identities(spec, ctx, blocks):
     arc_b = ArcBetweenPoints(py.get_center() + np.array([-0.12, -0.12, 0]),
                              px.get_center() + np.array([0.12, -0.12, 0]),
                              angle=-0.9, color=gold, stroke_width=3.0)
-    lab_f = MathTex("f", color=cyan, font_size=T.fs("math_sm"))
-    lab_b = MathTex("f^{-1}", color=gold, font_size=T.fs("math_sm"))
+    lab_f = MathTex("f", color=cyan, font_size=T.fs("math_rail"))
+    lab_b = MathTex("f^{-1}", color=gold, font_size=T.fs("math_rail"))
     lab_f.next_to(arc_f, UP, buff=0.12)
     lab_b.next_to(arc_b, DOWN, buff=0.12)
 

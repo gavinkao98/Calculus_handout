@@ -172,7 +172,7 @@ def _qed_row(qed_text: str, ground: str):
     line = brand.prose(qed_text, ground, role="success", size="step")
     box = RoundedRectangle(width=0.46, height=0.46, corner_radius=T.RADIUS_SM,
                            color=T.color(ground, "success"), stroke_width=3)
-    mark = brand.glyph("qed", ground, role="success", size="math_sm")
+    mark = brand.glyph("qed", ground, role="success", size="math_rail")
     mark.scale_to_fit_height(box.height * 0.46)
     mark.move_to(box.get_center())
     qbox = VGroup(box, mark)

@@ -307,7 +307,7 @@ def sector_inequality(spec, ctx, blocks):
     # shape above it, instead of the chain falling back to white.
     ineq = brand.math_line(
         r"{{\tfrac12\sin\theta}} \;\le\; {{\tfrac12\theta}} \;\le\; {{\tfrac12\tan\theta}}",
-        ground, role="text", size="math_sm",
+        ground, role="text", size="math_rail",
         seg_roles={r"\tfrac12\sin\theta": "accent", r"\tfrac12\theta": "strategy",
                    r"\tfrac12\tan\theta": "success"})
     row = VGroup(dst1, dst2, dst3)
@@ -812,11 +812,11 @@ def toward_the_chain_rule(spec, ctx, blocks):
     ]
 
     def _chip(tex, glyph_name, role):
-        formula = brand.math_line(tex, ground, role="primary", size="math_sm")
+        formula = brand.math_line(tex, ground, role="primary", size="math_rail")
         # glyph() has no ready-made "?"; a direct MathTex keeps the actual question
         # mark the storyboard math reads, styled the same accent colour glyph() uses.
-        mark = (brand.glyph("check", ground, role=role, size="math_sm") if glyph_name == "check"
-               else MathTex("?", color=T.color(ground, role), font_size=T.fs("math_sm")))
+        mark = (brand.glyph("check", ground, role=role, size="math_rail") if glyph_name == "check"
+               else MathTex("?", color=T.color(ground, role), font_size=T.fs("math_rail")))
         row = VGroup(formula, mark).arrange(RIGHT, buff=0.30)
         return brand.accent_panel(row, ground, bar_role=role, pad=0.32, pad_x=0.42)
 
@@ -907,7 +907,7 @@ def degrees_flatten(spec, ctx, blocks):
     # (amber at 0.96, red at 0.02), so nothing is written over a curve and the vertical
     # gap between the two label stacks IS the gap between the two slopes.
     def _tag(name_tex, slope_tex, role):
-        return VGroup(brand.math_line(name_tex, ground, role=role, size="math_sm"),
+        return VGroup(brand.math_line(name_tex, ground, role=role, size="math_rail"),
                       brand.math_line(slope_tex, ground, role=role, size="label")
                       ).arrange(DOWN, buff=0.16, aligned_edge=LEFT)
 
@@ -1051,17 +1051,17 @@ def derivative_cycle(spec, ctx, blocks):
     # sin (top-left) -> cos (top-right) -> -sin (bottom-right) -> -cos
     # (bottom-left) -> back to sin (top-left), i.e. clockwise.
     #
-    # Node panels use the smaller "label" size + tight padding (not math_sm):
-    # the gap this ring lives in is short enough that a math_sm-sized node is
+    # Node panels use the smaller "label" size + tight padding (not math_rail):
+    # the gap this ring lives in is short enough that a math_rail-sized node is
     # itself nearly as tall as the whole gap, leaving no room for the
     # vertical connector arrows to have any visible length -- they collapsed
     # to zero in an earlier pass. label-size keeps all four formulas legible
     # while leaving an actual gap between the top and bottom row to draw
     # into.
     # 2026-09-13: the gap is no longer short (math.1 drops into the dead band below, see
-    # MATH1_DROP), so the nodes get the readable math_sm size and the two rows get a real
+    # MATH1_DROP), so the nodes get the readable math_rail size and the two rows get a real
     # arrow run between them instead of the stubs the old cramped band forced.
-    NODE_SIZE, NODE_PAD, NODE_PAD_X = "math_sm", 0.16, 0.26
+    NODE_SIZE, NODE_PAD, NODE_PAD_X = "math_rail", 0.16, 0.26
 
     def _node(tex, role):
         label = brand.math_line(tex, ground, role="primary", size=NODE_SIZE)
@@ -1134,9 +1134,9 @@ def derivative_cycle(spec, ctx, blocks):
     # arrow at once (which is what the narration says -- "writing an arrow for one
     # derivative"), and it costs the ring no extra height, so all of the band goes to the
     # diagram instead of to a label stacked on top of it.
-    # math_sm, the node size: it was the smallest ink inside the ring at `label`, and the
+    # math_rail, the node size: it was the smallest ink inside the ring at `label`, and the
     # first thing to fail at phone width (regression audit, A6 med).
-    ddx = brand.math_line(r"\frac{d}{dx}", ground, role="text", size="math_sm")
+    ddx = brand.math_line(r"\frac{d}{dx}", ground, role="text", size="math_rail")
     ddx.move_to(VGroup(*nodes).get_center())
 
     # ddx is deliberately OUTSIDE the group the fit clamp below measures and scales. It
@@ -1270,7 +1270,7 @@ def chord_vs_arc(spec, ctx, blocks):
     lab_bc.next_to(bar_chord, RIGHT, buff=0.16)
     lab_ba = brand.math_line(r"|\theta|", ground, role="strategy", size="label")
     lab_ba.next_to(bar_arc, RIGHT, buff=0.16)
-    ineq = brand.math_line(r"|\sin\theta| \le |\theta|", ground, role="text", size="math_sm")
+    ineq = brand.math_line(r"|\sin\theta| \le |\theta|", ground, role="text", size="math_rail")
     ineq.next_to(bar_arc, DOWN, buff=0.55).align_to(base, LEFT)
     stage_bars = VGroup(base, bar_chord, bar_arc, lab_bc, lab_ba, ineq)
 
@@ -1429,7 +1429,7 @@ def chord_vs_arc(spec, ctx, blocks):
 # storyboard is overridden here: a 1.2 s glyph morph is the right length for a 5 s beat and
 # invisible in a 20 s one, which is the finding this hook exists to close.
 
-# The draft is scratch work beside the chain, not a fourth row of it: `text` ink at math_sm,
+# The draft is scratch work beside the chain, not a fourth row of it: `text` ink at math_rail,
 # one indent in from the chain's left edge, and no semantic hue (the deck's axis -- blue cos,
 # amber sin, ochre theta -- stays reserved for the rows themselves). It is built inside the
 # hook, never becomes a Block, and is faded out before {show step.1} needs the space, so every
@@ -1472,7 +1472,7 @@ def _draft_line(tex: str, ground: str, y: float, *, x: float = _DRAFT_X):
     Shared by scene 04 and scene 17 (`cosine_identity_draft`). *x* defaults to scene 04's
     own column, so its existing call sites are unchanged; scene 17 passes the column it
     reads off its own proof chain."""
-    mob = brand.math_line(tex, ground, role="text", size="math_sm")
+    mob = brand.math_line(tex, ground, role="text", size="math_rail")
     mob.move_to([x, y, 0], aligned_edge=LEFT)
     return mob
 
@@ -1676,7 +1676,7 @@ def difference_quotient_for_sine(spec, ctx, blocks):
 # derivation happens WHERE the narration puts it, as a temporary draft in the band
 # proof.1 / proof.2 / qed will occupy, which is empty for the whole of this beat.
 #
-# The draft is scratch work beside the chain, not a fourth row of it: `text` ink at math_sm
+# The draft is scratch work beside the chain, not a fourth row of it: `text` ink at math_rail
 # (`brand.math_line`, METHODOLOGY §5), one indent in from the chain's left edge, no semantic
 # hue. It is built inside the hook, never becomes a Block, and is cleared before
 # {show proof.1} needs the space, so every layout gate still measures the terminal frame it
@@ -2505,13 +2505,13 @@ def shm_device(spec, ctx, blocks):
     acc_arrow = always_redraw(_acc_arrow)
     displacement = always_redraw(_displacement)
 
-    # size "label"(30px)->"math_sm"(40px)（2026-09-13 合併版視覺幀稽核）：s/s'/s'' 三個裝置標籤
+    # size "label"(30px)->rail 階（2026-09-13 合併版視覺幀稽核；當時 math_sm 40，T2 後＝math_rail 34）：s/s'/s'' 三個裝置標籤
     # 單一字母的有效字級只有約 18-22 px，升一階讀得到。
-    vel_label = brand.math_line("s'", ground, role="secondary", size="math_sm")
+    vel_label = brand.math_line("s'", ground, role="secondary", size="math_rail")
     vel_label.move_to(CEIL + ARM * RIGHT + 0.32 * UP)
-    acc_label = brand.math_line("s''", ground, role="success", size="math_sm")
+    acc_label = brand.math_line("s''", ground, role="success", size="math_rail")
     acc_label.move_to(CEIL + ARM * LEFT + 0.32 * UP)
-    s_label = brand.math_line("s", ground, role="accent", size="math_sm")
+    s_label = brand.math_line("s", ground, role="accent", size="math_rail")
     s_label.next_to(EQ + 0.85 * RIGHT, RIGHT, buff=0.12)
 
     device = VGroup(ceiling, hatch, equilibrium, spring, weight, vel_arrow, acc_arrow,
