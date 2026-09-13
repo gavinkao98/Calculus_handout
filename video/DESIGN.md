@@ -336,7 +336,7 @@ video 保 `-c:v copy`（不破壞 T8 單次編碼）、linear gain 保 A/V 同�
 | **quantitative（讀值）** | 旁白指名某座標或要讀值（「在 `$x=a$`」「值為 `$L$`」「`$\arccos 1=0$`」） | **必須**在那些座標放 teaching-tick | `$\sin\theta=\tfrac13$` 求 `$\tan\theta$`、極限讀值 |
 
 - **teaching-tick 機制（已存在、opt-in）：** axes 區塊寫 `x_ticks: [{at, label}]`／`y_ticks: […]`，在指定座標畫**幾個關鍵刻度**（例如在 `$x=a$` 標 `a`、在 `$y$` 軸標 `L`），而非整條數線——保住乾淨軸又給尺度錨點。實作 `graph._axis_ticks`；數字渲成 math，故 `a`／`L` 會是斜體。
-- **軸字母：** `_add_axis_labels` 預設在軸尖標 `x`／`y`；該圖確實不需要時用 `axis_labels: false` 關掉（勿濫用）。
+- **軸字母：** `_add_axis_labels` 預設在軸尖標 `x`／`y`；該圖確實不需要時用 `axis_labels: false` 關掉（勿濫用）。**用別的變數名時寫 `x_label`／`y_label`**（2026-09-13）——例如整場旁白、曲線標籤與 caption 都講 $\theta$，軸卻獨自寫 `x`，讀起來像另一個變數（視覺稽核在 `squeeze_graph` 開的 advisory）。兩者都走 `brand.math_line`，所以 `meta.color_map` 裡的變數在軸標上也吃到同一個色。
 - **enforcement：** 此為**撰稿慣例**，目前靠人／VISUAL-FRAME gate 判讀，**未加 lint**（曾評估「旁白座標引用 ↔ teaching-tick」的 A-2 lint，因正則偵測旁白偽陽／偽陰風險，暫不採；情境變了再評）。緣由與取捨見 [`content_scripts/_audit/REVIEW-graph-axis-label-convention-proposal.html`](content_scripts/_audit/REVIEW-graph-axis-label-convention-proposal.html)。
 
 ## Lectern 版面網格（2026-06-21 版面重設計）
@@ -364,6 +364,11 @@ gutter、`derivation` 的式子右緣、`callout` 的置中…），任何「第
   卡 snap `RAIL_X`（會 graceful 收合，不與內容競爭）。
 - `derivation`：理由 snap `RAIL_X`；dotted leader 改為**目錄式可變長 connector**
   （短式配長 leader，連接永遠成立）。無理由的純鏈仍置中（不變）。
+  **2026-09-13：rail 不再是絕對釘死的。** 算式寬到逼近 rail 時，舊 code 會靜靜跳過 leader
+  （`lead_end - lead_start > 0.12` 那道保險），tag 於是黏在算式尾巴上，只剩 16–30 px 淨空
+  （視覺稽核在 `difference_quotient_for_sine` 與 `companion_limit` 各開一條）。現在 rail 會
+  **場級右移**到最寬那列還放得下 `MIN_LEADER = 0.55u` 為止，上限是「最寬 reason 自己的寬度」
+  ——欄位永遠不會被擠到要縮字（tag 已是畫面最小字級）。其餘場位移 0.000u，逐列輸出不變。
 - `procedure_steps`：result 欄左對齊 `RAIL_X`（原右對齊 far gutter、Codex 兩輪嫌 detached）。
 - `recap_cards`：**不用 rail**——改為單一全幅編號點欄（`points[]` 以 `01/02/03` ＋ 全寬 prose
   左堆疊、`center_in_zone` 上偏置中）；舊「公式卡 snap `RAIL_X`」雙欄版已退場。

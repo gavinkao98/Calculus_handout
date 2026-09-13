@@ -63,10 +63,14 @@ scenes:
     tagline: "How fast does sine change?"
     duration: 6.0
 
+  # divider 不帶 accent（2026-09-13 使用者裁決）：語意色軸是給「內容型別」用的，而 divider 是
+  # 結構標記、不屬於那六種型別中的任何一種。原本四個 divider 都寫 accent: definition＝赭，
+  # 但 §3.1 一個 envdefinition 都沒有（第一個在 §3.2），content 場清掉 definition 標記後，
+  # 赭在本節已改指 meta.color_map 的 θ——divider 再留著赭就是在說一件不存在的事。
+  # 不給 accent ＝ blocks.DEFAULT_ROLE 的中性 slate，只影響 eyebrow 與進度點的色相。
   # 1 ------------------------------------------- divider: Stage 1 opener
   - id: divider_limit
     kind: divider
-    accent: definition
     eyebrow: "Stage 1"
     title: "The Limit Behind the Slope"
     subtitle: "Why a trig derivative needs a new idea."
@@ -132,8 +136,12 @@ scenes:
       So let us transform that difference quotient instead of fighting it
       head-on. {show scaffold.motive} The decisive step is one trigonometric identity -- sum-to-product
       -- which turns a difference of sines into a product.
-      {show step.0} Here it is; and a product is exactly what we want, because
-      we can pull it apart and take limits one factor at a time.
+      {show step.0} Here it is. And if it looks like it fell out of the sky, it
+      did not: put $u=\tfrac{A+B}2$ and $v=\tfrac{A-B}2$, so that $A=u+v$ and
+      $B=u-v$; expand $\sin(u+v)-\sin(u-v)$ with the angle-sum formulas, and the
+      $\sin u\cos v$ terms cancel, leaving exactly $2\cos u\sin v$. A product is
+      also exactly what we want, because we can pull it apart and take limits one
+      factor at a time.
       {show step.1} Put $A=x+h$ and $B=x$, and the numerator becomes
       $2\cos(x+\tfrac h2)\sin\tfrac h2$.
       {show step.2} Now divide by $h$ -- and here is the small trick that makes
@@ -146,9 +154,9 @@ scenes:
       hangs on just two facts -- continuity, and that fundamental limit. We
       secure both now.
     steps:
-      - { math: "\\sin A-\\sin B = 2\\cos\\frac{A+B}{2}\\,\\sin\\frac{A-B}{2}", reason: "sum-to-product" }
+      - { math: "\\sin A-\\sin B = 2\\cos\\frac{A+B}{2}\\,\\sin\\frac{A-B}{2}", reason: "sum-to-product ($A=u+v$, $B=u-v$)" }
       - { math: "\\sin(x+h)-\\sin x = 2\\cos\\!\\left(x+\\frac h2\\right)\\sin\\frac h2", reason: "$A=x+h,\\ B=x$", anim: transform }
-      - { math: "\\frac{\\sin(x+h)-\\sin x}{h} = \\cos\\!\\left(x+\\frac h2\\right)\\cdot\\frac{\\sin(h/2)}{h/2}", reason: "write $h=2\\cdot\\tfrac h2$", anim: transform }
+      - { math: "\\frac{\\sin(x+h)-\\sin x}{h} = \\cos\\!\\left(x+\\frac h2\\right)\\cdot\\frac{\\sin(h/2)}{h/2}", reason: "write $h=2\\cdot(h/2)$", anim: transform }
     result: { math: "\\cos\\!\\left(x+\\frac h2\\right)\\to\\cos x\\quad\\text{and}\\quad \\frac{\\sin(h/2)}{h/2}\\to 1", reason: "continuity + the limit", anim: transform }
     # the substitution / divide / hand-off rows REWRITE the line above them instead of
     # arriving finished, and the screen holds after the decisive step so it can land.
@@ -158,7 +166,6 @@ scenes:
   # 4 ------------------------------------------- divider: Stage 2 opener
   - id: divider_squeeze
     kind: divider
-    accent: definition
     eyebrow: "Stage 2"
     title: "A Geometric Squeeze"
     subtitle: "Trapping a ratio between two areas."
@@ -182,17 +189,17 @@ scenes:
       - { at: tri_outer, dim: [tri_inner, sector] }
       # 規則 3 的閃爍變體：ineq 那拍三塊全部還原後，依序閃一下讓觀眾把三塊面積和不等式的三項對上。
       - { at: ineq, dim: [], indicate: [tri_inner, sector, tri_outer] }
+      # 偶函數離題移到最後（R6／四鏡同指，2026-09-13 使用者核准；講義把它放在圖之前，這是
+      # 刻意的影片／講義差異——書可以跳著讀，影片不能，19 秒的離題卡在主圖之前就是擋路）。
+      # 它現在覆蓋在已完成的圖上，所以整張圖壓暗當背景，小單位圓獨佔注意力。
+      - { at: evenness, dim: [circle, frame, apex, tri_inner, sector, tri_outer, ineq] }
     # 規則 1：07 只帶走 [circle, frame, apex]；其餘在場尾先淡出（exit），不靠硬切消失。
     exit: [evenness, tri_inner, sector, tri_outer, ineq]
     source: "chapter3-print-standalone.html SS3.1 . Figure 3.1 (sector-inequality) + area prose"
     title: "A Squeeze on the Unit Circle"
     say: |
       {show circle} Here is that new tool. We compare three areas on a circle of radius one.
-      {show evenness} But first, one convenience that saves us half the work. Replacing $\theta$
-      by $-\theta$ flips the sign of both $\theta$ and $\sin\theta$, so the
-      ratio $\sin\theta/\theta$ is even -- whatever we learn for positive angles
-      holds for negative ones, so it is enough to chase $\theta$ down to zero
-      from the positive side. {show frame} Now the geometry. On the unit circle, $A$ is at
+      {show frame} On the unit circle, $A$ is at
       $(1,0)$, $B$ is the point at angle $\theta$, {show apex} and extending the radius to
       the tangent at $A$ gives $C=(1,\tan\theta)$.
       {show tri_inner} The inner triangle $OAB$ has base one and height
@@ -203,7 +210,15 @@ scenes:
       its area is one half $\tan\theta$.
       {show ineq} Each region sits inside the next, so the areas line up in
       order: one half $\sin\theta$, then one half $\theta$, then one half
-      $\tan\theta$. The whole argument hangs on that one picture.
+      $\tan\theta$. And you can see exactly what each one adds: the corner piece
+      $ABC$ is what the outer triangle adds to the inner one, and inside it sits
+      the sliver between the chord $AB$ and the arc. The whole argument hangs on
+      that one picture.
+      {show evenness} One convenience before we push on, and it saves us half the
+      work. Replacing $\theta$ by $-\theta$ flips the sign of both $\theta$ and
+      $\sin\theta$, so the ratio $\sin\theta/\theta$ is even -- whatever we learn
+      for positive angles holds for negative ones, so it is enough to chase
+      $\theta$ down to zero from the positive side.
     axes:
       x_range: [-0.45, 1.4, 1]
       y_range: [-0.35, 1.65, 1]
@@ -254,7 +269,7 @@ scenes:
     steps:
       - { math: "{{\\sin\\theta}} \\;\\le\\; {{\\theta}} \\;\\le\\; {{\\tan\\theta}}", reason: "multiply areas by $2$",
           seg_roles: { "\\sin\\theta": secondary, "\\theta": accent, "\\tan\\theta": success } }
-      - { math: "{{1}} \\;\\le\\; {{\\frac{\\theta}{\\sin\\theta}}} \\;\\le\\; {{\\frac{1}{\\cos\\theta}}}", reason: "$\\div\\sin\\theta$, $\\tan=\\tfrac{\\sin}{\\cos}$", anim: transform, frame: true,
+      - { math: "{{1}} \\;\\le\\; {{\\frac{\\theta}{\\sin\\theta}}} \\;\\le\\; {{\\frac{1}{\\cos\\theta}}}", reason: "$\\div\\sin\\theta$, $\\tan=\\sin/\\cos$", anim: transform, frame: true,
           seg_roles: { "1": secondary, "\\frac{\\theta}{\\sin\\theta}": accent, "\\frac{1}{\\cos\\theta}": success } }
     result: { math: "{{\\cos\\theta}} \\;\\le\\; {{\\frac{\\sin\\theta}{\\theta}}} \\;\\le\\; {{1}} \\qquad (0<\\theta<\\frac{\\pi}{2})", reason: "reciprocate -- reverses", anim: transform, frame: true,
               seg_roles: { "\\cos\\theta": success, "\\frac{\\sin\\theta}{\\theta}": accent, "1": secondary } }
@@ -312,10 +327,19 @@ scenes:
     part: { current: 2, total: 2 }
     ref: md:continuity_argument
     covers: [cos_identity, sin_identity, bound, qed]     # proof.0/1/2 + qed (all shown)
-    paced: [proof.0, proof.1, qed]   # 15-17 s beats: each row written as it is read
+    paced: [proof.0]                 # 15-17 s beat: the row is written as it is read
+    # proof.1 與 qed 退出 paced：兩者的 reveal 都被 hook 換成 callable（pacing 只升級 stock
+    # reveal），各自有自己的填滿方式——proof.1 是由 proof.0 變形過去，qed 是「寫完最後一列
+    # ＋畫數線＋把 x 走進 x₀」，那段步行本身就把拍子的剩餘時間吃掉。
     # 規則 3：proof.2「Drop it to its largest size, one」講的是上面兩列的半和因子，閃兩列。
     focus:
       - { at: proof.2, dim: [], indicate: [proof.0, proof.1] }
+    # R2 盲審重跑的新 must（2026-09-13 使用者核准）：全片最抽象的一場、70 秒、一張圖都沒有。
+    # hook 做兩件事：(1) proof.1 不再從頭寫，而是由 proof.0 變形過去——兩條恆等式本來就是同一個
+    # 模板填兩次，cos 翻成 sin、前面的負號離開、兩個半角因子交換位置，其餘滑動（規則 2，螢幕文字
+    # 一字未改，所以 proof.1 退出 paced）；(2) 右下角空白處補一條數線：x_0 不動、x 滑進去、
+    # 中點與半距括號跟著收——qed 那拍旁白說的「let x→x_0，半角趨近 0」變成看得到的事。
+    hook: animations.ch03_trig_derivatives_hooks:continuity_template
     scaffold: { motive: "Turn $\\sin\\theta\\to 0$ into full continuity, everywhere." }
     source: "chapter3-print-standalone.html SS3.1 . Proposition 3.1 . Proof (sum-to-product bound + squeeze)"
     title: "Sine and Cosine Are Continuous"
@@ -400,8 +424,9 @@ scenes:
       # y 刻度「1」拿掉：它落在 (0,1)，而三條曲線都在那裡收攏，任何放在該高度的字都會被曲線穿過
       # （量測：746 點落在框內）。同一個「1」已由常數線自己的標籤講了一次，重複且更清楚。
       x_ticks: [{ at: 1.5708, label: "$\\tfrac{\\pi}{2}$" }, { at: -1.5708, label: "$-\\tfrac{\\pi}{2}$" }]
-      x_length: 6.4
-      y_length: 3.6
+      # 視覺稽核「三張 graph 場只佔內容區 31-41%」（2026-09-13）：放大到約 48%。
+      x_length: 7.5
+      y_length: 4.0
       x_label: "\\theta"      # 旁白、兩條曲線標籤與 caption 全用 θ，軸標不可獨自寫 x（2026-09-13 視覺稽核）
     # 色軸（規則 5）：cos 由 muted 升為 secondary，與場 18／24 的 cos 同色；常數 1 是參考線，降為 muted。
     # 原本 cos 灰、常數線藍，等於「會動的那條」比「不動的那條」還不顯眼。
@@ -444,17 +469,22 @@ scenes:
     type: caution
     sparse_ok: true                  # pull-quote caution: the calm whitespace is the emphasis (G3 ack, Task 14 #7)
     ref: md:limit_not_identity
-    paced: [body]                    # 17.9 s beat: the caution reads line by line
+    paced: [body]                    # the caution reads line by line
     # 規則 1：上一場的圖不重生——「at θ=π/2 it is 2/π」時那條曲線就在右上角（曲線在 π/2 明顯低於 1）。
     carry:
       - { from: squeeze_graph, block: [axes, ticks, plot.0, plot.1, plot.2, plot.3], as: carried.graph, to: { corner: top_right, scale: 0.4 } }
+    # R2 盲審重跑的新 must（2026-09-13 使用者核准）：專責擋誤解的一場卻最沒有畫面支撐。
+    # carry 把曲線帶過切點當角落 inset；hook 在「At a fixed angle」那拍把 inset 放回全幅並
+    # 延伸到 θ=π——場 11 的 x 只到 1.85，π 根本在它的畫面外——再逐拍落下旁白唸到的兩個讀數。
+    # 縮放在這裡不是裝飾：近景正是讓比值「看起來像 1」的那張圖，退開一步才看得到它不是。
+    hook: animations.ch03_trig_derivatives_hooks:ratio_readouts
     source: "chapter3-print-standalone.html SS3.1 . Caution (limit not identity)"
     title: "A Limit, Not an Identity"
     say: |
       {show carried.graph} One caution, because this result is easy to over-read.
       {show body} The statement is about the limit as $\theta\to 0$ -- not an
-      identity. At a fixed angle the ratio is generally not one: at
-      $\theta=\tfrac\pi2$ it is two over $\pi$, about $0.64$, and at $\theta=\pi$
+      identity. {show opened} At a fixed angle the ratio is generally not one: {show at_half_pi} at
+      $\theta=\tfrac\pi2$ it is two over $\pi$, about $0.64$, {show at_pi} and at $\theta=\pi$
       it is zero. The value one is reached only in the limit.
     body: "The limit as $\\theta\\to 0$ is not an identity. At a fixed angle, $\\sin\\theta/\\theta$ is generally not $1$: at $\\theta=\\tfrac{\\pi}{2}$ it is $2/\\pi\\approx 0.64$, and at $\\theta=\\pi$ it is $0$."
 
@@ -472,10 +502,12 @@ scenes:
       A second caution, and this one is structural.
       {show body} Everything here depends on radians. The sector area one half
       $\theta$ -- and with it the limit -- uses radian measure. Switch to degrees
-      and the limit is $\pi$ over $180$, not one, so the derivative drags that
-      factor along. The clean formulas $\sin'=\cos$ and $\cos'=-\sin$ hold only
-      in radians.
-    body: "Everything here needs radians. In degrees, $\\sin(x^{\\circ})/x \\to \\pi/180$, so $\\tfrac{d}{dx}\\sin(x^{\\circ})=\\tfrac{\\pi}{180}\\cos(x^{\\circ})$ --- the clean $\\sin'=\\cos$ holds only in radians."
+      and the limit is $\pi$ over $180$, not one -- and every formula we are
+      about to build on it changes with it.
+    # D-1b（R5；2026-09-13 使用者核准）：度數的導數公式 $\frac{d}{dx}\sin(x^\circ)$ 原本在這裡，
+    # 但此刻 $\sin'=\cos$ 還沒證（場 16 才證），是前向參照——書可以往後翻，影片不能。移到 recap。
+    # 講義把它留在同一個 Caution 裡，這是刻意的影片／講義差異。
+    body: "Everything here needs radians. In degrees, $\\sin(x^{\\circ})/x \\to \\pi/180$, not $1$ --- and every formula built on that limit changes with it."
 
   # 13 -------------------------------- Example 3.1: the companion limit (1-cos t)/t -> 0
   - id: companion_limit
@@ -509,7 +541,6 @@ scenes:
   # 14 ----------------------------------------- divider: Stage 3 opener
   - id: divider_derivatives
     kind: divider
-    accent: definition
     eyebrow: "Stage 3"
     title: "The Two Derivatives"
     subtitle: "Assembling the pieces."
@@ -574,7 +605,8 @@ scenes:
       Cosine falls to the very same machinery -- only the identity changes, so
       we go quickly.
       {show statement} The claim: the derivative of $\cos x$ is $-\sin x$.
-      {show proof.0} This time use the companion sum-to-product formula.
+      {show proof.0} This time use the companion sum-to-product formula --
+      obtained the same way as the first one, by expanding $\cos(u+v)-\cos(u-v)$.
       {show proof.1} The same division by $h$ turns the difference quotient into
       $-\sin(x+\tfrac h2)$ times $\sin(h/2)$ over $h/2$.
       {show proof.2} Send $h$ to zero: the sine factor tends to $\sin x$ by
@@ -615,15 +647,18 @@ scenes:
     axes:
       x_range: [-0.25, 3.45, 1]
       y_range: [-1.35, 1.35, 1]
-      x_length: 7.2
-      y_length: 4.0
+      # 同上：41% -> 約 57%。這一場沒有 caption，縱向餘裕最多。
+      x_length: 8.6
+      y_length: 4.7
     plots:
       # 色軸（規則 5）：amber＝sine、blue＝cosine（與場 24 的 s'=\cos t 同色）、green＝斜率。
       # cos 原為 muted 灰虛線，但讀數點與讀數標籤卻是 amber——同一個橘同時代表 sin 曲線與 cos 的值
       # （2026-09-13 視覺稽核）。cos 升為 secondary 後，hook 的讀數點／標籤跟著同色。
       # label_point 1.4→0.95：原位置壓在自己的曲線頂與 m=0 切線上（量測：曲線 3105 點落在標籤框內）。
       - { kind: function, expression: "sin(x)", x_range: [0, 3.3], color_role: accent, label: "$y=\\sin x$", label_point: [0.95, 1.24], reveal: true }
-      - { kind: function, expression: "cos(x)", x_range: [0, 3.3], color_role: secondary, dashed: true, label: "$y=\\cos x$", label_point: [2.95, 1.05], reveal: true }
+      # label_point 2.95,1.05 → 2.05,-0.95：原位置在右上角，離自己的曲線約兩個單位、反而貼近
+      # sin 那一條；新位置在 cos 曲線正下方 0.49 個單位的空白帶（量測 0 處相交，離 cos 0.49、離 sin 1.84）。
+      - { kind: function, expression: "cos(x)", x_range: [0, 3.3], color_role: secondary, dashed: true, label: "$y=\\cos x$", label_point: [2.05, -0.95], reveal: true }
 
   # 18 -------------------------------------- Remark 3.1: the four-step derivative cycle
   - id: derivative_cycle
@@ -658,7 +693,6 @@ scenes:
   # 19 ----------------------------------------- divider: Stage 4 opener
   - id: divider_apply
     kind: divider
-    accent: definition
     eyebrow: "Stage 4"
     title: "Consequences and Applications"
     subtitle: "From the cycle to oscillation."
@@ -694,9 +728,9 @@ scenes:
       rule, with a constant on top, gives this.
       {show result} Clean it up, and secant's derivative is $\sec x\tan x$.
     steps:
-      - { math: "{{\\frac{d}{dx}\\tan x}} = {{\\frac{(\\cos x)(\\cos x)-(\\sin x)(-\\sin x)}{\\cos^{2} x}}}", reason: "quotient rule on $\\tfrac{\\sin x}{\\cos x}$ ($\\cos x\\neq 0$)" }
+      - { math: "{{\\frac{d}{dx}\\tan x}} = {{\\frac{(\\cos x)(\\cos x)-(\\sin x)(-\\sin x)}{\\cos^{2} x}}}", reason: "quotient rule on $\\sin x/\\cos x$ ($\\cos x\\neq 0$)" }
       - { math: "= {{\\frac{\\cos^{2} x+\\sin^{2} x}{\\cos^{2} x}}} = {{\\frac{1}{\\cos^{2} x}}} = {{\\sec^{2} x}}", reason: "Pythagorean identity", anim: transform, frame: true }
-      - { math: "{{\\frac{d}{dx}\\sec x}} = {{\\frac{0\\cdot\\cos x-1\\cdot(-\\sin x)}{\\cos^{2} x}}}", reason: "quotient rule on $\\tfrac{1}{\\cos x}$" }
+      - { math: "{{\\frac{d}{dx}\\sec x}} = {{\\frac{0\\cdot\\cos x-1\\cdot(-\\sin x)}{\\cos^{2} x}}}", reason: "quotient rule on $1/\\cos x$" }
     result: { math: "= {{\\frac{\\sin x}{\\cos^{2} x}}} = {{\\sec x\\tan x}}", anim: transform }
 
   # 20b ------------------- Example 3.2 (part 2/2): cot' and csc' -- the same move
@@ -723,9 +757,9 @@ scenes:
       {show result} Cleaned up, that is $-\csc x\cot x$ -- and all six are done,
       every one built on $\sin'=\cos$ and $\cos'=-\sin$.
     steps:
-      - { math: "{{\\frac{d}{dx}\\cot x}} = {{\\frac{(-\\sin x)(\\sin x)-(\\cos x)(\\cos x)}{\\sin^{2} x}}}", reason: "quotient rule on $\\tfrac{\\cos x}{\\sin x}$ ($\\sin x\\neq 0$)" }
+      - { math: "{{\\frac{d}{dx}\\cot x}} = {{\\frac{(-\\sin x)(\\sin x)-(\\cos x)(\\cos x)}{\\sin^{2} x}}}", reason: "quotient rule on $\\cos x/\\sin x$ ($\\sin x\\neq 0$)" }
       - { math: "= {{\\frac{-(\\sin^{2} x+\\cos^{2} x)}{\\sin^{2} x}}} = {{-\\frac{1}{\\sin^{2} x}}} = {{-\\csc^{2} x}}", reason: "Pythagorean identity", anim: transform, frame: true }
-      - { math: "{{\\frac{d}{dx}\\csc x}} = {{\\frac{0\\cdot\\sin x-1\\cdot\\cos x}{\\sin^{2} x}}}", reason: "quotient rule on $\\tfrac{1}{\\sin x}$" }
+      - { math: "{{\\frac{d}{dx}\\csc x}} = {{\\frac{0\\cdot\\sin x-1\\cdot\\cos x}{\\sin^{2} x}}}", reason: "quotient rule on $1/\\sin x$" }
     result: { math: "= {{-\\frac{\\cos x}{\\sin^{2} x}}} = {{-\\csc x\\cot x}}", anim: transform }
 
   # 21 ------------------------------- Example 3.3: simple harmonic motion (s'' = -s)
@@ -752,8 +786,9 @@ scenes:
       {show step.2} Acceleration is the next derivative, $s''(t)=-\sin t$.
       {show result} But $-\sin t$ is just $-s(t)$ -- at every instant the weight
       is pushed back toward rest. That relation, $s''=-s$, is the signature of
-      simple harmonic motion; sine and cosine are exactly the functions that
-      describe it.
+      simple harmonic motion -- and it is the four-step cycle stopped halfway.
+      Both sine and cosine satisfy that relation, so either one can describe an
+      oscillation.
     steps:
       - { math: "s(t) = \\sin t", reason: "height" }
       - { math: "s'(t) = \\cos t", reason: "velocity" }
@@ -835,12 +870,15 @@ scenes:
       trig derivatives -- tangent, cotangent, secant, cosecant.
       {show point.3} And keep the cycle in mind -- four derivatives of sine or
       cosine bring you home -- with the fine print that it all depends on
-      radians.
+      radians: in degrees the derivative of $\sin(x^\circ)$ picks up a factor of
+      $\pi$ over $180$, so the clean $\sin'=\cos$ and $\cos'=-\sin$ hold only in
+      radian measure.
     points:
       - "Fundamental limit: $\\sin\\theta/\\theta \\to 1$ as $\\theta\\to 0$, proved by squeezing areas on the unit circle."
       - "Two core derivatives: $\\sin'=\\cos$ and $\\cos'=-\\sin$."
       - "The quotient rule delivers all six trig derivatives: $\\tan,\\cot,\\sec,\\csc$."
-      - "Derivatives of $\\sin$ and $\\cos$ cycle with period four; the entire framework requires radians."
+      # D-1b：度數的導數公式從場 13 移到這裡——現在兩條定理都證完了，講它才不是前向參照。
+      - "Derivatives of $\\sin$ and $\\cos$ cycle with period four; and it all needs radians --- in degrees $\\tfrac{d}{dx}\\sin(x^{\\circ})=\\tfrac{\\pi}{180}\\cos(x^{\\circ})$."
 
   # 25 ------------------------------------------------------------------------- outro
   - id: outro

@@ -35,9 +35,9 @@ meta:
   derived_from:
     inputs:
     - path: ch03_trig_derivatives.yml
-      sha256: ddbbd916f1f9125b7cd0e085a6c831dac85ffa852fa5773f0899e9a32e309a55
+      sha256: c7326b188a91a62e294b7d0b675d22b94df4ef4b2547493bbc2a039fff890d90
     - path: ../content_scripts/ch03_trig_derivatives.spoken.yml
-      sha256: 33b4bcbe4296446e89df8b59d9c27a20cab6e6102d58fdba2b2aa5bb11d00551
+      sha256: 57b72fd07fc8e2962cccf0885c6b45a301270829891f3d4ca5803eb1dfee15b1
 scenes:
 - id: intro
   kind: intro
@@ -45,7 +45,6 @@ scenes:
   duration: 6.0
 - id: divider_limit
   kind: divider
-  accent: definition
   eyebrow: Stage 1
   title: The Limit Behind the Slope
   subtitle: Why a trig derivative needs a new idea.
@@ -141,9 +140,19 @@ scenes:
 
     -- which turns a difference of sines into a product.
 
-    {show step.0} Here it is; and a product is exactly what we want, because
+    {show step.0} Here it is. And if it looks like it fell out of the sky, it did
 
-    we can pull it apart and take limits one factor at a time.
+    not: put u equals the quantity A plus B, all over two, and v equals the
+
+    quantity A minus B, all over two, so that A equals u plus v and B equals u
+
+    minus v; expand sine of the quantity u plus v, minus sine of the quantity u
+
+    minus v, with the angle-sum formulas, and the sine u cosine v terms cancel,
+
+    leaving exactly two cosine u sine v. A product is also exactly what we want,
+
+    because we can pull it apart and take limits one factor at a time.
 
     {show step.1} Put A equals x plus h and B equals x, and the numerator
 
@@ -174,12 +183,12 @@ scenes:
     '
   steps:
   - math: \sin A-\sin B = 2\cos\frac{A+B}{2}\,\sin\frac{A-B}{2}
-    reason: sum-to-product
+    reason: sum-to-product ($A=u+v$, $B=u-v$)
   - math: \sin(x+h)-\sin x = 2\cos\!\left(x+\frac h2\right)\sin\frac h2
     reason: $A=x+h,\ B=x$
     anim: transform
   - math: \frac{\sin(x+h)-\sin x}{h} = \cos\!\left(x+\frac h2\right)\cdot\frac{\sin(h/2)}{h/2}
-    reason: write $h=2\cdot\tfrac h2$
+    reason: write $h=2\cdot(h/2)$
     anim: transform
   result:
     math: \cos\!\left(x+\frac h2\right)\to\cos x\quad\text{and}\quad \frac{\sin(h/2)}{h/2}\to 1
@@ -190,7 +199,6 @@ scenes:
     seconds: 1.5
 - id: divider_squeeze
   kind: divider
-  accent: definition
   eyebrow: Stage 2
   title: A Geometric Squeeze
   subtitle: Trapping a ratio between two areas.
@@ -221,6 +229,15 @@ scenes:
     - tri_inner
     - sector
     - tri_outer
+  - at: evenness
+    dim:
+    - circle
+    - frame
+    - apex
+    - tri_inner
+    - sector
+    - tri_outer
+    - ineq
   exit:
   - evenness
   - tri_inner
@@ -231,15 +248,7 @@ scenes:
   title: A Squeeze on the Unit Circle
   say: '{show circle} Here is that new tool. We compare three areas on a circle of radius one.
 
-    {show evenness} But first, one convenience that saves us half the work. Replacing theta by
-
-    negative theta flips the sign of both theta and sine theta, so the ratio
-
-    sine theta over theta is even -- whatever we learn for positive angles
-
-    holds for negative ones, so it is enough to chase theta down to zero from
-
-    the positive side. {show frame} Now the geometry. On the unit circle, A is at the point
+    {show frame} On the unit circle, A is at the point
 
     with coordinates one and zero, B is the point at angle theta, {show apex} and extending
 
@@ -263,7 +272,23 @@ scenes:
 
     order: one half sine theta, then one half theta, then one half tangent
 
-    theta. The whole argument hangs on that one picture.
+    theta. And you can see exactly what each one adds: the corner piece A B C is
+
+    what the outer triangle adds to the inner one, and inside it sits the sliver
+
+    between the chord A B and the arc. The whole argument hangs on that one
+
+    picture.
+
+    {show evenness} One convenience before we push on, and it saves us half the
+
+    work. Replacing theta by negative theta flips the sign of both theta and sine
+
+    theta, so the ratio sine theta over theta is even -- whatever we learn for
+
+    positive angles holds for negative ones, so it is enough to chase theta down
+
+    to zero from the positive side.
 
     '
   axes:
@@ -349,7 +374,7 @@ scenes:
       \theta: accent
       \tan\theta: success
   - math: '{{1}} \;\le\; {{\frac{\theta}{\sin\theta}}} \;\le\; {{\frac{1}{\cos\theta}}}'
-    reason: $\div\sin\theta$, $\tan=\tfrac{\sin}{\cos}$
+    reason: $\div\sin\theta$, $\tan=\sin/\cos$
     anim: transform
     frame: true
     seg_roles:
@@ -446,14 +471,13 @@ scenes:
   - qed
   paced:
   - proof.0
-  - proof.1
-  - qed
   focus:
   - at: proof.2
     dim: []
     indicate:
     - proof.0
     - proof.1
+  hook: animations.ch03_trig_derivatives_hooks:continuity_template
   scaffold:
     motive: Turn $\sin\theta\to 0$ into full continuity, everywhere.
   source: chapter3-print-standalone.html SS3.1 . Proposition 3.1 . Proof (sum-to-product bound + squeeze)
@@ -593,8 +617,8 @@ scenes:
       label: $\tfrac{\pi}{2}$
     - at: -1.5708
       label: $-\tfrac{\pi}{2}$
-    x_length: 6.4
-    y_length: 3.6
+    x_length: 7.5
+    y_length: 4.0
     x_label: \theta
   plots:
   - kind: function
@@ -695,15 +719,16 @@ scenes:
     to:
       corner: top_right
       scale: 0.4
+  hook: animations.ch03_trig_derivatives_hooks:ratio_readouts
   source: chapter3-print-standalone.html SS3.1 . Caution (limit not identity)
   title: A Limit, Not an Identity
   say: '{show carried.graph} One caution, because this result is easy to over-read.
 
     {show body} The statement is about the limit as theta goes to zero -- not
 
-    an identity. At a fixed angle the ratio is generally not one: at theta
+    an identity. {show opened} At a fixed angle the ratio is generally not one: {show at_half_pi} at theta
 
-    equals pi over two it is two over pi, about zero point six four, and at
+    equals pi over two it is two over pi, about zero point six four, {show at_pi} and at
 
     theta equals pi it is zero. The value one is reached only in the limit.
 
@@ -725,14 +750,12 @@ scenes:
 
     theta -- and with it the limit -- uses radian measure. Switch to degrees
 
-    and the limit is pi over one hundred eighty, not one, so the derivative
+    and the limit is pi over one hundred eighty, not one -- and every formula we
 
-    drags that factor along. The clean formulas sine prime equals cosine and
-
-    cosine prime equals negative sine hold only in radians.
+    are about to build on it changes with it.
 
     '
-  body: Everything here needs radians. In degrees, $\sin(x^{\circ})/x \to \pi/180$, so $\tfrac{d}{dx}\sin(x^{\circ})=\tfrac{\pi}{180}\cos(x^{\circ})$ --- the clean $\sin'=\cos$ holds only in radians.
+  body: Everything here needs radians. In degrees, $\sin(x^{\circ})/x \to \pi/180$, not $1$ --- and every formula built on that limit changes with it.
 - id: companion_limit
   kind: content
   template: derivation
@@ -787,7 +810,6 @@ scenes:
     anim: transform
 - id: divider_derivatives
   kind: divider
-  accent: definition
   eyebrow: Stage 3
   title: The Two Derivatives
   subtitle: Assembling the pieces.
@@ -877,7 +899,11 @@ scenes:
 
     {show statement} The claim: the derivative of cosine x is negative sine x.
 
-    {show proof.0} This time use the companion sum-to-product formula.
+    {show proof.0} This time use the companion sum-to-product formula -- obtained
+
+    the same way as the first one, by expanding cosine of the quantity u plus v,
+
+    minus cosine of the quantity u minus v.
 
     {show proof.1} The same division by h turns the difference quotient into
 
@@ -949,8 +975,8 @@ scenes:
     - -1.35
     - 1.35
     - 1
-    x_length: 7.2
-    y_length: 4.0
+    x_length: 8.6
+    y_length: 4.7
   plots:
   - kind: function
     expression: sin(x)
@@ -972,8 +998,8 @@ scenes:
     dashed: true
     label: $y=\cos x$
     label_point:
-    - 2.95
-    - 1.05
+    - 2.05
+    - -0.95
     reveal: true
 - id: derivative_cycle
   kind: content
@@ -1019,7 +1045,6 @@ scenes:
   - $\dfrac{d^{4}}{dx^{4}}\sin x = \sin x \qquad\text{vs.}\qquad \dfrac{d}{dx}e^{x}=e^{x}$
 - id: divider_apply
   kind: divider
-  accent: definition
   eyebrow: Stage 4
   title: Consequences and Applications
   subtitle: From the cycle to oscillation.
@@ -1072,13 +1097,13 @@ scenes:
     '
   steps:
   - math: '{{\frac{d}{dx}\tan x}} = {{\frac{(\cos x)(\cos x)-(\sin x)(-\sin x)}{\cos^{2} x}}}'
-    reason: quotient rule on $\tfrac{\sin x}{\cos x}$ ($\cos x\neq 0$)
+    reason: quotient rule on $\sin x/\cos x$ ($\cos x\neq 0$)
   - math: = {{\frac{\cos^{2} x+\sin^{2} x}{\cos^{2} x}}} = {{\frac{1}{\cos^{2} x}}} = {{\sec^{2} x}}
     reason: Pythagorean identity
     anim: transform
     frame: true
   - math: '{{\frac{d}{dx}\sec x}} = {{\frac{0\cdot\cos x-1\cdot(-\sin x)}{\cos^{2} x}}}'
-    reason: quotient rule on $\tfrac{1}{\cos x}$
+    reason: quotient rule on $1/\cos x$
   result:
     math: = {{\frac{\sin x}{\cos^{2} x}}} = {{\sec x\tan x}}
     anim: transform
@@ -1126,13 +1151,13 @@ scenes:
     '
   steps:
   - math: '{{\frac{d}{dx}\cot x}} = {{\frac{(-\sin x)(\sin x)-(\cos x)(\cos x)}{\sin^{2} x}}}'
-    reason: quotient rule on $\tfrac{\cos x}{\sin x}$ ($\sin x\neq 0$)
+    reason: quotient rule on $\cos x/\sin x$ ($\sin x\neq 0$)
   - math: = {{\frac{-(\sin^{2} x+\cos^{2} x)}{\sin^{2} x}}} = {{-\frac{1}{\sin^{2} x}}} = {{-\csc^{2} x}}
     reason: Pythagorean identity
     anim: transform
     frame: true
   - math: '{{\frac{d}{dx}\csc x}} = {{\frac{0\cdot\sin x-1\cdot\cos x}{\sin^{2} x}}}'
-    reason: quotient rule on $\tfrac{1}{\sin x}$
+    reason: quotient rule on $1/\sin x$
   result:
     math: = {{-\frac{\cos x}{\sin^{2} x}}} = {{-\csc x\cot x}}
     anim: transform
@@ -1174,11 +1199,13 @@ scenes:
 
     {show result} But negative sine t is just negative s of t -- at every
 
-    instant the weight is pushed back toward rest. That relation, s double
+    instant the weight is pushed back toward rest. That relation, s double prime
 
-    prime equals negative s, is the signature of simple harmonic motion; sine
+    equals negative s, is the signature of simple harmonic motion -- and it is the
 
-    and cosine are exactly the functions that describe it.
+    four-step cycle stopped halfway. Both sine and cosine satisfy that relation, so
+
+    either one can describe an oscillation.
 
     '
   steps:
@@ -1309,14 +1336,20 @@ scenes:
 
     {show point.3} And keep the cycle in mind -- four derivatives of sine or
 
-    cosine bring you home -- with the fine print that it all depends on radians.
+    cosine bring you home -- with the fine print that it all depends on radians:
+
+    in degrees the derivative of sine of x degrees picks up a factor of pi over one
+
+    hundred eighty, so the clean sine prime equals cosine and cosine prime equals
+
+    negative sine hold only in radian measure.
 
     '
   points:
   - 'Fundamental limit: $\sin\theta/\theta \to 1$ as $\theta\to 0$, proved by squeezing areas on the unit circle.'
   - 'Two core derivatives: $\sin''=\cos$ and $\cos''=-\sin$.'
   - 'The quotient rule delivers all six trig derivatives: $\tan,\cot,\sec,\csc$.'
-  - Derivatives of $\sin$ and $\cos$ cycle with period four; the entire framework requires radians.
+  - Derivatives of $\sin$ and $\cos$ cycle with period four; and it all needs radians --- in degrees $\tfrac{d}{dx}\sin(x^{\circ})=\tfrac{\pi}{180}\cos(x^{\circ})$.
 - id: outro
   kind: outro
   duration: 8.0

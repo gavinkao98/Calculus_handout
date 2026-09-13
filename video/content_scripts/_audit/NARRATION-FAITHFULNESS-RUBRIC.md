@@ -46,6 +46,8 @@ NFA 在**鎖稿後**跑（旁白 source 已認可、已 derive）。從同一份
 - 座標 `(a,b)` → “the point with coordinates a and b”；區間 `[a,b]` → “the interval from a to b”
 - 反三角 `\arcsin` → “arcsine of …”；`\pi/2` → “pi over two”；常見分數念 “one half ／ nine-fifths” 等
 - `x+\tfrac h2` → “x plus one half h”——**不可** “x plus h over two”（會被聽成 `(x+h)/2`；§3.1 gate-2 實證的 D3 blocking）
+- **分子整個是和／差的分數** `\tfrac{A+B}{2}` → “the quantity A plus B, **all over** two”——**不可** “A plus B over two”（會被聽成 `A + B/2`）。上一條處理的是「加法在分數**外**」，這一條是「和在分子**內**」，兩者相反、都必須明講群組。（2026-09-13 §3.1 Task D 實證的 D3 blocking）
+- **函數的和／差引數** `\sin(u+v)`、`\cos(u-v)` → “sine of **the quantity** u plus v”——**不可** “sine of u plus v”（會被聽成 `(\sin u)+v`，在正要講「有東西相消」的句子裡會直接毀掉語意）。`\sin\frac h2` → “sine of h over two” 則**不需要**：介系詞 “of” 已經把 `h over two` 綁成引數。（2026-09-13 §3.1 Task D 實證的 D3 blocking；本片 `why_trig_is_different` 早有 “sine of the quantity x plus h” 的先例，是新寫的句子漏套）
 
 ## 收斂線（blocking vs advisory）
 
