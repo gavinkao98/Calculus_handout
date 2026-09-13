@@ -632,31 +632,68 @@ severity ∈ {`error`, `warn`}；`make.py` 有 error 即 abort（`--skip-sizeche
 
 ---
 
-## 6. 驗收迴圈（四項 merge 之後，**全片只 render 一次**）
+## 6. 驗收迴圈（四項 merge 之後，**全片只 render 一次**）✅ 已跑（2026-09-14）
 
 > `REVIEW_GATES.md` §6.1：一輪＝一次 merge → **一次 render** → 一次再審。
 > **這次 render 同時就是 §3.1 的「v1 版成片」**——之後 §3.1 的 4K final 以它為準，不要為了驗收再多 render 一次。
 
-1. **一次 render**：`python video/make.py --storyboard video/storyboards/ch03_trig_derivatives_mimo.yml
+1. **一次 render** ✅：`python video/make.py --storyboard video/storyboards/ch03_trig_derivatives_mimo.yml
    --reuse-audio --quality high`（**不重 TTS**；`--reuse-audio` 讀既有 `audio_mimo/manifest.json`）。
    **render 前先確認 `tts.py` 不會被叫到**（`make.py` 本身只有 `--backend mock`，真音檔一律走 `--reuse-audio`）。
-2. **兩道硬閘**（render 後必跑，§6.4）：
+   **實績（2026-09-14）：** 跑在 main `fbb9c86`（共用層 v1 全部＋§3.1 里程碑審七條 must 修正），
+   02:16–02:33，**零 TTS**（`--reuse-audio` manifest 全命中）；成片
+   `output/ch03/s3.1/ch03_trig_derivatives_mimo.mp4`（**1920×1080、30 fps、1049 s**），
+   舊成片備份成 `ch03_trig_derivatives_mimo__pre_shared_layer_v1.mp4`。
+2. **兩道硬閘**（render 後必跑，§6.4）✅：
    - `[sync]`：`make.py` 內建，偏差 > `SYNC_HARD_GATE_FRAMES`(2) 就自己 abort。
+     **實績：`[sync] beat timing clean`＋`[sync] render/audio lengths clean`**；
+     同一次 render 的 `sizecheck` **0 error／18 warn**（全是 T3 的 warn-only 新規則）、
+     `[stillness]` 12 條既有型態 advisory。
    - `[still-gate]`：`python video/pipeline/rewatch_pack.py --deck ch03_trig_derivatives_mimo
      --gate-still 12 --out <新 pack> --baseline %TEMP%\shared-layer-v1-baseline\rewatch_pack_v0`。
      **fps／畫面尺寸與基線不同會 exit 2 什麼都不寫**——所以第 1 步的 `--quality high` 不能改。
-3. **確定性閘**：`schema`／`lint`／`sizecheck` ——**正典 deck 0 error；`_demo_*` 壓測 fixture
+     **實績：PASS**——21 場全 ≤ 12 s、最長 **11.0 s @ `all_six_cot_csc`**（與基線同一場），
+     新包＝`%TEMP%\shared-layer-v1-baseline\rewatch_pack_v1`。
+     **`--baseline rewatch_pack_after21` 被拒（exit 2）：舊版 `rewatch_pack` 寫的包沒記 fps／size**
+     （§8 backlog ⑮；協定由 §3.1 里程碑審 session 回寫、並用備份成片重生基線）；
+     改以兩包的 `INDEX.md` 逐場比 fine 最長靜止＝**27 場秒數逐場相同**，
+     只有里程碑審修過的四場變短（`sector_inequality` 8.2→6.2、`continuity_argument` 9.0→8.0、
+     `companion_limit` 9.2→5.8、`slope_equals_height` 9.8→6.5），`fundamental_limit` +0.2，其餘 Δ=0.0。
+3. **確定性閘** ✅：`schema`／`lint`／`sizecheck` ——**正典 deck 0 error；`_demo_*` 壓測 fixture
    （`_demo_capacity`／`_demo_aside`／`_demo_multipage`／`_demo_tall_rows`，以及 T4 的
    `_demo_worked_example` 中刻意超量的 `capacity_over` 場）的刻意 error 要與 Phase 0 基線逐字相同**
    ——這些 fixture 存在的意義就是讓閘報錯，「0 error」對它們是錯的驗收標準；
    `python video/pipeline/run_selftests.py` 全綠；`python tools/doctor.py --smoke` 9/9；
    **23 個 deck 的三份報表對 Phase 0 做 diff**，逐條分類成「意圖不變＝必須逐字相同」與
    「意圖改變＝附幀對照」。
-4. **`visual-frame-audit`（免費 gate 1）**：21 個 content 場的最終幀全跑，**blocking = 0**。
+   **實績（量在 main `02a22c4`＝共用層 v1 最終、里程碑審 merge 之前，故變因只有共用層）：**
+   23 deck 對 Phase 0——**`schema` 22/22、`lint` 22/22 逐字相同**；`sizecheck` 正典
+   `ch03_trig_derivatives{,_mimo}`／`ch03_chain_rule` error **0→0**、
+   `ch01_inverse_functions` **0→1**（已裁決的已知例外，§8 backlog ⑤），
+   fixture `_demo_capacity` 23→23、`_demo_multipage` 2→2（僅座標位移），
+   `_demo_aside` 2→1 與 `_demo_tall_rows` 3→2 **各降一級**（出框 error → 越安全邊界 warn：
+   新字行框較淺、內容退回框內），`_demo_capacity` 與 `ch03_chain_rule` 各消失一筆既有 margin warn，
+   `_demo_worked_example` 的 2 error／4 warn 全在刻意超量的 `capacity_over` 場＋1 條 L2；
+   **warn 增量全是 T3 新規則**（基線 grep `LayoutRules`／`MathRules` 零命中）。
+   `run_selftests` **46/46**、`doctor --smoke` **9/9**（既存的 `pdftotext` FAIL 非本輪造成）。
+4. **`visual-frame-audit`（免費 gate 1）** ✅：21 個 content 場的最終幀全跑，**blocking = 0**。
    首輪有 blocking 就修完**回歸再跑一次**（根 `CLAUDE.md`「finding 修完必須回歸審核」）。
-5. **人閘（唯一停點）**：三場幀交使用者——**字體一場、字級一場、例題模板一場**
+   **實績：三個 opus 各 7 場（`critic.py --dry-run --per scene` 最滿幀），blocking 0、advisory 13**，
+   故無回歸輪。本輪新產生的三條＝場 14 statement 新列＋結論 62 把整組推低約 95 px、
+   reason tag 與右下品牌波形標只剩 ~10 px 帶（V1）；場 09 數線三點重疊（白 x₀ 被琥珀環＋紫核蓋住，
+   V2，由里程碑審側引入、修法在它的 backlog）；場 21／22 reason 第一列右緣餘裕 60→20 px（§8 backlog ⑬）。
+   其餘為既有型態（`\tfrac` 內列低於 floor、場 12 預設箭頭、`theorem_proof` 右下留白等）。
+   **覆蓋缺口＝`--per scene` 對有 `exit:` 的場取到末幀而非最滿幀**（場 06、23；§8 backlog ⑩），
+   主對話用 `--per beat` 補抽（`critic_v1_freeze_beats*/`）自審：場 06 新行 `(θ/2π)·π·1²=½θ` 零碰撞、
+   corner／sliver 清楚；場 23 裝置標籤 `s′`／`s″` 降到 34 後含撇高 27 px、可辨（advisory）。
+5. **人閘（唯一停點）** ✅ **Go**：三場幀交使用者——**字體一場、字級一場、例題模板一場**
    （建議：`continuity_statement_sin_limit` 看字體／`difference_quotient_for_sine` 看字級／
    `_demo_worked_example` 看新模板），各附 Phase 0 的 before 幀。
+   **使用者 2026-09-14 裁決 Go——凍結成立**，且**這次 render 即 §3.1 的「v1 版成片」**（4K final 以它為準）。
+   附帶：T2 留下的兩條 advisory 由里程碑審實測覆核——`squeeze_graph` 的 `\tfrac` 刻度內列
+   **既有就低於 floor**（非 T2 造成、不改，§8 backlog ①）；場 04 leader 73 px ＝ `MIN_LEADER` 下限被咬住
+   （不是「rail 被擠掉」，§8 backlog ④ 已據此改寫）。
+   **本輪不宣告 §3.1 收斂**——`REVIEW_GATES.md` §六 6.3 的判定歸 §3.1 里程碑審 session。
 
 > **生成式盲審（REWATCH 六鏡）本輪不跑**——`REVIEW_GATES.md` §6.2：輪內不跑，一節收斂時才跑。
 > 本輪是工具線，不是一節的收斂。
@@ -699,7 +736,8 @@ severity ∈ {`error`, `warn`}；`make.py` 有 error 即 abort（`--skip-sizeche
 
 ### 本輪（2026-09-13～14）做完之後新增的 backlog
 
-> 以下九條都是**本輪落地時查到、但刻意不在本輪修**的（外科手術原則）。認領時各自一個工具線 task。
+> 以下十五條都是**本輪落地時查到、但刻意不在本輪修**的（外科手術原則）。認領時各自一個工具線 task。
+> ①–⑨ 在四個 task 落地時查到；**⑩–⑮ 是 2026-09-14 §6 驗收當場查到的**（④ 亦於當時改寫）。
 
 1. **`\tfrac`／`\frac` 內縮的 floor 盲點。** `sizecheck._effective_font_px` 還原的是 authored px，
    **看不到 scriptstyle 的內縮係數**，所以「含分數的標籤」的 floor 閘等於不設防——
@@ -712,9 +750,11 @@ severity ∈ {`error`, `warn`}；`make.py` 有 error 即 abort（`--skip-sizeche
 3. **bold 標題（Instrument Sans）詞間距偏緊。** T1 之後唯一新增的可見缺點（3 場幀稽核點名）。
    可在 vendored 的 `.sty` 或 `_bootstrap` 的 preamble 調 `\fontdimen2`（interword space）處理；
    動它會改所有 bold 標題的 wrap，要重跑 T1-3 的估寬不變式。
-4. **derivation 的結論階 62 把 reason 欄右推、leader 可能只剩兩點。**
-   實例＝`difference_quotient_for_sine`。模板層的修法＝給 leader 設**最少點數**，或給 reason 欄設**最小寬**
-   （目前兩者都沒有，寬度全由結論列剩下多少決定）。
+4. **`MIN_LEADER` 下限被咬住時沒有 fallback 連接樣式。**（2026-09-14 §6 驗收改寫——
+   原本記的「結論階 62 把 leader 擠崩、可能只剩兩點；最少點數與最小寬兩者都沒有」是**錯誤診斷**。）
+   實例＝`difference_quotient_for_sine`（場 04）：里程碑審實測 leader **73 px ＝ `MIN_LEADER 0.55u`（≈74 px）的下限**，
+   也就是下限存在、機制照設計運作，不是 rail 被擠掉。真正的缺口在**咬住之後無路可走**——
+   修法屬共用層：下限咬住時換一種連接樣式（點改線、或 reason 併回同列），或允許 rail 整體再右移。
 5. **`ch01_inverse_functions` 的 `invert_a_rational` 結論階 62 出框（1 error）。**
    變因隔離證實純由 62 造成；主對話裁決 62 不退、修在 deck 側，**已用 `spawn_task` 開成獨立 chip**。
 6. **L4 `layout:` 佔比宣告欄位、M4 ∎ 字形化。** T3 判「只能人審」的兩條（§7「明確不做」也列了）。
@@ -730,12 +770,30 @@ severity ∈ {`error`, `warn`}；`make.py` 有 error 即 abort（`--skip-sizeche
    **紀律：同一個工作樹絕不並行跑兩個 deck 的報表或 build pass**——`media/Tex` 的競態會偽裝成 `sizecheck` error。
 9. **`_selftest_theorem_regime` 用 `"band" in msg` 撈 finding。** 於是 `sizecheck` 的新訊息**不得含 band 這個字**
    （T3 已避開），這是一條隱形的耦合。值得改成結構化比對（比對 finding 的 code／severity，而不是訊息字串）。
+10. **`critic.py --per scene` 對有 `exit:` 的場取到末幀、不是最滿幀。** gate 1 的長期覆蓋缺口：
+    場退場之後畫面已清空，抽到那一幀等於空跑，稽核看不到該場真正要審的版面。
+    **實例＝場 06、場 23**（2026-09-14 §6 的 21 場幀稽核當場發現）。當次繞法＝`--per beat` 補抽
+    （`critic_v1_freeze_beats*/`）再自審；正解是讓 `--per scene` 選 ink 量最大的幀。
+11. **`carry` 的 `to.scale` 縮放繞過 floor 閘。** `sizecheck` 讀的是 authored px，
+    carried 過去再乘 `scale` 之後的實效字級它看不到——**場 24 的 carried tag 實測約 19–23 px**，
+    低於 26 px 的 floor 卻零 warn。與 ①② 同屬「閘看不到渲染後的真實字級」，但成因是 carry 的縮放鏈，要分開修。
+12. **hook 手刻的 `MathTex` 不受 floor 保護。** 不經模板、由 hook 直接建的 mobject 不進 `sizecheck` 的字級樹——
+    **實例：場 06 的 ①②③ chip、場 07 carried circle 的標籤**。
+    修法二擇一：讓 hook 走一個共用 helper，或讓閘改掃 scene 樹而非 storyboard 宣告。
+13. **場 21／22 的 reason 第一列右緣餘裕 60→20 px。** Instrument Sans 比 Plex Sans 寬所致
+    （2026-09-14 幀稽核 advisory）；目前仍在框內但已無容錯，與 ④ 的 rail 寬度議題同源，宜一起看。
+14. **場 12 的 `Axes(tips=True)` 用 manim 預設箭頭 0.35，deck 其他圖是 0.16。** 同一節兩種箭頭大小；
+    修法是讓 `graph` 模板把箭頭尺寸納入 theme，而不是逐場覆寫。
+15. **`rewatch_pack --baseline` 拒絕舊版包。** 舊版 `rewatch_pack` 寫的包沒記 fps／畫面尺寸，
+    新版比對讀不到就 **exit 2 什麼都不寫**——2026-09-14 §6 的 `rewatch_pack_after21` 即因此被拒，
+    改以兩包 `INDEX.md` 逐場比對代替。協定已由 §3.1 里程碑審 session 回寫、並用備份成片重生基線；
+    此處記一筆，免得下一個人再撞一次。
 
 ---
 
 ## 9. 完成定義（DoD）
 
-> **逐項結算（2026-09-14）：1 ✅／2 ✅（逐檔核過）／3 ✅（＝本 commit）／4 ⏳（§6 未跑）。**
+> **逐項結算（2026-09-14）：1 ✅／2 ✅（逐檔核過）／3 ✅／4 ✅（§6 已跑，人閘 Go）。**
 
 1. **四項全部進 `main` ✅**：T1（或 T1 的 no-go 結論＋校準方法留存）、T2、T3、T4 各一個 commit。
    **實際落地＝五個**（＋本輪臨時收進的 T5）：T1 `74b88ca`／merge `edb457c`、T2 `f2b0813`／merge `c9792ea`、
@@ -755,13 +813,17 @@ severity ∈ {`error`, `warn`}；`make.py` 有 error 即 abort（`--skip-sizeche
 3. **`REBUILD_STATUS.md` 記一條「共用層 v1 凍結」✅（＝本 commit）**（日期、四個 commit hash），
    並**明文宣告**：凍結後任何共用層改動一律走工具線（§1 的框內規則逐字抄過去）。
    實際記的是**五個 task**（T5 臨時收進），且共用層清單**加了 `pipeline/scene.py`**。
-4. **驗收數字 ⏳**：`run_selftests` 全綠（預期 **45 支＝43（已含 T4 的 `_selftest_worked_example`）＋T1＋T3**）、
+4. **驗收數字 ✅**：`run_selftests` 全綠（預期 **45 支＝43（已含 T4 的 `_selftest_worked_example`）＋T1＋T3**）、
    `doctor --smoke` 9/9、**23 deck `sizecheck`：正典 deck 0 error；`_demo_*` 壓測 fixture
    （含 `_demo_worked_example` 的 `capacity_over`）的刻意 error 與 Phase 0 基線逐字相同**、
    `[sync]` 0、`[still-gate]` PASS、`visual-frame-audit` 21 場 0 blocking、人閘通過。
-   **現況：`run_selftests` 實際 46 支**（預期的 45 ＋ T5 的 `_selftest_theorem_proof_label`）、回歸 deck 23 個；
-   **§6 的驗收迴圈尚未跑**——`[sync]`／`[still-gate]`／21 場幀稽核／人閘四項，
-   **待 §3.1 里程碑審 session 把 must 修正併進 main 後執行，結果另補一段**。
+   **實績（2026-09-14，§6 驗收逐項數字見該節）：`run_selftests` 46/46**（預期的 45 ＋ T5 的
+   `_selftest_theorem_proof_label`）、回歸 deck **23 個**、`doctor --smoke` **9/9**、
+   `sizecheck` 正典 deck 0 error 且 fixture 的刻意 error 與 Phase 0 逐條可解釋
+   （兩筆 error→warn 降級＋兩筆座標位移，成因都是新字行框較淺）、
+   `[sync]` **0**、`[still-gate]` **PASS**（最長 11.0 s ≤ 12 s）、
+   `visual-frame-audit` **21 場 0 blocking**（13 advisory）、
+   **人閘 Go（使用者 2026-09-14 裁決，凍結成立；該次 render 即 §3.1 的 v1 版成片）**。
    **已知未收乾淨的一項＝`ch01_inverse_functions` 的 `invert_a_rational` 1 error**（§8 backlog ⑤，已開 chip）。
 
 ### 預估（工時／render 次數）
