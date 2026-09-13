@@ -1291,7 +1291,29 @@ def ratio_readouts(spec, ctx, blocks):
         return VGroup(drop, dot, lab)
 
     half = _readout(PI / 2, r"\tfrac{2}{\pi}\approx 0.64", True)
-    at_pi = _readout(PI, "0", False)
+
+    # theta = pi: a dot WALKS down the curve from pi/2 and the label lands when it arrives.
+    # Built at the terminal position (the gates measure the last frame); the reveal rewinds
+    # the tracker and runs it across the beat.
+    walk_t = ValueTracker(float(PI))
+    at_pi_dot = always_redraw(
+        lambda: Dot(axes.c2p(walk_t.get_value(), _ratio(walk_t.get_value())),
+                    radius=0.075, color=amber))
+    at_pi_lab = brand.math_line("0", ground, role="accent", size="label")
+    at_pi_lab.next_to(axes.c2p(float(PI), 0.0), UP + RIGHT, buff=0.16)
+    at_pi = VGroup(at_pi_dot, at_pi_lab)
+
+    def _walk_to_pi(scene, mob, _ground) -> float:
+        """Send the dot from pi/2 to pi across whatever the beat has, then label it."""
+        t0 = _elapsed(scene)
+        walk_t.set_value(float(PI) / 2.0)
+        scene.add(at_pi_dot)
+        budget = TM.beat_run_time(scene, 2.0)
+        run = max(budget - 1.0, 0.6)
+        scene.play(walk_t.animate.set_value(float(PI)), run_time=run, rate_func=linear)
+        scene.play(FadeIn(at_pi_lab), run_time=0.45)
+        scene.add(mob)
+        return _elapsed(scene) - t0
 
     def _open(scene, mob, _ground) -> float:
         """The corner close-up grows back out into the full picture."""
@@ -1317,7 +1339,7 @@ def ratio_readouts(spec, ctx, blocks):
     out = list(blocks)
     out.append(Block("opened", wide, anim=_open, static=False, layer="graph"))
     out.append(Block("at_half_pi", half, anim=_land, static=False, layer="graph"))
-    out.append(Block("at_pi", at_pi, anim=_land, static=False, layer="graph"))
+    out.append(Block("at_pi", at_pi, anim=_walk_to_pi, static=False, layer="graph"))
     return out
 
 
