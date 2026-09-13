@@ -75,6 +75,13 @@ def _box(mob):
 
 def _points(mob):
     p = mob.points
+    if len(p) == 0 and mob.submobjects:
+        # DashedLine clears its OWN points after construction and hangs the actual
+        # geometry on dash sub-mobjects (each itself a DashedLine, per the outermost
+        # match kept by _outermost); without this fallback a dashed connector has 0
+        # points and every crossing check against it is a silent no-op.
+        sub_pts = [s.points for s in mob.submobjects if len(s.points)]
+        p = np.vstack(sub_pts) if sub_pts else p
     if len(p) < 2:
         return p
     t = np.linspace(0.0, 1.0, SAMPLES_PER_SEGMENT)[:, None]
