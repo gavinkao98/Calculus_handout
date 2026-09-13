@@ -38,20 +38,27 @@ from __future__ import annotations
 # -- type scale -----------------------------------------------------------
 # tokens give px @ 1920x1080. manim font_size is its own unit; PX_TO_FS converts.
 # PX_TO_FS is the MATH (Latin Modern) anchor: math is unchanged across the Route A font
-# swap, so this stays at the established 0.698 (the NCM-era value the layout/zones were
-# tuned for) and on-screen math keeps its size. TEXT (Plex) is then scaled up by
-# TEXT_SCALE to reach its calibrated cap height -- one knob cannot size both, because
-# Plex caps are ~24% shorter per font_size than the math font, so calibrating PX_TO_FS to
-# Plex's caps (0.9145) would have inflated all math ~31% and overflowed dense scenes
+# swap AND across the 2026-09-13 text swap, so this stays at the established 0.698 (the
+# NCM-era value the layout/zones were tuned for) and on-screen math keeps its size. TEXT is
+# then scaled by TEXT_SCALE to reach its calibrated cap height -- one knob cannot size both,
+# because sans caps are ~24% shorter per font_size than the math font, so calibrating
+# PX_TO_FS to them (0.9145) would have inflated all math ~31% and overflowed dense scenes
 # (Route A decouple, 2026-06-24; was 0.72 Times, 0.655 Inter Tight).
+# INVARIANT (1): PX_TO_FS does not move when the TEXT family changes. Only TEXT_SCALE and
+# brand._WIDTH_K do -- both are guarded by pipeline/_selftest_text_metrics.py.
 PX_TO_FS = 0.698
 
 # TEXT-only scale on top of the MATH-anchored PX_TO_FS. brand's text builders use
 # _text_fs(size) = fs(size) * TEXT_SCALE; math (math_line/glyph/MathTex) uses fs(size)
-# directly. 1.3102 = 0.9145/0.698 keeps Plex text at the cap height the Times anchor
-# defined (0.006624 u/px) while leaving math at its established size. (Was TEX_TEXT_SCALE,
-# the obsolete Pango↔Tex size-match factor, before the all-LaTeX Route A.)
-TEXT_SCALE = 1.3102
+# directly.
+# INVARIANT (2): _text_fs(px) must render a cap height of 0.006624 u/px (the Times anchor
+# the zones were laid out against), whatever the text family is. That fixes the value:
+#   TEXT_SCALE = round(0.006624 / (Tex('H', font_size=fs).height / fs * PX_TO_FS), 4)
+# Instrument Sans measures H/fs = 0.007444 -> 1.2748 (2026-09-13). Plex Sans measured
+# H/fs = 0.007244 -> 1.3102, the previous value; the same formula reproduces it, so this
+# is a recalibration of one constant, not a change of method. (Was TEX_TEXT_SCALE, the
+# obsolete Pango<->Tex size-match factor, before the all-LaTeX Route A.)
+TEXT_SCALE = 1.2748
 
 # Inline math inside a DISPLAY HEADING (heading_rich). Provisional 1.0 for Route A:
 # LaTeX sets text + inline math on one line with native baseline/sizing, so a heading's

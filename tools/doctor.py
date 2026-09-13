@@ -318,16 +318,16 @@ def check_assets() -> None:
 # ── ⑥b 影片字型：LaTeX 套件（Route A 後文字＋數學皆走 LaTeX，不再用 Pango 系統字型）──
 
 def check_fonts() -> None:
-    """Route A（2026-06-24）後，影片**所有螢幕文字＋數學都走 LaTeX/pdflatex**——文字 IBM Plex
-    Sans／Mono、數學 Latin Modern，字體在 _bootstrap.apply_tex_template 的 preamble 設定，不再經
-    Pango（舊的 Times New Roman／Courier New 系統字型已棄）。所以這裡驗的是這些 MiKTeX 套件存在
-    （kpsewhich），缺了含文字／數學的場景會編譯失敗或 fallback。"""
+    """Route A（2026-06-24）後，影片**所有螢幕文字＋數學都走 LaTeX/pdflatex**——文字 Instrument
+    Sans（2026-09-13 換字，repo 內 vendored＋autoinst 生成，見 check_vendored_text_font）、
+    eyebrow/label 用 IBM Plex Mono、數學 Latin Modern，字體在 _bootstrap.apply_tex_template 的
+    preamble 設定，不再經 Pango（舊的 Times New Roman／Courier New 系統字型已棄）。所以這裡驗的是
+    這些 MiKTeX 套件存在（kpsewhich），缺了含文字／數學的場景會編譯失敗或 fallback。"""
     if not shutil.which("kpsewhich"):
         record(WARN, "fonts", "kpsewhich 不在 PATH，略過 LaTeX 字型套件檢查",
                "裝 MiKTeX 後 kpsewhich 會進 PATH（見 LaTeX 區）")
         return
     styles = (
-        ("plex-sans.sty", FAIL, "影片文字（IBM Plex Sans，內文/標題）"),
         ("plex-mono.sty", FAIL, "eyebrow/label（IBM Plex Mono）"),
         ("lmodern.sty", FAIL, "影片數學（Latin Modern）"),
         ("microtype.sty", WARN, "kerning/protrusion（preamble 也載它）"),
@@ -342,16 +342,87 @@ def check_fonts() -> None:
                    "（plex / lm / microtype）")
 
 
+# ── ⑥b2 影片文字字型 Instrument Sans：repo vendored ＋ MiKTeX 使用者層級註冊 ──
+
+# vendored tree（video/pipeline/fonts/instrument-sans/）內必須在的關鍵檔。CTAN 沒有
+# Instrument Sans 的 pdflatex 套件，所以字型支援是 autoinst 生成物、隨 repo 走。
+_IS_DIR = ("video", "pipeline", "fonts", "instrument-sans")
+_IS_FILES = (
+    "OFL.txt",
+    "otf/InstrumentSans-Regular.otf",
+    "otf/InstrumentSans-Bold.otf",
+    "texmf/tex/latex/instrumentsans/InstrumentSans.sty",
+    "texmf/tex/latex/instrumentsans/T1InstrumentSans-LF.fd",
+    "texmf/fonts/tfm/instrument/instrumentsans/InstrumentSans-Regular-lf-t1.tfm",
+    "texmf/fonts/type1/instrument/instrumentsans/InstrumentSans-Regular.pfb",
+    "texmf/fonts/map/dvips/instrumentsans/InstrumentSans.map",
+    "texmf/miktex/config/updmap.cfg",
+)
+
+
+def check_vendored_text_font() -> None:
+    """影片文字字型＝Instrument Sans（2026-09-13 換字），**沒有 CTAN 套件**：OTF＋autoinst 生成的
+    tfm/vf/pfb/enc/map/sty 全部 vendored 在 repo 裡。但光有檔案不夠——`latex` 與 `dvisvgm` 都得
+    找得到它們，而 **dvisvgm 只讀它預設找到的第一個 map 檔（本機＝ps2pk.map），沒有任何環境變數
+    能加 map**（實測 2026-09-13：TEXINPUTS/TFMFONTS/… 能讓 latex 編過，dvisvgm 仍 `no font file
+    found` → 文字 render 成空白）。所以要兩步 MiKTeX **使用者層級**設定，由 tools/setup.ps1 做：
+
+        initexmf --register-root=<repo>\\video\\pipeline\\fonts\\instrument-sans\\texmf
+        miktex fontmaps configure      # 把 vendored updmap.cfg 的 Map 行併進 ps2pk/psfonts.map
+
+    這裡驗三件事：① vendored 檔案在 ② `kpsewhich InstrumentSans.sty` 指到 repo 內（＝root 已註冊）
+    ③ 產生的 ps2pk.map 真的含 InstrumentSans 行（＝fontmaps configure 跑過）。"""
+    vdir = REPO.joinpath(*_IS_DIR)
+    missing = [rel for rel in _IS_FILES if not (vdir / rel).exists()]
+    if missing:
+        record(FAIL, "fonts", "vendored Instrument Sans 檔案不全",
+               f"{vdir} 缺 {', '.join(missing[:4])}"
+               f"{' …' if len(missing) > 4 else ''}；應隨 git 而來，先 git status 檢查是否誤刪")
+        return
+    record(PASS, "fonts", "vendored Instrument Sans 檔案齊", f"{vdir}（OTF＋autoinst 生成物）")
+
+    if not shutil.which("kpsewhich"):
+        record(WARN, "fonts", "kpsewhich 不在 PATH，略過 Instrument Sans 註冊檢查",
+               "裝 MiKTeX 後 kpsewhich 會進 PATH（見 LaTeX 區）")
+        return
+    setup_fix = ("跑 `powershell -ExecutionPolicy Bypass -File tools/setup.ps1`（會做 "
+                 "initexmf --register-root ＋ miktex fontmaps configure），再刪 `media/Tex` 快取。"
+                 "詳見 ENVIRONMENT.md ①b。")
+    rc, out = _run(["kpsewhich", "InstrumentSans.sty"])
+    sty = (out or "").strip().splitlines()[0] if rc == 0 and out.strip() else ""
+    if sty:
+        record(PASS, "fonts", "InstrumentSans.sty 可見（TEXMF root 已註冊）", sty)
+    else:
+        record(FAIL, "fonts", "InstrumentSans.sty 找不到（TEXMF root 未註冊）",
+               f"影片所有文字都編不出來。{setup_fix}")
+
+    rc, out = _run(["kpsewhich", "--format=map", "ps2pk.map"])
+    mp = (out or "").strip().splitlines()[0] if rc == 0 and out.strip() else ""
+    hit = False
+    if mp:
+        try:
+            hit = "InstrumentSans" in Path(mp).read_text(encoding="utf-8", errors="replace")
+        except OSError:
+            hit = False
+    if hit:
+        record(PASS, "fonts", "ps2pk.map 含 InstrumentSans（dvisvgm 描得出外框）", mp)
+    else:
+        record(FAIL, "fonts", "ps2pk.map 沒有 InstrumentSans（文字會 render 成空白）",
+               f"{mp or 'ps2pk.map 找不到'}。{setup_fix}")
+
+
 # ── ⑥d Plex 文字真的編得出來：實 build 一個 Tex、確認非空（補 kpsewhich 盲點）──
 
 def check_tex_compiles() -> None:
-    """kpsewhich 只證 `.sty` 檔在；**不證** latex→dvisvgm 真能把 Plex 字編成 glyph。
-    踩坑（2026-06-25）：MiKTeX 字型檔名庫（FNDB）stale → latex 找不到 Plex .tfm、fallback 去壞掉的
+    """kpsewhich 只證 `.sty` 檔在；**不證** latex→dvisvgm 真能把文字字體編成 glyph。
+    踩坑（2026-06-25）：MiKTeX 字型檔名庫（FNDB）stale → latex 找不到 .tfm、fallback 去壞掉的
     `makemf` → 文字 render 成空白 → 場景一開頭 `IndexError` 崩，但 doctor 全綠（只查 .sty）。
-    這裡實 build 一個 Plex Sans Bold＋Plex Mono 的 Tex（每次用全新 media_dir，壞掉時期的空白快取
-    才不會遮住真壞），斷言 family 有 glyph 點。修法見 ENVIRONMENT.md「Plex 文字 render 成空白」。"""
+    2026-09-13 換 Instrument Sans 後同一個坑又多一個入口：map 沒併進 ps2pk.map（見
+    check_vendored_text_font）也是「latex 編過、dvisvgm 描不出外框」。這裡實 build 一個
+    Instrument Sans Bold＋Plex Mono 的 Tex（每次用全新 media_dir，壞掉時期的空白快取才不會遮住
+    真壞），斷言 family 有 glyph 點。修法見 ENVIRONMENT.md「文字 render 成空白」。"""
     if not VENV_PY.exists() or not shutil.which("latex") or not shutil.which("kpsewhich"):
-        record(INFO, "fonts", "Plex Tex 實編檢查略過", "缺 .venv／latex／kpsewhich（見上方對應區）")
+        record(INFO, "fonts", "文字 Tex 實編檢查略過", "缺 .venv／latex／kpsewhich（見上方對應區）")
         return
     probe = (
         "import sys, os, json, tempfile\n"
@@ -365,7 +436,7 @@ def check_tex_compiles() -> None:
         "from manim import Tex\n"
         "import numpy as np\n"
         "try:\n"
-        "    t = Tex(r'\\textbf{Hg} \\texttt{Hg}')\n"            # Plex Sans Bold + Plex Mono
+        "    t = Tex(r'\\textbf{Hg} \\texttt{Hg}')\n"            # Instrument Sans Bold + Plex Mono
         "    n = sum(int(np.asarray(m.points).shape[0]) for m in t.family_members_with_points())\n"
         "    print('DOCTOR_TEX ' + json.dumps({'ok': n > 0, 'points': n}))\n"
         "except Exception as e:\n"
@@ -379,15 +450,16 @@ def check_tex_compiles() -> None:
                 data = json.loads(line[len("DOCTOR_TEX "):])
             except Exception:
                 data = {}
-    fix = ("字型查找壞（latex fallback 去 makemf）。修：`initexmf --update-fndb` ＋ `initexmf --mkmaps`，"
-           "再刪 `media/Tex` 快取（manim 會沿用舊空白）。詳見 ENVIRONMENT.md「Plex 文字 render 成空白」。")
+    fix = ("字型查找壞（latex fallback 去 makemf，或 map 沒併進 ps2pk.map）。修：跑 tools/setup.ps1"
+           "（register-root ＋ fontmaps configure），必要時 `initexmf --update-fndb`，"
+           "再刪 `media/Tex` 快取（manim 會沿用舊空白）。詳見 ENVIRONMENT.md「文字 render 成空白」。")
     if data.get("ok"):
-        record(PASS, "fonts", "Plex Tex 實編非空",
+        record(PASS, "fonts", "文字 Tex 實編非空",
                f"latex→dvisvgm 出 {data.get('points')} 個 glyph 點（文字真的 render 得出來）")
     elif data.get("error"):
-        record(FAIL, "fonts", "Plex Tex 編譯失敗（render 會崩）", f"{data['error']}。{fix}")
+        record(FAIL, "fonts", "文字 Tex 編譯失敗（render 會崩）", f"{data['error']}。{fix}")
     else:
-        record(FAIL, "fonts", "Plex Tex 實編出空白（render 會崩）", fix)
+        record(FAIL, "fonts", "文字 Tex 實編出空白（render 會崩）", fix)
 
 
 # ── ⑥c handout LaTeX 排版線（pilot v2：lualatex＋latexmk＋NCM＋vendored Inter）──
@@ -532,8 +604,9 @@ def print_report(as_json: bool) -> int:
     video_ok = not any(_missing("Python", x) for x in ("PyYAML", "manim", "ManimPango", "pillow")) \
         and not _missing("LaTeX", "latex") and not _missing("LaTeX", "dvisvgm") \
         and not _missing("ffmpeg", "ffmpeg") and not _missing("ffmpeg", "ffprobe") \
-        and not _missing("fonts", "plex-sans.sty") and not _missing("fonts", "plex-mono.sty") \
-        and not _missing("fonts", "lmodern.sty") and not _missing("fonts", "Plex Tex")
+        and not _missing("fonts", "InstrumentSans.sty") and not _missing("fonts", "plex-mono.sty") \
+        and not _missing("fonts", "lmodern.sty") and not _missing("fonts", "文字 Tex") \
+        and not _missing("fonts", "vendored Instrument Sans") and not _missing("fonts", "ps2pk.map")
     handout_fig_ok = not _missing("handout", "node") and not _missing("handout", "< 21") \
         and not _missing("handout", "Chrome")
     print("\n能力摘要\n" + "─" * 64)
@@ -570,6 +643,7 @@ def main() -> int:
     check_forced_alignment()
     check_assets()
     check_fonts()
+    check_vendored_text_font()
     check_tex_compiles()
     check_handout_latex()
     check_keys()
