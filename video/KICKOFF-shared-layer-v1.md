@@ -539,7 +539,8 @@ severity ∈ {`error`, `warn`}；`make.py` 有 error 即 abort（`--skip-sizeche
       用 `ex:3.1`（`companion_limit`，
       mockup 畫的就是它）當內容——**只放到 demo deck 裡，不要動 `ch03_trig_derivatives*.yml`**。
       它是第 23 個 deck，加進 §3/§6 的報表清單。
-- [ ] **T4-5 最後對 v1 字體字級回歸。⏳（本輪唯一未完成的 T4 子項）** T1／T2 merge 之後，
+- [x] **T4-5 最後對 v1 字體字級回歸。✅（2026-09-14；T4-3 選測與 demo deck 三份報表重跑綠，`companion_limit_example` 的
+      `strategy:` 縮成一行以符 rail 容錯）** T1／T2 merge 之後，
       重跑 T4-3 與 demo deck 的三份報表＋抽幀，並跑 `visual-frame-audit`（免費 gate 1）；
       `result` 的 62 px 與 rail 的 34 px **目前是 `worked_example.py` 內的模板常數**（D6），
       **T2 要把它們升成 `theme._SCALE_PX` 的具名 token，模板改讀 token、不再自帶 raw px**。
