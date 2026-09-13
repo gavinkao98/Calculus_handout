@@ -404,7 +404,7 @@ def _prose_lines(text: str, ground: str, role: str, size: str,
 
 
 def prose(text: str, ground: str, *, role: str = "text", size: str = "body",
-          max_width: float | None = None, align: str = "LEFT"):
+          max_width: float | None = None, align: str = "LEFT", seg_roles=None):
     """Render an author prose field, routing by content so markup never garbles.
 
     The ONE place that decides how prose is set. Route A: all text is LaTeX (Plex Sans),
@@ -413,10 +413,13 @@ def prose(text: str, ground: str, *, role: str = "text", size: str = "body",
     - Markup-free text -> ``body_text`` (Plex Sans Tex, wraps at *max_width*).
     - Text with inline ``$math$`` and/or an explicit ``\\\\`` break -> ``_prose_lines``
       (one Tex per wrapped line; text + inline math sit native on each line).
+
+    *seg_roles* (whole-segment colours; see ``math_line``) only applies to the single
+    ``$...$`` route -- the other two routes ignore it (their text is not a bare math line).
     """
     stripped = text.strip()
     if stripped.startswith("$") and stripped.endswith("$") and stripped.count("$") == 2:
-        mob = math_line(stripped, ground, role=role, size=size)
+        mob = math_line(stripped, ground, role=role, size=size, seg_roles=seg_roles)
         if max_width is not None and mob.width > max_width:
             _clamp_shrink(mob, max_width, T.fs(size) / T.PX_TO_FS)
         return _mark_prose(mob)
