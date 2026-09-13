@@ -1,0 +1,3239 @@
+{
+ "deck": "ch03_trig_derivatives_mimo",
+ "film_path": "C:\\Users\\Kao\\Downloads\\Calculus_handout\\video\\output\\ch03\\s3.1\\ch03_trig_derivatives_mimo.mp4",
+ "total_seconds": 1050.267,
+ "date": "2026-09-13",
+ "rubric": "video/content_scripts/_audit/REWATCH-REVIEW-RUBRIC.md",
+ "lenses": {
+  "R2": {
+   "lens": "R2",
+   "model": "Claude Opus 5 · subagent",
+   "film": {
+    "overall": "這是一部「版面經營得很好、但動畫很少」的片。27 場裡真正用動作在教的只有四場（06 面積三卡、07 不等式 token 變形、11 squeeze 圖＋inset、23 彈簧）；其餘多數是「reveal 淡入 → 停住」的投影片節奏。依每場 md 的 fine 最長靜止統計，27 場中有 18 場超過 6 s 的 ML4 門檻，其中 17（11.5 s）、24（11.5 s）、22（10.8 s）、26（10.5 s）已逼近 12 s 驗收線。最常見的毛病其實不是「沒動」，而是「動得比旁白晚一拍」：場 12 的 2/π 標記晚 5 s、場 24 的 peak/trough 圓點晚 12 s、場 25 的三個 chip 晚一整拍。好消息是，補救所需的手法全片都已經存在（跨場縮圖續用、in-place token 變形、inset 放大鏡、結論卡亮起），只是沒有推廣到純文字與純敘述的場。",
+    "patterns": [
+     "開場空轉：03/04/10/16/17/19/21/23/25 的 beat 1 都沒有任何 reveal，畫面只有標題停 3–6 s，全片累積約 40 s 的空白開場；場 14 更是開場 9.2 s 完全不動（0.2–9.5 s）。",
+     "reveal 落後旁白一拍：場 12 beat 4 念「at θ = π/2 it is 2/π ≈ 0.64」時圖上沒有標記（tile 05, +13.5s），標記到 +18.0 才出現；場 24 beat 4 念「Watch where the height hits a peak」時沒有點也沒有垂線（tile 06, +18.0s），要到 +24.0 才出現；場 25 的三個 chip 到 +16.25 才開始，旁白 +6.6 就在念它們。凡是旁白在「指著畫面說」的句子，畫面都該先到。",
+     "「一次到位」式 reveal：整組元素同時淡入，然後靠旁白逐一講——場 19 的四支箭頭（tile 04, +11.8s 已全部畫完，旁白才要逐步念四步）、場 18 的三組切線／高度匹配（+25.0 一次全出，旁白念「one, zero, minus one」）、場 06 beat 7 的三項不等式。旁白用列舉語氣的地方一律該 paced。",
+     "片中已有的好手法沒有推廣：場 07 把場 06 的單位圓縮到右上角續用（carried.circle）、場 12 把場 11 的圖續用、場 24 把場 23 的 s''=−s 結論行帶到底部、場 04/07/14/21/22 的 in-place token 變形（框住整行就地改寫）、場 11 的 inset 放大鏡、場 16/17 的結論卡在 qed 時亮起。把這五招套到 03、13、17、19、22、24 就能解掉大半 findings。",
+     "語意色軸幾乎沒有破口：sin 橘／θ 紫／tan 綠從場 06 的三塊面積一路貫到場 07 的不等式 token、場 11 的曲線、場 24 的三張堆疊圖；場 23／24 的 height 橘、velocity 藍、acceleration 綠也對得起來。ML5 是全片最穩的一項。",
+     "四張 divider（02/05/15/20）共用同一模板（STAGE n＋問題行＋進度點＋巨大數字浮水印＋裝飾曲線），每張 6 s 內有 5.2 s 完全靜止，合計約 21 s。它們是節奏的呼吸點，但連進度點推進、裝飾曲線 draw-on 這種一秒的動作都沒有。",
+     "體質分佈很清楚：幾何／函數圖的場（06/11/18/23/24）最會教；純代數推導的場（04/07/09/14/21/22）靠 in-place 變形撐住；純文字的場（13/19/25/26）最弱——13 整場 20 s 只有兩行字、92% 靜止。"
+    ],
+    "strongest_scenes": [
+     "23_shm_compute",
+     "11_squeeze_graph",
+     "07_squeeze_to_the_bound",
+     "06_sector_inequality"
+    ],
+    "weakest_scenes": [
+     "13_radians_essential",
+     "17_derivative_of_cosine",
+     "24_shm_stacked_graphs",
+     "19_derivative_cycle",
+     "12_limit_not_identity"
+    ]
+   },
+   "usage": null,
+   "scenes_reported": 27
+  }
+ },
+ "missing_runs": [],
+ "scenes": [
+  {
+   "n": 1,
+   "id": "intro",
+   "title": "intro",
+   "kind": "intro",
+   "template": null,
+   "hook": false,
+   "global_start": 0.0,
+   "duration": 10.3,
+   "reveals": 0,
+   "motion": {
+    "static_ratio": 0.6,
+    "moving_seconds": 4.0,
+    "longest_still_seconds": 2.0,
+    "fine_static_ratio": 0.425,
+    "fine_moving_seconds": 5.8,
+    "fine_longest_still_seconds": 1.5,
+    "longest_still_span": [
+     3.2,
+     5.2
+    ],
+    "fine_longest_still_span": [
+     8.5,
+     10.0
+    ],
+    "fine_events": [
+     0.25,
+     1.25,
+     2.25,
+     5.5,
+     7.0
+    ],
+    "events": [
+     0.25,
+     1.25,
+     2.25,
+     3.0,
+     5.5,
+     7.0
+    ],
+    "non_reveal_events": [
+     1.2,
+     2.2,
+     3.0,
+     5.5,
+     7.0
+    ],
+    "profile": "█▄▂█▂",
+    "levels": [
+     8,
+     4,
+     2,
+     8,
+     2
+    ]
+   },
+   "sheet": "01_intro.sheet.jpg",
+   "verdicts": {
+    "R2": "good"
+   },
+   "findings": [
+    {
+     "fid": "R2.01.note",
+     "run": "R2",
+     "lens": "R2",
+     "dim": "note",
+     "severity": "note",
+     "where": "",
+     "evidence": "",
+     "problem": "10.3 s 的無聲開場，logo → 課程地圖（3.1/3.2/3.3 逐項亮起）→ 章節標題卡，五個非 reveal 的變化點分佈平均，fine 最長靜止只有 1.5 s。tile 05→06 由米色底硬切到深色底，是刻意的品牌段落分界，與場 27 outro 的米色底成書擋，可接受。",
+     "proposal": "",
+     "check": null,
+     "check_note": ""
+    }
+   ],
+   "synthesis": "",
+   "one_change": "",
+   "level": "",
+   "by_rule": {
+    "ML1": 0,
+    "ML2": 0,
+    "ML3": 0,
+    "ML4": 0,
+    "ML5": 0,
+    "unlabeled": 0
+   }
+  },
+  {
+   "n": 2,
+   "id": "divider_limit",
+   "title": "The Limit Behind the Slope",
+   "kind": "divider",
+   "template": null,
+   "hook": false,
+   "global_start": 10.3,
+   "duration": 6.0,
+   "reveals": 0,
+   "motion": {
+    "static_ratio": 0.913,
+    "moving_seconds": 0.5,
+    "longest_still_seconds": 5.2,
+    "fine_static_ratio": 0.913,
+    "fine_moving_seconds": 0.5,
+    "fine_longest_still_seconds": 5.2,
+    "longest_still_span": [
+     0.2,
+     5.5
+    ],
+    "fine_longest_still_span": [
+     0.2,
+     5.5
+    ],
+    "fine_events": [
+     0.25,
+     5.75
+    ],
+    "events": [
+     0.25,
+     5.75
+    ],
+    "non_reveal_events": [],
+    "profile": "▆ ▅",
+    "levels": [
+     6,
+     0,
+     5
+    ]
+   },
+   "sheet": "02_divider_limit.sheet.jpg",
+   "verdicts": {
+    "R2": "ok"
+   },
+   "findings": [
+    {
+     "fid": "R2.02.1",
+     "run": "R2",
+     "lens": "R2",
+     "dim": "D-motion",
+     "severity": "nice",
+     "rule": "ML4",
+     "where": "02_divider_limit +0.2–5.5s（tile 01–07）",
+     "evidence": "md 記 fine 最長靜止 5.2 s at 0.2-5.5 s，change events 只有 +0.25 與 +5.75 兩個且「every change is a reveal fade-in」；tile 01 到 tile 07 六格畫面完全相同（STAGE 1 標題、lim sinθ/θ = ?、進度點、背景曲線）。",
+     "problem": "整張 divider 是一次淡入後停 5.2 s 的靜止卡，連進度點從第 0 站推進到第 1 站這個現成的敘事動作都沒有做；四張加起來約 21 s 的全靜止。",
+     "proposal": "進場時讓進度點從上一站滑到本站（0.5 s），背景那條藍色曲線用 draw-on 從左畫到右（1.2 s），lim sinθ/θ = ? 的問號延後 0.4 s 再打上去；總動作約 2 s，其餘 4 s 維持靜止當呼吸點。",
+     "check": null,
+     "check_note": ""
+    },
+    {
+     "fid": "R2.02.note",
+     "run": "R2",
+     "lens": "R2",
+     "dim": "note",
+     "severity": "note",
+     "where": "",
+     "evidence": "",
+     "problem": "四張 divider（02/05/15/20）共用同一模板，此條 finding 對另外三張同樣適用，不重複列。",
+     "proposal": "",
+     "check": null,
+     "check_note": ""
+    }
+   ],
+   "synthesis": "",
+   "one_change": "",
+   "level": "",
+   "by_rule": {
+    "ML1": 0,
+    "ML2": 0,
+    "ML3": 0,
+    "ML4": 1,
+    "ML5": 0,
+    "unlabeled": 0
+   }
+  },
+  {
+   "n": 3,
+   "id": "why_trig_is_different",
+   "title": "A Limit No Algebra Can Crack",
+   "kind": "content",
+   "template": "definition_math",
+   "hook": true,
+   "global_start": 16.3,
+   "duration": 70.9,
+   "reveals": 5,
+   "motion": {
+    "static_ratio": 0.94,
+    "moving_seconds": 4.2,
+    "longest_still_seconds": 40.5,
+    "fine_static_ratio": 0.569,
+    "fine_moving_seconds": 30.5,
+    "fine_longest_still_seconds": 8.5,
+    "longest_still_span": [
+     11.5,
+     52.0
+    ],
+    "fine_longest_still_span": [
+     11.5,
+     20.0
+    ],
+    "fine_events": [
+     0.25,
+     4.75,
+     10.5,
+     20.25,
+     25.75,
+     27.0,
+     31.75,
+     39.0,
+     40.0,
+     40.75,
+     44.25,
+     45.0,
+     45.5,
+     51.5,
+     64.0,
+     65.25,
+     70.75
+    ],
+    "events": [
+     0.25,
+     4.75,
+     10.5,
+     52.25,
+     53.25,
+     58.25,
+     60.75,
+     64.0,
+     65.25,
+     70.75
+    ],
+    "non_reveal_events": [
+     10.5,
+     53.2,
+     58.2,
+     60.8,
+     64.0
+    ],
+    "profile": "▅ ▃  ▃                    ▁  ▁▁▂▅  ▇",
+    "levels": [
+     5,
+     0,
+     3,
+     0,
+     0,
+     3,
+     0,
+     0,
+     0,
+     0,
+     0,
+     0,
+     0,
+     0,
+     0,
+     0,
+     0,
+     0,
+     0,
+     0,
+     0,
+     0,
+     0,
+     0,
+     0,
+     0,
+     1,
+     0,
+     0,
+     1,
+     1,
+     2,
+     5,
+     0,
+     0,
+     7
+    ]
+   },
+   "sheet": "03_why_trig_is_different.sheet.jpg",
+   "verdicts": {
+    "R2": "weak"
+   },
+   "findings": [
+    {
+     "fid": "R2.03.1",
+     "run": "R2",
+     "lens": "R2",
+     "dim": "D-carry",
+     "severity": "must",
+     "rule": "ML2",
+     "where": "03 beat 3，+19.2–38.4s（tile 05 +19.9s、tile 06 +28.8s）",
+     "evidence": "POLYNOMIAL 那組看得見約分：tile 03（+5.2s）是 ((x+h)^n − x^n)/h = h[nx^{n-1}+…]/h，tile 04（+11.8s）已收成 = nx^{n-1}+…。相對地旁白說「no identity cancels the h in the denominator -- sine of the quantity x plus h simply does not break into pieces」時，sine 那行（tile 06）只是整行淡入後直接接 0/0 與 (indeterminate)，分母的 h 從頭到尾沒有被碰過。",
+     "problem": "本場的全部命題就是「代數在這裡失效」。多項式那行用動作演出了『成功』，sine 那行卻沒有演出對應的『失敗』，於是最該被看見的對比只存在於旁白裡；初學者看到的是兩行長得差不多的式子，不會理解為什麼一個可以一個不行。",
+     "proposal": "beat 3 念到「no identity cancels the h」時，對 sine 行做 1.2 s 的『嘗試消去失敗』：分母的 h 先亮成紅色並浮起，一道刪除線從左掃過分子想找配對的 h，掃到底沒找到就彈回原位、刪除線淡出，h 留在原地閃一下；緊接著 0/0 與 (indeterminate) 才寫出來。",
+     "check": null,
+     "check_note": ""
+    },
+    {
+     "fid": "R2.03.2",
+     "run": "R2",
+     "lens": "R2",
+     "dim": "D-composition",
+     "severity": "should",
+     "rule": "",
+     "where": "03 全場版面（tile 12 最完整）",
+     "evidence": "tile 12：POLYNOMIAL 標籤與其式子固定在畫面右上，sine 的兩行（sin(x+h)−sin x)/h → 0/0 與 lim sinθ/θ）在左下，中間隔著一整行敘述句與大片空白，兩組從頭到尾沒有對齊過。",
+     "problem": "要做的是 A／B 對照，版面卻把 A 放右上、B 放左下，觀眾得自己在腦中把兩者拉到一起；畫面沒有替這個比較出任何力。",
+     "proposal": "改成兩欄：左欄標「代數行得通」放多項式（保留現有的約分動作），右欄標「代數行不通」放 sine，兩欄的分式基線對齊；beat 3 開始時左欄降亮到 40%，把注意力交給右欄。",
+     "check": null,
+     "check_note": ""
+    },
+    {
+     "fid": "R2.03.3",
+     "run": "R2",
+     "lens": "R2",
+     "dim": "D-dwell",
+     "severity": "should",
+     "rule": "ML4",
+     "where": "03 +11.5–20.0s（beat 2, cancels）",
+     "evidence": "md 記 fine 最長靜止 8.5 s at 11.5-20.0 s (beat 2, cancels)；這段旁白是「for e to the x the power series did the same job. The trigonometric functions refuse to play along.」，而 tile 04（+11.8s）與 tile 05（+19.9s）之間畫面上只多出 sine 那行的開頭。",
+     "problem": "e^x 這個第二個例證完全沒有畫面，8.5 s 的死區正好壓在它上面；同時「refuse to play along」這句轉折也沒有任何視覺標記。",
+     "proposal": "在 POLYNOMIAL 那行底下加一行 EXPONENTIAL：(e^{x+h} − e^x)/h = e^x·(h + h²/2 + …)/h，隨該句 paced 寫出約 3 s，並同樣做一次 h 約掉的動作（與多項式同一手法），讓「兩次成功」堆疊起來，下一拍的失敗才有落差。",
+     "check": null,
+     "check_note": ""
+    }
+   ],
+   "synthesis": "",
+   "one_change": "",
+   "level": "",
+   "by_rule": {
+    "ML1": 0,
+    "ML2": 1,
+    "ML3": 0,
+    "ML4": 1,
+    "ML5": 0,
+    "unlabeled": 1
+   }
+  },
+  {
+   "n": 4,
+   "id": "difference_quotient_for_sine",
+   "title": "The Difference Quotient for Sine",
+   "kind": "content",
+   "template": "derivation",
+   "hook": true,
+   "global_start": 87.2,
+   "duration": 107.567,
+   "reveals": 5,
+   "motion": {
+    "static_ratio": 0.886,
+    "moving_seconds": 12.2,
+    "longest_still_seconds": 10.2,
+    "fine_static_ratio": 0.83,
+    "fine_moving_seconds": 18.2,
+    "fine_longest_still_seconds": 7.5,
+    "longest_still_span": [
+     27.0,
+     37.2
+    ],
+    "fine_longest_still_span": [
+     6.0,
+     13.5
+    ],
+    "fine_events": [
+     0.25,
+     5.75,
+     13.75,
+     18.0,
+     22.5,
+     27.0,
+     32.75,
+     37.25,
+     42.0,
+     42.5,
+     43.25,
+     45.5,
+     49.75,
+     53.25,
+     59.25,
+     64.5,
+     72.25,
+     79.5,
+     86.75,
+     91.5,
+     96.5,
+     101.25
+    ],
+    "events": [
+     0.25,
+     5.75,
+     14.25,
+     17.0,
+     18.0,
+     22.5,
+     27.0,
+     37.5,
+     42.5,
+     43.25,
+     45.75,
+     53.25,
+     64.5,
+     72.25,
+     79.75,
+     86.75,
+     96.5,
+     101.25
+    ],
+    "non_reveal_events": [
+     17.0,
+     18.0,
+     22.5,
+     27.0,
+     37.5,
+     42.5,
+     43.2,
+     45.8,
+     72.2,
+     79.8,
+     86.8,
+     96.5,
+     101.2
+    ],
+    "profile": "▅ ▃    ▁▁  ▁ ▁    ▂▂ ▂▂▂  ▄▂    ▄   ▃  ▁   ▃    ▂ ▂   ",
+    "levels": [
+     5,
+     0,
+     3,
+     0,
+     0,
+     0,
+     0,
+     1,
+     1,
+     0,
+     0,
+     1,
+     0,
+     1,
+     0,
+     0,
+     0,
+     0,
+     2,
+     2,
+     0,
+     2,
+     2,
+     2,
+     0,
+     0,
+     4,
+     2,
+     0,
+     0,
+     0,
+     0,
+     4,
+     0,
+     0,
+     0,
+     3,
+     0,
+     0,
+     1,
+     0,
+     0,
+     0,
+     3,
+     0,
+     0,
+     0,
+     0,
+     2,
+     0,
+     2,
+     0,
+     0,
+     0
+    ]
+   },
+   "sheet": "04_difference_quotient_for_sine.sheet.jpg",
+   "verdicts": {
+    "R2": "ok"
+   },
+   "findings": [
+    {
+     "fid": "R2.04.1",
+     "run": "R2",
+     "lens": "R2",
+     "dim": "D-motion",
+     "severity": "should",
+     "rule": "ML4",
+     "where": "04 +6.0–13.5s（beat 2, scaffold.motive）",
+     "evidence": "md 記 fine 最長靜止 7.5 s at 6.0-13.5 s；tile 03（+6.3s）畫面上只有標題與一行「Sum-to-product turns the difference of sines into a product.」，直到 tile 04（+14.2s）才開始寫 sin A − sin B。",
+     "problem": "「把差變成積」這個本場的關鍵動詞，用一行靜止的字帶過，7.5 s 內畫面毫無變化；等到式子出現時，這句話的力道已經過去了。",
+     "proposal": "把 beat 2 的那行字當成動作腳本：念到「difference of sines」時先寫出 sin A − sin B 並把減號亮起 0.6 s，念到「into a product」時讓它就地變形成 2 cos((A+B)/2) sin((A−B)/2)，兩個因子用不同顏色框住各 0.4 s（共約 2 s），beat 3 再接「Here it is」的完整行。",
+     "check": null,
+     "check_note": ""
+    },
+    {
+     "fid": "R2.04.2",
+     "run": "R2",
+     "lens": "R2",
+     "dim": "D-focus",
+     "severity": "nice",
+     "rule": "ML5",
+     "where": "04 beat 6，+85.2–105.3s（tile 10 +85.9s → tile 12 +107.0s）",
+     "evidence": "tile 12 底部寫 cos(x + h/2) → cos x and sin(h/2)/(h/2) → 1；但上一行 (sin(x+h) − sin x)/h = cos(x + h/2) · sin(h/2)/(h/2) 裡的這兩個因子沒有任何顏色或框線標示，兩行之間也沒有視覺連線。",
+     "problem": "旁白說「a product of two factors. The first… the second…」，畫面沒有指出「第一個」「第二個」分別是上一行的哪一塊，靠讀者自己配對。",
+     "proposal": "beat 6 開始時把上一行的 cos(x + h/2) 框成藍、sin(h/2)/(h/2) 框成橘（沿用 §3.1 既有的語意色），然後讓這兩塊各自複製一份、以 0.8 s 下落到結論行的對應位置，落定後上一行的框淡出。",
+     "check": null,
+     "check_note": ""
+    },
+    {
+     "fid": "R2.04.note",
+     "run": "R2",
+     "lens": "R2",
+     "dim": "note",
+     "severity": "note",
+     "where": "",
+     "evidence": "",
+     "problem": "全片推導版面的典範：逐行往下長、舊行降亮、右側掛註解標籤（sum-to-product／A = x+h, B = x／write h = 2·(h/2)／CONTINUITY + THE LIMIT），beat 3 的 u/v 暫時 scratch（tile 05, +33.4s）寫完後在 tile 06 已退場，符合 ML1 的「臨時標註縮小淡出」。",
+     "proposal": "",
+     "check": null,
+     "check_note": ""
+    }
+   ],
+   "synthesis": "",
+   "one_change": "",
+   "level": "",
+   "by_rule": {
+    "ML1": 0,
+    "ML2": 0,
+    "ML3": 0,
+    "ML4": 1,
+    "ML5": 1,
+    "unlabeled": 0
+   }
+  },
+  {
+   "n": 5,
+   "id": "divider_squeeze",
+   "title": "A Geometric Squeeze",
+   "kind": "divider",
+   "template": null,
+   "hook": false,
+   "global_start": 194.767,
+   "duration": 6.0,
+   "reveals": 0,
+   "motion": {
+    "static_ratio": 0.913,
+    "moving_seconds": 0.5,
+    "longest_still_seconds": 5.2,
+    "fine_static_ratio": 0.913,
+    "fine_moving_seconds": 0.5,
+    "fine_longest_still_seconds": 5.2,
+    "longest_still_span": [
+     0.2,
+     5.5
+    ],
+    "fine_longest_still_span": [
+     0.2,
+     5.5
+    ],
+    "fine_events": [
+     0.25,
+     5.75
+    ],
+    "events": [
+     0.25,
+     5.75
+    ],
+    "non_reveal_events": [],
+    "profile": "▆ ▅",
+    "levels": [
+     6,
+     0,
+     5
+    ]
+   },
+   "sheet": "05_divider_squeeze.sheet.jpg",
+   "verdicts": {
+    "R2": "ok"
+   },
+   "findings": [
+    {
+     "fid": "R2.05.note",
+     "run": "R2",
+     "lens": "R2",
+     "dim": "note",
+     "severity": "note",
+     "where": "",
+     "evidence": "",
+     "problem": "與場 02 同一 divider 模板（STAGE 2、½sinθ ≤ ½θ ≤ ½tanθ、進度點在第 2 站），fine 最長靜止同為 5.2 s；改善建議見場 02 的 finding，不重複列。",
+     "proposal": "",
+     "check": null,
+     "check_note": ""
+    }
+   ],
+   "synthesis": "",
+   "one_change": "",
+   "level": "",
+   "by_rule": {
+    "ML1": 0,
+    "ML2": 0,
+    "ML3": 0,
+    "ML4": 0,
+    "ML5": 0,
+    "unlabeled": 0
+   }
+  },
+  {
+   "n": 6,
+   "id": "sector_inequality",
+   "title": "A Squeeze on the Unit Circle",
+   "kind": "content",
+   "template": "graph",
+   "hook": true,
+   "global_start": 200.767,
+   "duration": 83.067,
+   "reveals": 8,
+   "motion": {
+    "static_ratio": 0.782,
+    "moving_seconds": 18.0,
+    "longest_still_seconds": 27.2,
+    "fine_static_ratio": 0.695,
+    "fine_moving_seconds": 25.2,
+    "fine_longest_still_seconds": 8.8,
+    "longest_still_span": [
+     34.2,
+     61.5
+    ],
+    "fine_longest_still_span": [
+     39.8,
+     48.5
+    ],
+    "fine_events": [
+     0.25,
+     1.0,
+     5.75,
+     11.75,
+     12.25,
+     18.25,
+     26.25,
+     32.5,
+     34.25,
+     39.75,
+     48.75,
+     57.5,
+     61.75,
+     63.25,
+     64.5,
+     68.75,
+     73.25,
+     77.5,
+     81.25,
+     82.0
+    ],
+    "events": [
+     0.25,
+     1.25,
+     5.75,
+     18.25,
+     26.25,
+     32.5,
+     34.25,
+     61.75,
+     63.25,
+     65.0,
+     66.5,
+     69.25,
+     73.75,
+     75.0,
+     78.0,
+     81.25,
+     82.0
+    ],
+    "non_reveal_events": [
+     34.2,
+     61.8,
+     65.0,
+     66.5,
+     69.2,
+     73.8,
+     75.0,
+     78.0,
+     81.2,
+     82.0
+    ],
+    "profile": "▄ ▂      ▄   ▄  ▄▄            ▄▆▁▁▁▁▁▁▁▁▆▆",
+    "levels": [
+     4,
+     0,
+     2,
+     0,
+     0,
+     0,
+     0,
+     0,
+     0,
+     4,
+     0,
+     0,
+     0,
+     4,
+     0,
+     0,
+     4,
+     4,
+     0,
+     0,
+     0,
+     0,
+     0,
+     0,
+     0,
+     0,
+     0,
+     0,
+     0,
+     0,
+     4,
+     6,
+     1,
+     1,
+     1,
+     1,
+     1,
+     1,
+     1,
+     1,
+     6,
+     6
+    ]
+   },
+   "sheet": "06_sector_inequality.sheet.jpg",
+   "verdicts": {
+    "R2": "ok"
+   },
+   "findings": [
+    {
+     "fid": "R2.06.1",
+     "run": "R2",
+     "lens": "R2",
+     "dim": "D-focus",
+     "severity": "should",
+     "rule": "ML4",
+     "where": "06 +39.8–48.5s（beat 7, ineq）",
+     "evidence": "md 記 fine 最長靜止 8.8 s at 39.8-48.5 s (beat 7, ineq)；這 8.8 s 的旁白是「the areas line up in order: one half sine theta, then one half theta, then one half tangent theta」，而 tile 08（+40.5s）畫面下方只寫了 ½ sin θ 一項，第二、三項要到 +48.75 與 +57.5 才補上（tile 09、tile 10）。",
+     "problem": "旁白正在依序點名三塊面積，畫面卻停著不動，三張卡也沒有任何一張被亮起；等不等式補齊時，旁白早已講到別的地方，最該做的『圖形 ↔ 符號』配對就此錯過。",
+     "proposal": "把不等式拆成三次入場，各自對齊被念到的時刻：念「one half sine theta」時卡 ① 亮起（其餘兩張降亮到 40%）並同時寫出 ½ sin θ；「then one half theta」換卡 ②，寫 ≤ ½θ；「then one half tangent theta」換卡 ③，寫 ≤ ½ tan θ。每組約 1.5 s，8.8 s 死區直接被填滿。",
+     "check": null,
+     "check_note": ""
+    },
+    {
+     "fid": "R2.06.2",
+     "run": "R2",
+     "lens": "R2",
+     "dim": "D-continuity",
+     "severity": "should",
+     "rule": "ML1",
+     "where": "06 beat 8，+62.5–81.4s（tile 10 +63.2s → tile 11 +72.0s）",
+     "evidence": "tile 10 主圖還是原本的第一象限單位圓；tile 11（+72.0s）主圖被換成另一張完整圓（含一個往下的小扇形）並在底下寫 sin(−θ)/(−θ) = sinθ/θ，原圖消失，右側三張卡同時降亮。",
+     "problem": "同一幕裡為了講偶函數又另建了一張圓，違反「承重物件一幕只建一次」；而且「θ 換成 −θ 時 sinθ 也跟著變號」這個本來最適合用動作說的事，被換成一張新的靜態圖＋一行字。",
+     "proposal": "不要換圖：讓原圖的 B 點沿著圓弧從 θ 掃過 0 到 −θ（1.5 s），掃的同時橘色的 sinθ 線段跟著翻到 x 軸下方並把標籤改成 −sinθ，紫色角標 θ 改成 −θ；停 0.5 s 後 B 掃回 +θ，再把 sin(−θ)/(−θ) = sinθ/θ 寫在圖下。三張卡維持降亮即可。",
+     "check": null,
+     "check_note": ""
+    },
+    {
+     "fid": "R2.06.note",
+     "run": "R2",
+     "lens": "R2",
+     "dim": "note",
+     "severity": "note",
+     "where": "",
+     "evidence": "",
+     "problem": "本片最會教的場之一：單位圓逐步長出（弧 → A/B/θ/sinθ → C 與 tanθ），三塊面積被「抬」到右側成為 ①②③ 三張卡並各自標 ½sinθ／½θ／½tanθ，主圖上還留著綠色角塊與紫色弓形對應「outer 比 inner 多出什麼」。橘／紫／綠的語意色從這裡一路貫到場 07、11、24。",
+     "proposal": "",
+     "check": null,
+     "check_note": ""
+    }
+   ],
+   "synthesis": "",
+   "one_change": "",
+   "level": "",
+   "by_rule": {
+    "ML1": 1,
+    "ML2": 0,
+    "ML3": 0,
+    "ML4": 1,
+    "ML5": 0,
+    "unlabeled": 0
+   }
+  },
+  {
+   "n": 7,
+   "id": "squeeze_to_the_bound",
+   "title": "Trapping the Ratio",
+   "kind": "content",
+   "template": "derivation",
+   "hook": false,
+   "global_start": 283.833,
+   "duration": 57.367,
+   "reveals": 5,
+   "motion": {
+    "static_ratio": 0.882,
+    "moving_seconds": 6.8,
+    "longest_still_seconds": 8.5,
+    "fine_static_ratio": 0.877,
+    "fine_moving_seconds": 7.0,
+    "fine_longest_still_seconds": 8.2,
+    "longest_still_span": [
+     42.5,
+     51.0
+    ],
+    "fine_longest_still_span": [
+     42.5,
+     50.8
+    ],
+    "fine_events": [
+     1.0,
+     7.75,
+     13.75,
+     22.25,
+     30.0,
+     38.25,
+     42.5,
+     51.0,
+     55.25
+    ],
+    "events": [
+     1.0,
+     7.75,
+     13.75,
+     22.25,
+     30.0,
+     38.25,
+     42.5,
+     51.25,
+     55.25
+    ],
+    "non_reveal_events": [
+     22.2,
+     38.2,
+     51.2,
+     55.2
+    ],
+    "profile": "▄  ▃  ▁▃   ▁  ▂▃   ▂ ▂   ▁ ▃ ",
+    "levels": [
+     4,
+     0,
+     0,
+     3,
+     0,
+     0,
+     1,
+     3,
+     0,
+     0,
+     0,
+     1,
+     0,
+     0,
+     2,
+     3,
+     0,
+     0,
+     0,
+     2,
+     0,
+     2,
+     0,
+     0,
+     0,
+     1,
+     0,
+     3,
+     0
+    ]
+   },
+   "sheet": "07_squeeze_to_the_bound.sheet.jpg",
+   "verdicts": {
+    "R2": "good"
+   },
+   "findings": [
+    {
+     "fid": "R2.07.1",
+     "run": "R2",
+     "lens": "R2",
+     "dim": "D-dwell",
+     "severity": "should",
+     "rule": "ML4",
+     "where": "07 +42.5–50.8s（beat 5, check）",
+     "evidence": "md 記 fine 最長靜止 8.2 s at 42.5-50.8 s (beat 5, check)；tile 08（+43.1s）新行 0 ≤ |sin θ| ≤ |θ| ✓ 已經整行出現，下一個變化要到 +51.0 才發生（tile 10 才補上右側的 kept for later 標籤）。",
+     "problem": "整場唯一沒有做就地變形的一行，就是這一行——它直接淡入，看不出是從第一階的 sin θ ≤ θ 推來的；而且右側標籤晚了 8 s 才到，中間是全場最大的死區。",
+     "proposal": "沿用本場既有手法：把第一階的 sin θ ≤ θ 複製一份、以 0.8 s 下滑到新行位置，再用 0.7 s 在兩側套上絕對值並補上左端的 0 ≤，同時右側標籤 kept for later 一起寫出（不要延後）。整段約 1.5 s，剩下的時間讓那個綠色 ✓ 打上。",
+     "check": null,
+     "check_note": ""
+    },
+    {
+     "fid": "R2.07.note",
+     "run": "R2",
+     "lens": "R2",
+     "dim": "note",
+     "severity": "note",
+     "where": "",
+     "evidence": "",
+     "problem": "跨場延續的示範：場 06 的單位圓以原尺寸進場（tile 01），隨即縮到右上角變成常駐縮圖（tile 02 起），主圖位置讓給不等式階梯；每一階都用「框住整行就地改寫」（tile 04 的 sinθ ≤ θ ≤ tanθ、tile 06 的 1 ≤ θ/sinθ ≤ 1/cosθ 都拍到 token 正在變形），右側掛 multiply areas by 2／÷ sin θ, tan = sin/cos／RECIPROCATE − REVERSES 的操作標籤。ML1、ML2、ML3、ML5 同時成立。",
+     "proposal": "",
+     "check": null,
+     "check_note": ""
+    }
+   ],
+   "synthesis": "",
+   "one_change": "",
+   "level": "",
+   "by_rule": {
+    "ML1": 0,
+    "ML2": 0,
+    "ML3": 0,
+    "ML4": 1,
+    "ML5": 0,
+    "unlabeled": 0
+   }
+  },
+  {
+   "n": 8,
+   "id": "continuity_statement_sin_limit",
+   "title": "Sine and Cosine Are Continuous",
+   "kind": "content",
+   "template": "theorem_proof",
+   "hook": true,
+   "global_start": 341.2,
+   "duration": 59.167,
+   "reveals": 8,
+   "motion": {
+    "static_ratio": 0.78,
+    "moving_seconds": 13.0,
+    "longest_still_seconds": 16.5,
+    "fine_static_ratio": 0.597,
+    "fine_moving_seconds": 23.8,
+    "fine_longest_still_seconds": 7.0,
+    "longest_still_span": [
+     29.5,
+     46.0
+    ],
+    "fine_longest_still_span": [
+     29.5,
+     36.5
+    ],
+    "fine_events": [
+     0.25,
+     2.5,
+     5.25,
+     9.25,
+     18.5,
+     22.25,
+     27.25,
+     28.75,
+     36.75,
+     37.5,
+     38.25,
+     41.25,
+     44.25,
+     46.25,
+     46.75,
+     47.75,
+     52.75,
+     59.0
+    ],
+    "events": [
+     0.25,
+     9.25,
+     15.0,
+     22.25,
+     27.25,
+     28.75,
+     46.25,
+     46.75,
+     47.75,
+     52.75,
+     59.0
+    ],
+    "non_reveal_events": [
+     15.0,
+     27.2,
+     46.2,
+     46.8,
+     52.8
+    ],
+    "profile": "▅   ▃▃▃▃   ▄▃▁▅        ▃  ▂  ▇",
+    "levels": [
+     5,
+     0,
+     0,
+     0,
+     3,
+     3,
+     3,
+     3,
+     0,
+     0,
+     0,
+     4,
+     3,
+     1,
+     5,
+     0,
+     0,
+     0,
+     0,
+     0,
+     0,
+     0,
+     0,
+     3,
+     0,
+     0,
+     2,
+     0,
+     0,
+     7
+    ]
+   },
+   "sheet": "08_continuity_statement_sin_limit.sheet.jpg",
+   "verdicts": {
+    "R2": "ok"
+   },
+   "findings": [
+    {
+     "fid": "R2.08.1",
+     "run": "R2",
+     "lens": "R2",
+     "dim": "D-carry",
+     "severity": "should",
+     "rule": "ML2",
+     "where": "08 beat 2，+9.1–16.4s（tile 04 +9.8s）",
+     "evidence": "beat 2 旁白：「nudge the angle a little, and sine and cosine move only a little; they never jump.」tile 04（+9.8s）畫面是一個固定角度的半徑、固定長度的橘色 sinθ 與藍色 cosθ，此後到 tile 05（+17.1s）之間 fine change events 只有 +18.5 一次。",
+     "problem": "「nudge」是全片最直白的動作提示詞，畫面卻是靜止的定角圖。連續性（動一點點、只變一點點）本來就是用動作定義的概念，這裡卻只能用聽的。",
+     "proposal": "beat 2 讓半徑以目前的 θ 為中心來回擺 ±10°，做兩個來回共約 2.5 s；擺動時橘色 sinθ 線段與藍色 cosθ 線段的長度同步伸縮，並在右側加一對極小的刻度標記顯示它們「只移動一點點」。擺動結束停在原位，再接 beat 3 的弦／弧比較。",
+     "check": null,
+     "check_note": ""
+    },
+    {
+     "fid": "R2.08.2",
+     "run": "R2",
+     "lens": "R2",
+     "dim": "D-motion",
+     "severity": "nice",
+     "rule": "ML2",
+     "where": "08 beat 4 straighten（+22.1–28.6s）vs. tile 06（+22.8s）／tile 07（+29.3s）",
+     "evidence": "reveal 名為 straighten、beat 4 旁白是「which is just |sin θ| ≤ |θ| read geometrically」，但 tile 06（+22.8s，beat 4 中段）畫面上只有弧變成紫色，右側兩根比較長條要到 tile 07（+29.3s，已是 beat 5 statement）才在畫面上出現。",
+     "problem": "把弧「拉直」來和半弦比長度，是這一步的全部內容，卻在該講的那一拍看不到；長條晚了一拍才出現，等於在講命題時才補圖。",
+     "proposal": "beat 4 念到「read geometrically」時，把紫色弧複製一份、以 1.2 s 沿著切線方向展開成右側的紫色直條，橘色 sinθ 同樣平移成上方的橘色直條，兩條左端對齊後 |sin θ| ≤ |θ| 才寫出；beat 5 的命題卡再進場。",
+     "check": null,
+     "check_note": ""
+    },
+    {
+     "fid": "R2.08.note",
+     "run": "R2",
+     "lens": "R2",
+     "dim": "note",
+     "severity": "note",
+     "where": "",
+     "evidence": "",
+     "problem": "圖的資訊設計很好：單位圓上橘色 sinθ 半弦、藍色 cosθ、紫色弧 θ，右側再用一組橘／紫長條做等長比較並標 |sin θ| ≤ |θ|；命題卡出現後主圖自動縮小移位、左下讓給 PROOF 區塊，版面演化乾淨。",
+     "proposal": "",
+     "check": null,
+     "check_note": ""
+    }
+   ],
+   "synthesis": "",
+   "one_change": "",
+   "level": "",
+   "by_rule": {
+    "ML1": 0,
+    "ML2": 2,
+    "ML3": 0,
+    "ML4": 0,
+    "ML5": 0,
+    "unlabeled": 0
+   }
+  },
+  {
+   "n": 9,
+   "id": "continuity_argument",
+   "title": "Sine and Cosine Are Continuous",
+   "kind": "content",
+   "template": "theorem_proof",
+   "hook": true,
+   "global_start": 400.367,
+   "duration": 70.267,
+   "reveals": 5,
+   "motion": {
+    "static_ratio": 0.879,
+    "moving_seconds": 8.5,
+    "longest_still_seconds": 26.0,
+    "fine_static_ratio": 0.554,
+    "fine_moving_seconds": 31.2,
+    "fine_longest_still_seconds": 9.0,
+    "longest_still_span": [
+     1.8,
+     27.8
+    ],
+    "fine_longest_still_span": [
+     45.0,
+     54.0
+    ],
+    "fine_events": [
+     0.25,
+     1.25,
+     4.0,
+     12.5,
+     20.75,
+     21.25,
+     21.75,
+     26.75,
+     27.5,
+     34.25,
+     43.0,
+     44.5,
+     54.25,
+     56.25,
+     68.5,
+     70.0
+    ],
+    "events": [
+     0.25,
+     1.25,
+     28.0,
+     34.5,
+     43.0,
+     43.5,
+     44.5,
+     54.25,
+     60.5,
+     61.5,
+     70.0
+    ],
+    "non_reveal_events": [
+     28.0,
+     34.5,
+     44.5,
+     60.5,
+     61.5
+    ],
+    "profile": "▅            ▁▃▃▁▂   ▃▃    ▂  ▁   ▄",
+    "levels": [
+     5,
+     0,
+     0,
+     0,
+     0,
+     0,
+     0,
+     0,
+     0,
+     0,
+     0,
+     0,
+     0,
+     1,
+     3,
+     3,
+     1,
+     2,
+     0,
+     0,
+     0,
+     3,
+     3,
+     0,
+     0,
+     0,
+     0,
+     2,
+     0,
+     0,
+     1,
+     0,
+     0,
+     0,
+     4
+    ]
+   },
+   "sheet": "09_continuity_argument.sheet.jpg",
+   "verdicts": {
+    "R2": "ok"
+   },
+   "findings": [
+    {
+     "fid": "R2.09.1",
+     "run": "R2",
+     "lens": "R2",
+     "dim": "D-motion",
+     "severity": "should",
+     "rule": "ML2",
+     "where": "09 +45.0–54.0s（beat 4, proof.2）",
+     "evidence": "md 記 fine 最長靜止 9.0 s at 45.0-54.0 s (beat 4, proof.2)；tile 08（+43.5s）與 tile 09（+48.4s）之間新出現的 |cos x − cos x₀|, |sin x − sin x₀| ≤ 2|sin((x−x₀)/2)| 已整行寫完，之後 9 s 不動，期間旁白是「Drop it to its largest size, one, and both differences are bounded by the same thing」。",
+     "problem": "「把半和因子換成 1」是這一拍唯一的動作，卻沒有在式子上發生；新行直接淡入，前兩行的 sin((x+x₀)/2) 與 cos((x+x₀)/2) 也沒有被指認出來，讀者要自己找哪一塊被丟掉了。",
+     "proposal": "beat 4 依序做三個動作共約 2 s：①把兩行裡的半和因子同時亮起並在其上方打出 ≤ 1 的小標（0.6 s）；②讓這兩塊縮成 1 再淡出（0.6 s）；③剩下的兩個 sin((x−x₀)/2) 因子往下合流成同一行 bound（0.8 s）。9 s 死區可直接吸收掉一半。",
+     "check": null,
+     "check_note": ""
+    },
+    {
+     "fid": "R2.09.note",
+     "run": "R2",
+     "lens": "R2",
+     "dim": "note",
+     "severity": "note",
+     "where": "",
+     "evidence": "",
+     "problem": "數線上的 x 往 x₀ 滑動（tile 09 → tile 11 可見動點位置改變）與 (x−x₀)/2 的括號標記是好的具體化；黃色提問卡「Fix x₀: how far can cos x, sin x move?」全場常駐，錨定得住。",
+     "proposal": "",
+     "check": null,
+     "check_note": ""
+    }
+   ],
+   "synthesis": "",
+   "one_change": "",
+   "level": "",
+   "by_rule": {
+    "ML1": 0,
+    "ML2": 1,
+    "ML3": 0,
+    "ML4": 0,
+    "ML5": 0,
+    "unlabeled": 0
+   }
+  },
+  {
+   "n": 10,
+   "id": "fundamental_limit",
+   "title": "The Fundamental Limit",
+   "kind": "content",
+   "template": "theorem_proof",
+   "hook": false,
+   "global_start": 470.633,
+   "duration": 43.267,
+   "reveals": 4,
+   "motion": {
+    "static_ratio": 0.901,
+    "moving_seconds": 4.2,
+    "longest_still_seconds": 16.0,
+    "fine_static_ratio": 0.878,
+    "fine_moving_seconds": 5.2,
+    "fine_longest_still_seconds": 9.2,
+    "longest_still_span": [
+     5.0,
+     21.0
+    ],
+    "fine_longest_still_span": [
+     24.5,
+     33.8
+    ],
+    "fine_events": [
+     0.25,
+     4.75,
+     11.25,
+     11.75,
+     15.5,
+     21.25,
+     23.25,
+     34.0,
+     37.75,
+     41.25,
+     43.0
+    ],
+    "events": [
+     0.25,
+     4.75,
+     21.25,
+     23.25,
+     34.0,
+     37.75,
+     41.25,
+     43.0
+    ],
+    "non_reveal_events": [
+     21.2,
+     37.8,
+     41.2
+    ],
+    "profile": "▅ ▃       ▁▃▂   ▂▂▁ ▅▄",
+    "levels": [
+     5,
+     0,
+     3,
+     0,
+     0,
+     0,
+     0,
+     0,
+     0,
+     0,
+     1,
+     3,
+     2,
+     0,
+     0,
+     0,
+     2,
+     2,
+     1,
+     0,
+     5,
+     4
+    ]
+   },
+   "sheet": "10_fundamental_limit.sheet.jpg",
+   "verdicts": {
+    "R2": "ok"
+   },
+   "findings": [
+    {
+     "fid": "R2.10.1",
+     "run": "R2",
+     "lens": "R2",
+     "dim": "D-carry",
+     "severity": "should",
+     "rule": "ML4",
+     "where": "10 +24.5–33.8s（beat 4, proof.1）",
+     "evidence": "md 記 fine 最長靜止 9.2 s at 24.5-33.8 s (beat 4, proof.1)；tile 06（+23.7s）已寫出 cos θ → 1 ⇒ sinθ/θ → 1，tile 07（+28.3s）畫面與之相同。這 9.2 s 的旁白是「The ceiling is the constant one. The floor is cosine theta, which tends to one… so the squeeze pins the ratio to one from the right.」",
+     "problem": "本場是全片的拱心石，而「地板升上來、天花板不動、中間被夾住」這個純動作的意象，畫面上一個都沒有做；9.2 s 全靜止，靠旁白單獨承擔。",
+     "proposal": "在命題卡下方放一個 120 px 高的極簡夾擠示意：一條固定在高度 1 的天花板線（標 1）、一條從 0.6 高度往上升到 1 的地板線（標 cos θ）、中間一顆被擠上去的點（標 sinθ/θ），隨旁白 3 s 走完；同時把 PROOF 行裡的 cos θ 與 1 分別上色對應到兩條線（ML5）。",
+     "check": null,
+     "check_note": ""
+    },
+    {
+     "fid": "R2.10.note",
+     "run": "R2",
+     "lens": "R2",
+     "dim": "note",
+     "severity": "note",
+     "where": "",
+     "evidence": "",
+     "problem": "命題卡置右、PROOF 階梯置左的分工清楚，tile 06 拍到不等式行被框住就地改寫，結尾綠色 even ⇒ two-sided limit = 1 與 QED 方塊收得乾淨。",
+     "proposal": "",
+     "check": null,
+     "check_note": ""
+    }
+   ],
+   "synthesis": "",
+   "one_change": "",
+   "level": "",
+   "by_rule": {
+    "ML1": 0,
+    "ML2": 0,
+    "ML3": 0,
+    "ML4": 1,
+    "ML5": 0,
+    "unlabeled": 0
+   }
+  },
+  {
+   "n": 11,
+   "id": "squeeze_graph",
+   "title": "The Squeeze, Drawn",
+   "kind": "content",
+   "template": "graph",
+   "hook": false,
+   "global_start": 513.9,
+   "duration": 36.833,
+   "reveals": 7,
+   "motion": {
+    "static_ratio": 0.699,
+    "moving_seconds": 11.0,
+    "longest_still_seconds": 7.2,
+    "fine_static_ratio": 0.692,
+    "fine_moving_seconds": 11.2,
+    "fine_longest_still_seconds": 7.2,
+    "longest_still_span": [
+     22.5,
+     29.8
+    ],
+    "fine_longest_still_span": [
+     22.5,
+     29.8
+    ],
+    "fine_events": [
+     0.25,
+     3.25,
+     7.0,
+     9.5,
+     13.0,
+     15.0,
+     30.0,
+     36.0
+    ],
+    "events": [
+     0.25,
+     3.5,
+     7.0,
+     9.5,
+     13.0,
+     15.0,
+     30.0,
+     36.0
+    ],
+    "non_reveal_events": [
+     36.0
+    ],
+    "profile": "▅▂ ▂▂ ▄▂▂▂▃▃  ▁▄ ▅▄",
+    "levels": [
+     5,
+     2,
+     0,
+     2,
+     2,
+     0,
+     4,
+     2,
+     2,
+     2,
+     3,
+     3,
+     0,
+     0,
+     1,
+     4,
+     0,
+     5,
+     4
+    ]
+   },
+   "sheet": "11_squeeze_graph.sheet.jpg",
+   "verdicts": {
+    "R2": "good"
+   },
+   "findings": [
+    {
+     "fid": "R2.11.1",
+     "run": "R2",
+     "lens": "R2",
+     "dim": "D-focus",
+     "severity": "should",
+     "rule": "ML3",
+     "where": "11 +22.5–29.8s（beat 7, plot.3）",
+     "evidence": "md 記 fine 最長靜止 7.2 s at 22.5-29.8 s (beat 7, plot.3)，且該段 change events 一個都沒有；旁白是「Notice the open circle at theta equals zero: the ratio is undefined there, zero over zero.」而 tile 09（+23.8s）的空心圓只是主圖頂點上一個既有的小圈，沒有任何指引。",
+     "problem": "旁白明確要求「notice」一個直徑只有幾個像素的細節，畫面卻在這 7.2 s 完全不動、也沒有把視線帶過去；右上那個現成的 inset 放大鏡正是為此而設卻沒有被使用。",
+     "proposal": "beat 7 讓 inset 的視窗以 0.8 s 平移／收緊到 θ = 0 的鄰域（主圖不動），空心圓在 inset 裡做兩次 0.5 s 的脈動環，旁邊寫出 0/0 undefined 的小標；主圖同位置同步畫一條指向該點的細引線。共約 3 s。",
+     "check": null,
+     "check_note": ""
+    },
+    {
+     "fid": "R2.11.note",
+     "run": "R2",
+     "lens": "R2",
+     "dim": "note",
+     "severity": "note",
+     "where": "",
+     "evidence": "",
+     "problem": "全片動畫語彙最完整的一場：cos θ 虛線地板、常數 1 天花板、橘色 sinθ/θ 依序畫出，右上開 inset 放大鏡看 θ→0 的窄縫（ML3 的正解，主圖不縮放），再用一條垂直掃描線帶著兩個端點從 π/2 往 0 滑、中間色帶隨之變窄（tile 07→08→09）。",
+     "proposal": "",
+     "check": null,
+     "check_note": ""
+    }
+   ],
+   "synthesis": "",
+   "one_change": "",
+   "level": "",
+   "by_rule": {
+    "ML1": 0,
+    "ML2": 0,
+    "ML3": 1,
+    "ML4": 0,
+    "ML5": 0,
+    "unlabeled": 0
+   }
+  },
+  {
+   "n": 12,
+   "id": "limit_not_identity",
+   "title": "A Limit, Not an Identity",
+   "kind": "content",
+   "template": "callout",
+   "hook": true,
+   "global_start": 550.733,
+   "duration": 23.8,
+   "reveals": 5,
+   "motion": {
+    "static_ratio": 0.84,
+    "moving_seconds": 3.8,
+    "longest_still_seconds": 12.5,
+    "fine_static_ratio": 0.702,
+    "fine_moving_seconds": 7.0,
+    "fine_longest_still_seconds": 6.8,
+    "longest_still_span": [
+     11.0,
+     23.5
+    ],
+    "fine_longest_still_span": [
+     11.0,
+     17.8
+    ],
+    "fine_events": [
+     1.0,
+     5.0,
+     7.0,
+     9.5,
+     18.0
+    ],
+    "events": [
+     1.0,
+     5.0,
+     7.0,
+     9.5
+    ],
+    "non_reveal_events": [
+     7.0
+    ],
+    "profile": "▅ ▄▄▄▄      ",
+    "levels": [
+     5,
+     0,
+     4,
+     4,
+     4,
+     4,
+     0,
+     0,
+     0,
+     0,
+     0,
+     0
+    ]
+   },
+   "sheet": "12_limit_not_identity.sheet.jpg",
+   "verdicts": {
+    "R2": "weak"
+   },
+   "findings": [
+    {
+     "fid": "R2.12.1",
+     "run": "R2",
+     "lens": "R2",
+     "dim": "D-motion",
+     "severity": "must",
+     "rule": "ML4",
+     "where": "12 beat 4，+12.8–17.8s（tile 05 +13.5s）vs. tile 06（+18.5s）",
+     "evidence": "md 記 fine change events 為 +1.0, +5.0, +7.0, +9.5, +18.0，最長靜止 6.8 s at 11.0-17.8 s (beat 4, at_half_pi)。beat 4 旁白是「at theta equals pi over two it is two over pi, about zero point six four」，但 tile 05（+13.5s）的曲線上沒有任何標記點；到 tile 06（+18.5s）才同時看到 2/π ≈ 0.64 的標記，而那時旁白已在念「and at theta equals pi it is zero」。",
+     "problem": "兩個具體數值被依序念出，畫面卻是「先什麼都沒有，再一次全部出現」，而且整整晚了一拍。初學者聽到 0.64 時看到的是空曲線，看到標記時聽到的是另一個值，很容易把數值配到錯的點上——這是形成錯誤印象的風險，不只是節奏問題。",
+     "proposal": "兩個標記各自對齊自己的句子：+13.0 s 在 θ = π/2 處畫出實心點、拉一條虛線到縱軸並寫 2/π ≈ 0.64（0.8 s）；+18.5 s 在 θ = π 處畫出點並寫 0（0.8 s）；最後 beat 5 收句時讓 θ = 0 端的空心圓與高度 1 的虛線一起閃一次，對比「只有極限才是 1」。",
+     "check": null,
+     "check_note": ""
+    },
+    {
+     "fid": "R2.12.note",
+     "run": "R2",
+     "lens": "R2",
+     "dim": "note",
+     "severity": "note",
+     "where": "",
+     "evidence": "",
+     "problem": "場 11 的圖以縮圖形式帶進來（tile 02–03 右上角）做開場，跨場延續的意圖是對的。",
+     "proposal": "",
+     "check": null,
+     "check_note": ""
+    }
+   ],
+   "synthesis": "",
+   "one_change": "",
+   "level": "",
+   "by_rule": {
+    "ML1": 0,
+    "ML2": 0,
+    "ML3": 0,
+    "ML4": 1,
+    "ML5": 0,
+    "unlabeled": 0
+   }
+  },
+  {
+   "n": 13,
+   "id": "radians_essential",
+   "title": "Why Radians",
+   "kind": "content",
+   "template": "callout",
+   "hook": false,
+   "global_start": 574.533,
+   "duration": 20.033,
+   "reveals": 1,
+   "motion": {
+    "static_ratio": 0.924,
+    "moving_seconds": 1.5,
+    "longest_still_seconds": 8.0,
+    "fine_static_ratio": 0.924,
+    "fine_moving_seconds": 1.5,
+    "fine_longest_still_seconds": 8.0,
+    "longest_still_span": [
+     11.5,
+     19.5
+    ],
+    "fine_longest_still_span": [
+     11.5,
+     19.5
+    ],
+    "fine_events": [
+     0.25,
+     4.0,
+     11.25,
+     19.75
+    ],
+    "events": [
+     0.25,
+     4.0,
+     11.25,
+     19.75
+    ],
+    "non_reveal_events": [
+     11.2
+    ],
+    "profile": "▄▃▄  ▄   ▄",
+    "levels": [
+     4,
+     3,
+     4,
+     0,
+     0,
+     4,
+     0,
+     0,
+     0,
+     4
+    ]
+   },
+   "sheet": "13_radians_essential.sheet.jpg",
+   "verdicts": {
+    "R2": "weak"
+   },
+   "findings": [
+    {
+     "fid": "R2.13.1",
+     "run": "R2",
+     "lens": "R2",
+     "dim": "D-carry",
+     "severity": "must",
+     "rule": "ML4",
+     "where": "13 全場 20.0 s，死區 +11.5–19.5s（beat 2, body）",
+     "evidence": "md 記全場 1 個 reveal、92% 靜止、fine 最長靜止 8.0 s at 11.5-19.5 s (beat 2, body)；tile 04（+11.5s）與 tile 05（+19.4s）畫面完全相同，只有標題「Why Radians」與兩行字「Everything here needs radians. In degrees, sin(x°)/x → π/180, not 1 — and every formula built on that limit changes with it.」整場沒有任何圖。",
+     "problem": "這是旁白自己說的「structural」caution，卻是全片畫面最空的一場：20 s 內只發生兩次文字淡入。「換成度數極限就變成 π/180」是一個可以一眼看懂的圖形事實（曲線塌平），用兩行字講等於沒講；初學者看完不會對這件事留下任何印象。",
+     "proposal": "把場 11 的 squeeze 圖原樣帶回（它離現在只有 1 分鐘，觀眾還記得），保持橘色 sinθ/θ 曲線不動；念到「Switch to degrees」時複製一份曲線並在 1.5 s 內把它壓到 y ≈ 0.0175 的位置變成近乎貼著 x 軸的灰線，右端標 π/180 ≈ 0.017，原橘線右端標 1；兩個高度同時留在畫面上做對照，文字降為圖說。",
+     "check": null,
+     "check_note": ""
+    },
+    {
+     "fid": "R2.13.2",
+     "run": "R2",
+     "lens": "R2",
+     "dim": "D-composition",
+     "severity": "nice",
+     "rule": "",
+     "where": "13 tile 03–05 全場版面",
+     "evidence": "tile 05（+19.4s，最完整的一格）：標題在頂端、兩行內文在畫面中段偏上，往下整整三分之二的畫布是空的，右半邊也全空。",
+     "problem": "字量（兩行）與畫布（16:9 全幅）完全不成比例，畫面讀起來像一張沒做完的投影片，也讓 8 s 的靜止更難熬。",
+     "proposal": "採上文的圖之後，把文字縮到單行置於圖下方當 caption，圖佔中央 60% 寬；若維持純文字方案，則把 sin(x°)/x → π/180 單獨放大成一行主視覺（字級為內文的 2 倍）置中，其餘句子縮小成註腳。",
+     "check": null,
+     "check_note": ""
+    }
+   ],
+   "synthesis": "",
+   "one_change": "",
+   "level": "",
+   "by_rule": {
+    "ML1": 0,
+    "ML2": 0,
+    "ML3": 0,
+    "ML4": 1,
+    "ML5": 0,
+    "unlabeled": 1
+   }
+  },
+  {
+   "n": 14,
+   "id": "companion_limit",
+   "title": "A Companion Limit",
+   "kind": "content",
+   "template": "derivation",
+   "hook": false,
+   "global_start": 594.567,
+   "duration": 45.4,
+   "reveals": 4,
+   "motion": {
+    "static_ratio": 0.878,
+    "moving_seconds": 5.5,
+    "longest_still_seconds": 9.2,
+    "fine_static_ratio": 0.873,
+    "fine_moving_seconds": 5.8,
+    "fine_longest_still_seconds": 9.2,
+    "longest_still_span": [
+     0.2,
+     9.5
+    ],
+    "fine_longest_still_span": [
+     0.2,
+     9.5
+    ],
+    "fine_events": [
+     0.25,
+     9.75,
+     14.25,
+     20.5,
+     24.25,
+     31.0,
+     36.5,
+     42.0,
+     45.25
+    ],
+    "events": [
+     0.25,
+     9.75,
+     14.25,
+     20.5,
+     24.25,
+     31.0,
+     36.5,
+     42.0,
+     45.25
+    ],
+    "non_reveal_events": [
+     20.5,
+     31.0,
+     42.0
+    ],
+    "profile": "▅   ▃  ▃  ▂ ▄  ▁  ▃ ▂ ▇",
+    "levels": [
+     5,
+     0,
+     0,
+     0,
+     3,
+     0,
+     0,
+     3,
+     0,
+     0,
+     2,
+     0,
+     4,
+     0,
+     0,
+     1,
+     0,
+     0,
+     3,
+     0,
+     2,
+     0,
+     7
+    ]
+   },
+   "sheet": "14_companion_limit.sheet.jpg",
+   "verdicts": {
+    "R2": "ok"
+   },
+   "findings": [
+    {
+     "fid": "R2.14.1",
+     "run": "R2",
+     "lens": "R2",
+     "dim": "D-dwell",
+     "severity": "should",
+     "rule": "ML4",
+     "where": "14 +0.2–9.5s（beat 1, no reveal）",
+     "evidence": "md 記 fine 最長靜止 9.2 s at 0.2-9.5 s (beat 1, no reveal)，是全片最長的開場死區；tile 01（+0.5s）到 tile 03（+5.2s）畫面都只有題目行與 SOLUTION 分隔線，第一個 reveal 要到 +9.5 才來。",
+     "problem": "旁白在這 9.2 s 裡把整個命題唸完了（「the quantity one minus cosine theta, over theta tends to zero」），畫面卻只有一條空的 SOLUTION 線。開場就先讓觀眾盯著空白 9 s，是全片最該優先修掉的節奏破口。",
+     "proposal": "beat 1 隨旁白 paced 寫出題目行（目前它在 +0.25 就整行出現），念到「(1−cos θ)/θ」時把該式從題目行複製一份、0.8 s 下滑到 SOLUTION 區成為「Bank a companion limit: (1−cos θ)/θ → 0.」；如此第一個 reveal 提前到約 +3 s，開場死區降到 3 s 以內。",
+     "check": null,
+     "check_note": ""
+    },
+    {
+     "fid": "R2.14.note",
+     "run": "R2",
+     "lens": "R2",
+     "dim": "note",
+     "severity": "note",
+     "where": "",
+     "evidence": "",
+     "problem": "EXAMPLE 卡＋SOLUTION 階梯的格式與場 21/22 一致；tile 07（+24.8s）拍到整行被框住就地改寫成 sin²θ 形式，右側 multiply by 1 + cos θ／1 − cos²θ = sin²θ／THE LIMIT, THEN CONTINUITY 的操作標籤把每一步的理由都掛住了。",
+     "proposal": "",
+     "check": null,
+     "check_note": ""
+    }
+   ],
+   "synthesis": "",
+   "one_change": "",
+   "level": "",
+   "by_rule": {
+    "ML1": 0,
+    "ML2": 0,
+    "ML3": 0,
+    "ML4": 1,
+    "ML5": 0,
+    "unlabeled": 0
+   }
+  },
+  {
+   "n": 15,
+   "id": "divider_derivatives",
+   "title": "The Two Derivatives",
+   "kind": "divider",
+   "template": null,
+   "hook": false,
+   "global_start": 639.967,
+   "duration": 6.0,
+   "reveals": 0,
+   "motion": {
+    "static_ratio": 0.913,
+    "moving_seconds": 0.5,
+    "longest_still_seconds": 5.2,
+    "fine_static_ratio": 0.913,
+    "fine_moving_seconds": 0.5,
+    "fine_longest_still_seconds": 5.2,
+    "longest_still_span": [
+     0.2,
+     5.5
+    ],
+    "fine_longest_still_span": [
+     0.2,
+     5.5
+    ],
+    "fine_events": [
+     0.25,
+     5.75
+    ],
+    "events": [
+     0.25,
+     5.75
+    ],
+    "non_reveal_events": [],
+    "profile": "▆ ▅",
+    "levels": [
+     6,
+     0,
+     5
+    ]
+   },
+   "sheet": "15_divider_derivatives.sheet.jpg",
+   "verdicts": {
+    "R2": "ok"
+   },
+   "findings": [
+    {
+     "fid": "R2.15.note",
+     "run": "R2",
+     "lens": "R2",
+     "dim": "note",
+     "severity": "note",
+     "where": "",
+     "evidence": "",
+     "problem": "與場 02 同一 divider 模板（STAGE 3、d/dx sin x = ?　d/dx cos x = ?、進度點在第 3 站），fine 最長靜止同為 5.2 s；改善建議見場 02 的 finding，不重複列。",
+     "proposal": "",
+     "check": null,
+     "check_note": ""
+    }
+   ],
+   "synthesis": "",
+   "one_change": "",
+   "level": "",
+   "by_rule": {
+    "ML1": 0,
+    "ML2": 0,
+    "ML3": 0,
+    "ML4": 0,
+    "ML5": 0,
+    "unlabeled": 0
+   }
+  },
+  {
+   "n": 16,
+   "id": "derivative_of_sine",
+   "title": "The Derivative of Sine",
+   "kind": "content",
+   "template": "theorem_proof",
+   "hook": false,
+   "global_start": 645.967,
+   "duration": 39.333,
+   "reveals": 5,
+   "motion": {
+    "static_ratio": 0.865,
+    "moving_seconds": 5.2,
+    "longest_still_seconds": 8.2,
+    "fine_static_ratio": 0.859,
+    "fine_moving_seconds": 5.5,
+    "fine_longest_still_seconds": 8.0,
+    "longest_still_span": [
+     16.0,
+     24.2
+    ],
+    "fine_longest_still_span": [
+     16.2,
+     24.2
+    ],
+    "fine_events": [
+     0.25,
+     4.75,
+     10.0,
+     15.0,
+     24.5,
+     32.25
+    ],
+    "events": [
+     0.25,
+     4.75,
+     10.0,
+     15.0,
+     24.5,
+     32.25
+    ],
+    "non_reveal_events": [],
+    "profile": "▅ ▄ ▂▂ ▃    ▃   ▅   ",
+    "levels": [
+     5,
+     0,
+     4,
+     0,
+     2,
+     2,
+     0,
+     3,
+     0,
+     0,
+     0,
+     0,
+     3,
+     0,
+     0,
+     0,
+     5,
+     0,
+     0,
+     0
+    ]
+   },
+   "sheet": "16_derivative_of_sine.sheet.jpg",
+   "verdicts": {
+    "R2": "ok"
+   },
+   "findings": [
+    {
+     "fid": "R2.16.1",
+     "run": "R2",
+     "lens": "R2",
+     "dim": "D-continuity",
+     "severity": "should",
+     "rule": "ML1",
+     "where": "16 +16.2–24.2s（beat 4, proof.1）",
+     "evidence": "md 記 fine 最長靜止 8.0 s at 16.2-24.2 s (beat 4, proof.1)，且整場「every change is a reveal fade-in」（無任何非 reveal 動作）；beat 4 旁白是「But we already did the hard algebra: that quotient is cosine of the quantity x plus one half h, times sine of h over two, all over h over two.」而 tile 05（+15.3s）那一行只是淡入。",
+     "problem": "這一行是 1 分半前場 04 辛苦推完的成果，旁白也明講「我們已經做過了」，但畫面用的是和其他新內容一樣的淡入，看不出它是「搬過來的」；同時這一拍有 8 s 全靜止。",
+     "proposal": "讓它從場 04 的版面「飛過來」：先在右上角閃現場 04 最終畫面的 120 px 縮圖（0.5 s），該行從縮圖位置沿弧線滑進 PROOF 區並放大落位（1.0 s），右側掛標籤 from the difference quotient；縮圖再淡出。剩餘時間用 paced 寫出等號右邊即可。",
+     "check": null,
+     "check_note": ""
+    },
+    {
+     "fid": "R2.16.note",
+     "run": "R2",
+     "lens": "R2",
+     "dim": "note",
+     "severity": "note",
+     "where": "",
+     "evidence": "",
+     "problem": "結論卡在 qed 時整張亮成青色（tile 08, +32.9s）再回復（tile 09），是很好的收束訊號，建議在場 10、22 也比照。",
+     "proposal": "",
+     "check": null,
+     "check_note": ""
+    }
+   ],
+   "synthesis": "",
+   "one_change": "",
+   "level": "",
+   "by_rule": {
+    "ML1": 1,
+    "ML2": 0,
+    "ML3": 0,
+    "ML4": 0,
+    "ML5": 0,
+    "unlabeled": 0
+   }
+  },
+  {
+   "n": 17,
+   "id": "derivative_of_cosine",
+   "title": "The Derivative of Cosine",
+   "kind": "content",
+   "template": "theorem_proof",
+   "hook": false,
+   "global_start": 685.3,
+   "duration": 48.8,
+   "reveals": 5,
+   "motion": {
+    "static_ratio": 0.897,
+    "moving_seconds": 5.0,
+    "longest_still_seconds": 11.5,
+    "fine_static_ratio": 0.897,
+    "fine_moving_seconds": 5.0,
+    "fine_longest_still_seconds": 11.5,
+    "longest_still_span": [
+     11.0,
+     22.5
+    ],
+    "fine_longest_still_span": [
+     11.0,
+     22.5
+    ],
+    "fine_events": [
+     0.25,
+     6.25,
+     10.75,
+     22.75,
+     33.5,
+     41.25
+    ],
+    "events": [
+     0.25,
+     6.25,
+     10.75,
+     22.75,
+     33.5,
+     41.25
+    ],
+    "non_reveal_events": [],
+    "profile": "▅  ▄ ▂     ▃    ▄▃  ▅▄   ",
+    "levels": [
+     5,
+     0,
+     0,
+     4,
+     0,
+     2,
+     0,
+     0,
+     0,
+     0,
+     0,
+     3,
+     0,
+     0,
+     0,
+     0,
+     4,
+     3,
+     0,
+     0,
+     5,
+     4,
+     0,
+     0,
+     0
+    ]
+   },
+   "sheet": "17_derivative_of_cosine.sheet.jpg",
+   "verdicts": {
+    "R2": "weak"
+   },
+   "findings": [
+    {
+     "fid": "R2.17.1",
+     "run": "R2",
+     "lens": "R2",
+     "dim": "D-carry",
+     "severity": "must",
+     "rule": "ML4",
+     "where": "17 +11.0–22.5s（beat 3, proof.0）",
+     "evidence": "md 記 fine 最長靜止 11.5 s at 11.0-22.5 s (beat 3, proof.0)，是全片單一 beat 內最長的靜止；tile 04（+11.3s）與 tile 05（+16.5s）畫面完全相同，只有一行 cos A − cos B = −2 sin((A+B)/2) sin((A−B)/2)。這 11.5 s 的旁白是「obtained the same way as the first one, by expanding cosine of the quantity u plus v, minus cosine of the quantity u minus v」。",
+     "problem": "旁白正在完整描述一段推導（怎麼從角和公式得到這條恆等式），畫面卻連一個字都沒有動，11.5 s 幾乎踩到 12 s 的驗收線。初學者在這裡只能聽，聽不懂就整條恆等式都變成天上掉下來的——而這正是場 04 明確避免過的毛病。",
+     "proposal": "照搬場 04 beat 3 的做法：在 identity 行下方開一塊暫時 scratch，隨句 paced 寫出 u = (A+B)/2, v = (A−B)/2 → cos(u+v) − cos(u−v) → 兩個 cos u cos v 項相消 → −2 sin u sin v（約 6–7 s），寫完停 1 s 後整塊縮小淡出，主行保留。這一招本片已有現成實作，直接複用。",
+     "check": null,
+     "check_note": ""
+    }
+   ],
+   "synthesis": "",
+   "one_change": "",
+   "level": "",
+   "by_rule": {
+    "ML1": 0,
+    "ML2": 0,
+    "ML3": 0,
+    "ML4": 1,
+    "ML5": 0,
+    "unlabeled": 0
+   }
+  },
+  {
+   "n": 18,
+   "id": "slope_equals_height",
+   "title": "Slope Equals Height",
+   "kind": "content",
+   "template": "graph",
+   "hook": true,
+   "global_start": 734.1,
+   "duration": 35.033,
+   "reveals": 6,
+   "motion": {
+    "static_ratio": 0.921,
+    "moving_seconds": 2.8,
+    "longest_still_seconds": 9.5,
+    "fine_static_ratio": 0.885,
+    "fine_moving_seconds": 4.0,
+    "fine_longest_still_seconds": 9.5,
+    "longest_still_span": [
+     25.0,
+     34.5
+    ],
+    "fine_longest_still_span": [
+     25.0,
+     34.5
+    ],
+    "fine_events": [
+     0.25,
+     4.25,
+     9.0,
+     12.0,
+     17.75,
+     21.25,
+     24.0,
+     25.0,
+     34.75
+    ],
+    "events": [
+     0.25,
+     4.25,
+     9.0,
+     12.0,
+     21.25,
+     24.0,
+     24.5,
+     25.0,
+     34.75
+    ],
+    "non_reveal_events": [],
+    "profile": "▅ ▃ ▁▁    ▂▁▃    ▄",
+    "levels": [
+     5,
+     0,
+     3,
+     0,
+     1,
+     1,
+     0,
+     0,
+     0,
+     0,
+     2,
+     1,
+     3,
+     0,
+     0,
+     0,
+     0,
+     4
+    ]
+   },
+   "sheet": "18_slope_equals_height.sheet.jpg",
+   "verdicts": {
+    "R2": "ok"
+   },
+   "findings": [
+    {
+     "fid": "R2.18.1",
+     "run": "R2",
+     "lens": "R2",
+     "dim": "D-focus",
+     "severity": "should",
+     "rule": "ML4",
+     "where": "18 +25.0–34.5s（beat 7, cos_dots）",
+     "evidence": "md 記 fine 最長靜止 9.5 s at 25.0-34.5 s (beat 7, cos_dots)，整場「every change is a reveal fade-in」；tile 08（+24.8s）一次就把三個 cos 高度點、三條垂直虛線與 cos 0 = 1／cos(π/2) = 0／cos π = −1 三個標籤全部放上，而該拍旁白是逐一念「one, zero, minus one. They match exactly」。",
+     "problem": "「相符」是三組配對，畫面卻一次全給再停 9.5 s；觀眾沒有被帶著做過任何一次配對，最後看到的是一張資訊密集的靜態圖。",
+     "proposal": "拆成三次配對各約 1.2 s，對齊旁白的三個詞：念「one」時 m = 1 的切線與 cos 0 = 1 的點同時亮起、兩者之間的垂直虛線畫出；「zero」與「minus one」比照。三組走完後全部回到常態亮度，再寫出結語行。",
+     "check": null,
+     "check_note": ""
+    },
+    {
+     "fid": "R2.18.2",
+     "run": "R2",
+     "lens": "R2",
+     "dim": "D-motion",
+     "severity": "nice",
+     "rule": "ML2",
+     "where": "18 beat 3–5，+8.9–21.4s（tile 04、tile 05、tile 06）",
+     "evidence": "三條切線分別在 +9.0、+12.0、+18.5 淡入（md 標示每個 change 都是 reveal fade-in），tile 04→06 可見三條線是各自出現、彼此無關。",
+     "problem": "切線斜率如何隨 x 連續改變（也就是 cos 為什麼是 sin 的導數）這件事，被切成三個離散樣本；斜率『變』的過程沒有被演出。",
+     "proposal": "改成一條切線沿 sin 曲線從 0 滑到 π（約 3 s），滑動時切線角度連續改變，同時下方 cos 曲線上有一個同步的動點標出當下高度；滑到 0、π/2、π 時各停 0.4 s 並留下永久標記，最後三個樣本自然成形。",
+     "check": null,
+     "check_note": ""
+    },
+    {
+     "fid": "R2.18.note",
+     "run": "R2",
+     "lens": "R2",
+     "dim": "note",
+     "severity": "note",
+     "where": "",
+     "evidence": "",
+     "problem": "教學內容的圖像化很到位：三條綠色切線分別標 m = 1／m = 0／m = −1，再把 cos x 藍色虛線疊上並在同樣的 x 用垂直虛線把高度接到切線斜率。",
+     "proposal": "",
+     "check": null,
+     "check_note": ""
+    }
+   ],
+   "synthesis": "",
+   "one_change": "",
+   "level": "",
+   "by_rule": {
+    "ML1": 0,
+    "ML2": 1,
+    "ML3": 0,
+    "ML4": 1,
+    "ML5": 0,
+    "unlabeled": 0
+   }
+  },
+  {
+   "n": 19,
+   "id": "derivative_cycle",
+   "title": "The Derivative Cycle",
+   "kind": "content",
+   "template": "definition_math",
+   "hook": true,
+   "global_start": 769.133,
+   "duration": 34.733,
+   "reveals": 3,
+   "motion": {
+    "static_ratio": 0.913,
+    "moving_seconds": 3.0,
+    "longest_still_seconds": 18.2,
+    "fine_static_ratio": 0.652,
+    "fine_moving_seconds": 12.0,
+    "fine_longest_still_seconds": 8.2,
+    "longest_still_span": [
+     11.8,
+     30.0
+    ],
+    "fine_longest_still_span": [
+     11.8,
+     20.0
+    ],
+    "fine_events": [
+     0.25,
+     4.5,
+     11.0,
+     20.25,
+     21.0,
+     30.25,
+     34.5
+    ],
+    "events": [
+     0.25,
+     4.5,
+     11.0,
+     30.25,
+     34.5
+    ],
+    "non_reveal_events": [
+     30.2
+    ],
+    "profile": "▅ ▄  ▃         ▅ ▆",
+    "levels": [
+     5,
+     0,
+     4,
+     0,
+     0,
+     3,
+     0,
+     0,
+     0,
+     0,
+     0,
+     0,
+     0,
+     0,
+     0,
+     5,
+     0,
+     6
+    ]
+   },
+   "sheet": "19_derivative_cycle.sheet.jpg",
+   "verdicts": {
+    "R2": "weak"
+   },
+   "findings": [
+    {
+     "fid": "R2.19.1",
+     "run": "R2",
+     "lens": "R2",
+     "dim": "D-motion",
+     "severity": "should",
+     "rule": "ML2",
+     "where": "19 +11.8–20.0s（beat 3, math.0）",
+     "evidence": "md 記 fine 最長靜止 8.2 s at 11.8-20.0 s (beat 3, math.0)；tile 04（+11.8s）畫面上 sin x → cos x → −sin x → −cos x 四個方框與四支箭頭（含中央 d/dx 標籤）已經全部畫完，而 beat 3 的旁白此刻才要開始逐步念「sine x to cosine x to negative sine x to negative cosine x, and back to sine x」。",
+     "problem": "整條旁白是一段四步的行走，畫面卻在第一秒就把終點圖給完，接下來 8.2 s 不動。循環這個概念本身就是動作，用靜態圖呈現等於把最容易做的動畫丟掉。",
+     "proposal": "四個方框先全部淡入（或只先亮 sin x），四支箭頭改成隨句各自 draw-on：念到「to cosine x」畫第一支（0.6 s）並讓 cos x 框亮起，其餘三支比照；念到「and back to sine x」時最後一支閉合，整圈沿順時針跑一道光暈 0.8 s。beat 4 的「Four derivatives and you are home」再讓一顆代表 sin x 的 token 沿圈跑完整一圈（2 s）。",
+     "check": null,
+     "check_note": ""
+    },
+    {
+     "fid": "R2.19.2",
+     "run": "R2",
+     "lens": "R2",
+     "dim": "D-carry",
+     "severity": "nice",
+     "rule": "",
+     "where": "19 beat 4，+19.8–33.8s（tile 07 +26.8s、tile 08 +34.1s）",
+     "evidence": "beat 4 長 14.0 s，畫面只在 +30.25 多出底部一行 d⁴/dx⁴ sin x = sin x　vs.　d/dx e^x = e^x；旁白的「Where e to the x reproduces itself in a single step, these do it in a cycle of four」對應的視覺只有這一行並排文字。",
+     "problem": "e^x「一步回到自己」與三角「四步回到自己」是一組很好的對比，但畫面只是把兩個式子擺在一起，沒有用同一種視覺語言呈現「一步 vs 四步」。",
+     "proposal": "在四格循環圖旁邊補一個只有單一方框、箭頭從自己出發繞回自己的迷你圖（標 e^x），與四格圖並置；念到 in a single step 時迷你圖的自迴圈跑一次（0.6 s），念到 cycle of four 時四格圖跑一整圈（1.6 s）。",
+     "check": null,
+     "check_note": ""
+    }
+   ],
+   "synthesis": "",
+   "one_change": "",
+   "level": "",
+   "by_rule": {
+    "ML1": 0,
+    "ML2": 1,
+    "ML3": 0,
+    "ML4": 0,
+    "ML5": 0,
+    "unlabeled": 1
+   }
+  },
+  {
+   "n": 20,
+   "id": "divider_apply",
+   "title": "Consequences and Applications",
+   "kind": "divider",
+   "template": null,
+   "hook": false,
+   "global_start": 803.867,
+   "duration": 6.0,
+   "reveals": 0,
+   "motion": {
+    "static_ratio": 0.913,
+    "moving_seconds": 0.5,
+    "longest_still_seconds": 5.2,
+    "fine_static_ratio": 0.913,
+    "fine_moving_seconds": 0.5,
+    "fine_longest_still_seconds": 5.2,
+    "longest_still_span": [
+     0.2,
+     5.5
+    ],
+    "fine_longest_still_span": [
+     0.2,
+     5.5
+    ],
+    "fine_events": [
+     0.25,
+     5.75
+    ],
+    "events": [
+     0.25,
+     5.75
+    ],
+    "non_reveal_events": [],
+    "profile": "▆ ▅",
+    "levels": [
+     6,
+     0,
+     5
+    ]
+   },
+   "sheet": "20_divider_apply.sheet.jpg",
+   "verdicts": {
+    "R2": "ok"
+   },
+   "findings": [
+    {
+     "fid": "R2.20.note",
+     "run": "R2",
+     "lens": "R2",
+     "dim": "note",
+     "severity": "note",
+     "where": "",
+     "evidence": "",
+     "problem": "與場 02 同一 divider 模板（STAGE 4、d/dx tan x, sec x, cot x, csc x = ?、進度點在第 4 站），fine 最長靜止同為 5.2 s；改善建議見場 02 的 finding，不重複列。",
+     "proposal": "",
+     "check": null,
+     "check_note": ""
+    }
+   ],
+   "synthesis": "",
+   "one_change": "",
+   "level": "",
+   "by_rule": {
+    "ML1": 0,
+    "ML2": 0,
+    "ML3": 0,
+    "ML4": 0,
+    "ML5": 0,
+    "unlabeled": 0
+   }
+  },
+  {
+   "n": 21,
+   "id": "all_six_tan_sec",
+   "title": "All Six Derivatives",
+   "kind": "content",
+   "template": "derivation",
+   "hook": false,
+   "global_start": 809.867,
+   "duration": 35.467,
+   "reveals": 4,
+   "motion": {
+    "static_ratio": 0.872,
+    "moving_seconds": 4.5,
+    "longest_still_seconds": 6.8,
+    "fine_static_ratio": 0.858,
+    "fine_moving_seconds": 5.0,
+    "fine_longest_still_seconds": 6.5,
+    "longest_still_span": [
+     23.0,
+     29.8
+    ],
+    "fine_longest_still_span": [
+     0.2,
+     6.8
+    ],
+    "fine_events": [
+     0.25,
+     7.0,
+     13.25,
+     18.5,
+     22.75,
+     29.75,
+     35.25
+    ],
+    "events": [
+     0.25,
+     7.0,
+     13.5,
+     18.5,
+     22.75,
+     30.0,
+     35.25
+    ],
+    "non_reveal_events": [
+     18.5
+    ],
+    "profile": "▅  ▄  ▄▃ ▂ ▃  ▃▄ ▆",
+    "levels": [
+     5,
+     0,
+     0,
+     4,
+     0,
+     0,
+     4,
+     3,
+     0,
+     2,
+     0,
+     3,
+     0,
+     0,
+     3,
+     4,
+     0,
+     6
+    ]
+   },
+   "sheet": "21_all_six_tan_sec.sheet.jpg",
+   "verdicts": {
+    "R2": "good"
+   },
+   "findings": [
+    {
+     "fid": "R2.21.1",
+     "run": "R2",
+     "lens": "R2",
+     "dim": "D-dwell",
+     "severity": "nice",
+     "rule": "ML4",
+     "where": "21 +0.2–6.8s（beat 1, no reveal）",
+     "evidence": "md 記 fine 最長靜止 6.5 s at 0.2-6.8 s (beat 1, no reveal)；tile 01（+0.5s）與 tile 02（+1.7s）畫面相同，只有題目行與一行「From sin, cos, the quotient rule gives the other four.」，第一個 reveal 在 +7.0。",
+     "problem": "開場 6.5 s 不動，而旁白正在說「the other four cost almost nothing」——「另外四個」是誰，畫面沒有交代。",
+     "proposal": "beat 1 念到「the other four」時，讓 tan x / cot x / sec x / csc x 四個小標籤從 sin, cos 那行下方依序彈出成一列（每個 0.3 s，共 1.2 s），本場處理的 tan、sec 兩個維持高亮，cot、csc 降亮並留到場 22 接手。",
+     "check": null,
+     "check_note": ""
+    },
+    {
+     "fid": "R2.21.note",
+     "run": "R2",
+     "lens": "R2",
+     "dim": "note",
+     "severity": "note",
+     "where": "",
+     "evidence": "",
+     "problem": "EXAMPLE 1/2 的推導階梯乾淨：tile 04（+13.8s）拍到整行被框住就地改寫，右側 quotient rule on sin/cos (cos x ≠ 0)／Pythagorean identity／quotient rule on 1/cos x 把每一步的依據都掛住，舊行降亮處理得當。",
+     "proposal": "",
+     "check": null,
+     "check_note": ""
+    }
+   ],
+   "synthesis": "",
+   "one_change": "",
+   "level": "",
+   "by_rule": {
+    "ML1": 0,
+    "ML2": 0,
+    "ML3": 0,
+    "ML4": 1,
+    "ML5": 0,
+    "unlabeled": 0
+   }
+  },
+  {
+   "n": 22,
+   "id": "all_six_cot_csc",
+   "title": "All Six Derivatives",
+   "kind": "content",
+   "template": "derivation",
+   "hook": false,
+   "global_start": 845.333,
+   "duration": 38.267,
+   "reveals": 4,
+   "motion": {
+    "static_ratio": 0.855,
+    "moving_seconds": 5.5,
+    "longest_still_seconds": 10.8,
+    "fine_static_ratio": 0.855,
+    "fine_moving_seconds": 5.5,
+    "fine_longest_still_seconds": 10.8,
+    "longest_still_span": [
+     27.0,
+     37.8
+    ],
+    "fine_longest_still_span": [
+     27.0,
+     37.8
+    ],
+    "fine_events": [
+     0.25,
+     4.0,
+     9.25,
+     15.5,
+     20.75,
+     25.5,
+     38.0
+    ],
+    "events": [
+     0.25,
+     4.0,
+     9.25,
+     15.5,
+     20.75,
+     25.5,
+     38.0
+    ],
+    "non_reveal_events": [
+     15.5
+    ],
+    "profile": "▅▃▄ ▄▄ ▂  ▃ ▃▃    ▃",
+    "levels": [
+     5,
+     3,
+     4,
+     0,
+     4,
+     4,
+     0,
+     2,
+     0,
+     0,
+     3,
+     0,
+     3,
+     3,
+     0,
+     0,
+     0,
+     0,
+     3
+    ]
+   },
+   "sheet": "22_all_six_cot_csc.sheet.jpg",
+   "verdicts": {
+    "R2": "weak"
+   },
+   "findings": [
+    {
+     "fid": "R2.22.1",
+     "run": "R2",
+     "lens": "R2",
+     "dim": "D-carry",
+     "severity": "should",
+     "rule": "ML1",
+     "where": "22 +27.0–37.8s（beat 5, result）",
+     "evidence": "md 記 fine 最長靜止 10.8 s at 27.0-37.8 s (beat 5, result)；tile 07（+26.2s）最後一行已寫完，tile 08（+31.4s）與 tile 09（+37.7s）畫面不再變化。這 10.8 s 的旁白是「and all six are done, every one built on sine prime equals cosine and cosine prime equals negative sine」。兩場的標題都叫「All Six Derivatives」，但場 21 是 1/2、場 22 是 2/2，六個結果從未同時出現在同一畫面。",
+     "problem": "旁白宣告「六個都完成了」，畫面上卻只有 cot 與 csc 兩個；全片沒有任何一刻讓學生看到這六條並排。這既浪費了 10.8 s 的死區，也讓「全部建立在那兩條之上」的結構訊息完全沒有視覺對應。",
+     "proposal": "beat 5 念到「all six are done」時做一次收攏：本頁的 −csc²x、−csc x cot x 兩式縮小移到右側，場 21 的 sec²x、sec x tan x 與場 16/17 的 cos x、−sin x 從畫面外滑入，1.5 s 內排成 2×3 的結果表；表的最上面兩列（sin′、cos′）用高亮色標成「根」，其餘四列用細線連回這兩列，對應「every one built on…」。",
+     "check": null,
+     "check_note": ""
+    },
+    {
+     "fid": "R2.22.note",
+     "run": "R2",
+     "lens": "R2",
+     "dim": "note",
+     "severity": "note",
+     "where": "",
+     "evidence": "",
+     "problem": "推導本身與場 21 同樣穩（tile 04 +9.9s 拍到就地改寫、tile 07 +26.2s 拍到最後一行正在變形收尾）。",
+     "proposal": "",
+     "check": null,
+     "check_note": ""
+    }
+   ],
+   "synthesis": "",
+   "one_change": "",
+   "level": "",
+   "by_rule": {
+    "ML1": 1,
+    "ML2": 0,
+    "ML3": 0,
+    "ML4": 0,
+    "ML5": 0,
+    "unlabeled": 0
+   }
+  },
+  {
+   "n": 23,
+   "id": "shm_compute",
+   "title": "A Weight on a Spring",
+   "kind": "content",
+   "template": "derivation",
+   "hook": true,
+   "global_start": 883.6,
+   "duration": 41.8,
+   "reveals": 4,
+   "motion": {
+    "static_ratio": 0.175,
+    "moving_seconds": 34.2,
+    "longest_still_seconds": 4.2,
+    "fine_static_ratio": 0.12,
+    "fine_moving_seconds": 36.5,
+    "fine_longest_still_seconds": 4.2,
+    "longest_still_span": [
+     0.2,
+     4.5
+    ],
+    "fine_longest_still_span": [
+     0.2,
+     4.5
+    ],
+    "fine_events": [
+     0.25,
+     4.75,
+     5.25,
+     41.0
+    ],
+    "events": [
+     0.25,
+     4.75,
+     5.25,
+     5.75,
+     9.25,
+     11.25,
+     15.25,
+     17.25,
+     23.25,
+     33.0,
+     37.0,
+     39.0,
+     41.0
+    ],
+    "non_reveal_events": [
+     11.2,
+     15.2,
+     17.2,
+     23.2,
+     33.0,
+     37.0,
+     39.0
+    ],
+    "profile": "▅ ▂▂▂▂▃▂▂▃▃▂▂▂▂▂▃▂▂▂▄",
+    "levels": [
+     5,
+     0,
+     2,
+     2,
+     2,
+     2,
+     3,
+     2,
+     2,
+     3,
+     3,
+     2,
+     2,
+     2,
+     2,
+     2,
+     3,
+     2,
+     2,
+     2,
+     4
+    ]
+   },
+   "sheet": "23_shm_compute.sheet.jpg",
+   "verdicts": {
+    "R2": "good"
+   },
+   "findings": [
+    {
+     "fid": "R2.23.note",
+     "run": "R2",
+     "lens": "R2",
+     "dim": "note",
+     "severity": "note",
+     "where": "",
+     "evidence": "",
+     "problem": "全片唯一持續運動的場（coarse static 18%／fine static 12%，fine 最長靜止只有 4.2 s）：右側的彈簧與重物整場上下振盪，s′、s″ 標註跟著走，箭頭方向隨加速度反向（tile 04 +9.4s 向上、tile 06 +19.7s 向下），正好把 s″ = −s「永遠指回平衡位置」演出來；tile 06 還拍到 s″(t) = −sin t 那行被框住就地改寫成 = −s(t)。這場是全片其他 26 場該對齊的基準。",
+     "proposal": "",
+     "check": null,
+     "check_note": ""
+    }
+   ],
+   "synthesis": "",
+   "one_change": "",
+   "level": "",
+   "by_rule": {
+    "ML1": 0,
+    "ML2": 0,
+    "ML3": 0,
+    "ML4": 0,
+    "ML5": 0,
+    "unlabeled": 0
+   }
+  },
+  {
+   "n": 24,
+   "id": "shm_stacked_graphs",
+   "title": "Height, Velocity, Acceleration",
+   "kind": "content",
+   "template": "graph",
+   "hook": true,
+   "global_start": 925.4,
+   "duration": 36.733,
+   "reveals": 5,
+   "motion": {
+    "static_ratio": 0.918,
+    "moving_seconds": 3.0,
+    "longest_still_seconds": 11.8,
+    "fine_static_ratio": 0.87,
+    "fine_moving_seconds": 4.8,
+    "fine_longest_still_seconds": 11.5,
+    "longest_still_span": [
+     12.2,
+     24.0
+    ],
+    "fine_longest_still_span": [
+     12.2,
+     23.8
+    ],
+    "fine_events": [
+     1.0,
+     5.25,
+     8.25,
+     11.75,
+     24.0,
+     24.75,
+     35.5,
+     36.5
+    ],
+    "events": [
+     1.0,
+     5.75,
+     8.75,
+     12.25,
+     24.25,
+     24.75,
+     35.5,
+     36.5
+    ],
+    "non_reveal_events": [
+     35.5
+    ],
+    "profile": "▄ ▃ ▂ ▃     ▂    ▂▅",
+    "levels": [
+     4,
+     0,
+     3,
+     0,
+     2,
+     0,
+     3,
+     0,
+     0,
+     0,
+     0,
+     0,
+     2,
+     0,
+     0,
+     0,
+     0,
+     2,
+     5
+    ]
+   },
+   "sheet": "24_shm_stacked_graphs.sheet.jpg",
+   "verdicts": {
+    "R2": "weak"
+   },
+   "findings": [
+    {
+     "fid": "R2.24.1",
+     "run": "R2",
+     "lens": "R2",
+     "dim": "D-focus",
+     "severity": "must",
+     "rule": "ML4",
+     "where": "24 +12.2–23.8s（beat 4, g_a）",
+     "evidence": "md 記 fine 最長靜止 11.5 s at 12.2-23.8 s (beat 4, g_a)，fine change events 為 +11.75 之後直接跳到 +24.0。beat 4 後半的旁白是「Watch where the height hits a peak or a trough -- there the velocity passes through zero」，但 tile 06（+18.0s，正是這句話的當下）三張圖上沒有任何圓點或垂直虛線；t = π/2、3π/2 的點與貫穿三圖的虛線要到 tile 07（+24.9s，已是 beat 5）才出現。",
+     "problem": "旁白用「Watch where…」直接指揮觀眾看某個位置，那個位置卻整整 11.5 s 不在畫面上，等標記出現時旁白已經換題目（在講上下翻轉）。這是全片最典型的「畫面晚一拍」，初學者照著指令去看只會看到一片空白。",
+     "proposal": "把兩組圓點與貫穿三圖的垂直虛線提前到 beat 4：+14.5 s 先做 t = π/2 這一組（頂圖峰值點 → 虛線下拉 → 中圖零點亮起，共 0.8 s），+17.5 s 做 t = 3π/2 這一組；beat 5 只保留翻轉動作。",
+     "check": null,
+     "check_note": ""
+    },
+    {
+     "fid": "R2.24.2",
+     "run": "R2",
+     "lens": "R2",
+     "dim": "D-motion",
+     "severity": "should",
+     "rule": "ML2",
+     "where": "24 beat 5，+24.2–35.7s（tile 07 +24.9s → tile 09 +36.1s）",
+     "evidence": "beat 5 旁白是「hold the bottom graph against the top: it is the top one flipped upside down」，畫面在這 11.5 s 內只多了右側一個 s″ = −s 的小標（md 記 +35.5 有一次非 reveal 變化）；tile 08 與 tile 09 的三張圖形狀完全沒有動過。",
+     "problem": "「把底圖貼到頂圖上、上下翻過來」本身就是一個明確的動作指令，畫面卻用一個靜態標籤代替，等於把最有說服力的一秒鐘丟掉。",
+     "proposal": "複製頂圖的橘色 sin t 曲線成半透明副本，讓它以自己的時間軸為鏡射軸翻轉 180°（1.2 s），翻完後平移下落到底圖位置（0.8 s），與綠色 −sin t 完全重合時整條閃一次並在旁寫 s″ = −s；重合後副本淡出，留下原本的三圖。",
+     "check": null,
+     "check_note": ""
+    },
+    {
+     "fid": "R2.24.note",
+     "run": "R2",
+     "lens": "R2",
+     "dim": "note",
+     "severity": "note",
+     "where": "",
+     "evidence": "",
+     "problem": "場 23 的結論行 s″(t) = −sin t = −s(t)（SIMPLE HARMONIC MOTION）被帶到本場底部常駐（tile 01 起），跨場延續做得對；三張圖的橘／藍／綠語意色也與場 23 一致。",
+     "proposal": "",
+     "check": null,
+     "check_note": ""
+    }
+   ],
+   "synthesis": "",
+   "one_change": "",
+   "level": "",
+   "by_rule": {
+    "ML1": 0,
+    "ML2": 1,
+    "ML3": 0,
+    "ML4": 1,
+    "ML5": 0,
+    "unlabeled": 0
+   }
+  },
+  {
+   "n": 25,
+   "id": "toward_the_chain_rule",
+   "title": "Toward the Chain Rule",
+   "kind": "content",
+   "template": "definition_math",
+   "hook": true,
+   "global_start": 962.133,
+   "duration": 33.933,
+   "reveals": 2,
+   "motion": {
+    "static_ratio": 0.941,
+    "moving_seconds": 2.0,
+    "longest_still_seconds": 9.0,
+    "fine_static_ratio": 0.933,
+    "fine_moving_seconds": 2.2,
+    "fine_longest_still_seconds": 9.0,
+    "longest_still_span": [
+     7.0,
+     16.0
+    ],
+    "fine_longest_still_span": [
+     7.0,
+     16.0
+    ],
+    "fine_events": [
+     0.25,
+     6.75,
+     16.25,
+     21.75,
+     27.0,
+     33.75
+    ],
+    "events": [
+     0.25,
+     6.75,
+     16.25,
+     21.75,
+     27.25,
+     33.75
+    ],
+    "non_reveal_events": [
+     21.8,
+     27.2
+    ],
+    "profile": "▅  ▄    ▁ ▃  ▃  ▆",
+    "levels": [
+     5,
+     0,
+     0,
+     4,
+     0,
+     0,
+     0,
+     0,
+     1,
+     0,
+     3,
+     0,
+     0,
+     3,
+     0,
+     0,
+     6
+    ]
+   },
+   "sheet": "25_toward_the_chain_rule.sheet.jpg",
+   "verdicts": {
+    "R2": "weak"
+   },
+   "findings": [
+    {
+     "fid": "R2.25.1",
+     "run": "R2",
+     "lens": "R2",
+     "dim": "D-motion",
+     "severity": "should",
+     "rule": "ML4",
+     "where": "25 +7.0–16.0s（beat 2, statement）",
+     "evidence": "md 記 fine 最長靜止 9.0 s at 7.0-16.0 s (beat 2, statement)；beat 2（+6.6–16.2s）的旁白是「We can handle sine x, yet not sine of x squared or sine of the quantity three x plus one」，但 tile 03（+7.3s）與 tile 04（+11.4s）畫面上只有一行同樣內容的文字，三個 chip 要到 +16.25（beat 3）才開始出現，tile 05（+16.9s）只有第一個、tile 06（+24.6s）才有第二個、tile 07（+33.3s）才三個到齊。",
+     "problem": "旁白依序點名三個函數，chip 卻整整晚一拍才逐一登場，而且是在講「chain rule 是什麼」的那一拍才補齊；beat 2 本身留下 9 s 的空白。",
+     "proposal": "三個 chip 對齊 beat 2 的三個詞出現（「sine x」+8.0 s、「sine of x squared」+10.5 s、「three x plus one」+13.0 s，每個 0.5 s 彈入）；同時在 sin(x²) 與 sin(3x+1) 的內層 x²、3x+1 外面各畫一個框並標 inner function，念到「tucked inside」時兩個框同時閃一次。beat 3 再讓兩個問號 chip 併攏指向「chain rule」的佔位框。",
+     "check": null,
+     "check_note": ""
+    },
+    {
+     "fid": "R2.25.note",
+     "run": "R2",
+     "lens": "R2",
+     "dim": "note",
+     "severity": "note",
+     "where": "",
+     "evidence": "",
+     "problem": "三個 chip（sin x ✓／sin(x²) ?／sin(3x+1) ?）用勾與問號區分「會／不會」，構想是對的。",
+     "proposal": "",
+     "check": null,
+     "check_note": ""
+    }
+   ],
+   "synthesis": "",
+   "one_change": "",
+   "level": "",
+   "by_rule": {
+    "ML1": 0,
+    "ML2": 0,
+    "ML3": 0,
+    "ML4": 1,
+    "ML5": 0,
+    "unlabeled": 0
+   }
+  },
+  {
+   "n": 26,
+   "id": "recap",
+   "title": "Key Takeaways",
+   "kind": "content",
+   "template": "recap_cards",
+   "hook": false,
+   "global_start": 996.067,
+   "duration": 47.2,
+   "reveals": 4,
+   "motion": {
+    "static_ratio": 0.952,
+    "moving_seconds": 2.2,
+    "longest_still_seconds": 16.8,
+    "fine_static_ratio": 0.941,
+    "fine_moving_seconds": 2.8,
+    "fine_longest_still_seconds": 10.5,
+    "longest_still_span": [
+     19.0,
+     35.8
+    ],
+    "fine_longest_still_span": [
+     36.2,
+     46.8
+    ],
+    "fine_events": [
+     0.25,
+     3.0,
+     10.0,
+     18.75,
+     26.25,
+     36.0,
+     47.0
+    ],
+    "events": [
+     0.25,
+     3.0,
+     10.25,
+     18.75,
+     36.0,
+     47.0
+    ],
+    "non_reveal_events": [
+     36.0
+    ],
+    "profile": "▄▄   ▃   ▄       ▄▃    ▆",
+    "levels": [
+     4,
+     4,
+     0,
+     0,
+     0,
+     3,
+     0,
+     0,
+     0,
+     4,
+     0,
+     0,
+     0,
+     0,
+     0,
+     0,
+     0,
+     4,
+     3,
+     0,
+     0,
+     0,
+     0,
+     6
+    ]
+   },
+   "sheet": "26_recap.sheet.jpg",
+   "verdicts": {
+    "R2": "ok"
+   },
+   "findings": [
+    {
+     "fid": "R2.26.1",
+     "run": "R2",
+     "lens": "R2",
+     "dim": "D-composition",
+     "severity": "should",
+     "rule": "ML4",
+     "where": "26 beat 5，+26.1–46.3s（tile 07 +26.8s、死區 +36.2–46.8s）",
+     "evidence": "tile 07（+26.8s）畫面上第四點只有一個藍色編號「04」，後面一片空白；md 記 fine change events 在 +26.25 之後要到 +36.0 才有下一次，亦即這個空編號維持了約 9 s。文字補上之後（tile 08, +36.2s）又是 fine 最長靜止 10.5 s at 36.2-46.8 s，而 beat 5 的旁白長達 20.2 s。",
+     "problem": "一個沒有內容的項目符號掛在畫面上 9 s，看起來像沒載入完；接著整段 radians 的 fine print 又在 10.5 s 的全靜止中念完。全場 94% 靜止，是四點條列裡節奏最差的一段。",
+     "proposal": "把第 04 點拆成兩行、各隨其子句寫出：「Derivatives of sin and cos cycle with period four」對齊「four derivatives… bring you home」（約 +27 s），「and it all needs radians — in degrees d/dx sin(x°) = (π/180)cos(x°)」對齊「with the fine print…」（約 +36 s），並讓 π/180 這個因子最後單獨亮起 0.6 s。編號 04 與其第一行文字同時出現，不得先出現空編號。",
+     "check": null,
+     "check_note": ""
+    },
+    {
+     "fid": "R2.26.2",
+     "run": "R2",
+     "lens": "R2",
+     "dim": "D-carry",
+     "severity": "nice",
+     "rule": "ML1",
+     "where": "26 全場（tile 09 +46.6s 最完整）",
+     "evidence": "tile 09：四點全部是純文字條列，畫面上沒有任何圖；而這四點分別對應全片四張最強的圖（場 06 的單位圓、場 11 的 squeeze 圖、場 21/22 的六導數、場 19 的循環圖）。",
+     "problem": "recap 是把整節「壓縮回可回想的形狀」的地方，卻只用文字複述，等於放棄了前面辛苦建立的視覺記憶點。",
+     "proposal": "每一點左側（或右側）放一張 100–120 px 的縮圖：01 配場 06 的三塊面積、02 配場 18 的 slope=height 圖、03 配場 22 建議新增的 2×3 結果表、04 配場 19 的循環圖；縮圖隨該點一起淡入（0.4 s），全部到齊後整排微微亮一次收尾。",
+     "check": null,
+     "check_note": ""
+    },
+    {
+     "fid": "R2.26.note",
+     "run": "R2",
+     "lens": "R2",
+     "dim": "note",
+     "severity": "note",
+     "where": "",
+     "evidence": "",
+     "problem": "四點條列的層級與編號設計清楚，內容覆蓋完整。",
+     "proposal": "",
+     "check": null,
+     "check_note": ""
+    }
+   ],
+   "synthesis": "",
+   "one_change": "",
+   "level": "",
+   "by_rule": {
+    "ML1": 1,
+    "ML2": 0,
+    "ML3": 0,
+    "ML4": 1,
+    "ML5": 0,
+    "unlabeled": 0
+   }
+  },
+  {
+   "n": 27,
+   "id": "outro",
+   "title": "outro",
+   "kind": "outro",
+   "template": null,
+   "hook": false,
+   "global_start": 1043.267,
+   "duration": 7.0,
+   "reveals": 0,
+   "motion": {
+    "static_ratio": 0.667,
+    "moving_seconds": 2.2,
+    "longest_still_seconds": 2.8,
+    "fine_static_ratio": 0.593,
+    "fine_moving_seconds": 2.8,
+    "fine_longest_still_seconds": 2.8,
+    "longest_still_span": [
+     3.8,
+     6.5
+    ],
+    "fine_longest_still_span": [
+     3.8,
+     6.5
+    ],
+    "fine_events": [
+     0.25,
+     1.25,
+     2.5,
+     3.0,
+     6.75
+    ],
+    "events": [
+     0.25,
+     1.25,
+     2.5,
+     3.0,
+     6.75
+    ],
+    "non_reveal_events": [
+     1.2,
+     2.5,
+     3.0
+    ],
+    "profile": "█▄ █",
+    "levels": [
+     8,
+     4,
+     0,
+     8
+    ]
+   },
+   "sheet": "27_outro.sheet.jpg",
+   "verdicts": {
+    "R2": "good"
+   },
+   "findings": [
+    {
+     "fid": "R2.27.note",
+     "run": "R2",
+     "lens": "R2",
+     "dim": "note",
+     "severity": "note",
+     "where": "",
+     "evidence": "",
+     "problem": "7.0 s 的無聲收尾，米色底呼應場 01 的開場，logo → END OF SECTION 3.1 → 標題 → Next §3.2 The Chain Rule 分四段錯落進場（fine change events +0.25/+1.25/+2.5/+3.0），fine 最長靜止 2.8 s，節奏合宜，且把下一節的指向交代清楚。",
+     "proposal": "",
+     "check": null,
+     "check_note": ""
+    }
+   ],
+   "synthesis": "",
+   "one_change": "",
+   "level": "",
+   "by_rule": {
+    "ML1": 0,
+    "ML2": 0,
+    "ML3": 0,
+    "ML4": 0,
+    "ML5": 0,
+    "unlabeled": 0
+   }
+  }
+ ],
+ "film": {},
+ "by_rule": {
+  "ML1": 4,
+  "ML2": 7,
+  "ML3": 1,
+  "ML4": 15,
+  "ML5": 1,
+  "unlabeled": 3
+ }
+}
