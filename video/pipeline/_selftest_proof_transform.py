@@ -12,6 +12,9 @@ textbook "rewrite the line above" move that theorem_proof had no entrance for. T
   * a transform row also listed in `paced:` keeps the transform (a proof row has no rail)
   * schema: cancel is derivation-only; `frame` needs `anim: transform`; `tex` is required
   * lint sees a dict row's tex the way it sees a string row
+  * a dict row's `seg_roles` (rollout T2-3) colours its named `{{...}}` segment whole,
+    leaves the rest of the row at the row colour, and moves no glyph; schema's three
+    seg_roles checks (no segments / key miss / bad role) apply to `proof[]` too
 """
 from pipeline import _bootstrap
 
@@ -24,6 +27,7 @@ from pipeline.templates import build_blocks
 from pipeline.templates import derivation
 from pipeline.templates import theorem_proof as TP
 from pipeline.timing import STOCK_ANIM_SECONDS, stock_animation_seconds
+from pipeline.visuals import theme as T
 
 _META = {"id": "_t", "chapter": "Chapter 9", "section": "9.9", "title": "T", "theme": "midnight"}
 _TEX = [r"$\sin(x+h)-\sin x = 2\cos(x+h/2)\sin(h/2)$",
@@ -187,6 +191,74 @@ def test_lint_reads_a_dict_row_like_a_string_row():
     strings = lint._prose_strings({"scenes": [_spec(_dict_rows())]})
     assert ("thm.proof[1]", _TEX[1]) in strings, strings
     assert strings == lint._prose_strings({"scenes": [_spec(list(_TEX))]})
+
+
+# -- seg_roles on a proof dict row (rollout T2-3: theorem_proof gets the derivation
+#    whole-segment-colour primitive) -----------------------------------------------------
+
+def _seg_rows(seg_roles=None):
+    row = {"tex": r"${{a}} = {{c}}$"}
+    if seg_roles is not None:
+        row["seg_roles"] = seg_roles
+    return [r"$p = q$", row]
+
+
+def _hex(mob) -> str:
+    """The RENDERED colour: that of the first family member with points (a MathTexPart
+    wrapper has no points of its own and keeps the default white attribute)."""
+    pts = mob.family_members_with_points()
+    return str((pts[0] if pts else mob).get_color()).lower()
+
+
+def test_seg_roles_colour_the_named_segment_and_leave_the_rest_row_coloured():
+    blk = _b(_blocks(_spec(_seg_rows({"c": "success"}), say="One. {show proof.1} Two.")),
+             "proof.1")
+    eq = blk.mobject
+    hit = [s for s in eq.submobjects if getattr(s, "tex_string", None) == "c"]
+    rest = [s for s in eq.submobjects if getattr(s, "tex_string", None) == "a"]
+    assert hit and _hex(hit[0]) == T.color("dark", "success").lower(), hit
+    assert rest and _hex(rest[0]) == T.color("dark", "text").lower(), rest
+
+
+def test_seg_roles_do_not_move_a_glyph():
+    """Colour only: with vs without seg_roles, and vs a plain (undivided) row, every proof
+    row and the rest of the chain (qed included) sits at the same token geometry."""
+    plain = _blocks(_spec(_seg_rows(), say="One. {show proof.1} Two."))
+    tinted = _blocks(_spec(_seg_rows({"c": "success"}), say="One. {show proof.1} Two."))
+    for bid in ("proof.0", "proof.1", "qed"):
+        a, b = _b(plain, bid).mobject, _b(tinted, bid).mobject
+        assert _tokens(a) == _tokens(b), bid
+
+
+# -- schema: the same three seg_roles checks apply to theorem_proof's `proof[]` (T2-3) ------
+
+def _sr_errs(proof):
+    scene = {"template": "theorem_proof", "proof": proof}
+    return [m for sev, m in schema._seg_roles_issues("thm", scene) if sev == "error"]
+
+
+def test_schema_accepts_seg_roles_on_a_wellformed_proof_row():
+    assert _sr_errs([{"tex": "$p = q$"},
+                     {"tex": r"${{a}} = {{c}}$", "seg_roles": {"c": "success"}}]) == []
+
+
+def test_schema_a_proof_row_with_no_seg_roles_has_zero_errors():
+    assert _sr_errs(["$p = q$", {"tex": r"${{a}} = {{c}}$"}]) == []
+
+
+def test_schema_rejects_proof_seg_roles_on_a_row_without_segments():
+    errs = _sr_errs([{"tex": "$a = b$", "seg_roles": {"a": "secondary"}}])
+    assert len(errs) == 1 and "no {{...}} segments" in errs[0], errs
+
+
+def test_schema_rejects_proof_seg_roles_key_matching_no_segment():
+    errs = _sr_errs([{"tex": r"${{a}} = {{c}}$", "seg_roles": {"z": "secondary"}}])
+    assert len(errs) == 1 and "matches no segment" in errs[0], errs
+
+
+def test_schema_rejects_proof_seg_roles_with_an_unknown_role():
+    errs = _sr_errs([{"tex": r"${{a}} = {{c}}$", "seg_roles": {"c": "greenish"}}])
+    assert len(errs) == 1 and "not a palette role" in errs[0], errs
 
 
 if __name__ == "__main__":

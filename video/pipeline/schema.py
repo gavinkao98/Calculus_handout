@@ -338,14 +338,20 @@ def _seg_roles_issues(sid: str, scene: dict) -> "list[tuple[str, str]]":
     (the tex inside `{{...}}`, stripped) and each role a palette key -- a miss is silent at
     render (brand skips a row without segments or a key that matches nothing; theme.color
     falls back to primary on an unknown role), so it is said here. Errors: each is always a
-    mistake. steps[i] / result / check / lines[] dict rows; theorem_proof's dict rows are
-    wired once T1-3 lands."""
-    if scene.get("template") != "derivation":
+    mistake. steps[i] / result / check / lines[] dict rows; theorem_proof's `proof[]` dict
+    rows get the same three checks (rollout T2-3), their `tex` field standing in for
+    derivation's `math`."""
+    template = scene.get("template")
+    if template not in ("derivation", "theorem_proof"):
         return []
     from pipeline import texparts
     from pipeline.visuals import theme
     rows: list[tuple[str, dict]] = []
-    if scene.get("steps") is not None or scene.get("result") is not None:
+    if template == "theorem_proof":
+        for j, row in enumerate(scene.get("proof") or []):
+            if isinstance(row, dict):
+                rows.append((f"{sid}.proof[{j}]", {**row, "math": row.get("tex", "")}))
+    elif scene.get("steps") is not None or scene.get("result") is not None:
         for j, st in enumerate(scene.get("steps") or []):
             if isinstance(st, dict):
                 rows.append((f"{sid}.steps[{j}]", st))

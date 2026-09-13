@@ -30,7 +30,10 @@ YAML shape:
 
 A proof row may also be a dict (rollout T1-3): `{tex: "$...$", anim: transform, frame: true}`
 morphs the PREVIOUS proof row's equation into this one (derivation's `anim: transform`, same
-callable); proof.0 keeps its stock reveal. `cancel` is derivation-only (schema).
+callable); proof.0 keeps its stock reveal. `cancel` is derivation-only (schema). A dict row
+may also carry `seg_roles` (rollout T2-3): the `{{...}}` segment whole-colour primitive,
+passed to `brand.prose` -> `brand.math_line` the same way derivation rows carry it (schema
+via `_seg_roles_issues`).
 """
 from __future__ import annotations
 
@@ -235,8 +238,9 @@ def build(spec: dict[str, Any], ctx: dict[str, Any]) -> list[Block]:
 
     proof_left = left + 0.4
     proof_label = brand.eyebrow("proof", ground, role="muted")
-    step_mobs = [brand.prose(p, ground, role="text", size="step",
-                             max_width=content_w - 1.0) for p in steps]
+    step_mobs = [brand.prose(p, ground, role="text", size="step", max_width=content_w - 1.0,
+                             seg_roles=rows[i].get("seg_roles") if isinstance(rows[i], dict) else None)
+                for i, p in enumerate(steps)]
     qrow = _qed_row(qed_text, ground) if qed_text else None
     # the proof stack's vertical extent at the chain's min pitch: label + (label->chain gap) + rows
     row_hs = [m.height for m in step_mobs] + ([qrow.height] if qrow is not None else [])

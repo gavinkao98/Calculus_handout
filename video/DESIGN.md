@@ -958,10 +958,14 @@ key＝該段 `{{…}}` 內的 tex **原樣去頭尾空白**（是整段、不是
 `brand.math_line(..., seg_roles=)` → `_math_tex`：建好後對每個頂層段（`texparts.split_segments` 的順序）比對 key，
 命中就整段 `set_color`；**段色蓋過段內色表 token**（作者明寫的段是語意單位——同段裡的 `\theta` 不再另色，
 整段一色才讀得出「這一項＝那一塊」）；沒命中的段照舊（列底色＋token 色表）。derivation 的 `steps[i]`／`result`／
-`check`／`lines[]` 都收（`_rows_from_spec` 複製、`_eq_mob` 傳下去）；theorem_proof 的 `proof[]` dict 列待 T1-3
-合併後接。混排句（`Tex` 路徑）不吃。幾何逐 byte 不變（`_selftest_tex_parts` 釘 parity）。
+`check`／`lines[]` 都收（`_rows_from_spec` 複製、`_eq_mob` 傳下去）；**theorem_proof 的 `proof[]` dict 列也收**
+（rollout T2-3）——列經 `brand.prose(p, ..., role="text", size="step", seg_roles=…)`，`prose` 對單段 `$…$`
+把 `seg_roles` 轉傳給 `math_line`（其他兩個 route 忽略）；字串列與無 `seg_roles` 的 dict 列逐 byte 不變
+（`_selftest_proof_transform` 釘 parity）。混排句（`Tex` 路徑）不吃。幾何逐 byte 不變（`_selftest_tex_parts` 釘
+derivation parity、`_selftest_proof_transform` 釘 theorem_proof parity）。
 `schema._seg_roles_issues`（error，三條）：列沒有 `{{}}` 卻寫 `seg_roles`；key 沒對到任何段；role 不是 palette
-role。首用＝06 hook 的 `ineq`（藍／琥珀／綠對三塊區域）。
+role；`template == "theorem_proof"` 時比照 `derivation` 掃 `proof[]` dict 列（`tex` 欄位當 `math` 用）。首用＝06
+hook 的 `ineq`（藍／琥珀／綠對三塊區域）。
 
 **`anim: transform` 升級為對位。** 上一列與本列**都**分段時改用 `TransformMatchingTex(ghost, this_eq,
 transform_mismatches=True)`（key＝各段 tex：同名段原位 morph、其餘段兩兩變形），否則沿用
