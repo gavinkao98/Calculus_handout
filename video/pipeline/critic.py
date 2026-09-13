@@ -34,6 +34,12 @@ Pipeline:
 
 Run (offline, no key needed):
     python video/pipeline/critic.py --storyboard video/storyboards/_demo_derivation.yml --dry-run
+
+Output dir: <section>/critic (or critic_mimo for an _mimo deck) by default, or --out <dir>
+to pick another one (e.g. to keep a round's frames after a re-render, or to avoid two
+concurrent runs on the same deck overwriting each other). Either way, existing frames/
+under that dir are cleared first, so a run is always one complete retake, never a mix of
+this round's and a prior round's PNGs.
 """
 from __future__ import annotations
 
@@ -42,6 +48,7 @@ import base64
 import json
 import os
 import re
+import shutil
 import subprocess
 import sys
 import time
@@ -159,9 +166,18 @@ def plan_frames(storyboard: dict, manifest: dict, selector: str, per: str = "sce
     composition after every reveal. That is what you actually want to judge: a
     mid-reveal beat is half-built, and the critic wrongly scores it as empty /
     unbalanced (a real artifact we hit and measured). per="beat": one frame per
-    beat (progression view -- catches pacing issues, but ~3x the frames/cost)."""
+    beat (progression view -- catches pacing issues, but ~3x the frames/cost).
+
+    scene_number comes from the STORYBOARD's full scene order (1-based over every
+    scene -- intro/divider/content/outro all take a number), not from the
+    manifest entry: a manifest merged across renders (--reuse-existing) can carry
+    a stale scene_number from a run where the deck had a different scene count,
+    which duplicated 17 for two different scenes on 2026-09-13. This is the same
+    counting rewatch_pack.py and a fresh tts.py manifest both use, so the three
+    stay aligned."""
     titles = {s["id"]: s.get("title", "") for s in storyboard["scenes"]}
     scenes_by_id = {s["id"]: s for s in storyboard["scenes"]}
+    scene_numbers = {s["id"]: i for i, s in enumerate(storyboard["scenes"], 1)}
     meta = storyboard.get("meta", {})
     by_id = {s["scene_id"]: s for s in manifest["scenes"]}
     if selector == "all":
@@ -177,7 +193,7 @@ def plan_frames(storyboard: dict, manifest: dict, selector: str, per: str = "sce
         beats = entry.get("beats", [])
         if not beats:
             continue
-        common = {"scene_id": sid, "scene_number": entry["scene_number"],
+        common = {"scene_id": sid, "scene_number": scene_numbers[sid],
                   "title": titles.get(sid, "")}
         if per == "scene":
             item = {**common, "beat_index": 0, "final": True,
@@ -201,6 +217,18 @@ def plan_frames(storyboard: dict, manifest: dict, selector: str, per: str = "sce
                              "narration": beat.get("text", ""), "reveal": beat.get("reveal"),
                              "revealed_so_far": cumulative_reveals(beats, i)})
     return plan
+
+
+def reset_frames_dir(out_dir: Path) -> None:
+    """Clear out_dir/frames before a fresh extraction, so each run is one complete
+    retake rather than PNGs from several rounds piling up in the same directory --
+    e.g. renaming the whole critic dir to "keep as a snapshot" after a re-numbering
+    fix silently carried five stale frames (incl. a pre-renumber scene) into the
+    kept copy (2026-09-13). A directory kept as a snapshot (via --out) is untouched
+    on the NEXT run only if it is given a new --out path."""
+    frames_dir = out_dir / "frames"
+    if frames_dir.exists() and any(frames_dir.iterdir()):
+        shutil.rmtree(frames_dir)
 
 
 def extract_frames(deck_id: str, plan: list[dict], out_dir: Path) -> list[dict]:
@@ -559,6 +587,12 @@ def main() -> int:
     parser.add_argument("--base-url", default=DEFAULT_BASE_URL)
     parser.add_argument("--per", choices=("scene", "beat"), default="scene",
                         help="scene = one fullest frame per scene (default); beat = one per beat")
+    parser.add_argument("--out", type=Path, default=None,
+                        help="output dir for frames/critique (default: <section>/critic"
+                             " or critic_mimo). Existing frames/ under it are cleared first, "
+                             "so two runs never mix frames from different rounds; use a fresh "
+                             "--out to keep a prior round untouched. Only one run at a time "
+                             "should target the same dir.")
     args = parser.parse_args()
 
     storyboard = load_storyboard(args.storyboard)
@@ -568,13 +602,15 @@ def main() -> int:
 
     sec_dir = _bootstrap.section_output_dir(meta)
     critic_subdir = "critic_mimo" if deck_id.endswith("_mimo") else "critic"
-    out_dir = sec_dir / critic_subdir
+    out_dir = args.out if args.out else sec_dir / critic_subdir
     plan = plan_frames(storyboard, manifest, args.scene, per=args.per)
     if not plan:
         print("[critic] no content beats selected.", flush=True)
         return 0
     print(f"[critic] {deck_id}: planning {len(plan)} frame(s) across content scenes", flush=True)
+    print(f"[critic] output dir: {out_dir}", flush=True)
     rubric = load_rubric()
+    reset_frames_dir(out_dir)
     plan = extract_frames(deck_id, plan, out_dir)
     (out_dir / "frame_plan.json").write_text(
         json.dumps(plan, indent=2, ensure_ascii=False) + "\n", encoding="utf-8")
