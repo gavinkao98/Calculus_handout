@@ -90,6 +90,25 @@ DECK: <填，如 ch01_precise_limit>      SECTION: <填，如 §1.6>
   整場被判 fail 而去重合成。該場需要 `--skip-qa`（manifest 會誠實記成 `qa.status=skipped,
   reason=--skip-qa (intentional)`）。判斷是不是誤報：離線跑 `SA.align_scene` + `run_gates`，對齊
   本身過就是探針誤報，不是 take 有問題。
+- **〔2026-09-13 訂正〕上一條不是某一場的特例——scene-level 重合成一律下 `--skip-qa`。**
+  探針誤判的對象是**所有被 spell out 的數學**，不只逐字母唸的點名：“pi over one hundred eighty”、
+  “s double prime equals negative s”、“sine prime equals cosine” 一樣會被 ASR 轉回數字與符號、
+  一樣變成 replace ⇒ `fail` ⇒ 重合成。實測（Task D，6 場）：**只給場 06 下旗標時，四場跑下來三場
+  被退回重試，7 次 billed call 一場都沒 promote**（`--max-billed-calls` 擋住，什麼都沒污染）；
+  六場全下 `--skip-qa` 後 **5 場 5 次呼叫、0 retry**。QA 改成事後看：`manifest.json` 的
+  `gates.qa` 仍然誠實記錄 skipped，要真做 QA 就離線另跑探針、不要讓它決定要不要重花錢。
+- **〔2026-09-13〕beat 級 reuse 以「輸出檔路徑」為 key，所以場序一變就全部對不上。**
+  `build_reuse_index` 建的是 `{該 beat 的 audio_file 絕對路徑: {…, text_hash}}`，而路徑是
+  `beats/<兩位數場號>_<scene_id>/<兩位數序>_<reveal>.wav`——**場號與 reveal 都進檔名**。於是
+  (a) 任何場序調整（例：Task B-4 把 `companion_limit` 往前搬，`derivative_of_cosine` 由第 16 場
+  變第 17 場）會讓整場的 beat 路徑失配，(b) 在場中間插一個 `{show}` marker 會讓其後每一拍的序號
+  位移、同樣失配。兩種情況下工具都會**把整場每一拍重合成**，即使 `text_hash` 大多沒變。
+  實測代價：改 1 個 beat 的字，工具打算合成 6 個。**改字前先核 manifest 的 `scene_number` 與
+  `beats[].audio_file` 是否還對得上現在的場序**；對不上就把整個 beats 目錄複製到新場號、把
+  manifest 的 `audio_file`／`scene_number` 指過去（留一份 `.bak`），再跑——實測回到
+  `backend_calls: 1`，log 明寫 `not reusing 03_proof_0.wav: text_hash changed`。
+  §3.1 目前走 beats 路線的三場是 `continuity_argument`(09)／`derivative_of_cosine`(17)／
+  `shm_stacked_graphs`(24)，後兩者的場號都在 B-4 之後變過。
 - `make.py --reuse-audio` 會先驗 manifest freshness（deck id、scene、beat count、`{show}`、
   `text_hash`、WAV 存在/時長；`scene_aligned` 另驗 scene WAV＋words/aligned 檔＋`validation.status`），再 render；
   若報 stale/incomplete，不要硬跳過，先重跑該 storyboard 的 `tts.py` 或確認是不是選錯 `<deck>_mimo.yml`。

@@ -274,15 +274,35 @@ diff /tmp/before.txt /tmp/after.txt      # 必須逐字相同
 
 這兩件都要重 TTS。**建議一次決定範圍、一次報量**，不要分兩次。
 
-- [ ] **D-1 R6 三處外科修改中剩下的兩處**（⑤④ 拍板；20 已在 B-4 免費做掉）：
+- [x] **D-1 R6 三處外科修改中剩下的兩處**（⑤④ 拍板；20 已在 B-4 免費做掉）——**2026-09-13 完成**：
       - 場 **06** 偶函數對稱論證移到不等式之後（四鏡同指）——**beat 級**，鎖在 LOCKED 旁白內。
         註：本 session 已用 `evenness` 動畫讓那 19 秒有東西看，但**論證順序本身沒動**。
       - 場 **13** 度數導數公式延後到場 15 之後或 recap（R5）——**beat 級**。
       每處＝post-lock 改稿 → scoped NFA → 該場重 TTS。
-- [ ] **D-2 §3.1 對 `.tex` 的 §8 對齊**（⑤ 拍板）：全稿對
+- [x] **D-2 §3.1 對 `.tex` 的 §8 對齊**（⑤ 拍板）——**2026-09-13 完成，`[source_rev]` WARN 已消失**：全稿對
       `handout/latex/src/ch03/chapter3.tex` 做 diff、逐單元判是否跟改。已知分歧：04 的
       和差化積推導、03 開節兩句已刪。改的場一併 scoped NFA ＋ 重 TTS。完成後
       `source_rev` stamp 換到 `.tex`、現在那個常駐的 `[source_rev] WARN` 才會消失。
+
+> **Task D 收線（2026-09-13）。** 逐單元 diff 之後 **5 場跟改**（03 補和差化積恆等式的來源、
+> 06 補 corner piece $ABC$ 一句、17 補伴隨恆等式的來源、23 收回過強的「exactly the functions」、
+> 26 接收從 13 移來的度數導數公式），16 場判定不跟改；D-1 的兩處（06 偶函數論證後移、
+> 13 度數公式移到 recap）**刻意與講義次序不同**，理由與裁決記在 content script 表頭。
+> `source_rev` 改指 `chapter3.tex`（`sha256:acc1feed…`），schema 現在只印 `structure OK`。
+>
+> **實際帳：15 次 billed call**（使用者核准 12＋10＝22），其中 **9 次浪費在兩個坑**，都已寫進
+> [`RUNBOOK-mimo-narration-route.md`](RUNBOOK-mimo-narration-route.md)：
+> 1. **QA 探針不是只對逐字母唸讀誤報**——凡 spell out 的數學（“pi over one hundred eighty”、
+>    “s double prime equals negative s”）都會被 ASR 轉回符號而判 misspeak ⇒ 場判 fail ⇒ 重合成。
+>    只給場 06 下 `--skip-qa` 時，四場跑下來三場重試、**7 次呼叫一場都沒 promote**；六場全下
+>    之後 **5 場 5 次、0 retry**。**scene-level 重合成一律 `--skip-qa`。**
+> 2. **beat 級 reuse 以輸出檔路徑為 key，場號與 reveal 都在檔名裡**——B-4 把 `companion_limit`
+>    往前搬之後 `derivative_of_cosine` 由 16 變 17，整場 6 個 beat 路徑全失配，工具打算為「改了
+>    1 個 beat」重合成 6 個（吃掉 2 次才被上限擋下）。把 beats 目錄複製到新場號、manifest 的
+>    `audio_file`／`scene_number` 指過去之後，實測 `backend_calls: 1`。
+>
+> 兩次超支都由 `--max-billed-calls` 擋住，**舊音檔一次都沒被污染**——這個旗標是上一輪事故
+> 之後加的，這次證明它值得。全片旁白 895.8 s → **963.6 s（14.93 → 16.06 分）**。
 
 ---
 
