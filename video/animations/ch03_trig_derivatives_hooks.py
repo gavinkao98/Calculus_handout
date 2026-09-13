@@ -46,9 +46,11 @@ from manim import (
     Polygon,
     Rectangle,
     ReplacementTransform,
+    SurroundingRectangle,
     TransformMatchingShapes,
     VGroup,
     ValueTracker,
+    Write,
     always_redraw,
     linear,
     smooth,
@@ -1065,6 +1067,13 @@ def chord_vs_arc(spec, ctx, blocks):
 # ================================================================ hook 7
 # difference_quotient_for_sine (scene 04) -- the film's longest still (21.0 s) and the one
 # the six-lens review flags hardest: three `must`s on the same two beats.
+#   beat 3 (39.7 s, step.0) is where Task D's narration rewrite (2026-09-13) put the identity's
+#     OWN derivation -- "put u=(A+B)/2 and v=(A-B)/2 ... expand sin(u+v)-sin(u-v) with the
+#     angle-sum formulas, and the sin u cos v terms cancel, leaving exactly 2 cos u sin v" --
+#     spoken over a screen that shows the one finished row and then holds: 25.8 s of measured
+#     stillness (rewatch_pack_after17, fine threshold) against a 12 s acceptance line. The
+#     derivation now happens where the narration puts it, as a TEMPORARY draft in the band
+#     step.1 / step.2 / result will occupy, which is empty for the whole of this beat.
 #   beat 4 (20.9 s, step.2) is "the decisive step" -- write h as 2*(h/2) so the denominator
 #     carries the very h/2 that is inside the sine. The stock row posts the FINISHED line
 #     and holds: "畫面把它當成又一行結果貼出來，再停 20 秒，觀眾沒有機會看到中間發生了什麼"
@@ -1073,9 +1082,52 @@ def chord_vs_arc(spec, ctx, blocks):
 #   beat 5 (20.2 s, result) names two factors in turn ("The first slides to cos x ... the
 #     second is exactly sin theta / theta") over one finished line (R2 D-focus). The row is
 #     rebuilt as three addressable parts so each factor lands on the words that name it.
-# Both are paced across their beat (motion primitive 6). `anim: transform` in the storyboard
-# is overridden here: a 1.2 s glyph morph is the right length for a 5 s beat and invisible
-# in a 20 s one, which is the finding this hook exists to close.
+# All three are paced across their beat (motion primitive 6). `anim: transform` in the
+# storyboard is overridden here: a 1.2 s glyph morph is the right length for a 5 s beat and
+# invisible in a 20 s one, which is the finding this hook exists to close.
+
+# The draft is scratch work beside the chain, not a fourth row of it: `text` ink at math_sm,
+# one indent in from the chain's left edge, and no semantic hue (the deck's axis -- blue cos,
+# amber sin, ochre theta -- stays reserved for the rows themselves). It is built inside the
+# hook, never becomes a Block, and is faded out before {show step.1} needs the space, so every
+# layout gate still measures exactly the terminal frame it measured before.
+_DRAFT_X = -5.85                      # the chain's left edge (-6.37) plus one indent
+_DRAFT_Y = (-0.55, -1.30, -2.25)      # the empty band between step.0 and the bottom margin
+# The substitution line is split at the narration's own comma ("put u equals ... AND v equals
+# ..." is 9 s of speech), so the two halves arrive on the two clauses instead of together.
+_DRAFT_SUBS = (r"{{u=\frac{A+B}{2},}} {{\quad v=\frac{A-B}{2}}}",
+               r"A=u+v,\quad B=u-v")
+_DRAFT_START = r"\sin(u+v)-\sin(u-v)"
+# `{{...}}` segments so the two `\sin u\cos v` are addressable as one unit for the cancel
+# (SPEC-motion-language 規則 2 的兩段式消去); the expand itself is glyph-matched, which is
+# `derivation._matching`'s own choice when only one side is segmented.
+_DRAFT_EXPANDED = (r"{{(}} {{\sin u\cos v}} {{+\cos u\sin v)-(}} "
+                   r"{{\sin u\cos v}} {{-\cos u\sin v)}}")
+_CANCEL_SEGS = (1, 3)
+_DRAFT_PRODUCT = r"2\cos u\sin v"
+_DRAFT_RHS = r"2\cos\frac{A+B}{2}\,\sin\frac{A-B}{2}"   # step.0's own right-hand side
+# The beat's own words, from the forced alignment (`audio_mimo/manifest.json` -> words_file),
+# as a FRACTION of the beat so the draft tracks the narration rather than a metronome:
+# beat-relative seconds / 39.14 s of beat run time.
+_CUE = {
+    "u":        0.108,   # 4.22  "put u equals the quantity A plus B, all over two,"
+    "v":        0.224,   # 8.76  "and v equals the quantity A minus B, all over two,"
+    "back":     0.341,   # 13.36 "so that A equals u plus v and B equals u minus v;"
+    "expand":   0.489,   # 19.14 "expand sine of u plus v, minus sine of u minus v,"
+    "formulas": 0.603,   # 23.60 "... with the angle-sum formulas,"
+    "terms":    0.676,   # 26.44 "and the sine u cosine v terms"
+    "cancel":   0.725,   # 28.36 "cancel,"
+    "leaving":  0.756,   # 29.58 "leaving exactly two cosine u sine v."
+    "handoff":  0.815,   # 31.90 the product IS step.0's right-hand side; hand it over
+    "clear":    0.920,   # 36.01 "A product is also exactly what we want ..." -- draft spent
+}
+
+
+def _draft_line(tex: str, ground: str, y: float):
+    """One line of the scene-04 draft, left-flush in the indented draft column."""
+    mob = brand.math_line(tex, ground, role="text", size="math_sm")
+    mob.move_to([_DRAFT_X, y, 0], aligned_edge=LEFT)
+    return mob
 
 
 def difference_quotient_for_sine(spec, ctx, blocks):
@@ -1097,6 +1149,104 @@ def difference_quotient_for_sine(spec, ctx, blocks):
 
     def _rail(row, eq_wrap):
         return VGroup(*[m for m in row.submobjects if m is not eq_wrap])
+
+    # -- beat 3: write step.0, then draft its derivation in the band below it -----------
+    step0_row = ids["step.0"].mobject
+    step0_eq = _core(step0_row)
+    step0_rail = _rail(step0_row, step0_row.submobjects[0])
+
+    subs = [_draft_line(tex, ground, y) for tex, y in zip(_DRAFT_SUBS, _DRAFT_Y)]
+    work = _draft_line(_DRAFT_START, ground, _DRAFT_Y[2])
+    expanded = _draft_line(_DRAFT_EXPANDED, ground, _DRAFT_Y[2])
+    product = _draft_line(_DRAFT_PRODUCT, ground, _DRAFT_Y[2])
+    # Where the draft's product belongs: step.0's own right-hand side. Built at the row's ink
+    # and size and right-aligned to the row, so the flown copy lands ON the line it justifies
+    # (move_to(..., aligned_edge=RIGHT) matches the right edge AND the vertical centre).
+    landed = brand.math_line(_DRAFT_RHS, ground, role="primary", size="math")
+    landed.move_to(step0_eq.get_right(), aligned_edge=RIGHT)
+
+    def _step0_anim(scene, mob, g) -> float:
+        """The row, then the draft, cut to the narration's own cue words (`_CUE`)."""
+        total = TM.beat_run_time(scene, 18.0)
+        t = 0.0
+
+        def at(cue):
+            return total * _CUE[cue]
+
+        def play(*anims, run_time):
+            nonlocal t
+            rt = max(run_time, 0.25)
+            scene.play(*anims, run_time=rt)
+            t += rt
+
+        def hold(until):
+            nonlocal t
+            if until > t:
+                scene.wait(until - t)
+                t = until
+
+        # (1) "Here it is." -- the row, written while it is read (pacing's atomic-write rate,
+        #     capped so it is finished by the time the narration starts deriving it).
+        w = max(at("u") - pacing.FADE_SECONDS - 0.4, 1.0)
+        play(Write(step0_eq), run_time=min(pacing.write_seconds(step0_eq, w), w))
+        if step0_rail.submobjects:
+            play(FadeIn(step0_rail), run_time=pacing.FADE_SECONDS)
+        scene.add(mob)
+        hold(at("u"))
+
+        # (2) "put u = (A+B)/2, and v = (A-B)/2, so that A = u+v and B = u-v"
+        for part, cue in zip(subs[0].submobjects, ("u", "v")):
+            hold(at(cue))
+            play(FadeIn(part, shift=0.1 * UP), run_time=pacing.FADE_SECONDS)
+        scene.add(subs[0])
+        hold(at("back"))
+        play(FadeIn(subs[1], shift=0.1 * UP), run_time=pacing.FADE_SECONDS)
+
+        # (3) "expand sin(u+v) - sin(u-v) ... with the angle-sum formulas" -- the same line
+        #     rewriting itself, not a second line arriving finished.
+        hold(at("expand"))
+        play(Write(work), run_time=2.2)
+        hold(at("formulas"))
+        play(TransformMatchingShapes(work, expanded), run_time=1.6)
+
+        # (4) "... and the sin u cos v terms cancel, leaving exactly 2 cos u sin v": the two
+        #     terms are framed (WHICH two), dimmed, then gone, and only then do the survivors
+        #     close up -- the two-stage elimination of SPEC rule 2, in place.
+        scene.remove(expanded)
+        gone = VGroup(*[expanded.submobjects[i] for i in _CANCEL_SEGS])
+        keep = VGroup(*[m for i, m in enumerate(expanded.submobjects)
+                        if i not in _CANCEL_SEGS])
+        scene.add(keep, gone)
+        boxes = VGroup(*[SurroundingRectangle(s, color=T.color(g, "hairline_strong"),
+                                              buff=0.07, stroke_width=2.0) for s in gone])
+        hold(at("terms"))
+        play(Create(boxes), run_time=0.7)
+        hold(at("cancel"))
+        play(gone.animate.set_color(T.color(g, "muted")), run_time=0.45)
+        play(FadeOut(gone), FadeOut(boxes), run_time=0.45)
+        hold(at("leaving"))
+        play(TransformMatchingShapes(keep, product), run_time=1.2)
+
+        # (5) The product is step.0's right-hand side, so a copy goes and says so. The
+        #     substitution lines leave first: they are spent, and they sit on the flight path.
+        hold(at("handoff"))
+        play(FadeOut(subs[0]), FadeOut(subs[1]), run_time=0.7)
+        flyer = product.copy()
+        scene.add(flyer)
+        play(TransformMatchingShapes(flyer, landed), run_time=1.1)
+        play(FadeOut(landed), run_time=0.4)     # step.0's own RHS is underneath, untouched
+
+        # (6) "A product is also exactly what we want ..." -- clear the band well before
+        #     {show step.1} needs it.
+        hold(at("clear"))
+        play(FadeOut(product), run_time=0.8)
+        hold(total)
+        return max(total, t)
+
+    ids["step.0"].anim = _step0_anim
+    # The forced plays alone (the write, six fades, three morphs, the flight): what make.py's
+    # short-beat warning should compare against if this beat is ever re-cut shorter.
+    ids["step.0"].anim_seconds = 12.0
 
     # -- beat 4: the intermediate line, then the 2s cancel ------------------------------
     step1_row, step2_row = ids["step.1"].mobject, ids["step.2"].mobject
