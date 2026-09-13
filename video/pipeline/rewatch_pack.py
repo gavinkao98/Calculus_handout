@@ -11,6 +11,20 @@ multi-lens rewatch review so every lens looks at exactly the same evidence.
 
     python video/pipeline/rewatch_pack.py --deck ch03_trig_derivatives_mimo
     python video/pipeline/rewatch_pack.py --deck <deck> --scene sector_inequality,recap
+    python video/pipeline/rewatch_pack.py --deck <deck> --out <new> --baseline <old pack>
+
+It is also the HARD gate on the 12 s still line, so exit code carries a verdict:
+    0  the pack is written and every content scene's FINE longest still stretch is <= 12 s
+    1  the pack is written (a human still needs to look at it) and at least one content
+       scene is over the line -- `--gate-still` moves the line, nothing turns it off
+    2  `--baseline` points at a pack rendered at another fps / frame size, or this render's
+       own scenes disagree; nothing is written to --out
+The 12 s line was already met in round 13 and stayed met through round 21, yet it and
+`[sync]` were both warn-only, which is how eight `[sync]` warnings lived from round 13 to
+round 20: a gate that cannot stop anything is not a gate (KICKOFF-process-reform §2.3, G1).
+An A/B against a baseline at a different `--quality` compares fps, not the change (G4).
+This is the 12 s threshold of the three: make.py `[stillness]` is the 6 s authoring advisory
+and REWATCH R4 is the subjective one (DESIGN.md).
 
 Reads (all local, no API): storyboards/<deck>.yml (+ the base canonical deck for the
 written-math form of each beat), the audio manifest (audio_mimo/ or audio/) for beat
@@ -71,6 +85,15 @@ def _run(cmd: list[str]) -> bytes:
 def ffprobe_duration(p: Path) -> float:
     out = _run(["ffprobe", "-v", "error", "-show_entries", "format=duration", "-of", "csv=p=0", str(p)])
     return float(out.decode().strip())
+
+
+def ffprobe_video(p: Path) -> dict:
+    """{"fps": "30/1", "size": "1920x1080"} -- `r_frame_rate` is kept as the raw fraction so
+    30000/1001 stays distinguishable from 30/1, and it is the string the A/B check compares."""
+    out = _run(["ffprobe", "-v", "error", "-select_streams", "v:0", "-show_entries",
+                "stream=r_frame_rate,width,height", "-of", "json", str(p)])
+    st = json.loads(out.decode())["streams"][0]
+    return {"fps": st["r_frame_rate"], "size": f"{st['width']}x{st['height']}"}
 
 
 def fmt(t: float) -> str:
@@ -286,6 +309,81 @@ def build_sheet(frames: list[tuple[Path, str]], header: list[str], dst: Path, le
     sheet.save(dst, "JPEG", quality=88, optimize=True)
 
 
+# ---- verdicts the run exits on ----------------------------------------------------------
+# Pure functions (no ffmpeg, no files) so `_selftest_rewatch_pack.py` tests the judging.
+# Why they exit rather than warn: `[sync]` and the 12 s still line were both warn-only, and
+# eight `[sync]` warnings therefore survived from round 13 to round 20 -- a gate that cannot
+# stop anything is not a gate (KICKOFF-process-reform §2.3, §3 G1). Hence no off switch.
+
+def still_gate(rows: list[dict], threshold: float) -> dict:
+    """Judge the measured 12 s line over one pack's scenes.
+
+    rows: [{"scene", "kind", "still_seconds", "where"}] -- `still_seconds` is the FINE
+    (>0.05 %) longest still stretch, because the coarse threshold cannot see a formula
+    being written; `where` is `_beat_at`'s ` (beat N, <reveal>)`. Only `kind == "content"`
+    is judged (an intro or divider holds a card on purpose). Exactly the threshold passes.
+    """
+    content = [r for r in rows if r["kind"] == "content"]
+    over = [r for r in content if r["still_seconds"] - threshold > 1e-9]
+    top = max(content, key=lambda r: r["still_seconds"], default=None)
+    return {"over": over, "passed": not over, "content": len(content),
+            "max_seconds": top["still_seconds"] if top else 0.0,
+            "max_scene": top["scene"] if top else ""}
+
+
+def still_gate_lines(verdict: dict, threshold: float) -> list[str]:
+    """The verdict as text -- printed AND written to the production view, so the two agree."""
+    lines = [f"[still-gate] FAIL {r['scene']}: fine longest still {r['still_seconds']:.1f} s "
+             f"> {threshold:.1f} s{r['where']}" for r in verdict["over"]]
+    if verdict["over"]:
+        lines.append(f"[still-gate] {len(verdict['over'])}/{verdict['content']} "
+                     f"content scenes over {threshold:.1f} s")
+    elif verdict["content"]:
+        lines.append(f"[still-gate] PASS: all {verdict['content']} content scenes "
+                     f"<= {threshold:.1f} s (max {verdict['max_seconds']:.1f} s @ {verdict['max_scene']})")
+    else:                                   # a --scene subset can measure no content scene
+        lines.append("[still-gate] PASS: no content scenes measured")
+    return lines
+
+
+def source_record(deck: str, per_scene: dict) -> dict:
+    """The pack's machine-readable note of what was rendered. Deck-wide fps/size are None
+    when the per-scene probes disagree -- that render mixed `--quality` and is itself broken."""
+    fps = {v["fps"] for v in per_scene.values()}
+    size = {v["size"] for v in per_scene.values()}
+    return {"deck": deck,
+            "fps": fps.pop() if len(fps) == 1 else None,
+            "size": size.pop() if len(size) == 1 else None,
+            "scenes": per_scene}
+
+
+def baseline_verdict(this: dict, base: "dict | None") -> tuple[bool, str]:
+    """(may the A/B proceed, message). A 480p15 pack against a 1080p30 one measures the
+    `--quality` flag and not the change, so refuse instead of reporting a false conclusion
+    (KICKOFF-process-reform §3 G4)."""
+    if this["fps"] is None or this["size"] is None:
+        mixed = sorted({(v["fps"], v["size"]) for v in this["scenes"].values()})
+        return (False, "[ab] REFUSE: this render's scenes disagree: "
+                + ", ".join(f"fps={f} size={s}" for f, s in mixed)
+                + " -- re-render the whole deck at one --quality")
+    if not base or base.get("fps") is None or base.get("size") is None:
+        return (False, "[ab] REFUSE: the baseline pack records no source fps/size (it is "
+                "missing, or was written before this field existed) -- rebuild the baseline "
+                "pack with this version of rewatch_pack.py before comparing")
+    if (base["fps"], base["size"]) != (this["fps"], this["size"]):
+        return (False, f"[ab] REFUSE: baseline fps={base['fps']} size={base['size']} vs this "
+                f"render fps={this['fps']} size={this['size']}"
+                " -- A/B across different --quality is invalid")
+    return (True, f"[ab] baseline fps/size match (fps={this['fps']} size={this['size']})")
+
+
+def baseline_source(pack_dir: "Path | None") -> "dict | None":
+    """The `source` record of an earlier pack. None when there is no baseline, the pack is
+    missing, or it predates the field -- all three mean 'nothing safe to compare against'."""
+    p = pack_dir / "pack.json" if pack_dir else None
+    return json.loads(p.read_text(encoding="utf-8")).get("source") if p and p.exists() else None
+
+
 # ---- main ------------------------------------------------------------------------------
 
 def load_manifest(section_dir: Path) -> tuple[dict, Path]:
@@ -314,6 +412,12 @@ def main() -> int:
     ap.add_argument("--deck", required=True, help="rendered deck id, e.g. ch03_trig_derivatives_mimo")
     ap.add_argument("--scene", default="all", help="comma-separated scene ids (default all)")
     ap.add_argument("--out", type=Path, default=None, help="pack dir (default <section>/rewatch_pack)")
+    ap.add_argument("--gate-still", type=float, default=12.0, metavar="SECONDS",
+                    help="a content scene whose FINE longest still stretch exceeds this fails "
+                         "the run (exit 1). Deliberately has no off switch (kickoff G1).")
+    ap.add_argument("--baseline", type=Path, default=None, metavar="PACK_DIR",
+                    help="an earlier pack to A/B against; refuse (exit 2, before writing "
+                         "anything) unless it was rendered at the same fps and frame size")
     args = ap.parse_args()
 
     sb = yaml.safe_load((REPO / "video" / "storyboards" / f"{args.deck}.yml").read_text(encoding="utf-8"))
@@ -328,18 +432,29 @@ def main() -> int:
     by_id = {e["scene_id"]: e for e in manifest["scenes"]}
     av_dir = REPO / "video" / "output" / "_av" / args.deck
     out = args.out or (section_dir / "rewatch_pack")
-    out.mkdir(parents=True, exist_ok=True)
 
     scenes = sb["scenes"]
     wanted = None if args.scene == "all" else set(args.scene.split(","))
 
-    # exact global timeline from the concatenated per-scene files
+    # exact global timeline from the concatenated per-scene files (+ what they were rendered at)
     durs: dict[str, float] = {}
+    probes: dict[str, dict] = {}
     for s in scenes:
         av = av_dir / f"{s['id']}.mp4"
         if not av.exists():
             raise SystemExit(f"[rewatch_pack] missing per-scene A/V file {av} (render the deck first)")
         durs[s["id"]] = ffprobe_duration(av)
+        probes[s["id"]] = ffprobe_video(av)
+    src = source_record(args.deck, probes)
+    # Settle the A/B question BEFORE a byte is written to --out: a pack built against a
+    # baseline at another fps is worse than no pack, because its numbers look comparable.
+    if args.baseline or src["fps"] is None or src["size"] is None:
+        ok, msg = baseline_verdict(src, baseline_source(args.baseline))
+        print(msg, flush=True)
+        if not ok:
+            return 2
+
+    out.mkdir(parents=True, exist_ok=True)
     starts: dict[str, float] = {}
     t = 0.0
     for s in scenes:
@@ -347,7 +462,7 @@ def main() -> int:
         t += durs[s["id"]]
     total = t
 
-    records = []
+    records, gate_rows = [], []
     for n, s in enumerate(scenes, 1):
         sid = s["id"]
         if wanted and sid not in wanted:
@@ -379,6 +494,9 @@ def main() -> int:
             sample_rows.append({"k": k, "t_video": round(tv, 2), "t_global": round(g0 + tv, 2),
                                 "why": why, "beat": bi, "words": snippet, "file": dst.name})
         mot = motion_stats(av, dur, reveal_times)
+        still_where = _beat_at(mot["fine_longest_still_span"], beats)
+        gate_rows.append({"scene": sid, "kind": s.get("kind", "content"),
+                          "still_seconds": mot["fine_longest_still_seconds"], "where": still_where})
         header = [
             f"{stem}   \"{title}\"   global {fmt(g0)}–{fmt(g0 + dur)}   duration {dur:.1f}s   "
             f"{len(reveal_times)} reveals   picture static {mot['static_ratio'] * 100:.0f}% of the time",
@@ -399,7 +517,7 @@ def main() -> int:
                  f"{mot['fine_static_ratio'] * 100:.0f}% of the time; moving {mot['fine_moving_seconds']} s; "
                  f"longest still stretch {mot['fine_longest_still_seconds']} s "
                  f"at {mot['fine_longest_still_span'][0]}-{mot['fine_longest_still_span'][1]} s"
-                 + _beat_at(mot["fine_longest_still_span"], beats)
+                 + still_where
                  + "  <-- LOCATE DEAD ZONES HERE, not from the coarse events below",
                  f"- fine change events at "
                  + (", ".join(f"+{e}" for e in mot.get("fine_events", [])) or "none"),
@@ -468,14 +586,25 @@ def main() -> int:
         idx.append(f"| {r['n']:02d} | `{r['id']}` | {r['title']} | {fmt(r['global_start'])} | {r['duration']:.0f} | {r['reveals']} "
                    f"| {m['static_ratio'] * 100:.0f}% / {m['fine_static_ratio'] * 100:.0f}% | {m['longest_still_seconds']}s / {m['fine_longest_still_seconds']}s | {len(m['non_reveal_events'])} |")
     (out / "INDEX.md").write_text("\n".join(idx) + "\n", encoding="utf-8")
-    prod = ["# Production view (NOT for blind lenses)", "", "| # | scene | kind | template | hook | narration mode |", "|---|---|---|---|---|---|"]
+    # The gate verdict is production information, not evidence a blind lens should read, so it
+    # goes here and never into INDEX.md (a lens that sees the verdict grades the verdict).
+    verdict = still_gate(gate_rows, args.gate_still)
+    gate_lines = still_gate_lines(verdict, args.gate_still)
+    prod = ["# Production view (NOT for blind lenses)", "",
+            f"source: fps={src['fps']} size={src['size']}", "",
+            "Measured still gate (fine >0.05 % threshold, content scenes only; "
+            "the same lines the run printed, and what it exited on):", "",
+            *[f"    {ln}" for ln in gate_lines], "",
+            "| # | scene | kind | template | hook | narration mode |", "|---|---|---|---|---|---|"]
     prod += [f"| {r['n']:02d} | `{r['id']}` | {r['kind']} | {r['template'] or '—'} | {r['hook'] or '—'} | {r['mode']} |" for r in records]
     (out / "PRODUCTION.md").write_text("\n".join(prod) + "\n", encoding="utf-8")
     (out / "pack.json").write_text(json.dumps({"deck": args.deck, "film": str(section_dir / f"{args.deck}.mp4"),
                                                "total_seconds": round(total, 3), "lead_seconds": SCENE_LEAD_SECONDS,
-                                               "scenes": records}, ensure_ascii=False, indent=1), encoding="utf-8")
+                                               "source": src, "scenes": records}, ensure_ascii=False, indent=1), encoding="utf-8")
     print(f"[rewatch_pack] wrote {out}  ({len(records)} scenes; INDEX.md, PRODUCTION.md, pack.json)", flush=True)
-    return 0
+    for ln in gate_lines:
+        print(ln, flush=True)
+    return 0 if verdict["passed"] else 1
 
 
 if __name__ == "__main__":

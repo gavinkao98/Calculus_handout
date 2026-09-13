@@ -13,6 +13,13 @@ render cycles were spent animating the wrong one.
 The tests drive the real `motion_stats` over synthesised clips (so the shipped arithmetic is
 what runs, not a copy of it) and check that the reported span points at the LONGEST run rather
 than the first one, and that `_beat_at` names the beat that span sits in.
+
+Also pinned (2026-09-13, KICKOFF-process-reform §2.3/§3 G1+G4): the two verdicts the pack now
+EXITS on rather than merely reporting. `still_gate` is the 12 s measured line -- warn-only is
+how eight `[sync]` warnings survived from round 13 to round 20, so a gate that cannot stop
+anything is not a gate. `baseline_verdict` refuses an A/B whose baseline was rendered at a
+different fps or frame size, because comparing 480p15 against 1080p30 measures `--quality`
+and not the change. Both are pure functions so the judging is tested without ffmpeg.
 """
 from pipeline import _bootstrap
 
@@ -99,10 +106,101 @@ def test_beat_attribution_is_silent_without_beats_or_outside_them():
     assert RP._beat_at([900.0, 901.0], one) == ""
 
 
+# ---- the 12 s still gate (G1) ---------------------------------------------------------
+
+def _row(scene: str, still: float, kind: str = "content", where: str = "") -> dict:
+    return {"scene": scene, "kind": kind, "still_seconds": still, "where": where}
+
+
+def test_still_gate_passes_when_every_content_scene_is_under_the_line():
+    v = RP.still_gate([_row("a", 11.0), _row("b", 8.5)], 12.0)
+    assert v["passed"] and v["over"] == [], v
+    assert (v["content"], v["max_seconds"], v["max_scene"]) == (2, 11.0, "a"), v
+    assert RP.still_gate_lines(v, 12.0) == [
+        "[still-gate] PASS: all 2 content scenes <= 12.0 s (max 11.0 s @ a)"]
+
+
+def test_still_gate_fails_and_names_the_beat_of_the_scene_over_the_line():
+    v = RP.still_gate([_row("a", 11.0), _row("b", 13.4, where=" (beat 2, proof.1)")], 12.0)
+    assert not v["passed"] and [r["scene"] for r in v["over"]] == ["b"], v
+    assert RP.still_gate_lines(v, 12.0) == [
+        "[still-gate] FAIL b: fine longest still 13.4 s > 12.0 s (beat 2, proof.1)",
+        "[still-gate] 1/2 content scenes over 12.0 s"]
+
+
+def test_still_gate_ignores_scenes_that_are_not_content():
+    """An intro/divider holds a card on purpose; judging those makes the line unpassable."""
+    v = RP.still_gate([_row("intro", 40.0, kind="intro"), _row("d", 44.0, kind="divider"),
+                       _row("a", 9.0)], 12.0)
+    assert v["passed"] and (v["content"], v["max_scene"]) == (1, "a"), v
+
+
+def test_still_gate_counts_exactly_the_threshold_as_a_pass():
+    assert RP.still_gate([_row("a", 12.0)], 12.0)["passed"]
+    assert not RP.still_gate([_row("a", 12.1)], 12.0)["passed"]
+
+
+def test_still_gate_is_honest_about_a_subset_with_no_content_scene():
+    """`--scene intro,divider_limit` measures nothing the gate judges; do not claim it did."""
+    v = RP.still_gate([_row("intro", 40.0, kind="intro")], 12.0)
+    assert v["passed"] and v["content"] == 0, v
+    assert RP.still_gate_lines(v, 12.0) == ["[still-gate] PASS: no content scenes measured"]
+
+
+# ---- the A/B baseline refusal (G4) ----------------------------------------------------
+
+def _src(fps: str = "30/1", size: str = "1920x1080") -> dict:
+    return RP.source_record("deck", {i: {"fps": fps, "size": size} for i in ("a", "b")})
+
+
+def test_baseline_at_the_same_fps_and_size_continues():
+    ok, msg = RP.baseline_verdict(_src(), _src())
+    assert ok and msg == "[ab] baseline fps/size match (fps=30/1 size=1920x1080)", msg
+
+
+def test_baseline_at_a_different_fps_is_refused():
+    ok, msg = RP.baseline_verdict(_src(), _src(fps="15/1"))
+    assert not ok, msg
+    assert msg == ("[ab] REFUSE: baseline fps=15/1 size=1920x1080 vs this render fps=30/1 "
+                   "size=1920x1080 -- A/B across different --quality is invalid"), msg
+
+
+def test_baseline_at_a_different_frame_size_is_refused():
+    ok, msg = RP.baseline_verdict(_src(), _src(size="854x480"))
+    assert not ok and "baseline fps=30/1 size=854x480 vs this render" in msg, msg
+
+
+def test_a_baseline_pack_that_records_no_source_is_refused():
+    """An old pack has no source record; silently comparing it is how a fake A/B happens."""
+    for base in (None, {"deck": "d", "fps": None, "size": None, "scenes": {}}):
+        ok, msg = RP.baseline_verdict(_src(), base)
+        assert not ok and "baseline pack records no source fps/size" in msg, msg
+        assert "rebuild the baseline pack" in msg, msg
+
+
+def test_this_render_mixing_fps_across_its_own_scenes_is_refused():
+    src = RP.source_record("deck", {"a": {"fps": "30/1", "size": "1920x1080"},
+                                    "b": {"fps": "15/1", "size": "854x480"}})
+    assert src["fps"] is None and src["size"] is None, src
+    ok, msg = RP.baseline_verdict(src, _src())
+    assert not ok and "this render's scenes disagree" in msg, msg
+    assert "fps=15/1 size=854x480" in msg and "fps=30/1 size=1920x1080" in msg, msg
+
+
 if __name__ == "__main__":
     test_the_span_points_at_the_longest_run_not_the_first()
     test_both_thresholds_report_a_span()
     test_a_clip_too_short_to_difference_still_carries_the_new_keys()
     test_beat_attribution_names_the_beat_the_span_sits_in()
     test_beat_attribution_is_silent_without_beats_or_outside_them()
+    test_still_gate_passes_when_every_content_scene_is_under_the_line()
+    test_still_gate_fails_and_names_the_beat_of_the_scene_over_the_line()
+    test_still_gate_ignores_scenes_that_are_not_content()
+    test_still_gate_counts_exactly_the_threshold_as_a_pass()
+    test_still_gate_is_honest_about_a_subset_with_no_content_scene()
+    test_baseline_at_the_same_fps_and_size_continues()
+    test_baseline_at_a_different_fps_is_refused()
+    test_baseline_at_a_different_frame_size_is_refused()
+    test_a_baseline_pack_that_records_no_source_is_refused()
+    test_this_render_mixing_fps_across_its_own_scenes_is_refused()
     print("OK rewatch_pack self-test")
