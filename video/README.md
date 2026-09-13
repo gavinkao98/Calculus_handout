@@ -55,7 +55,7 @@ video/
         frames_before/ 修改前 bug-state 幀（不可重生的證據；唯一進版控的 render 幀）
   animations/          客製動畫 hook code（`# HOOK` 接入點；進版控）
   storyboards/         Stage 2 工程稿（進版控）
-    _demo_*.yml        模板示範／回歸樣本（asymptote／derivation／graph_compare／sign_chart／…）
+    _demo_*.yml        模板示範／回歸樣本（asymptote／derivation／graph_compare／sign_chart／worked_example／…）
     <deck>.yml         逐節正式 storyboard（依方法論產生）
   experiments/         實驗線（不碰成熟產線；forced_alignment_dean 測整段音訊＋alignment；reference_frames＝YouTube 參考影片抓幀／拆解／對照表工具，2026-09-13）
   pipeline/assets/brand/  NTU logo 向量源（icon／lockup ×3 色；進版控）
@@ -121,6 +121,16 @@ video/
   （`align_on`，預設 `=`）；`anim: highlight` 標結果行。與左右並列模板的
   選用判準、容量上限見 [DESIGN.md](DESIGN.md)「Template selection」；demo
   稿 `storyboards/_demo_derivation.yml`。
+- **`worked_example`**（2026-09-13 新增）：課本例題（講義的 `workedexample`
+  容器，全書語意塊的 24%）。題目當 masthead（`[ EXAMPLE 3.1 ]` 字卡＋
+  `title` 小字 tagline）、`SOLUTION` 步驟鏈在左、策略／notes rail 在右、
+  **答案框**釘在下三分之一（62 px，畫面最重的元素）。列文法與 `derivation`
+  逐字相同（直接 import 它的變形函式，所以 `{{…}}` 分段／`anim: transform`／
+  `cancel`／`seg_roles`／`paced:` 行為一致），但**列不收 `reason`**——右 rail
+  已經給了 `strategy:`／`notes:`。`accent` 省略時預設 `example`（綠）。
+  契約與兩處刻意偏離設計畫布的理由見 [DESIGN.md](DESIGN.md)
+  「Worked-example 模板 `worked_example`」；demo 稿
+  `storyboards/_demo_worked_example.yml`。
 
 模板層的 **motion primitive**（2026-09-12 首輪，全部 opt-in；契約與理由見
 [DESIGN.md](DESIGN.md)「motion primitive」節）：
