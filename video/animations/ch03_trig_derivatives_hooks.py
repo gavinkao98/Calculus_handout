@@ -582,17 +582,54 @@ def slope_equals_height(spec, ctx, blocks):
     # there" made literal. Drawn together with cos_dots so it appears at the
     # exact beat the narration reads the matching heights, not before.
     DOT_R = 0.07
-    cos_dots = VGroup()
-    for x0, h, lab in marks:
-        sin_pt = axes.c2p(x0, np.sin(x0))
-        cos_pt = axes.c2p(x0, h)
+    GAP_MARGIN = 0.08
+    # bboxes of the x-tick LABELS only (not the tick Line marks) -- the pi
+    # connector runs straight down through the pi tick's glyph (2026-09-13
+    # round-20 visual audit V2); any connector whose vertical run crosses a
+    # label gets a gap opened around it below.
+    tick_label_boxes = [(m.get_left()[0], m.get_right()[0], m.get_bottom()[1], m.get_top()[1])
+                        for m in xticks if isinstance(m, MathTex)]
+
+    def _connector(sin_pt, cos_pt):
         # trim both ends past the dot radius (and off the curve point) so the
         # dash pattern doesn't terminate a partial dash inside the dot itself.
         gap = DOT_R + 0.03
         v = cos_pt - sin_pt
         v_hat = v / np.linalg.norm(v)
-        connector = DashedLine(sin_pt + gap * v_hat, cos_pt - gap * v_hat,
-                               color=mut, stroke_width=1.6, dash_length=0.07)
+        p0 = sin_pt + gap * v_hat
+        p1 = cos_pt - gap * v_hat
+        # sin_pt and cos_pt share x0, so the trimmed run is exactly vertical --
+        # clip it to the sub-intervals that clear every tick label at this x,
+        # each pulled back GAP_MARGIN from the label edge it must skip.
+        x_scene, z = p0[0], p0[2]
+        lo, hi = sorted((p0[1], p1[1]))
+        intervals = [(lo, hi)]
+        for bx0, bx1, by0, by1 in tick_label_boxes:
+            if not (bx0 <= x_scene <= bx1):
+                continue
+            clipped = []
+            for a, b in intervals:
+                if by1 < a or by0 > b:
+                    clipped.append((a, b))
+                    continue
+                if a < by0 - GAP_MARGIN:
+                    clipped.append((a, by0 - GAP_MARGIN))
+                if b > by1 + GAP_MARGIN:
+                    clipped.append((by1 + GAP_MARGIN, b))
+            intervals = clipped
+        descending = p0[1] > p1[1]
+        segs = []
+        for a, b in sorted(intervals, reverse=descending):
+            y0, y1 = (b, a) if descending else (a, b)
+            segs.append(DashedLine(np.array([x_scene, y0, z]), np.array([x_scene, y1, z]),
+                                   color=mut, stroke_width=1.6, dash_length=0.07))
+        return VGroup(*segs)
+
+    cos_dots = VGroup()
+    for x0, h, lab in marks:
+        sin_pt = axes.c2p(x0, np.sin(x0))
+        cos_pt = axes.c2p(x0, h)
+        connector = _connector(sin_pt, cos_pt)
         # The read-off dot and its label take the COSINE curve's own colour: they report
         # cosine's heights, and wearing sine's amber made one hue mean two functions
         # (2026-09-13 visual audit; SPEC-motion-language 規則 5). Blue is already cosine
