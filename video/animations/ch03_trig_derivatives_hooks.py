@@ -32,6 +32,7 @@ import numpy as np
 from manim import (
     AnnularSector,
     Arc,
+    Arrow,
     Axes,
     BackgroundRectangle,
     Circle,
@@ -43,6 +44,7 @@ from manim import (
     Line,
     MathTex,
     Polygon,
+    Rectangle,
     ReplacementTransform,
     TransformMatchingShapes,
     VGroup,
@@ -1475,3 +1477,190 @@ def continuity_template(spec, ctx, blocks):
 
     qed_block.anim = _close_gap
     return blocks
+
+
+# ================================================================ hook: shm_device
+# shm_device (Example 3.3, scene shm_compute) -- R2 must (2026-09-13 鋪滿輪盲審): "全片
+# 唯一一個具體的物理情境，畫面上完全不存在那個物件；'每一刻都被推回平衡點' 是本場的教學點，
+# 卻只能靠文字宣稱." The weight-on-a-spring is named four times in the narration and never
+# drawn. A small schematic (ceiling, spring, weight, equilibrium line) rides beside the
+# four derivation rows, to their right (clear of the reason rail, safe-area checked):
+#   {show step.0}  the device fades in and the weight starts oscillating as s(t)=sin t
+#                  (TM.beat_run_time fills the rest of this beat; a dt updater on the
+#                  ValueTracker keeps it swinging through every later beat, including the
+#                  plain scene.wait()s _play_content adds -- it is never re-started).
+#   {show step.1}  a velocity arrow joins (secondary/blue, s'(t)=cos t).
+#   {show step.2}  an acceleration arrow joins (success/green, s''(t)=-sin t), ALWAYS
+#                  pointing at the equilibrium line -- toward rest, never away.
+#   {show result}  the displacement itself is drawn in amber (accent, sin's colour
+#                  elsewhere in this section), so "acceleration opposite displacement" --
+#                  s''=-s -- is something the viewer watches for the rest of the beat, not
+#                  a claim taken on faith.
+# Reveal ids are unchanged; each row's EXISTING anim (a plain "write", or result's
+# transform+frame+paced rail) is run first via `_play_stock` (continuity_argument's
+# helper, above) and still plays exactly as it did -- the device stages on top of it.
+# Skeleton (ceiling/spring/weight outline) is muted/text; only the three taught
+# quantities (s, s', s'') carry colour, matching Figure 3.4's palette one scene later.
+
+
+def shm_device(spec, ctx, blocks):
+    ground = ctx["ground"]
+    ids = _by_id(blocks)
+    anchor = ids.get("scaffold.motive") or ids.get("sollead") or ids["title"]
+
+    amber = T.color(ground, "accent")      # displacement / s(t) = sin t
+    blue = T.color(ground, "secondary")    # velocity / s'(t) = cos t
+    green = T.color(ground, "success")     # acceleration / s''(t) = -sin t
+    mut = T.color(ground, "muted")
+    text = T.color(ground, "text")
+
+    row_ids = [r for r in ("step.0", "step.1", "step.2", "result") if r in ids]
+    rows_right = max(ids[r].mobject.get_right()[0] for r in row_ids)
+
+    AMP = 0.8          # weight's vertical swing, scene units -- s(t) = sin t
+    BOX = 0.4          # weight square side
+    REST_LEN = 1.7     # spring's natural length, ceiling -> equilibrium
+    ARROW_LEN = 0.6    # arrow length at |value| = 1
+    ARM = 0.4          # horizontal offset of the velocity/accel arrows off the spring's column
+    dev_half_w = ARM + ARROW_LEN + 0.35
+
+    right_safe = T.FRAME_W / 2 - T.SAFE_MARGIN
+    dev_x = min(rows_right + 0.55 + dev_half_w, right_safe - dev_half_w)
+
+    zone_top = anchor.mobject.get_bottom()[1] - 0.55
+    zone_bottom = -T.FRAME_H / 2 + T.SAFE_MARGIN + 0.15
+    dev_height = REST_LEN + AMP + BOX / 2 + ARROW_LEN + 0.3
+    ceiling_y = zone_top - max((zone_top - zone_bottom - dev_height) / 2, 0.05)
+    equilibrium_y = ceiling_y - REST_LEN
+    CEIL = np.array([dev_x, ceiling_y, 0.0])
+    EQ = np.array([dev_x, equilibrium_y, 0.0])
+
+    t_track = ValueTracker(0.0)
+    OMEGA = 1.6   # rad/s -- a few visible cycles across the scene, not frantic
+
+    def _s():
+        return float(np.sin(t_track.get_value()))
+
+    def _weight_pt():
+        return EQ + AMP * _s() * UP
+
+    ceiling = Line(CEIL + 0.6 * LEFT, CEIL + 0.6 * RIGHT, color=mut, stroke_width=3.0)
+    hatch = VGroup(*[
+        Line(CEIL + x * RIGHT, CEIL + x * RIGHT + 0.16 * LEFT + 0.26 * DOWN,
+             color=mut, stroke_width=1.6)
+        for x in np.linspace(-0.45, 0.45, 5)
+    ])
+    equilibrium = DashedLine(EQ + 0.85 * LEFT, EQ + 0.85 * RIGHT, color=mut,
+                             stroke_width=1.6, dash_length=0.08)
+
+    def _spring():
+        """Zigzag ceiling -> current weight top, rebuilt every frame (weight moves)."""
+        top, bot = CEIL, _weight_pt() + (BOX / 2) * UP
+        n = 6
+        pts = [top]
+        for i in range(1, n):
+            side = 0.16 if i % 2 else -0.16
+            pts.append(top + (i / n) * (bot - top) + side * RIGHT)
+        pts.append(bot)
+        return VGroup(*[Line(pts[i], pts[i + 1], color=mut, stroke_width=2.2)
+                       for i in range(len(pts) - 1)])
+
+    def _weight():
+        return Rectangle(width=BOX, height=BOX, color=text,
+                         fill_color=T.color(ground, "bg"), fill_opacity=1.0,
+                         stroke_width=2.6).move_to(_weight_pt())
+
+    def _vel_arrow():
+        """Velocity s'=cos t: vertical, signed length -- shrinks to nothing at the
+        swing's ends, longest passing through equilibrium (exactly where cos peaks)."""
+        v = float(np.cos(t_track.get_value()))
+        if abs(v) < 0.05:
+            return VGroup()
+        base = _weight_pt() + ARM * RIGHT
+        return Arrow(base, base + v * ARROW_LEN * UP, color=blue, buff=0.0,
+                    stroke_width=4.0, max_tip_length_to_length_ratio=0.3)
+
+    def _acc_arrow():
+        """Acceleration s''=-sin t: always signed toward the equilibrium line -- this
+        is the arrow the R2 must exists for (it visibly never points away from rest)."""
+        a = -_s()
+        if abs(a) < 0.05:
+            return VGroup()
+        base = _weight_pt() + ARM * LEFT
+        return Arrow(base, base + a * ARROW_LEN * UP, color=green, buff=0.0,
+                    stroke_width=4.0, max_tip_length_to_length_ratio=0.3)
+
+    def _displacement():
+        return Line(EQ, _weight_pt(), color=amber, stroke_width=5.5)
+
+    spring = always_redraw(_spring)
+    weight = always_redraw(_weight)
+    vel_arrow = always_redraw(_vel_arrow)
+    acc_arrow = always_redraw(_acc_arrow)
+    displacement = always_redraw(_displacement)
+
+    vel_label = brand.math_line("s'", ground, role="secondary", size="label")
+    vel_label.move_to(CEIL + ARM * RIGHT + 0.32 * UP)
+    acc_label = brand.math_line("s''", ground, role="success", size="label")
+    acc_label.move_to(CEIL + ARM * LEFT + 0.32 * UP)
+    s_label = brand.math_line("s", ground, role="accent", size="label")
+    s_label.next_to(EQ + 0.85 * RIGHT, RIGHT, buff=0.12)
+
+    device = VGroup(ceiling, hatch, equilibrium, spring, weight, vel_arrow, acc_arrow,
+                    displacement, vel_label, acc_label, s_label)
+
+    def _freeze():
+        """Stop every updater before the scene's own `exit:` FadeOut runs -- an
+        always_redraw block still ticking would `become()` back to full opacity
+        each frame and fight the fade (house gotcha; see sector_inequality's
+        _evenness_anim, which sidesteps it by never fading a live block at all)."""
+        for m in (spring, weight, vel_arrow, acc_arrow, displacement, t_track):
+            m.clear_updaters()
+
+    def _stage_step0(scene, ground, base):
+        scene.play(FadeIn(VGroup(ceiling, hatch, equilibrium)), run_time=0.5)
+        t_track.add_updater(lambda m, dt: m.increment_value(dt * OMEGA))
+        scene.add(spring, weight, t_track)    # always_redraw: pop in, not faded (house style)
+        remaining = max(TM.beat_run_time(scene, 3.0) - base - 0.5, 0.6)
+        scene.wait(remaining)
+
+    def _stage_step1(scene, ground, base):
+        scene.add(vel_arrow)                  # always_redraw: pop in, not faded
+        scene.play(FadeIn(vel_label), run_time=0.3)
+
+    def _stage_step2(scene, ground, base):
+        scene.add(acc_arrow)
+        scene.play(FadeIn(acc_label), run_time=0.3)
+
+    def _stage_result(scene, ground, base):
+        scene.add(displacement)
+        scene.play(FadeIn(s_label), run_time=0.3)
+        _freeze()
+
+    def _wrap(rid, stage):
+        orig = ids[rid].anim
+
+        def _anim(scene, mob, ground):
+            t0 = _elapsed(scene)
+            base = _play_stock(scene, orig, mob, ground)
+            stage(scene, ground, base)
+            return _elapsed(scene) - t0
+        return _anim
+
+    ids["step.0"].anim = _wrap("step.0", _stage_step0)
+    ids["step.1"].anim = _wrap("step.1", _stage_step1)
+    ids["step.2"].anim = _wrap("step.2", _stage_step2)
+    ids["result"].anim = _wrap("result", _stage_result)
+
+    out = list(blocks)
+    # Never revealed through a `{show ...}` marker (the device rides the four rows'
+    # own beats above) -- this Block exists only so `exit:` and sizecheck's overflow
+    # guard can find it by id. `static=False` + unrevealed means scene.py's own
+    # end-of-beats sweep (_play_content's final `for block in blocks: ... play_block`,
+    # which forces any block nobody showed) WILL call this anim once, so it must be a
+    # true no-op -- a real stock reveal here (e.g. "fade") would fade the whole live
+    # device in a second time right before `exit:` fades it back out, visibly blinking
+    # it (found via the +end-1.5s mock-render frame, first cut of this hook).
+    out.append(Block("device", device, static=False,
+                     anim=lambda scene, mob, ground: 0.0, layer="graph"))
+    return out
