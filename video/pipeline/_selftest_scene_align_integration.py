@@ -68,7 +68,7 @@ def _fake_align_long_fails(wav_path, plan, **kw):
 
 
 def test_tts_scene_path_and_make_consumers():
-    saved = (SA.align_scene, tts._synth_scene_wav, make._probe_duration)
+    saved = (SA.align_scene, tts._synth_scene_wav, make._probe_duration_fps)
     SA.align_scene, tts._synth_scene_wav = _fake_align, _fake_synth(12.0)
     try:
         with tempfile.TemporaryDirectory() as d:
@@ -85,11 +85,11 @@ def test_tts_scene_path_and_make_consumers():
                         "voice": "Dean", "style": "STY", "scenes": [entry]}
             make._check_manifest_schema(manifest)
             make._validate_reuse_manifest(META, [SCENE], manifest)           # raises if stale
-            make._probe_duration = lambda p: 1.0 + entry["audio_seconds"] + 1.0
+            make._probe_duration_fps = lambda p: (1.0 + entry["audio_seconds"] + 1.0, 30.0)
             assert make._audit_render_sync([SCENE], manifest,
                                            {SCENE["id"]: Path(entry["audio_file"])}, lead=1.0) is True
     finally:
-        SA.align_scene, tts._synth_scene_wav, make._probe_duration = saved
+        SA.align_scene, tts._synth_scene_wav, make._probe_duration_fps = saved
 
 
 def test_gate_fail_demotes_to_beats():
