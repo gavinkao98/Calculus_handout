@@ -16,7 +16,9 @@ card+aside two-column layout unchanged.
 Reveal: each proof step and the QED line are dynamic (proof.0/1/2, qed) so narration
 walks the argument via {show ...}. The statement card is the frame by default (static);
 a scene whose `say` names ``{show statement}`` instead has it slide in on that beat, and
-the PROOF eyebrow then rides with proof.0 rather than standing over an empty column.
+the PROOF eyebrow then rides with proof.0 rather than standing over an empty column --
+as a Block of its own declaring ``reveal_with="proof.0"`` (blocks.Block), so the player
+brings it in on that same beat whatever proof.0's own animation turns out to be.
 
 YAML shape:
   template: theorem_proof
@@ -39,11 +41,10 @@ from __future__ import annotations
 
 from typing import Any
 
-from manim import DOWN, FadeIn, LEFT, RIGHT, UP, MathTex, Rectangle, RoundedRectangle, Tex, VGroup
+from manim import DOWN, LEFT, RIGHT, MathTex, Rectangle, RoundedRectangle, Tex, VGroup
 
 from .. import brand
 from ..blocks import Block, accent_role
-from ..timing import STOCK_ANIM_SECONDS
 from ..visuals import theme as T
 from . import derivation
 from ._common import (scene_head, motif_corner, center_in_zone, build_aside, render_scaffold,
@@ -138,25 +139,6 @@ def _rail_card(stmt_text: str, is_formula: bool, ground: str, *, role: str):
     content = _statement_content(stmt_text, is_formula, ground, RAIL_W - 2 * _CARD_PAD_X)
     return brand.accent_panel(content, ground, bar_role=role, fill_role="panel",
                               pad=0.34, pad_x=_CARD_PAD_X)
-
-
-_LABEL_FADE_SECONDS = STOCK_ANIM_SECONDS["fade"]
-
-
-def _reveal_with_label(label, inner=None):
-    """proof.0's reveal, bringing the PROOF eyebrow in with it.
-
-    *inner* is the row's own reveal when the scene paces it (`paced:`, motion primitive 7):
-    the eyebrow still rides this beat, but the row is then walked/written across the beat
-    instead of being pinned to one 0.45 s fade. Without it the eyebrow fold would be the
-    one place `paced:` could not reach, because it makes proof.0's anim a callable."""
-    def anim(scene, mob, ground) -> float:
-        if inner is None:
-            scene.play(FadeIn(label), FadeIn(mob, shift=0.1 * UP), run_time=_LABEL_FADE_SECONDS)
-            return _LABEL_FADE_SECONDS
-        scene.play(FadeIn(label), run_time=_LABEL_FADE_SECONDS)
-        return _LABEL_FADE_SECONDS + inner(scene, mob, ground)
-    return anim
 
 
 def _statement_block(spec: dict[str, Any], card) -> Block:
@@ -270,10 +252,23 @@ def build(spec: dict[str, Any], ctx: dict[str, Any]) -> list[Block]:
     proof_label.move_to([proof_left, proof_top - proof_label.height / 2, 0], aligned_edge=LEFT)
     # The eyebrow rides with the first step when narration reveals it ({show proof.0}), so the
     # word PROOF no longer stands over an empty column for the whole run-up; with no marker it
-    # stays in the opening frame as before. Grouping only -- placement below is untouched.
-    fold_label = bool(step_mobs) and reveals(spec, "proof.0")
-    if not fold_label:
-        blocks.append(Block("proof_label", proof_label, anim="fade", static=True))
+    # stays in the opening frame as before. Timing only -- placement above is untouched.
+    #
+    # It stays a Block of its OWN either way, riding the beat via `Block.reveal_with` rather
+    # than inside proof.0. Both alternatives are wrong here (2026-09-14):
+    #   * inside proof.0's ANIM (what this was until now): a hook that REPLACES that anim
+    #     drops the eyebrow silently -- ch03 `continuity_template` does exactly that, and
+    #     §3.1 scene 09 rendered its whole proof with no PROOF card.
+    #   * inside proof.0's MOBJECT (worked_example's notes_label, D11): the §3.1 hooks
+    #     address that mobject by position (`_mark_factors` reads `.submobjects[1]` as the
+    #     row's `{{...}}` segment; `cosine_identity_draft` runs `derivation._eq_core` over
+    #     it), and a label-to-row VGroup would hand the layout gates a box with a hollow
+    #     middle whenever `reaches_rail` drops the chain below the card -- the overlap /
+    #     capacity guards read that empty span as content (it warned on _demo_tall_rows).
+    rides_with_proof = bool(step_mobs) and reveals(spec, "proof.0")
+    blocks.append(Block("proof_label", proof_label, anim="fade",
+                        static=not rides_with_proof,
+                        reveal_with="proof.0" if rides_with_proof else None))
 
     chain: list = []
     y = 0.0
@@ -298,16 +293,6 @@ def build(spec: dict[str, Any], ctx: dict[str, Any]) -> list[Block]:
                                 anim_seconds=derivation.TRANSFORM_SECONDS
                                 + (derivation.FRAME_SECONDS if frame else 0.0),
                                 static=False))
-        elif fold_label and i == 0:
-            # The label rides in on proof.0's ANIMATION, not inside its mobject: a VGroup
-            # spanning label-to-row would hand the layout gates a box with a hollow middle,
-            # and _overlap_issues / _capacity_issues would read that empty span as content
-            # (it warned on _demo_tall_rows). This way the measured geometry is the bare row,
-            # exactly as before.
-            from .. import pacing
-            inner = pacing.paced_reveal if f"proof.{i}" in (spec.get("paced") or []) else None
-            blocks.append(Block(f"proof.{i}", m, anim=_reveal_with_label(proof_label, inner),
-                                anim_seconds=_LABEL_FADE_SECONDS, static=False))
         else:
             blocks.append(Block(f"proof.{i}", m, anim="fade", static=False))
         chain.append(m)   # the raw row: the anchor shift below must move the step, not the label

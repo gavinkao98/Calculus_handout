@@ -8,7 +8,9 @@ ch03 continuity_statement_sin_limit (rewatch R2, 2026-09-12). The marker is the 
 a scene that does NOT name it keeps the card in the opening frame exactly as before.
 
 Also locks P1-2: the PROOF eyebrow rides with proof.0 instead of standing alone in the
-opening frame when the proof is narration-revealed.
+opening frame when the proof is narration-revealed. HOW it rides -- its own Block carrying
+`reveal_with`, proof against a hook that replaces proof.0's anim -- is
+`_selftest_theorem_proof_label`; this file only locks the timing switch itself.
 """
 import pathlib
 
@@ -120,39 +122,25 @@ def test_proof_label_static_when_proof_not_revealed():
     assert _block(blocks, "proof_label").static is True
 
 
-def test_proof_label_folded_into_proof0_when_revealed():
+def test_proof_label_rides_with_proof0_when_revealed():
     blocks = _build(_THM_BASE, "Words. {show proof.0} The first step.")
-    assert "proof_label" not in _ids(blocks), \
+    label = _block(blocks, "proof_label")
+    assert label.static is False, \
         "the PROOF eyebrow must ride with proof.0, not sit in the opening frame"
-    p0 = _block(blocks, "proof.0")
-    assert p0.static is False and callable(p0.anim) and p0.anim_seconds is not None
+    assert label.reveal_with == "proof.0"
+    assert _block(blocks, "proof.0").static is False
 
 
-def test_proof_label_folding_does_not_change_measured_geometry():
-    """The label rides in on proof.0's ANIMATION, not inside its mobject. A VGroup spanning
-    label-to-row would hand the layout gates a box with a hollow middle, and the overlap /
-    capacity guards read that empty span as content (it warned on _demo_tall_rows)."""
-    folded = _block(_build(_THM_BASE, "Words. {show proof.0} The first step."), "proof.0").mobject
+def test_proof_label_riding_does_not_change_measured_geometry():
+    """The eyebrow rides as a Block of its OWN, never inside proof.0's mobject. A VGroup
+    spanning label-to-row would hand the layout gates a box with a hollow middle, and the
+    overlap / capacity guards read that empty span as content (it warned on
+    _demo_tall_rows)."""
+    riding = _block(_build(_THM_BASE, "Words. {show proof.0} The first step."), "proof.0").mobject
     plain = _block(_build(_THM_BASE, "Words only, no markers."), "proof.0").mobject
-    assert abs(folded.get_left()[0] - plain.get_left()[0]) < 1e-6
-    assert abs(folded.get_center()[1] - plain.get_center()[1]) < 1e-6
-    assert abs(folded.height - plain.height) < 1e-6 and abs(folded.width - plain.width) < 1e-6
-
-
-def test_proof_label_reveal_plays_label_and_row_together():
-    block = _block(_build(_THM_BASE, "Words. {show proof.0} The first step."), "proof.0")
-    played = []
-
-    class _S:
-        def add(self, *m):
-            pass
-
-        def play(self, *a, **k):
-            played.append((a, k))
-
-    secs = block.anim(_S(), block.mobject, "dark")
-    assert len(played) == 1 and len(played[0][0]) == 2   # the label AND the row, one beat
-    assert played[0][1]["run_time"] == secs == block.anim_seconds
+    assert abs(riding.get_left()[0] - plain.get_left()[0]) < 1e-6
+    assert abs(riding.get_center()[1] - plain.get_center()[1]) < 1e-6
+    assert abs(riding.height - plain.height) < 1e-6 and abs(riding.width - plain.width) < 1e-6
 
 
 if __name__ == "__main__":

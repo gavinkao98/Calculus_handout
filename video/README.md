@@ -137,7 +137,8 @@ video/
 
 - **揭示時序**——`say` 寫了 `{show statement}` 時，`theorem_proof`／`derivation`
   的字卡才改為該拍滑入（否則仍屬開場畫面）；`theorem_proof` 的 `PROOF` 小標
-  在有 `{show proof.0}` 時跟第一行證明一起進場。
+  在有 `{show proof.0}` 時跟第一行證明一起進場（小標是獨立 Block，以
+  `Block.reveal_with` 宣告同拍，不折進 `proof.0` 的 anim，故 hook 覆寫該 anim 也掉不了）。
 - **`pauses:`**（場級）——某個 reveal 之後讓畫面靜靜停 N 秒（旁白不動、不重合成）。
 - **`anim: transform`**（`derivation` 的 `steps[i]`／`result`）——把上一列的式子
   原地變形成這一列，來源那列退為 muted。

@@ -517,7 +517,7 @@ freeform 人讀標籤、不被解析為 provenance**（provenance 只認 `ref:`�
 | `number` | | `"3.1"` → eyebrow `[ EXAMPLE 3.1 ]`；省略則 `[ EXAMPLE ]`。 |
 | `title` | | chip 右側的小字 tagline（`caption` 30 px），**不是標題**；critic 仍用它當場景標籤。 |
 | `strategy` | | 右 rail 上段（`STRATEGY` 小標＋散文）。 |
-| `notes` / `notes_label` | | 右 rail 下段，每項 `{math, text?, ref?}`；`ref` 是靠右的藍色 mono 引用 tag。`notes_label` 預設 `notes`，跟 `note.0` 一起進場（比照 `theorem_proof` 的 `PROOF` 小標跟 `proof.0`）。 |
+| `notes` / `notes_label` | | 右 rail 下段，每項 `{math, text?, ref?}`；`ref` 是靠右的藍色 mono 引用 tag。`notes_label` 預設 `notes`，跟 `note.0` 一起進場（行為比照 `theorem_proof` 的 `PROOF` 小標跟 `proof.0`，但機制不同：此處小標併進 `note.0` 的 mobject——rail 內、相距 0.16u；`theorem_proof` 走 `reveal_with` 的獨立 Block，理由見該節）。 |
 | `steps[]` / `check` | | 步驟鏈；`check` 得綠 ✓。**列不收 `reason`**（schema error）——右 rail 給 `strategy`／`notes`，與 derivation 的 reason rail 是同一欄，不能並存；理由進 `strategy:`／`notes:`／旁白。**不收 back-compat `lines[]`**（schema error）。 |
 | `accent` | | **省略＝`example`（practice 綠）**——它就是講義的 `workedexample` 容器，講義裡永遠綠。 |
 | `scaffold` | | 比照 `derivation` 掛在 SOLUTION 之下。`statement` 不收（`prompt` 就是題目）。 |
@@ -806,7 +806,18 @@ say: |
   `theorem_proof` 與 `derivation` 的 `statement` 預設是開場畫面的一部分（static）；
   **`say` 一旦寫了 `{show statement}`，它就改為該 beat 滑入**（`slide`，0.5 s）。
   marker 即 opt-in：沒寫的場逐 token 不變。同理 `theorem_proof` 的 **`PROOF` 小標
-  在 `say` 有 `{show proof.0}` 時跟第一行證明一起進場**（否則照舊 static）。
+  在 `say` 有 `{show proof.0}` 時跟第一行證明一起進場**（否則照舊 static）。小標
+  **始終是自己的 Block**，靠 `blocks.Block.reveal_with="proof.0"` 宣告「沒有自己的
+  marker，跟那一拍進場」，player（`scene._play_content`）在該 beat 先播小標再播那一
+  列（2026-09-14）。在此之前它折在 `proof.0` 的 **anim** 裡，於是只要 hook **覆寫**
+  （而非包住）`proof.0` 的 anim，字卡就整場不見——`ch03_trig_derivatives_hooks:
+  continuity_template` 正是如此，§3.1 場 09 的證明從頭到尾沒有 `PROOF`。也不採
+  `worked_example` 把小標併進 `note.0` mobject 的做法：§3.1 的 hook 以位置定址
+  `proof.0.mobject`（`_mark_factors` 取 `.submobjects[1]` 當 `{{…}}` 分段、
+  `cosine_identity_draft` 對它跑 `derivation._eq_core`），且 `reaches_rail` 會把證明鏈
+  推到字卡下方，小標到首列的 VGroup 會給佈局閘一個中空的框（`_demo_tall_rows` 的
+  overlap／capacity 誤判）。副作用：`paced: [proof.0]` 不再需要模板自己接手——
+  `proof.0` 回到 stock reveal，`pacing.apply` 照一般列升級它。
   在此之前，reveal 打在 static block 上只是對已在畫面上的 mobject 再播一次 FadeIn，
   「揭示」前後兩幀無差（ch03 `continuity_statement_sin_limit`，rewatch R2 2026-09-12）。
 - `say` 中的 LaTeX 是正典寫法（mock 與閱讀版直接用）。**真旁白走 MiMo**，由
