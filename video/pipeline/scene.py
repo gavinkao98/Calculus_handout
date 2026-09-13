@@ -62,9 +62,10 @@ class LessonScene(Scene):
     # it and keeps its fixed duration.
     beat_seconds: float | None = None
     # How much of the CURRENT beat is already spoken for by something fixed-length that
-    # plays AFTER the reveal (today: a `focus[].indicate` flash) -- 0 outside a beat, or
-    # in a beat with no indicate. `timing.beat_run_time` subtracts this from a beat-filling
-    # reveal's budget so that later animation lands inside the beat instead of past it.
+    # plays before or after the reveal (a `focus[].indicate` flash AFTER it, a `dim` that
+    # actually changes the dimmed set BEFORE it) -- 0 outside a beat, or in a beat with
+    # neither. `timing.beat_run_time` subtracts this from a beat-filling reveal's budget
+    # so that both land inside the beat instead of past it.
     beat_reserved_seconds: float = 0.0
 
     def construct(self) -> None:
@@ -175,16 +176,27 @@ class LessonScene(Scene):
             else:
                 target_seconds = estimate_seconds(beat.text)
             self.beat_seconds = target_seconds
-            # `indicate` (below) always plays AFTER this beat's reveal, so a reveal that
+            # `indicate` (below) always plays AFTER this beat's reveal, and `dim` (further
+            # below, but resolved here) always plays BEFORE it -- either way, a reveal that
             # fills the whole beat via `timing.beat_run_time` (a paced walk, a hook's own
-            # sweep) must leave the flash's INDICATE_SECONDS unspent up front, or the flash
-            # lands past the narration's end (ch03 06's `ineq` beat -- paced reveal + rule-3
-            # indicate in one beat -- was the first to hit this and had its own local
-            # reservation before `beat_run_time` grew this generic one). Set BEFORE the
-            # reveal below so it is in effect while that reveal asks for its budget; 0 in a
-            # beat with no indicate.
-            self.beat_reserved_seconds = (focus.INDICATE_SECONDS if indicate_plan.get(target)
+            # sweep) must leave both unspent up front, or the reveal overruns the beat by
+            # whatever they cost (ch03 06's `ineq` beat -- paced reveal + rule-3 indicate in
+            # one beat -- was the first to hit this for indicate; `evenness`'s hook reveal +
+            # a declared `dim` is the same trap for dim, since `focus.apply`'s FADE_SECONDS
+            # play is not part of the hook's own budget either). `wanted` mirrors
+            # `focus.apply`'s own change test (its `by_id` filter included) so this beat
+            # reserves FADE_SECONDS only when `apply` a few lines down will actually play
+            # something -- a `dim: []` beat that already has nothing dimmed must reserve 0.
+            # Both set BEFORE the reveal below so they are in effect while that reveal asks
+            # for its budget; 0 in a beat with neither.
+            wanted = dim_ids(self.spec, target, focus_plan[target]) if target in focus_plan else None
+            dim_changes = False
+            if wanted is not None:
+                dim_target = {b for b in wanted if b in by_id}
+                dim_changes = bool(dim_target - dimmed) or bool(dimmed - dim_target)
+            self.beat_reserved_seconds = ((focus.INDICATE_SECONDS if indicate_plan.get(target)
                                           else 0.0)
+                                          + (focus.FADE_SECONDS if dim_changes else 0.0))
             # The focus runs BEFORE the beat's own reveal. It used to run after, on the
             # reasoning that a just-revealed block earns full attention before anything
             # dims -- but what a `dim` dims is never the block being revealed, it is the
@@ -196,9 +208,8 @@ class LessonScene(Scene):
             # velocity row lit until the beat's midpoint, because its hook reveal runs ~5 s
             # of an 11.5 s beat. `indicate` stays after the reveal -- it flashes blocks to
             # point at them rather than steering attention away from one.
-            if target in focus_plan:
+            if wanted is not None:
                 before = dimmed
-                wanted = dim_ids(self.spec, target, focus_plan[target])
                 dimmed = focus.apply(self, by_id, wanted, dimmed)
                 if dimmed != before:
                     consumed += focus.FADE_SECONDS

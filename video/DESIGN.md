@@ -857,6 +857,17 @@ hook 佔 11.5 秒拍的前 ~5 秒）實測速度列到拍中才暗。`indicate` 
 `set_opacity` 會把整個 family 的 fill 與 stroke 一律設成該值，於是「刻意透明」的部分
 （`fill_opacity=0` 的空心編號環）會被填成實心色塊。`schema._focus_issues` 擋 `at` 指到
 `say` 沒揭示過的 id 與重複的 `at`；`sizecheck` 擋 `dim` 裡不存在的 block id。
+**壓暗集合真的改變的那一拍，`_play_content` 也會把 `focus.apply` 的 FADE_SECONDS 存進
+`scene.beat_reserved_seconds`（比照下面 `indicate` 的做法，用 `apply` 同一套 by_id 過濾判斷
+「有沒有變」），讓填滿整拍的 reveal 自己少要求 0.4 s 的預算（2026-09-13 六輪，dim 對稱擴充
+indicate-budget）。**已知限制：這個預算只覆蓋「同一拍宣告、同一拍的 reveal 要讓路」的情況——
+一個**最後一拍**才壓暗、且沒有下一拍能寫 `dim: []` 收回的壓暗，只能靠 `_play_content` 迴圈
+**結束後**的場末 sweep-up（`focus.apply(self, by_id, [], dimmed)`）還原，那筆 FADE_SECONDS
+落在迴圈之外，不吃這個預算，會直接疊進 `_tail` 的 SCENE_TAIL_SECONDS 額度裡；`exit:` 的淡出
+已經先佔掉 EXIT_FADE_SECONDS，剩下的餘裕通常不夠再吸收一次 0.4 s，MIN_HOLD 地板一頂就整場
+超時（06 `evenness` 拍實測：改宣告式 `dim` 後 `[sync]` 報 82.599 s vs 預期 82.410 s，超出
+0.189 s，遠超 1 影格；已還原，storyboard `focus:`／hook `_evenness_anim` 皆未變動，維持 hook
+自己壓暗＋還原）。
 
 **`color_role`（derivation 的 `steps[i]` / `result`）——跨場延續。** 圖已經用顏色替各部分
 命名了（`graph` 的 plot 一直有 `color_role`），推導列寫同一個 role，讀者就看得出這一行講的

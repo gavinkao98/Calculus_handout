@@ -428,6 +428,44 @@ def test_play_content_sets_beat_reserved_seconds_only_for_the_beat_with_indicate
     assert scene.beat_reserved_seconds == 0.0, "reset once the scene has finished its beats"
 
 
+def test_play_content_reserves_fade_seconds_for_a_dim_that_actually_changes():
+    """The dim-budget generalisation of the test above: `scene.beat_reserved_seconds` must
+    also cover the `focus.apply` FADE_SECONDS play that runs BEFORE this beat's own reveal
+    whenever the dim set is about to change (ch03 06's `evenness` beat -- a full-beat hook
+    reveal plus a declared `dim` -- is the motivating case). `apply`'s own by_id-filtered
+    change test decides "change": a `dim: []` beat that already has nothing dimmed must
+    reserve 0, not FADE_SECONDS, and a beat pairing a real dim change with an `indicate`
+    must reserve both."""
+    from manim import Square
+
+    reserved_at_reveal = {}
+
+    def _reveal(name):
+        def reveal(scene, mob, ground):
+            reserved_at_reveal[name] = scene.beat_reserved_seconds
+            return 0.0
+        return reveal
+
+    by_id = {"a": FakeBlock(),
+             "dim_only": Block(id="dim_only", mobject=Square(), anim=_reveal("dim_only")),
+             "both": Block(id="both", mobject=Square(), anim=_reveal("both")),
+             "no_change": Block(id="no_change", mobject=Square(), anim=_reveal("no_change"))}
+    log = []
+    scene = _run_play_content(
+        {"say": ("{show dim_only} one two {show both} three four "
+                 "{show no_change} five six"),
+         "focus": [{"at": "dim_only", "dim": ["a"]},                    # {} -> {a}: change
+                   {"at": "both", "dim": [], "indicate": ["dim_only"]},  # {a} -> {}: change
+                   {"at": "no_change", "dim": []}]},                    # {} -> {}: no change
+        by_id, log)
+
+    assert reserved_at_reveal["dim_only"] == F.FADE_SECONDS, "dim alone: 0.4 s"
+    assert (reserved_at_reveal["both"]
+            == F.FADE_SECONDS + F.INDICATE_SECONDS), "dim change + indicate: 1.2 s"
+    assert reserved_at_reveal["no_change"] == 0.0, "dim: [] with nothing dimmed: no change"
+    assert scene.beat_reserved_seconds == 0.0, "reset once the scene has finished its beats"
+
+
 # -- schema validation -----------------------------------------------------------
 
 def _focus_errs(scene, say):
@@ -520,6 +558,7 @@ if __name__ == "__main__":
     test_every_focus_entry_runs_before_the_beats_own_reveal()
     test_a_dim_that_names_its_own_beats_reveal_is_skipped_and_warned()
     test_play_content_sets_beat_reserved_seconds_only_for_the_beat_with_indicate()
+    test_play_content_reserves_fade_seconds_for_a_dim_that_actually_changes()
     test_schema_accepts_indicate_next_to_dim()
     test_schema_rejects_a_malformed_indicate()
     test_schema_rejects_indicating_a_block_the_same_entry_dims()
