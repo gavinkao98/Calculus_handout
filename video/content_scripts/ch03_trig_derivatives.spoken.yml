@@ -35,8 +35,13 @@ difference_quotient_for_sine: |
   So let us transform that difference quotient instead of fighting it
   head-on. {show scaffold.motive} The decisive step is one trigonometric identity -- sum-to-product
   -- which turns a difference of sines into a product.
-  {show step.0} Here it is; and a product is exactly what we want, because
-  we can pull it apart and take limits one factor at a time.
+  {show step.0} Here it is. And if it looks like it fell out of the sky, it did
+  not: put u equals the quantity A plus B, all over two, and v equals the
+  quantity A minus B, all over two, so that A equals u plus v and B equals u
+  minus v; expand sine of the quantity u plus v, minus sine of the quantity u
+  minus v, with the angle-sum formulas, and the sine u cosine v terms cancel,
+  leaving exactly two cosine u sine v. A product is also exactly what we want,
+  because we can pull it apart and take limits one factor at a time.
   {show step.1} Put A equals x plus h and B equals x, and the numerator
   becomes two cosine of the quantity x plus one half h, times sine of h over
   two.
@@ -53,11 +58,7 @@ difference_quotient_for_sine: |
 
 sector_inequality: |
   {show circle} Here is that new tool. We compare three areas on a circle of radius one.
-  {show evenness} But first, one convenience that saves us half the work. Replacing theta by
-  negative theta flips the sign of both theta and sine theta, so the ratio
-  sine theta over theta is even -- whatever we learn for positive angles
-  holds for negative ones, so it is enough to chase theta down to zero from
-  the positive side. {show frame} Now the geometry. On the unit circle, A is at the point
+  {show frame} On the unit circle, A is at the point
   with coordinates one and zero, B is the point at angle theta, {show apex} and extending
   the radius to the tangent at A gives C equals the point with coordinates
   one and tangent theta.
@@ -69,7 +70,15 @@ sector_inequality: |
   its area is one half tangent theta.
   {show ineq} Each region sits inside the next, so the areas line up in
   order: one half sine theta, then one half theta, then one half tangent
-  theta. The whole argument hangs on that one picture.
+  theta. And you can see exactly what each one adds: the corner piece A B C is
+  what the outer triangle adds to the inner one, and inside it sits the sliver
+  between the chord A B and the arc. The whole argument hangs on that one
+  picture.
+  {show evenness} One convenience before we push on, and it saves us half the
+  work. Replacing theta by negative theta flips the sign of both theta and sine
+  theta, so the ratio sine theta over theta is even -- whatever we learn for
+  positive angles holds for negative ones, so it is enough to chase theta down
+  to zero from the positive side.
 
 squeeze_to_the_bound: |
   {show carried.circle} Now turn that chain of areas into a statement about sine theta over theta,
@@ -150,17 +159,16 @@ squeeze_graph: |
 limit_not_identity: |
   {show carried.graph} One caution, because this result is easy to over-read.
   {show body} The statement is about the limit as theta goes to zero -- not
-  an identity. At a fixed angle the ratio is generally not one: at theta
-  equals pi over two it is two over pi, about zero point six four, and at
+  an identity. {show opened} At a fixed angle the ratio is generally not one: {show at_half_pi} at theta
+  equals pi over two it is two over pi, about zero point six four, {show at_pi} and at
   theta equals pi it is zero. The value one is reached only in the limit.
 
 radians_essential: |
   A second caution, and this one is structural.
   {show body} Everything here depends on radians. The sector area one half
   theta -- and with it the limit -- uses radian measure. Switch to degrees
-  and the limit is pi over one hundred eighty, not one, so the derivative
-  drags that factor along. The clean formulas sine prime equals cosine and
-  cosine prime equals negative sine hold only in radians.
+  and the limit is pi over one hundred eighty, not one -- and every formula we
+  are about to build on it changes with it.
 
 derivative_of_sine: |
   Now the payoff, and it falls into our hands.
@@ -180,7 +188,9 @@ derivative_of_cosine: |
   Cosine falls to the very same machinery -- only the identity changes, so we
   go quickly.
   {show statement} The claim: the derivative of cosine x is negative sine x.
-  {show proof.0} This time use the companion sum-to-product formula.
+  {show proof.0} This time use the companion sum-to-product formula -- obtained
+  the same way as the first one, by expanding cosine of the quantity u plus v,
+  minus cosine of the quantity u minus v.
   {show proof.1} The same division by h turns the difference quotient into
   negative sine of the quantity x plus one half h, times sine of h over two,
   all over h over two.
@@ -256,9 +266,10 @@ shm_compute: |
   {show step.2} Acceleration is the next derivative, s double prime of t
   equals negative sine t.
   {show result} But negative sine t is just negative s of t -- at every
-  instant the weight is pushed back toward rest. That relation, s double
-  prime equals negative s, is the signature of simple harmonic motion; sine
-  and cosine are exactly the functions that describe it.
+  instant the weight is pushed back toward rest. That relation, s double prime
+  equals negative s, is the signature of simple harmonic motion -- and it is the
+  four-step cycle stopped halfway. Both sine and cosine satisfy that relation, so
+  either one can describe an oscillation.
 
 shm_stacked_graphs: |
   {show carried.shm} Stack the three graphs over one time axis and the relationship jumps out.
@@ -293,4 +304,7 @@ recap: |
   {show point.2} From those two, the quotient rule delivered all the other
   trig derivatives -- tangent, cotangent, secant, cosecant.
   {show point.3} And keep the cycle in mind -- four derivatives of sine or
-  cosine bring you home -- with the fine print that it all depends on radians.
+  cosine bring you home -- with the fine print that it all depends on radians:
+  in degrees the derivative of sine of x degrees picks up a factor of pi over one
+  hundred eighty, so the clean sine prime equals cosine and cosine prime equals
+  negative sine hold only in radian measure.

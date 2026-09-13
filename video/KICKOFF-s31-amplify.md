@@ -251,11 +251,26 @@ diff /tmp/before.txt /tmp/after.txt      # 必須逐字相同
 - [x] **C-4** 既有閘全綠：`run_selftests`、`doctor --smoke`、`visual-frame-audit` subagent。
 - [x] **C-5** 產 standalone HTML 報告（繁體中文框架、self-contained），比照
       `REVIEW-ch03_s31-pilot-ab.html`。
-- [ ] **C-6** **人閘**：把成片交給使用者裁決要不要進計費階段（Task D）。
+- [x] **C-6** **人閘**：2026-09-13 使用者裁決「四件都同意，一次都做完」——進 Task D、做 R2 的兩條新 must、六條 advisory 全做、四個 divider 拿掉 `accent`。
 
 ---
 
 ## 6. Task D — 計費的部分（**執行前必須先報量徵同意**）
+
+> **2026-09-13 已報量、已核准。** 範圍＝6 場重 TTS（03 `difference_quotient_for_sine`／
+> 06 `sector_inequality`／13 `radians_essential`／17 `derivative_of_cosine`／
+> 23 `shm_compute`／26 `recap`），nominal 6 次 MiMo 呼叫、234.8 s 音訊，硬上限
+> `--max-billed-calls 12`；場 06 加 `--skip-qa`（ASR 探針把逐字唸的 `O A B` 聽成 `OAB`）。
+> 其餘 21 場 `--reuse-existing`＝0 次。
+>
+> **報量時查到的兩件事（下一輪會再踩）：**
+> 1. **場 17／09／24 在 beats 路線上**（FA 降級的三場），沒有 `scene_text_hash`，
+>    reuse 是**逐 beat 且以輸出檔路徑為 key**——所以在這三場**加一個 `{show}` marker
+>    就要錢**：它會切開一拍，其後每一拍的檔名對位全部偏移。場 09 的新圖因此改成在
+>    `qed` 那一拍的 reveal 內部畫出來，不另立 marker，維持 0 次呼叫。
+> 2. **D-1 的兩處與講義次序相反**（講義把偶函數論證放在圖之前、把度數導數公式放在
+>    radians 的 Caution 裡）。2026-09-13 使用者裁決：**兩處都照 R6／R5 改**，並在
+>    content script 與本檔記錄「刻意與講義不同」——書可以翻頁，影片不能。
 
 這兩件都要重 TTS。**建議一次決定範圍、一次報量**，不要分兩次。
 

@@ -44,6 +44,7 @@ from manim import (
     MathTex,
     Polygon,
     ReplacementTransform,
+    TransformMatchingShapes,
     VGroup,
     ValueTracker,
     always_redraw,
@@ -54,7 +55,7 @@ from manim import (
 
 from pipeline import brand
 from pipeline import timing as TM
-from pipeline.blocks import Block
+from pipeline.blocks import Block, play_block
 from pipeline.visuals import theme as T
 
 PI = np.pi
@@ -196,9 +197,10 @@ def sector_inequality(spec, ctx, blocks):
     # seconds of narration over a finished picture -- the longest still in the whole film
     # (six-lens review, level (1)). It is now built in the order the narration builds it:
     #   stage_circle : "we compare three areas on a circle of radius one"
-    #   (evenness)   : the theta <-> -theta aside, below
     #   stage_frame  : "A is at (1,0), B is the point at angle theta"
     #   stage_apex   : "extending the radius to the tangent at A gives C"
+    #   ... the three regions, the inequality, then LAST the evenness aside (below):
+    #   it used to sit second and stood between "here is the new tool" and the figure.
     # `scaffold` stays assembled for layout (centring + the gates measure the same figure).
     dotO, dotA, dotB, dotC = dots
     stage_circle = VGroup(quarter, xaxis, yaxis)
@@ -253,18 +255,34 @@ def sector_inequality(spec, ctx, blocks):
         num = MathTex(str(n), color=text, font_size=T.fs("label") * 0.75)
         return VGroup(ring, num).move_to(np.array([x, badge_y, 0.0])).set_z_index(6)
 
-    def _slot(o, shape, lab_tex, role, n, badge_col):
+    # Each peeled glyph is NESTED, not a single flat shape: glyph ② is the inner triangle
+    # sitting inside the sector, glyph ③ is both sitting inside the outer triangle -- the
+    # same opaque stack, at the same MAIN_FOP, as the source figure on the left.
+    #
+    # Why (2026-09-13 visual audit): the source figure's opaque stacking leaves each region
+    # showing only its own RING, so amber on the left is the crescent -- what the sector
+    # ADDS -- while glyph ② was the WHOLE sector, and badges ①②③ asserted the two were the
+    # same thing. Rollout T2-2 then painted the inequality's three terms in the same three
+    # colours, which makes the mismatch load-bearing: the amber term is 1/2 theta, the whole
+    # sector. Nesting the glyphs makes both readings true at once -- the colour is still the
+    # increment, the badge and the outline are the whole area, and "each region sits inside
+    # the next" (the narration's own words) becomes something the row SHOWS rather than
+    # asserts. `nested` layers fade in with the label, on top of the flown shape.
+    def _slot(o, shape, lab_tex, role, n, badge_col, nested=()):
+        whole = VGroup(shape, *nested)
         lab = brand.math_line(lab_tex, ground, role=role, size="label")
-        lab.next_to(shape, DOWN, buff=0.28)
+        lab.next_to(whole, DOWN, buff=0.28)
         badge = _badge(n, o[0] + R / 2, badge_col)   # centred over the slot, equal height
-        return VGroup(shape, lab, badge)
+        return VGroup(shape, *nested, lab, badge)
 
-    dst1 = _slot(O1, _tri(O1, B_off, blue, 0.50, 2),
+    dst1 = _slot(O1, _tri(O1, B_off, blue, MAIN_FOP, 3),
                  r"\tfrac12\sin\theta", "secondary", 1, blue)
-    dst2 = _slot(O2, _sec(O2, 0.42, 2),
-                 r"\tfrac12\theta", "accent", 2, amber)
-    dst3 = _slot(O3, _tri(O3, C_off, green, 0.40, 2),
-                 r"\tfrac12\tan\theta", "success", 3, green)
+    dst2 = _slot(O2, _sec(O2, MAIN_FOP, 2),
+                 r"\tfrac12\theta", "accent", 2, amber,
+                 nested=[_tri(O2, B_off, blue, MAIN_FOP, 3)])
+    dst3 = _slot(O3, _tri(O3, C_off, green, MAIN_FOP, 1),
+                 r"\tfrac12\tan\theta", "success", 3, green,
+                 nested=[_sec(O3, MAIN_FOP, 2), _tri(O3, B_off, blue, MAIN_FOP, 3)])
 
     # the three terms in the three regions' colours (SPEC rule 5 "same quantity, same
     # colour"; rollout T2-2): each `{{...}}` segment is one term and seg_roles paints it
@@ -293,16 +311,22 @@ def sector_inequality(spec, ctx, blocks):
                                   buff=0.04).set_z_index(5)
         stage.insert(stage.submobjects.index(label), pad)
 
-    # -- the evenness aside (beat 0, stage 2; motion primitives 6 + 3) ------------
+    # -- the evenness aside (LAST beat; motion primitives 6 + 4) ------------------
     # 19 seconds of narration explaining that sin(theta)/theta is EVEN used to play over a
-    # finished, motionless picture -- part of what made beat 0 the longest still in the
-    # film (37.6 s). Here the angle actually swings from +theta to -theta and back with
-    # both half-chords tracking it, so "both flip sign, so the ratio does not" is something
-    # the viewer WATCHES. Built after _centre_in_zone and kept OUT of `full`, so it hangs
-    # off the final layout without being able to move the main figure; it occupies the
-    # right half, which is empty until the peeled copies arrive on the later beats.
+    # finished, motionless picture -- part of what made this scene's first beat the longest
+    # still in the film (37.6 s). Here the angle actually swings from +theta to -theta and
+    # back with both half-chords tracking it, so "both flip sign, so the ratio does not" is
+    # something the viewer WATCHES. Built after _centre_in_zone and kept OUT of `full`, so
+    # it hangs off the final layout without being able to move the main figure.
+    #
+    # It plays LAST now (R6 and four rewatch lenses: a 19-second digression standing between
+    # "here is the new tool" and the figure itself; the handout can put it first because a
+    # reader can skip a sentence, a viewer cannot -- 2026-09-13 user call). By then nothing
+    # on the frame is empty, so the aside is an OVERLAY: the storyboard's `focus:` entry dims
+    # the finished figure for this beat and restores it at the end, and the little circle
+    # sits over the middle of that figure rather than in a corner.
     er = 1.05
-    eO = row.get_center() + 0.30 * UP
+    eO = np.array([full.get_center()[0], full.get_center()[1] + 0.30, 0.0])
     e_circle = Circle(radius=er, color=mut, stroke_width=1.8).move_to(eO)
     e_axis = Line(eO + (er + 0.35) * LEFT, eO + (er + 0.35) * RIGHT,
                   color=mut, stroke_width=1.4)
@@ -348,7 +372,11 @@ def sector_inequality(spec, ctx, blocks):
 
     def _peel(src, chip):
         def anim(scene, mob, ground):
-            shape, label, badge = mob[0], mob[1], mob[2]
+            # [shape, *nested, label, badge] -- `nested` is the smaller regions this glyph
+            # contains (empty for glyph ①); they arrive with the label, so the flown copy
+            # is still the one region this beat is about.
+            shape, label, badge = mob[0], mob[-2], mob[-1]
+            nested = list(mob[1:-2])
             scene.play(FadeIn(src), run_time=0.4)            # region appears on the left
             scene.add(src)
             flyer = src.copy()
@@ -357,7 +385,8 @@ def sector_inequality(spec, ctx, blocks):
             scene.play(ReplacementTransform(flyer, shape), run_time=0.8, rate_func=smooth)
             # right-side glyph brightens (label + badge) the SAME beat the main
             # figure's own ①②③ chip appears, tying the two halves together.
-            scene.play(FadeIn(label, shift=0.08 * UP), FadeIn(badge), FadeIn(chip), run_time=0.32)
+            scene.play(FadeIn(label, shift=0.08 * UP), FadeIn(badge), FadeIn(chip),
+                       *[FadeIn(m) for m in nested], run_time=0.32)
             return 1.52
         return anim
 
@@ -654,8 +683,15 @@ def derivative_cycle(spec, ctx, blocks):
         label = brand.math_line(tex, ground, role="primary", size=NODE_SIZE)
         return brand.accent_panel(label, ground, bar_role=role, pad=NODE_PAD, pad_x=NODE_PAD_X)
 
+    # The bar says WHICH FUNCTION, never the sign: amber = sine, blue = cosine, the same
+    # two colours the graphs use (slope_equals_height, shm_stacked_graphs). The old table
+    # made `sin x` green while amber meant sine everywhere else in the film, and it changed
+    # colour for `-sin x` but not for `-cos x` -- a rule that is not a rule (2026-09-13
+    # visual audit). Alternating amber/blue around the ring is also the remark's own
+    # sentence: differentiation sends the two INTO EACH OTHER, and the minus signs carry
+    # the sign flip on their own.
     node_specs = [
-        (r"\sin x", "TL", "success"),   # seed of the cycle
+        (r"\sin x", "TL", "accent"),    # seed of the cycle
         (r"\cos x", "TR", "secondary"),
         (r"-\sin x", "BR", "accent"),
         (r"-\cos x", "BL", "secondary"),
@@ -1131,3 +1167,226 @@ def why_trig_is_different(spec, ctx, blocks):
 
     out.append(Block("cancels", body, anim=_cancels_anim, static=False))
     return out
+
+
+# ================================================================ hook 6
+# limit_not_identity (Caution) -- the ratio curve, carried in from squeeze_graph,
+# opens out past pi/2 to pi so the two values the caution names can be READ OFF it.
+#
+# R2 director lens, 2026-09-13 (a `must` on the rerun): this is the scene whose whole job
+# is to stop a misreading -- "the limit is 1" heard as "the ratio is 1" -- and it was the
+# scene with the least picture behind it, while the one curve that settles the question in
+# a second had been drawn 20 s earlier in squeeze_graph and thrown away. `carry:` (rollout
+# T4) now brings that curve across the cut as a corner inset. What it cannot do is show
+# theta = pi: squeeze_graph is a CLOSE-UP, x in [-1.85, 1.85], and pi is off its right edge.
+#
+# So the inset opens back out. Zooming out is not decoration here, it IS the argument: the
+# close-up is the picture that makes the ratio look like 1, and stepping back is what shows
+# it is not. The wide view keeps the same curve, the same y = 1 ceiling and the same hollow
+# circle at theta = 0, drops cos (which leaves the frame past pi/2 and has no part in this
+# caution), and gains the two read-offs the narration names, one per beat.
+
+
+def ratio_readouts(spec, ctx, blocks):
+    ground = ctx["ground"]
+    ids = _by_id(blocks)
+    inset = ids["carried.graph"].mobject       # the close-up carried across the cut
+    body = ids["body"].mobject
+
+    amber = T.color(ground, "accent")
+    mut = T.color(ground, "muted")
+
+    X0, X1 = -0.25, 3.45                        # far enough right to hold theta = pi
+
+    def _ratio(t):
+        return 1.0 if abs(t) < 1e-9 else float(np.sin(t) / t)
+
+    axes = Axes(x_range=[X0, X1, 1.0], y_range=[0.0, 1.18, 0.5],
+                x_length=7.6, y_length=2.0, tips=True,
+                axis_config={"color": mut, "stroke_width": 1.6, "include_ticks": False})
+    # stop at pi exactly: past it the ratio goes negative, off the bottom of this y range
+    # and straight through the theta label at the axis tip -- and pi is where the
+    # narration stops too ('at theta = pi it is zero').
+    curve = axes.plot(_ratio, x_range=[0.015, float(PI)], color=amber, stroke_width=4.0)
+    ceiling = DashedLine(axes.c2p(X0, 1.0), axes.c2p(X1, 1.0), color=mut,
+                         stroke_width=2.0, dash_length=0.09)
+    # the same open circle squeeze_graph carries: the ratio is undefined AT zero, and this
+    # scene is precisely about not confusing "the limit" with "the value".
+    hollow = Circle(radius=0.075, color=amber, stroke_width=3.0,
+                    fill_color=T.color(ground, "bg"), fill_opacity=1.0)
+    hollow.move_to(axes.c2p(0.0, 1.0))
+    ticks = VGroup()
+    for xv, tex in [(PI / 2, r"\tfrac{\pi}{2}"), (PI, r"\pi")]:
+        p = axes.c2p(xv, 0.0)
+        ticks.add(Line(p + 0.08 * UP, p + 0.08 * DOWN, color=mut, stroke_width=2.0))
+        ticks.add(MathTex(tex, color=mut, font_size=T.fs("label")).next_to(p, DOWN, buff=0.18))
+    one_lab = brand.math_line("1", ground, role="muted", size="label")
+    one_lab.next_to(axes.c2p(X0, 1.0), LEFT, buff=0.12)
+    th_lab = brand.math_line(r"\theta", ground, role="text", size="label")
+    th_lab.next_to(axes.x_axis.get_right(), DOWN, buff=0.12)
+    ratio_lab = brand.math_line(r"\tfrac{\sin\theta}{\theta}", ground, role="accent", size="label")
+    ratio_lab.move_to(axes.c2p(2.25, 0.62))    # under the curve's falling arm, clear of it
+    wide = VGroup(axes, ceiling, one_lab, ticks, th_lab, curve, hollow, ratio_lab)
+
+    # the empty lower band the caution's own `sparse_ok` whitespace leaves free
+    zone_top = body.get_bottom()[1] - 0.50
+    zone_bottom = -T.FRAME_H / 2 + T.SAFE_MARGIN + 0.15
+    wide.move_to([0.0, (zone_top + zone_bottom) / 2, 0.0])
+
+    def _readout(xv, tex, above):
+        """A dot on the curve at *xv* with the value the narration reads out."""
+        p = axes.c2p(xv, _ratio(xv))
+        foot = axes.c2p(xv, 0.0)
+        dot = Dot(p, radius=0.075, color=amber)
+        lab = brand.math_line(tex, ground, role="accent", size="label")
+        lab.next_to(dot, UP + RIGHT if above else DOWN + RIGHT, buff=0.16)
+        # at theta = pi the point IS on the axis, so there is no drop to draw
+        if abs(p[1] - foot[1]) < 0.05:
+            return VGroup(dot, lab)
+        drop = DashedLine(foot, p, color=mut, stroke_width=1.6, dash_length=0.07)
+        return VGroup(drop, dot, lab)
+
+    half = _readout(PI / 2, r"\tfrac{2}{\pi}\approx 0.64", True)
+    at_pi = _readout(PI, "0", False)
+
+    def _open(scene, mob, _ground) -> float:
+        """The corner close-up grows back out into the full picture."""
+        secs = min(max(TM.beat_run_time(scene, 1.4) * 0.6, 0.9), 1.8)
+        scene.play(ReplacementTransform(inset, mob), run_time=secs)
+        scene.add(mob)
+        return secs
+
+    def _land(scene, mob, _ground) -> float:
+        """Draw the read-off one part at a time, spread over the beat it is read on."""
+        parts = list(mob)
+        each = min(max(TM.beat_run_time(scene, 0.9) / len(parts), 0.35), 1.1)
+        for part in parts:
+            scene.play(Create(part) if isinstance(part, DashedLine) else FadeIn(part),
+                       run_time=each)
+        scene.add(mob)
+        return each * len(parts)
+
+    out = list(blocks)
+    out.append(Block("opened", wide, anim=_open, static=False, layer="graph"))
+    out.append(Block("at_half_pi", half, anim=_land, static=False, layer="graph"))
+    out.append(Block("at_pi", at_pi, anim=_land, static=False, layer="graph"))
+    return out
+
+
+def _play_stock(scene, anim, mob, ground) -> float:
+    """Run a block's stock reveal (an anim NAME or a callable) and report what it cost --
+    so a hook can wrap a reveal instead of replacing it."""
+    if callable(anim):
+        return float(anim(scene, mob, ground))
+    return float(play_block(scene, Block("_", mob, anim=anim, static=False), ground))
+
+
+# ================================================================ hook 7
+# continuity_argument (Proposition 3.1, proof part 2/2) -- the second sum-to-product
+# identity is the FIRST one with only the changed tokens flipped, and the half-gap that
+# both of them hang on gets a picture.
+#
+# R2 director lens, 2026-09-13 (a `must` on the rerun): the most abstract scene in the
+# film, 70 seconds, not one figure -- four rows of symbols, revealed one at a time. Two
+# things are actually happening in it and neither was visible:
+#
+#   1. The two identities are ONE template filled twice. Writing the second from scratch
+#      hides that; morphing the first into it (SPEC-motion-language 規則 2, 只動變的 token)
+#      shows cos flip to sin, the leading minus leave, and the two half-angle factors trade
+#      places, while everything they share simply glides. No on-screen text changes.
+#   2. Everything collapses because the HALF-GAP (x - x_0)/2 goes to zero. That is a
+#      number line: x_0 fixed, x sliding into it, the bracket between them closing. The qed
+#      beat says "let x -> x_0: the half-angle goes to zero" -- now it happens on screen,
+#      paced to the beat, in the empty lower-right quadrant the proof column never uses.
+def continuity_template(spec, ctx, blocks):
+    ground = ctx["ground"]
+    ids = _by_id(blocks)
+    row0 = ids["proof.0"].mobject
+    qed_block = ids["qed"]
+
+    amber = T.color(ground, "accent")
+    mut = T.color(ground, "muted")
+    ink = T.color(ground, "text")
+
+    # -- the second identity: the first one with the changed tokens flipped ------
+    def _fill_second(scene, mob, _ground) -> float:
+        total = TM.beat_run_time(scene, 1.6)
+        ghost = row0.copy()
+        scene.add(ghost)
+        secs = min(max(total * 0.30, 0.7), 1.4)
+        scene.play(TransformMatchingShapes(ghost, mob), run_time=secs)
+        scene.add(mob)
+        return secs
+
+    ids["proof.1"].anim = _fill_second
+
+    # -- the half-gap number line (lower right; the proof column keeps the left) --
+    HALF_W = 2.15                       # half the line's length
+    CENTRE = np.array([3.65, -1.95, 0.0])
+    x0_pt = CENTRE + HALF_W * LEFT      # x_0 stays put
+    gap = ValueTracker(1.0)             # 1 = x at the right end, 0 = x has arrived
+
+    axis = Line(CENTRE + (HALF_W + 0.35) * LEFT, CENTRE + (HALF_W + 0.35) * RIGHT,
+                color=mut, stroke_width=1.6)
+
+    def _x_pt():
+        return x0_pt + 2.0 * HALF_W * gap.get_value() * RIGHT
+
+    def _mid_pt():
+        return (x0_pt + _x_pt()) / 2.0
+
+    def _dot_x():
+        return Dot(_x_pt(), radius=0.075, color=amber)
+
+    def _dot_mid():
+        return Dot(_mid_pt(), radius=0.06, color=ink)
+
+    def _bracket():
+        """The half-gap itself: midpoint -> x, the argument of every sine in the bound."""
+        a, b = _mid_pt() + 0.30 * DOWN, _x_pt() + 0.30 * DOWN
+        if b[0] - a[0] < 0.04:
+            return VGroup()
+        return VGroup(Line(a, b, color=amber, stroke_width=3.0),
+                      Line(a + 0.07 * UP, a + 0.07 * DOWN, color=amber, stroke_width=2.0),
+                      Line(b + 0.07 * UP, b + 0.07 * DOWN, color=amber, stroke_width=2.0))
+
+    def _x_label():
+        return brand.math_line("x", ground, role="text", size="label").next_to(
+            _x_pt(), UP, buff=0.16)
+
+    dot_x0 = Dot(x0_pt, radius=0.075, color=ink)
+    lab_x0 = brand.math_line("x_0", ground, role="text", size="label").next_to(
+        x0_pt, UP, buff=0.16)
+    lab_half = brand.math_line(r"\tfrac{x-x_0}{2}", ground, role="accent", size="label")
+    lab_half.next_to(CENTRE + 0.30 * DOWN, DOWN, buff=0.22)
+    halfgap = VGroup(axis, dot_x0, lab_x0, lab_half,
+                     always_redraw(_dot_x), always_redraw(_dot_mid),
+                     always_redraw(_bracket), always_redraw(_x_label))
+
+    # -- qed: the payoff beat draws the gap and then closes it ------------------
+    # The figure is revealed from INSIDE this reveal rather than by a {show halfgap}
+    # marker of its own: a new marker splits a beat, and this scene sits on the fallback
+    # ladder's BEATS rung, where reuse is keyed by each beat's output FILE -- so the split
+    # shifts every later beat and bills three MiMo calls. The qed beat is where the
+    # narration says "let x -> x_0" anyway, so the whole figure lives in this one beat.
+    # (Price of not being a Block: sizecheck's overlap pass does not see it. Measured by
+    # hand instead -- x [+1.15, +6.15], y [-2.70, -1.66], inside the safe area and clear
+    # of the proof column, whose widest row ends at +0.30.)
+    stock_qed = qed_block.anim
+
+    def _close_gap(scene, mob, _ground) -> float:
+        """Reveal the qed line, draw the number line, then walk x into x_0 across whatever
+        is left of the beat -- the narration's own 'let x -> x_0' happening rather than
+        being asserted."""
+        used = _play_stock(scene, stock_qed, mob, _ground)
+        scene.play(Create(axis), FadeIn(dot_x0), FadeIn(lab_x0), run_time=0.6)
+        scene.add(halfgap)
+        scene.play(FadeIn(lab_half), run_time=0.35)
+        used += 0.95
+        total = TM.beat_run_time(scene, used + 1.2)
+        walk = max(total - used - 0.4, 0.8)
+        scene.play(gap.animate.set_value(0.0), run_time=walk, rate_func=smooth)
+        return used + walk
+
+    qed_block.anim = _close_gap
+    return blocks

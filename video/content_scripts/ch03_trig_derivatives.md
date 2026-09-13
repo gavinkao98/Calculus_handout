@@ -89,9 +89,13 @@ narration: |
   So let us transform that difference quotient instead of fighting it
   head-on. The decisive step is one trigonometric identity — sum-to-product —
   which turns a difference of sines into a product:
-  $\sin A-\sin B=2\cos\frac{A+B}{2}\sin\frac{A-B}{2}$. A product is exactly
-  what we want, because we can pull it apart and take limits one factor at
-  a time. Put $A=x+h$ and $B=x$. The numerator becomes
+  $\sin A-\sin B=2\cos\frac{A+B}{2}\sin\frac{A-B}{2}$. And if it looks like it
+  fell out of the sky, it did not: put $u=\frac{A+B}{2}$ and $v=\frac{A-B}{2}$,
+  so that $A=u+v$ and $B=u-v$; expand $\sin(u+v)-\sin(u-v)$ with the angle-sum
+  formulas, and the $\sin u\cos v$ terms cancel, leaving exactly $2\cos u\sin v$.
+  A product is also
+  exactly what we want, because we can pull it apart and take limits one factor
+  at a time. Put $A=x+h$ and $B=x$. The numerator becomes
   $2\cos\!\left(x+\frac h2\right)\sin\frac h2$. Now divide by $h$ — and here
   is the small trick that makes everything line up: write $h$ as
   $2\cdot\frac h2$, so the denominator carries the very $\frac h2$ that sits
@@ -139,12 +143,7 @@ learning_goal: 在單位圓上用三塊嵌套面積，幾何地夾出 sinθ ≤ 
 kind: visual
 narration: |
   Here is that new tool. We compare three areas on a circle of radius one.
-  But first, one convenience that saves us half the work. Replacing $\theta$
-  by $-\theta$ flips the sign of both $\theta$ and $\sin\theta$, so their
-  ratio $\sin\theta/\theta$ is left unchanged — it is an even function. That
-  means whatever we learn for positive angles holds for negative ones, so it
-  is enough to chase $\theta$ down to zero from the positive side. Now the
-  geometry. On the unit circle, put $A$ at $(1,0)$ and let $B$ be the point at
+  On the unit circle, put $A$ at $(1,0)$ and let $B$ be the point at
   angle $\theta$, so $B=(\cos\theta,\sin\theta)$. Extend the radius until it
   meets the vertical tangent line at $A$, and call that meeting point
   $C=(1,\tan\theta)$. Three regions now nest one inside the next, and each
@@ -154,9 +153,16 @@ narration: |
   $\frac12\theta$. And the outer triangle $OAC$ has base one and height
   $\tan\theta$, so its area is $\frac12\tan\theta$. Because each region sits
   strictly inside the next, their areas must line up in the same order:
-  $\frac12\sin\theta \le \frac12\theta \le \frac12\tan\theta$. The whole
-  argument hangs on that one picture — a triangle inside a sector inside a
-  triangle.
+  $\frac12\sin\theta \le \frac12\theta \le \frac12\tan\theta$. And you can see
+  exactly what each one adds: the corner piece $ABC$ is what the outer triangle
+  adds to the inner one, and inside it sits the sliver between the chord $AB$
+  and the arc. The whole argument hangs on that one picture — a triangle inside
+  a sector inside a triangle. One convenience before we push on, and it saves us
+  half the work. Replacing $\theta$ by $-\theta$ flips the sign of both $\theta$
+  and $\sin\theta$, so their ratio $\sin\theta/\theta$ is left unchanged — it is
+  an even function. That means whatever we learn for positive angles holds for
+  negative ones, so it is enough to chase $\theta$ down to zero from the
+  positive side.
 visual_need: |
   單位圓（半徑 1），A=(1,0)、B=(cosθ,sinθ)、C=(1,tanθ)、射線 OB 延伸交切線於 C；
   三塊嵌套區域：內接 △OAB、扇形 OAB、外切 △OAC，各標面積 ½sinθ／½θ／½tanθ；
@@ -414,7 +420,7 @@ animation_cue: （無——靜態警示即可）
 ```
 id: radians_essential
 source: chapter3-print-standalone.html §3.1 · Caution（弧度制必要；度數下極限為 π/180、sin' 帶 π/180 因子）
-learning_goal: 懂得弧度制不是慣例而是 sin'=cos、cos'=−sin 成立的前提——度數下公式會帶醜因子。
+learning_goal: 懂得整套結果建立在弧度制上——扇形面積 ½θ 與基本極限都依賴它，換成度數極限就變成 π/180。（原本這裡還要學生記住 sin'=cos、cos'=−sin 只在弧度成立；2026-09-13 移到 recap，因為影片走到這一場時那兩條還沒證。）
 kind: counterexample
 narration: |
   A second caution, and this one is structural: everything here depends on
@@ -423,15 +429,14 @@ narration: |
   arc cut off on the unit circle has length exactly $\theta$. Switch to
   degrees and the limit is no longer one. Since $x$ degrees is
   $\frac{\pi}{180}x$ radians, you get $\lim_{x\to 0}\dfrac{\sin(x^\circ)}{x}=
-  \dfrac{\pi}{180}$, and the derivative drags that factor along:
-  $\dfrac{d}{dx}\sin(x^\circ)=\dfrac{\pi}{180}\cos(x^\circ)$. The clean
-  formulas we are about to prove, $\sin'=\cos$ and $\cos'=-\sin$, hold only in
-  radians. So radians are not a stylistic choice here — they are what keeps
-  the calculus tidy.
+  \dfrac{\pi}{180}$ — and every formula we are about to build on that limit
+  changes with it. So radians are not a stylistic choice here — they are what
+  keeps the calculus tidy.
 visual_need: |
-  警示卡：弧度 → $\sin\theta/\theta\to1$、$\sin'=\cos$；度數 →
-  $\lim_{x\to0}\tfrac{\sin(x^\circ)}{x}=\tfrac{\pi}{180}$、
-  $\tfrac{d}{dx}\sin(x^\circ)=\tfrac{\pi}{180}\cos(x^\circ)$。
+  警示卡：弧度 → $\sin\theta/\theta\to1$；度數 →
+  $\lim_{x\to0}\tfrac{\sin(x^\circ)}{x}=\tfrac{\pi}{180}$。
+  （度數的**導數**公式 $\tfrac{d}{dx}\sin(x^\circ)=\tfrac{\pi}{180}\cos(x^\circ)$
+  2026-09-13 移到 `recap`：本單元在影片中出現時 $\sin'=\cos$ 尚未證出，是前向參照。）
 animation_cue: （無——靜態警示即可）
 ```
 
@@ -495,7 +500,8 @@ kind: theorem
 narration: |
   Cosine falls to the very same machinery — only the identity changes, so we
   go quickly. This time use the companion sum-to-product formula,
-  $\cos A-\cos B=-2\sin\frac{A+B}{2}\sin\frac{A-B}{2}$. With $A=x+h$ and
+  $\cos A-\cos B=-2\sin\frac{A+B}{2}\sin\frac{A-B}{2}$ — obtained the same way as
+  the first one, by expanding $\cos(u+v)-\cos(u-v)$. With $A=x+h$ and
   $B=x$, the same division by $h=2\cdot\frac h2$ turns the difference quotient
   into $-\sin\!\left(x+\frac h2\right)\cdot\dfrac{\sin(h/2)}{h/2}$. Send $h$ to
   zero. The sine factor goes to $\sin x$ by continuity, the second factor goes
@@ -712,9 +718,10 @@ narration: |
   $-\sin t$ is just $-s(t)$. The acceleration is the negative of the height.
   So at every instant the weight is pushed back toward rest, and harder the
   farther it has strayed. That relation, $s''=-s$, is the signature of simple
-  harmonic motion. And it is no accident that sine and cosine — the functions
-  whose second derivative is their own negative — are exactly the ones that
-  describe oscillation.
+  harmonic motion — and it is the four-step cycle stopped halfway: two
+  derivatives already turn each of sine and cosine into its own negative. Both
+  sine and cosine satisfy that relation, so either one can describe an
+  oscillation.
 visual_need: |
   推導，逐行 reveal：
    1. $s(t)=\sin t$（height）。
@@ -806,7 +813,9 @@ narration: |
   Keep the cycle in mind — differentiating runs
   $\sin\to\cos\to-\sin\to-\cos$ and back around, so the fourth derivative
   brings you home. And remember the fine print: all of it depends on measuring
-  angles in radians.
+  angles in radians — in degrees the derivative picks up that same factor,
+  $\dfrac{d}{dx}\sin(x^\circ)=\dfrac{\pi}{180}\cos(x^\circ)$, so the clean
+  $\sin'=\cos$ and $\cos'=-\sin$ hold only in radian measure.
 visual_need: |
   Key Takeaways 卡片（5 點）＋ remember-formula 卡：
   points：
@@ -814,7 +823,8 @@ visual_need: |
     • $\tfrac{d}{dx}\sin x=\cos x$、$\tfrac{d}{dx}\cos x=-\sin x$。
     • 由這兩個＋商法則，得全部六個三角函數的導數。
     • 導數四步循環：$\sin\to\cos\to-\sin\to-\cos\to\sin$。
-    • 一切以弧度為前提。
+    • 一切以弧度為前提——度數下 $\tfrac{d}{dx}\sin(x^\circ)=\tfrac{\pi}{180}\cos(x^\circ)$
+      （2026-09-13 自 `radians_essential` 移來：兩條定理都證完之後講，才不是前向參照）。
   formulas（保持短，避免出框）：
     • $\lim_{\theta\to0}\dfrac{\sin\theta}{\theta}=1$
     • $\dfrac{d}{dx}\sin x=\cos x,\quad \dfrac{d}{dx}\cos x=-\sin x$
