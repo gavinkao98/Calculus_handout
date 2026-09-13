@@ -448,7 +448,7 @@ def sector_inequality(spec, ctx, blocks):
                        rate_func=there_and_back)
         # the aside has done its job; the figure underneath gets the frame back
         scene.play(FadeOut(mob), backdrop.animate.restore(), run_time=OUT_SECONDS)
-        return _elapsed(scene) - t0
+        return _spent(scene, t0, total)
 
     def _peel(src, chip):
         def anim(scene, mob, ground):
@@ -626,6 +626,7 @@ def shm_stacked_graphs(spec, ctx, blocks):
 
     groups = []
     axes_list = []
+    curves = []
     for i, (func, color, label_tex, word_tex) in enumerate(rows):
         ax = Axes(x_range=[0, 2 * PI, PI / 2], y_range=[-1.2, 1.2, 1],
                   x_length=6.0, y_length=1.0, tips=False,
@@ -634,6 +635,7 @@ def shm_stacked_graphs(spec, ctx, blocks):
         # move axes AND curve together (the curve is not a child of the axes, so
         # moving the axes alone leaves the curve behind on the origin band).
         plot_grp = VGroup(ax, curve).move_to([0.6, (1 - i) * 1.55, 0.0])
+        curves.append(curve)
         # left label = physical name (Height/Velocity/Acceleration) over the formula,
         # so the row reads as physics, not just symbols.
         word = brand.math_line(word_tex, ground, role="text", size="label")
@@ -654,7 +656,9 @@ def shm_stacked_graphs(spec, ctx, blocks):
                           color=mut, stroke_width=1.8, dash_length=0.09)
 
     guide_ts = [PI / 2, 3 * PI / 2]
-    mirror = VGroup(*(vline(t) for t in guide_ts))
+    # renamed from `mirror`: these now ride the `g_a` beat, so sharing a name with the
+    # `mirror` block would point at the wrong beat.
+    guides = VGroup(*(vline(t) for t in guide_ts))
 
     # guide labels, once each, tucked under the bottom axis where they sit clear
     # of all three curves (no per-panel repetition needed -- one shared time axis).
@@ -664,23 +668,73 @@ def shm_stacked_graphs(spec, ctx, blocks):
         glab.next_to(ax_bot.c2p(t, -1.2), DOWN, buff=0.22)
         guide_labels.add(glab)
 
-    # dots where each curve crosses a guide -- the read-off the narration asks for
-    # (height peaks/troughs <-> velocity crosses zero <-> acceleration mirrors height).
-    # These can only sit on a guide that already spans all three panels, so, like the
-    # guide lines themselves, they ride the `mirror` beat rather than their own panel.
-    guide_dots = VGroup()
+    # dots where each curve crosses a guide -- the read-off the narration asks for.
+    # Kept PER ROW: the `g_a` beat names the height and the velocity ("watch where the
+    # height hits a peak or a trough -- there the velocity passes through zero"), and the
+    # `mirror` beat names the acceleration. One VGroup per row lets each land on the beat
+    # that asks for it instead of all six arriving together, 11.5 s after the first ask.
+    dots_by_row = []
     for (func, color, _, _), ax in zip(rows, axes_list):
-        for t in guide_ts:
-            guide_dots.add(Dot(ax.c2p(t, func(t)), radius=0.07, color=color))
+        dots_by_row.append(VGroup(*(Dot(ax.c2p(t, func(t)), radius=0.07, color=color)
+                                    for t in guide_ts)))
+    dots_s, dots_v, dots_a = dots_by_row
 
     mlab = brand.math_line(r"s''=-s", ground, role="success", size="label")
     mlab.next_to(groups[2][1], RIGHT, buff=0.35)  # anchored to the accel panel's right side
-    g_mirror = VGroup(mirror, guide_labels, guide_dots, mlab)
+
+    def _accel_and_guides(scene, mob, _ground) -> float:
+        """The panel while it is named, then the read-off while it is asked for.
+
+        Two thirds of this 12.3 s beat is "watch where the height hits a peak or a trough
+        -- there the velocity passes through zero". The guides and dots that make those
+        places findable used to sit in the NEXT block and arrived 11.5 s later (R2
+        round-19 must), which is also why this beat held the film's longest still."""
+        total = TM.beat_run_time(scene, 3.0)
+        t0 = _elapsed(scene)
+        scene.play(Create(groups[2]), run_time=0.65)
+        # "Watch where..." starts about a third of the way in; the guides wait for the
+        # sentence that motivates them rather than racing ahead of it.
+        hold = max(total * 0.30 - (_elapsed(scene) - t0), 0.0)
+        if hold:
+            scene.wait(hold)
+        scene.play(*[Create(g) for g in guides], *[FadeIn(g) for g in guide_labels],
+                   run_time=0.7)
+        scene.play(FadeIn(dots_s), run_time=0.45)       # the peaks and the troughs...
+        scene.play(FadeIn(dots_v), run_time=0.45)       # ...and the zeros under them
+        scene.add(mob)
+        return _spent(scene, t0, total * 0.30 + 1.6)
+
+    def _mirror_anim(scene, mob, _ground) -> float:
+        """The acceleration's own dots, then the sentence's claim actually performed.
+
+        Moving the guides back to `g_a` (above) would otherwise leave this 11.5 s beat
+        holding two dots -- the dead zone moved, not removed. What fills it is the beat's
+        own words: "it is the top one flipped upside down". A copy of the HEIGHT curve,
+        flipped about the horizontal, IS -sin t, so flipping it down onto the acceleration
+        panel is the claim itself rather than an illustration of it. The ghost leaves once
+        it has landed: two strokes on one curve would just read as a thicker curve."""
+        total = TM.beat_run_time(scene, 3.0)
+        t0 = _elapsed(scene)
+        scene.play(FadeIn(dots_a), run_time=0.45)
+        hold = max(total * 0.22 - (_elapsed(scene) - t0), 0.0)
+        if hold:
+            scene.wait(hold)
+        ghost = curves[0].copy().set_stroke(opacity=0.7)
+        scene.add(ghost)
+        scene.play(ghost.animate.flip(RIGHT).move_to(curves[2]),
+                   run_time=min(max(total * 0.20, 1.0), 2.4), rate_func=smooth)
+        scene.play(FadeOut(ghost), FadeIn(mlab), run_time=0.5)
+        scene.add(mob)
+        return _spent(scene, t0, total * 0.42 + 1.0)
 
     out.append(Block("g_s", groups[0], anim=_draw, static=False, layer="graph"))
     out.append(Block("g_v", groups[1], anim=_draw, static=False, layer="graph"))
-    out.append(Block("g_a", groups[2], anim=_draw, static=False, layer="graph"))
-    out.append(Block("mirror", g_mirror, anim=_fade, static=False, layer="graph"))
+    # the guides/labels/dots the `g_a` sentence asks for belong to the `g_a` BLOCK, not
+    # just to its animation, so the layout gates measure what the beat actually puts up.
+    out.append(Block("g_a", VGroup(groups[2], guides, guide_labels, dots_s, dots_v),
+                     anim=_accel_and_guides, static=False, layer="graph"))
+    out.append(Block("mirror", VGroup(dots_a, mlab), anim=_mirror_anim,
+                     static=False, layer="graph"))
     return out
 
 
@@ -1517,16 +1571,23 @@ def ratio_readouts(spec, ctx, blocks):
     at_pi = VGroup(at_pi_dot, at_pi_lab)
 
     def _walk_to_pi(scene, mob, _ground) -> float:
-        """Send the dot from pi/2 to pi across whatever the beat has, then label it."""
+        """Send the dot from pi/2 to pi and label it WHILE the words are said.
+
+        The beat is "and at theta = pi it is zero. The value one is reached only in the
+        limit." -- the reading takes about the first 2.2 s of 5.1 s and the rest is a
+        closing remark about the picture as a whole. The old version spread the walk over
+        `budget - 1.0` and landed the 0 at +4.6 s: two and a half seconds after it was
+        read, on the wrong sentence (R2 round-19 must ML4). The walk now finishes inside
+        the reading and the remainder of the beat is an ordinary hold."""
+        total = TM.beat_run_time(scene, 2.0)
         t0 = _elapsed(scene)
         walk_t.set_value(float(PI) / 2.0)
         scene.add(at_pi_dot)
-        budget = TM.beat_run_time(scene, 2.0)
-        run = max(budget - 1.0, 0.6)
+        run = min(max(total * 0.32, 0.6), 2.0)
         scene.play(walk_t.animate.set_value(float(PI)), run_time=run, rate_func=linear)
-        scene.play(FadeIn(at_pi_lab), run_time=0.45)
+        scene.play(FadeIn(at_pi_lab), run_time=0.4)
         scene.add(mob)
-        return _elapsed(scene) - t0
+        return _spent(scene, t0, run + 0.4)
 
     def _open(scene, mob, _ground) -> float:
         """The corner close-up grows back out into the full picture."""
@@ -1534,20 +1595,28 @@ def ratio_readouts(spec, ctx, blocks):
         scene.play(ReplacementTransform(inset, mob),
                    run_time=min(max(TM.beat_run_time(scene, 1.4) * 0.6, 0.9), 1.8))
         scene.add(mob)
-        return _elapsed(scene) - t0
+        return _spent(scene, t0, 1.4)
 
     def _land(scene, mob, _ground) -> float:
-        """Draw the read-off one part at a time, spread over the beat it is read on."""
-        parts = list(mob)
-        # an equal share of the beat, capped so a long beat is not crawled out;
-        # never MORE than the share, or the scene outruns its own narration.
-        each = min(TM.beat_run_time(scene, 0.9) / len(parts), 1.1)
+        """Mark the PLACE at once, and land the VALUE where the value is spoken.
+
+        The beat reads "at theta = pi/2 it is two over pi, about 0.64": the place is named
+        in the first second, the number a little after. Splitting the beat into equal
+        shares put the number LAST -- +3.3 s into a 5.0 s beat, by which time the phrase
+        was nearly over (R2 round-19 must ML4). An equal split is the wrong shape for a
+        sentence that names one thing and then measures it."""
+        total = TM.beat_run_time(scene, 0.9)
         t0 = _elapsed(scene)
-        for part in parts:
+        *place, value = list(mob)               # [drop, dot], then the value label
+        for part in place:
             scene.play(Create(part) if isinstance(part, DashedLine) else FadeIn(part),
-                       run_time=each)
+                       run_time=0.35)
+        hold = max(total * 0.32 - (_elapsed(scene) - t0), 0.0)
+        if hold:
+            scene.wait(hold)
+        scene.play(FadeIn(value), run_time=0.4)
         scene.add(mob)
-        return _elapsed(scene) - t0
+        return _spent(scene, t0, total * 0.32 + 0.4)
 
     out = list(blocks)
     out.append(Block("opened", wide, anim=_open, static=False, layer="graph"))
@@ -1626,7 +1695,7 @@ def continuity_template(spec, ctx, blocks):
                    run_time=min(max(total * 0.55, 1.2), 8.0))
         scene.add(mob)
         _mark_factors(scene)
-        return _elapsed(scene) - t0
+        return _spent(scene, t0, min(max(total * 0.55, 1.2), 8.0) + 1.6)
 
     ids["proof.1"].anim = _fill_second
 
@@ -1748,7 +1817,7 @@ def continuity_template(spec, ctx, blocks):
         if left >= 3.0:
             scene.play(gap.animate.set_value(0.15), run_time=min(left * 0.45, 3.0),
                        rate_func=there_and_back)
-        return _elapsed(scene) - t0
+        return _spent(scene, t0, used + (min(left * 0.45, 3.0) if left >= 3.0 else 0.0))
 
     stmt_block.anim = _pose_question
 
@@ -1759,10 +1828,10 @@ def continuity_template(spec, ctx, blocks):
     def _show_half(scene, mob, _ground) -> float:
         t0 = _elapsed(scene)
         _release_factors(scene)
-        _play_stock(scene, stock_p2, mob, _ground)
+        stock = _play_stock(scene, stock_p2, mob, _ground)
         scene.add(half_group)
         scene.play(FadeIn(lab_half), run_time=0.45)
-        return _elapsed(scene) - t0
+        return _spent(scene, t0, stock + 1.05)
 
     p2_block.anim = _show_half
 
@@ -1794,7 +1863,7 @@ def continuity_template(spec, ctx, blocks):
         # the bracket has collapsed to nothing, so its label is naming an object that is no
         # longer there -- take it with it (visual frame audit advisory)
         scene.play(FadeOut(lab_half), run_time=0.4)
-        return _elapsed(scene) - t0
+        return _spent(scene, t0, used + max(walk, 0.0) + 0.4)
 
     qed_block.anim = _close_gap
     return blocks
@@ -1967,7 +2036,7 @@ def shm_device(spec, ctx, blocks):
             t0 = _elapsed(scene)
             base = _play_stock(scene, orig, mob, ground)
             stage(scene, ground, base)
-            return _elapsed(scene) - t0
+            return _spent(scene, t0, base)
         return _anim
 
     ids["step.0"].anim = _wrap("step.0", _stage_step0)
