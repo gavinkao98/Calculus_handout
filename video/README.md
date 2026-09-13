@@ -94,7 +94,7 @@ video/
 逐節進度與跨對話狀態以 [REBUILD_STATUS.md](REBUILD_STATUS.md) 頂部現況快照為準（本檔不重複）。
 
 - **TTS＝MiMo builtin voice `Dean` 單一路線**（Gemini/Charon 已退場 2026-06-16；voice-design／「Calm Professor」persona 2026-07-05 退役）；**scene-level TTS＋forced alignment（stable-ts）為正式路線**，`--unit auto` 涵蓋全部 content template。
-- **文字渲染＝Route A（全 LaTeX/pdflatex，2026-06-25 落地）**：內文/標題 IBM Plex Sans、eyebrow IBM Plex Mono、數學 Latin Modern（見下方「文字渲染」節與 [DESIGN.md](DESIGN.md)）。
+- **文字渲染＝Route A（全 LaTeX/pdflatex，2026-06-25 落地）**：內文/標題 Instrument Sans（vendored）、eyebrow IBM Plex Mono、數學 Latin Modern（見下方「文字渲染」節與 [DESIGN.md](DESIGN.md)）。
 - **語意色＝講義色軸（Direction B「對位」，2026-09-12 落地）**：`accent` 的六個語意族對位到講義 `calcbook.sty` 的 `\definecolor`——definition＝赭、theorem/proof＝藍、example＝綠、caution＝紅、strategy＝紫、remark＝灰；`LIGHT` 逐字沿用講義 hex，`DARK` 保色相提亮。**definition 與 theorem 原本與講義對調，本輪修正。** 契約與對照表見 [DESIGN.md](DESIGN.md) §語意色軸；`pipeline/_selftest_semantic_palette.py` 重讀 `calcbook.sty` 守住兩線不漂開。
 - 引擎完整：`make.py` orchestrator、**五道 render 前確定性檢查（schema → provenance → pedagogy → lint → sizecheck，後兩者 warn-default；另掛 `source_rev` 講義源 freshness，永遠 warn-only）**、模板 catalog＋容量契約 G1–G6、`hook:` 機制、MiMo TTS、`timing.py` 同步守衛、**七份判斷閘 SSOT rubric**（six-lens／copyedit／NFA／VISUAL-FRAME／hook-engineering／pedagogy-firstlearner／amplification）。
 - 音訊驅動對齊（beat-level：每 beat 影片長度＝該 beat 音檔長度；scene-level：FA 逐字對位映回 beat）為產線核心；mock 路徑（`make.py --backend mock`）離線、不計費，供版面／時序迭代。`video/output/` 是 gitignored。
@@ -245,7 +245,7 @@ python video\make.py          --storyboard video\storyboards\<deck>_mimo.yml --r
 
 ## 文字渲染（避免亂碼）
 
-**Route A（2026-06-25 落地）：所有螢幕文字都走 LaTeX/pdflatex** 以取得正確 kerning——內文/標題 **IBM Plex Sans**、eyebrow **IBM Plex Mono**、數學 **Latin Modern**（實測 manim `Text`/Pango 不套 kerning，故 Pango 路徑與 `TEX_TEXT_SCALE` 拼接機制已全部移除）。角色分派表、display-style 慣例（`\frac` vs `\tfrac`）、wrap-don't-shrink 規則的權威描述見 [`DESIGN.md`](DESIGN.md) §Text rendering；落地計畫存 [`content_scripts/_audit/PLAN-routeA-plex-latex.md`](content_scripts/_audit/PLAN-routeA-plex-latex.md)。
+**Route A（2026-06-25 落地）：所有螢幕文字都走 LaTeX/pdflatex** 以取得正確 kerning——內文/標題 **Instrument Sans**（2026-09-13 由 IBM Plex Sans 換過來；repo vendored，見 [`../ENVIRONMENT.md`](../ENVIRONMENT.md) ①b）、eyebrow **IBM Plex Mono**、數學 **Latin Modern**（實測 manim `Text`/Pango 不套 kerning，故 Pango 路徑與 `TEX_TEXT_SCALE` 拼接機制已全部移除）。角色分派表、display-style 慣例（`\frac` vs `\tfrac`）、wrap-don't-shrink 規則的權威描述見 [`DESIGN.md`](DESIGN.md) §Text rendering；落地計畫存 [`content_scripts/_audit/PLAN-routeA-plex-latex.md`](content_scripts/_audit/PLAN-routeA-plex-latex.md)。
 
 > **鐵則:任何作者可能填入 `$` 或 `\` 的散文／標題欄位，模板一律用 `brand.prose`
 > 或 `brand.heading_rich` 渲染，不要直接用 `body_text` / `heading`。**

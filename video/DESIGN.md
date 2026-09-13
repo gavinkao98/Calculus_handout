@@ -43,7 +43,7 @@ scene `kind` 是 first-class 的，且支援 silent（no-narration）scene。
 
 | 原封沿用（已驗證，重寫無收益） | 從零重寫 |
 |---|---|
-| `visuals/theme.py`（Midnight Canvas palette + Plex/LaTeX type scale + layout metrics） | storyboard schema + format |
+| `visuals/theme.py`（Midnight Canvas palette + LaTeX type scale + layout metrics） | storyboard schema + format |
 | `visuals/graph_utils.py`（safe expr eval + sampling） | narration → beats compiler |
 | `visuals/layout.py`（16:9 zone layout） | scene templates |
 | ffmpeg mux/concat logic *（現於 `make.py` compose；gen-2 的 `mux.py` 已刪）* | TTS backend（MiMo；Gemini 已退場） |
@@ -1151,20 +1151,20 @@ assert 回傳的秒數，沒有這層 fallback 會拿到 0.0。所以 hook 一�
 
 ### Text rendering：prose vs math（no garble）
 
-**Route A（2026-06-24 落地）：所有螢幕文字都走 LaTeX/pdflatex** 以拿到正確 kerning——內文/標題 **IBM Plex Sans**、eyebrow **IBM Plex Mono**、數學 **Latin Modern**。根因：實測 manim `Text`/`MarkupText`（Pango）完全不套 kerning（`W("AVAVAV")`≈各字寬相加），sans 尤其鬆；LaTeX 會 kerning。字體在 TeX preamble 設定（`_bootstrap.apply_tex_template`：`plex-sans`＋`plex-mono`＋`lmodern`＋`microtype`，`familydefault=\sfdefault`，`\everymath{\displaystyle}`），所以本模組不再出現任何 Pango family 名。硬約束：只能 pdflatex（lualatex/xelatex 會破壞 manim 的 `\special{dvisvgm:raw}` 數學子部件定址）。計畫見 [`content_scripts/_audit/PLAN-routeA-plex-latex.md`](content_scripts/_audit/PLAN-routeA-plex-latex.md)。
+**Route A（2026-06-24 落地）：所有螢幕文字都走 LaTeX/pdflatex** 以拿到正確 kerning——內文/標題 **Instrument Sans**（2026-09-13 由 IBM Plex Sans 換過來；沒有 CTAN 套件，OTF＋autoinst 生成物 vendored 在 `pipeline/fonts/instrument-sans/`，換機設定見 [`../ENVIRONMENT.md`](../ENVIRONMENT.md) ①b）、eyebrow **IBM Plex Mono**、數學 **Latin Modern**。根因：實測 manim `Text`/`MarkupText`（Pango）完全不套 kerning（`W("AVAVAV")`≈各字寬相加），sans 尤其鬆；LaTeX 會 kerning。字體在 TeX preamble 設定（`_bootstrap.apply_tex_template`：`InstrumentSans`＋`plex-mono`＋`lmodern`＋`microtype`，`familydefault=\sfdefault`，`\everymath{\displaystyle}`），所以本模組不再出現任何 Pango family 名。硬約束：只能 pdflatex（lualatex/xelatex 會破壞 manim 的 `\special{dvisvgm:raw}` 數學子部件定址）。計畫見 [`content_scripts/_audit/PLAN-routeA-plex-latex.md`](content_scripts/_audit/PLAN-routeA-plex-latex.md)。
 
-> **每景重套 template（坑）：** manim 的 `tempconfig`（`make.py`／`scratch_frames` 每景 `with tempconfig(cfg): LessonScene().render()`）退出時會把 `config.tex_template` 重設回預設（serif CM、缺 `\sfdefault` 與 `\arccsc` 等），所以 `LessonScene.construct()` 在 build 前都呼叫 `_bootstrap.apply_tex_template()` 重套，否則一個 batch 只有第一景拿到 Plex。
+> **每景重套 template（坑）：** manim 的 `tempconfig`（`make.py`／`scratch_frames` 每景 `with tempconfig(cfg): LessonScene().render()`）退出時會把 `config.tex_template` 重設回預設（serif CM、缺 `\sfdefault` 與 `\arccsc` 等），所以 `LessonScene.construct()` 在 build 前都呼叫 `_bootstrap.apply_tex_template()` 重套，否則一個 batch 只有第一景拿到正確字體。
 
 螢幕文字現在全走 LaTeX（`Tex`／`MathTex`），按角色分：
 
 | 角色 | 函式 | 字體 | LaTeX |
 |---|---|---|---|
-| 標題 | `brand.heading` / `brand.heading_rich` | Plex Sans Bold | `\textbf{…}` |
-| 內文 prose | `brand.body_text` / `brand.prose` | Plex Sans | text-mode（含 `$math$`） |
+| 標題 | `brand.heading` / `brand.heading_rich` | Instrument Sans Bold | `\textbf{…}` |
+| 內文 prose | `brand.body_text` / `brand.prose` | Instrument Sans | text-mode（含 `$math$`） |
 | eyebrow / label | `brand.eyebrow` | Plex Mono | `\texttt{…}` |
 | 數學 | `brand.math_line` / `MathTex` | Latin Modern | math-mode |
 
-`Tex` 在 text mode 原生排「文字＋內聯 `$math$` 同行」、baseline 正確、kerned，所以**舊的 Pango↔Tex 拼接機制已全部移除**：`theme.TEX_TEXT_SCALE`（Pango↔Tex 尺寸對齊，今 = 1.0 no-op）、`brand._pango_dashes`、`brand._compose`／`_prose_mixed`（手動 baseline 拼接）。換行寬度估計 `_WIDTH_K`／`estimate_text_width` 與 kerning 無關，保留並已重校為 Plex-LaTeX。
+`Tex` 在 text mode 原生排「文字＋內聯 `$math$` 同行」、baseline 正確、kerned，所以**舊的 Pango↔Tex 拼接機制已全部移除**：`theme.TEX_TEXT_SCALE`（Pango↔Tex 尺寸對齊，今 = 1.0 no-op）、`brand._pango_dashes`、`brand._compose`／`_prose_mixed`（手動 baseline 拼接）。換行寬度估計 `_WIDTH_K`／`estimate_text_width` 與 kerning 無關，保留並在每次換字時重校（2026-09-13：Instrument Sans）。
 
 **規則（template 必須遵循）：** 作者可能放入 `$` 或 `\` 的任何欄位——`title`、
 `statement`、step `text`、`takeaway`、recap `points`——透過 **`brand.prose`**
@@ -1233,7 +1233,7 @@ standalone display line**——`heading`/`heading_rich` title——即使在那�
 | 路徑 | 公式 | 說明 |
 |---|---|---|
 | `MathTex`（display） | `px × PX_TO_FS(0.698)` | 基準：math-anchored 換算 |
-| inline-in-prose | 同基準 `× TEXT_SCALE(1.3102)` ＝ **+31%** | `brand.prose` 中的 inline `$...$` |
+| inline-in-prose | 同基準 `× TEXT_SCALE(1.2748)` ＝ **+27%** | `brand.prose` 中的 inline `$...$` |
 | inline-in-heading | 同基準 `× HEADING_MATH_SCALE(1.0)` | 標題中的 inline `$...$`，無額外放大 |
 
 Divider hook 案例：`divider` 的 **title 走 92px**（heading 路徑）；其 optional `scaffold.problem`（hook 式問句，P-A3）走 **56px raw px**——純 `$math$` 因此走 `MathTex` display 路徑（不吃 `TEXT_SCALE`），讀來高於 subtitle 而非其 ~80%（見上方 Authoring Playbook「章節轉場」列）。
@@ -1252,9 +1252,9 @@ Divider hook 案例：`divider` 的 **title 走 92px**（heading 路徑）；其
 | procedure pitch | row_gap 1.4 / min_clear 0.35 / title_clear 0.2u | `procedure_steps.py` 設計 rhythm |
 | recap pitch | 47 | recap card 節奏 |
 
-**行長量測法：** 權威＝`brand._WIDTH_K = 0.00507`（＋CJK 字元 ×2 加權）；
+**行長量測法：** 權威＝`brand._WIDTH_K = 0.00521`（＋CJK 字元 ×2 加權）；
 `CONTENT_W ≈ 65` 加權字元＝可讀上緣。**勿再用 0.5em 粗估**——`_WIDTH_K` 已為
-Plex-LaTeX kerning 重新校正，粗估法未計入 kerning 與 CJK 加權，會系統性低估
+實際字體的 LaTeX kerning 重新校正，粗估法未計入 kerning 與 CJK 加權，會系統性低估
 真實跨度。
 
 自動強制：`pipeline/sizecheck.py` build 每個 scene（不 render），在每個

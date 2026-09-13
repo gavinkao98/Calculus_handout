@@ -1,11 +1,11 @@
-"""Brand visual primitives (all-LaTeX type: Plex Sans/Mono text + Latin Modern math).
+"""Brand visual primitives (all-LaTeX type: Instrument Sans text, Plex Mono eyebrows, Latin Modern math).
 
 Builds the recurring design elements templates compose. Colours come from the
 active ground's palette (dark/paper) via theme.py -- no hex literals here.
 
 Fonts (Route A, 2026-06-24): ALL on-screen text renders through LaTeX (Tex) so it is
-kerned -- manim Text (Pango) does not kern. heading()/heading_rich() set IBM Plex Sans
-Bold, body_text()/prose() set IBM Plex Sans, eyebrow() sets IBM Plex Mono; math
+kerned -- manim Text (Pango) does not kern. heading()/heading_rich() set Instrument Sans
+Bold, body_text()/prose() set Instrument Sans, eyebrow() sets IBM Plex Mono; math
 (MathTex/Tex) is Latin Modern. The fonts live in the TeX preamble
 (_bootstrap.apply_tex_template), so this module hardcodes no font name and no longer
 touches Pango at all -- every text mobject it builds (heading, body, eyebrow, glyph,
@@ -58,13 +58,23 @@ FRAME_H = T.FRAME_H
 #
 # Calibration (manim units per char*font_size). CJK glyphs are full-width, so they count
 # as ~2x a latin advance. One global knob -- retune if fonts change (Times advance ~0.0060,
-# used 0.0058; Inter Tight 0.0068; NCM-Pango 0.0065). Plex Sans via LaTeX measures
-# ~0.004973 per char*fs (Route A, 2026-06-24); 0.00507 = that + 2% so the estimate sits
-# just above the real advance (overflow is worse than a slightly short line). The font_size
-# fed to estimate_text_width is the TEXT size (_text_fs = fs(size)*TEXT_SCALE), so this is
-# keyed to the rendered Plex text size and is unaffected by the math-anchored PX_TO_FS.
+# used 0.0058; Inter Tight 0.0068; NCM-Pango 0.0065; Plex Sans via LaTeX 0.004973, used
+# 0.00507). Instrument Sans via LaTeX measures ~0.005109 per char*fs on the reference
+# sentence "A function is one-to-one when different inputs" (2026-09-13); 0.00521 = that
+# + 2% so the estimate sits just above the real advance on that sentence (overflow is worse
+# than a slightly short line). The font_size fed to estimate_text_width is the TEXT size
+# (_text_fs = fs(size)*TEXT_SCALE), so this is keyed to the rendered text size and is
+# unaffected by the math-anchored PX_TO_FS.
+#
+# INVARIANT (3): the estimate must not sit systematically BELOW the real advance, or every
+# wrapped line overflows. A single character-count knob cannot be a hard upper bound -- the
+# per-char advance of real prose spans roughly +-10% around the calibration sentence -- so
+# what is guarded (pipeline/_selftest_text_metrics.py) is: >= measured on the calibration
+# sentence, and never more than 6% below measured across a representative prose set. Worst
+# case measured: Plex Sans -5.31%, Instrument Sans -4.56% -- i.e. the spread is a property
+# of the estimator, not of this font, and the swap did not make it worse.
 
-_WIDTH_K = 0.00507
+_WIDTH_K = 0.00521
 
 
 def _char_weight(ch: str) -> float:
@@ -156,7 +166,7 @@ def eyebrow(label: str, ground: str, *, role: str = "secondary", size="eyebrow")
 
 def heading(text: str, ground: str, *, role: str = "primary", size: str = "h1",
             max_width: float | None = None) -> Tex:
-    """Display heading -- IBM Plex Sans Bold (Tex ``\\textbf{}``). (Route A: was Pango
+    """Display heading -- Instrument Sans Bold (Tex ``\\textbf{}``). (Route A: was Pango
     Times/NCM bold.) If *max_width* is given and the rendered line is wider, scale it
     down to fit -- the standalone-display-line exception to "wrap, don't shrink" (a hero
     title has no siblings to size-match)."""
@@ -189,7 +199,7 @@ def _tex_text(s: str) -> str:
 
 
 def _text_fs(size) -> float:
-    """Font size for TEXT (Plex Sans/Mono), in manim units. theme.PX_TO_FS is the MATH
+    """Font size for TEXT (Instrument Sans / Plex Mono), in manim units. theme.PX_TO_FS is the MATH
     (Latin Modern) anchor, so TEXT is scaled up by theme.TEXT_SCALE to its calibrated cap
     height -- this keeps math at its established size while text matches the prior visual
     size (Plex caps are smaller per font_size, so the single PX_TO_FS knob can't size both)."""
@@ -198,7 +208,7 @@ def _text_fs(size) -> float:
 
 def body_text(text: str, ground: str, *, role: str = "text", size: str = "body",
               max_width: float | None = None, align: str = "LEFT"):
-    """Body prose rendered via LaTeX (Tex) in IBM Plex Sans (the \\sfdefault family).
+    """Body prose rendered via LaTeX (Tex) in Instrument Sans (the \\sfdefault family).
 
     (Route A, 2026-06-24: was Pango Text -- manim Text does not kern, LaTeX does.)
     Handles pure text only; the prose() router sends any inline-$math$ line through the
@@ -379,7 +389,7 @@ def _prose_lines(text: str, ground: str, role: str, size: str,
     """Prose with inline ``$math$`` and/or explicit ``\\\\`` breaks, set as LaTeX.
 
     Each output line is ONE ``Tex`` in text mode: LaTeX lays text + inline math on the
-    same line with native baselines and kerning (Plex Sans text, Latin Modern math), so
+    same line with native baselines and kerning (Instrument Sans text, Latin Modern math), so
     the old Pango/Tex baseline compositing (_compose) is gone. Author ``\\\\`` breaks
     split first, then each segment word-wraps to *max_width*; lines are LEFT-stacked.
     """
@@ -407,10 +417,10 @@ def prose(text: str, ground: str, *, role: str = "text", size: str = "body",
           max_width: float | None = None, align: str = "LEFT", seg_roles=None):
     """Render an author prose field, routing by content so markup never garbles.
 
-    The ONE place that decides how prose is set. Route A: all text is LaTeX (Plex Sans),
+    The ONE place that decides how prose is set. Route A: all text is LaTeX (Instrument Sans),
     math is Latin Modern -- on the same line.
     - Single ``$...$`` wrapping pure math -> ``math_line`` (display mode, Latin Modern).
-    - Markup-free text -> ``body_text`` (Plex Sans Tex, wraps at *max_width*).
+    - Markup-free text -> ``body_text`` (Instrument Sans Tex, wraps at *max_width*).
     - Text with inline ``$math$`` and/or an explicit ``\\\\`` break -> ``_prose_lines``
       (one Tex per wrapped line; text + inline math sit native on each line).
 
@@ -445,8 +455,8 @@ def heading_rich(text: str, ground: str, *, role: str = "primary", size: str = "
                  max_width: float | None = None):
     """A display heading that may carry inline ``$math$``.
 
-    Plain titles go through ``heading`` (Plex Sans Bold). A title WITH ``$...$`` is set
-    as ONE ``Tex``: the words become ``\\textbf{}`` (Plex Bold), the ``$...$`` spans stay
+    Plain titles go through ``heading`` (Instrument Sans Bold). A title WITH ``$...$`` is set
+    as ONE ``Tex``: the words become ``\\textbf{}`` (Instrument Sans Bold), the ``$...$`` spans stay
     math (Latin Modern). LaTeX lays text + math on one line with native baselines, so the
     old Pango/Tex compositing (_compose) is gone. *max_width* clamps a long title to fit
     (the standalone-display-line "shrink, don't wrap" exception).
@@ -778,7 +788,7 @@ def hero_curve(ground: str, *, role: str = "secondary", width: float = 6.0) -> V
 
 
 def ghost_numeral(text: str, ground: str, *, opacity: float = 0.05) -> Tex:
-    """A huge faint numeral behind divider content (5% opacity ink-1), Plex Bold via Tex."""
+    """A huge faint numeral behind divider content (5% opacity ink-1), Instrument Sans Bold via Tex."""
     mob = Tex(r"\textbf{" + _tex_text(str(text)) + "}", font_size=_text_fs("ghost_numeral"),
               color=T.color(ground, "ink_1"))
     mob.set_opacity(opacity)

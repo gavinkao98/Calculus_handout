@@ -4,8 +4,9 @@ manim/yaml are not in .venv; they live under .deps_voiceover (manim 0.20.1) and
 .deps (PyYAML). Call bootstrap() before importing manim or yaml.
 
 Type (Route A, 2026-06-24): all on-screen text AND math render through LaTeX
-(pdflatex). Text = IBM Plex Sans (body/headings) + IBM Plex Mono (eyebrows/labels);
-math = Latin Modern (`lmodern`). The fonts are set in the TeX preamble
+(pdflatex). Text = Instrument Sans (body/headings, vendored -- see pipeline/fonts/ and
+ENVIRONMENT.md (1)b; was IBM Plex Sans until 2026-09-13) + IBM Plex Mono (eyebrows/
+labels); math = Latin Modern (`lmodern`). The fonts are set in the TeX preamble
 (apply_tex_template); nothing is registered with Pango, because manim Text (Pango)
 no longer carries the type -- Pango does not apply kerning ("AVAVAV" came out as the
 sum of the glyph advances), LaTeX does. Exact `newcomputermodern` needs lualatex/
@@ -43,12 +44,15 @@ def section_output_dir(meta: dict) -> Path:
 
 
 def apply_tex_template() -> None:
-    """(Re)assign the global manim TeX template — Plex Sans/Mono text + Latin Modern math.
+    """(Re)assign the global manim TeX template — Instrument Sans text + Latin Modern math.
 
     Route A (2026-06-24): on-screen TEXT moves off Pango onto LaTeX so it gets real
     kerning (manim Text/Pango does not kern -- "AVAVAV" rendered as the sum of the
-    glyph advances). Text is IBM Plex Sans (`plex-sans`, made the default family via
-    \\sfdefault) with IBM Plex Mono (`plex-mono`) for eyebrows/labels; math stays on
+    glyph advances). Text is Instrument Sans (`InstrumentSans`, made the default family via
+    \\sfdefault; no CTAN package exists for it, so the .sty and the tfm/vf/pfb/enc/map behind
+    it are autoinst output vendored under pipeline/fonts/instrument-sans/ and registered with
+    the local MiKTeX by tools/setup.ps1 -- ENVIRONMENT.md (1)b) with IBM Plex Mono
+    (`plex-mono`) for eyebrows/labels; math stays on
     Latin Modern (`lmodern`) -- pdflatex-compatible (exact `newcomputermodern` needs
     lualatex/xelatex, which breaks manim's `\\special{dvisvgm:raw}` math sub-part
     addressing). microtype adds kerning/protrusion. The three inverse-trig operators
@@ -72,9 +76,9 @@ def apply_tex_template() -> None:
     tpl = TexTemplate()
     tpl.add_to_preamble(
         r"\usepackage{lmodern}" "\n"          # math = Latin Modern (locked)
-        r"\usepackage{plex-sans}" "\n"        # text = IBM Plex Sans
+        r"\usepackage{InstrumentSans}" "\n"   # text = Instrument Sans (vendored, see fonts/)
         r"\usepackage{plex-mono}" "\n"        # mono (eyebrow) = IBM Plex Mono
-        r"\renewcommand{\familydefault}{\sfdefault}" "\n"   # body default -> Plex Sans
+        r"\renewcommand{\familydefault}{\sfdefault}" "\n"   # body default -> Instrument Sans
         r"\usepackage{microtype}" "\n"        # kerning / protrusion
         r"\everymath{\displaystyle}" "\n"     # all inline $..$ render display-style;
         #                                       \tfrac still overrides to text-style

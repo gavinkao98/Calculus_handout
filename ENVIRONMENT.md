@@ -99,25 +99,30 @@ python -m pip install --upgrade whisper-timestamped stable-ts
 
 ### ③ LaTeX — MiKTeX，沒有 code 繞法
 - manim 的每個 `Tex`／`MathTex` 都要走真 TeX：`latex → .dvi → dvisvgm → svg`。
-- `pipeline/_bootstrap.apply_tex_template()` 設的全域 TeX template 用 **`plex-sans` + `plex-mono`**（文字，`familydefault=\sfdefault`）
-  **+ `lmodern`**（數學）**+ `microtype`**（kerning），外加 `\DeclareMathOperator` 三個反三角 operator（Route A，2026-06-24：
-  所有螢幕文字＋數學都走 LaTeX 以拿到 kerning）。MiKTeX 首次編譯會自動補裝這些套件。**硬約束：只能 pdflatex**——
+- `pipeline/_bootstrap.apply_tex_template()` 設的全域 TeX template 用 **`InstrumentSans`**（文字，vendored，見 ①b）
+  **+ `plex-mono`**（eyebrow/label mono）**+ `lmodern`**（數學）**+ `microtype`**（kerning）＋`familydefault=\sfdefault`，
+  外加 `\DeclareMathOperator` 三個反三角 operator（Route A，2026-06-24：所有螢幕文字＋數學都走 LaTeX 以拿到 kerning；
+  文字家族 2026-09-13 由 `plex-sans` 換成 Instrument Sans）。`plex-mono`／`lm`／`microtype` 是 MiKTeX 套件，首次編譯會自動
+  補裝；**`InstrumentSans` 不是**——它沒有 CTAN 套件，靠 repo vendored（①b）。**硬約束：只能 pdflatex**——
   lualatex/xelatex 會破壞 manim 的 `\special{dvisvgm:raw}` 數學子部件定址，故排除需 fontspec 的 `newcomputermodern`。
   （`newtx` 已不再是 video 需求，但仍是 `legacy/tex_handout/` 的需求。）
 - handout 的 HTML 講義**不需要** LaTeX（數學走 MathJax/KaTeX CDN）；`video/` render 需要 pdflatex 路徑，
   出版排版線（`handout/latex/`）另需 lualatex 路徑（見 ③b）——同一套 MiKTeX、兩條互不干擾。
-- **踩坑（2026-06-25）：Plex 文字 render 成空白／場景一開頭 `IndexError` 崩。** 症狀：含文字的場景 render 崩在
-  `IndexError: too many indices for array`（標題 Tex 沒有任何點），或 latex 印 `'miktex-makemf.exe…plxSans-…mf'
-  is not recognized`。**不是缺套件**——`kpsewhich plex-sans.sty` 找得到——而是這台 MiKTeX 的**字型檔名庫（FNDB）
-  stale**：latex 找不到已裝的 Plex `.tfm`，就 fallback 去壞掉的 `makemf`，glyph 描成空白。修法：
+- **踩坑（2026-06-25）：文字 render 成空白／場景一開頭 `IndexError` 崩。** 症狀：含文字的場景 render 崩在
+  `IndexError: too many indices for array`（標題 Tex 沒有任何點），或 latex／dvisvgm 印
+  `'miktex-makemf.exe…mf' is not recognized`、`no font file found for '…'`。**不是缺套件**——`kpsewhich`
+  查得到 `.sty`——而是字型查找鏈斷了。**兩個入口，症狀一樣：**
+  ① 這台 MiKTeX 的**字型檔名庫（FNDB）stale**：latex 找不到已裝的 `.tfm`，fallback 去壞掉的 `makemf`。修法：
   ```powershell
-  initexmf --update-fndb     # 刷新檔名資料庫，latex 才找得到已裝的 Plex .tfm
-  initexmf --mkmaps          # 重建字型 map（dvisvgm 描 Type1 外框要它）
+  initexmf --update-fndb     # 刷新檔名資料庫，latex 才找得到已裝的 .tfm
+  miktex fontmaps configure  # 重建字型 map（dvisvgm 描 Type1 外框要它）
   ```
-  修完**還要刪 manim 的 Tex 快取** `media/Tex/`——壞掉時期那批空白 svg 會被 manim 依 hash 沿用，不清就還是空。
-  `doctor.py` 的「Plex Tex 實編非空」檢查（`check_tex_compiles`）會實 build 一個 Plex Tex 抓這個坑（kpsewhich 查
-  `.sty` 在 ≠ 編得出字）。另：MiKTeX 一直印「you have not checked for updates as a MiKTeX user」是同源警告，
-  開一次 MiKTeX Console → Check for updates 可消。
+  ② **vendored Instrument Sans 的 map 沒併進 `ps2pk.map`**（換機／搬 repo 後沒跑 `tools/setup.ps1`）：latex 編得過、
+  dvisvgm 描不出外框。修法＝跑 `tools/setup.ps1`（見 ①b）。
+  兩者修完**還要刪 manim 的 Tex 快取** `media/Tex/`——壞掉時期那批空白 svg 會被 manim 依 hash 沿用，不清就還是空。
+  `doctor.py` 的「文字 Tex 實編非空」檢查（`check_tex_compiles`）會實 build 一個 Tex 抓這個坑（kpsewhich 查
+  `.sty` 在 ≠ 編得出字），`check_vendored_text_font` 則分別點名 ①b 的三個前提。另：MiKTeX 一直印
+  「you have not checked for updates as a MiKTeX user」是同源警告，開一次 MiKTeX Console → Check for updates 可消。
 
 ### ③b handout LaTeX 出版排版線 — lualatex + memoir + NCM + vendored Inter
 - **這條線是講義的出版排版（`handout/latex/`，[`handout/latex/KICKOFF-latex-pilot.md`](handout/latex/KICKOFF-latex-pilot.md)）**：
@@ -139,13 +144,42 @@ python -m pip install --upgrade whisper-timestamped stable-ts
 - `doctor.py` 的 `check_handout_latex`（區名 `handout-tex`）驗上述全部：lualatex／latexmk／pdftotext 在 PATH、
   `kpsewhich NewCM10-Regular.otf` 可尋、vendored Inter 六檔在。
 
-### ①b 影片字型 — 全走 LaTeX（Plex Sans/Mono 文字 + Latin Modern 數學）
-- Route A（2026-06-24）後，影片**所有螢幕文字＋數學都走 LaTeX/pdflatex**：文字 **IBM Plex Sans**（標題/內文）+ **IBM Plex Mono**
-  （eyebrow/標籤），數學 **Latin Modern**。字體在 ③ 的 preamble 設定，**不再經 Pango、不用任何系統字型**（舊的 Times New Roman／
-  Courier New 已棄）。根因：manim `Text`（Pango）不套 kerning，LaTeX 會。
-- `doctor.py` 的 `check_fonts` 改以 **kpsewhich 驗 `plex-sans.sty`／`plex-mono.sty`／`lmodern.sty`／`microtype.sty`** 存在（缺了含
-  文字／數學的場景會編譯失敗或 fallback）。
-- **影片不 vendored 任何字型。** Direction D 的 vendored 設計字型早於 2026-06-20 清理移除；`fonttools` 仍是依賴（logo 外框工具
+### ①b 影片字型 — 全走 LaTeX（vendored Instrument Sans 文字 + Plex Mono + Latin Modern 數學）
+- Route A（2026-06-24）後，影片**所有螢幕文字＋數學都走 LaTeX/pdflatex**：文字 **Instrument Sans**（標題/內文；2026-09-13
+  由 IBM Plex Sans 換過來）+ **IBM Plex Mono**（eyebrow/標籤），數學 **Latin Modern**。字體在 ③ 的 preamble 設定，
+  **不再經 Pango、不用任何系統字型**（舊的 Times New Roman／Courier New 已棄）。根因：manim `Text`（Pango）不套 kerning，LaTeX 會。
+- **Instrument Sans 沒有 CTAN 的 pdflatex 套件**（2023 年的 Google Font／OFL，只有 OTF/TTF；`kpsewhich instrument-sans.sty` 查無），
+  所以走 **vendoring**：字體檔與 pdflatex 字型支援都在 `video/pipeline/fonts/instrument-sans/`，隨 repo 走。
+  - `otf/`＝三個靜態字重 OTF（Regular／SemiBold／Bold）＋ `OFL.txt`。來源＝GitHub `Instrument/instrument-sans`
+    commit `7fa22308a3d0c94ee2b3cd537a1196b65db34a3e`（`fonts/otf/`），sha256：
+    Regular `33c8c755…a372fa`／SemiBold `2846d624…30d085fe`／Bold `6746ca64…f58c4a25`／`OFL.txt` `9e27a72e…134ef966`。
+    **Medium（500）沒收**：`autoinst` 的 NFSS 權重表沒有對應碼（`-nfssweight=mb=medium` 不被接受），
+    裝不進來；現役 code 也只用到 upright regular（`\mdseries`）與 bold（`\textbf`）。
+  - `texmf/`＝`autoinst`（MiKTeX 自帶的 lcdf-typetools）生成的 pdflatex 支援：`.sty`／`.fd`／`.tfm`／`.vf`／`.pfb`／`.enc`／`.map`
+    ＋一份 `miktex/config/updmap.cfg`。**重生指令**（在 `video/pipeline/fonts/instrument-sans/` 下跑）：
+    ```bash
+    /c/Strawberry/perl/bin/perl "$LOCALAPPDATA/Programs/MiKTeX/scripts/fontools/autoinst" \
+      -target=texmf -vendor=instrument -typeface=instrumentsans -sanserif -encoding=OT1,T1 \
+      -nosmallcaps -noswash -notitling -nosuperiors -noinferiors -noornaments -nofractions \
+      -nooldstyle -notabular otf/InstrumentSans-{Regular,SemiBold,Bold}.otf
+    ```
+    ⚠ `autoinst` 是 perl 腳本，Git Bash 內附的 msys perl **缺 `Pod::Usage` 跑不起來**，一定要用 Strawberry Perl
+    （`C:\Strawberry\perl\bin\perl`）呼叫 `%LOCALAPPDATA%\Programs\MiKTeX\scripts\fontools\autoinst`。
+    生成物只涵蓋 upright（無 italic／small caps）——現役 code grep 過只用 `\textbf`／`\texttt`／預設 upright。
+- **換機／搬 repo 後要跑 `tools/setup.ps1`**（冪等）：它做兩步 MiKTeX **使用者層級**設定——
+  ```powershell
+  initexmf --register-root=<repo>\video\pipeline\fonts\instrument-sans\texmf
+  miktex fontmaps configure      # 把 vendored updmap.cfg 的 Map 行併進 ps2pk.map／psfonts.map
+  ```
+  **為什麼非做不可（2026-09-13 實測）：** 純環境變數路線（`TEXINPUTS`／`TFMFONTS`／`VFFONTS`／`T1FONTS`／`ENCFONTS`／
+  `TEXFONTMAPS`）能讓 `latex` 編過，但 **`dvisvgm` 只讀它預設找到的第一個 map 檔**（本機＝`ps2pk.map`），且
+  manim 呼叫它時不帶 `--font-map`（`--no-fonts --verbosity=0`，錯誤還被靜音）——把 vendored map 命名成 `ps2pk.map`
+  搶第一順位則換成 `lmodern`／`plex-mono` 描不出來。所以 map 一定要併進本機生成的 `ps2pk.map`。
+  註冊的是**任一份** vendored `texmf`（各 worktree 的內容相同），所以主 checkout 註冊一次，全部 worktree 都能 render。
+- `doctor.py` 驗四層：`check_fonts` 以 kpsewhich 驗 `plex-mono.sty`／`lmodern.sty`／`microtype.sty`；
+  `check_vendored_text_font` 驗 ① vendored 關鍵檔在 ② `kpsewhich InstrumentSans.sty` 指到 repo 內（root 已註冊）
+  ③ `ps2pk.map` 真的含 `InstrumentSans` 行；`check_tex_compiles` 再實 build 一個 Tex 確認非空。
+- **影片只 vendored 這一套字型。** Direction D 的 vendored 設計字型早於 2026-06-20 清理移除；`fonttools` 仍是依賴（logo 外框工具
   `pipeline/assets/_outline_text.py` 用）。
 
 ### ④ Node + Chrome — 給 handout 圖 render 與 `video/experiments/reference_frames/` 抓 YouTube 幀用
