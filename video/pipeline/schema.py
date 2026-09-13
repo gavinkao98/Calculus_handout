@@ -308,6 +308,58 @@ def _derivation_issues(sid: str, scene: dict) -> "list[tuple[str, str]]":
     return issues
 
 
+def _seg_roles_issues(sid: str, scene: dict) -> "list[tuple[str, str]]":
+    """derivation rows' `seg_roles: {segment tex: palette role}` (kickoff rollout T2-1): a
+    whole `{{...}}` segment in one role colour. Each key must be one of the row's segments
+    (the tex inside `{{...}}`, stripped) and each role a palette key -- a miss is silent at
+    render (brand skips a row without segments or a key that matches nothing; theme.color
+    falls back to primary on an unknown role), so it is said here. Errors: each is always a
+    mistake. steps[i] / result / check / lines[] dict rows; theorem_proof's dict rows are
+    wired once T1-3 lands."""
+    if scene.get("template") != "derivation":
+        return []
+    from pipeline import texparts
+    from pipeline.visuals import theme
+    rows: list[tuple[str, dict]] = []
+    if scene.get("steps") is not None or scene.get("result") is not None:
+        for j, st in enumerate(scene.get("steps") or []):
+            if isinstance(st, dict):
+                rows.append((f"{sid}.steps[{j}]", st))
+        for key in ("result", "check"):
+            if isinstance(scene.get(key), dict):
+                rows.append((f"{sid}.{key}", scene[key]))
+    else:
+        for j, ln in enumerate(scene.get("lines") or []):
+            if isinstance(ln, dict):
+                rows.append((f"{sid}.lines[{j}]", {**ln, "math": ln.get("tex", "")}))
+    roles = theme.palette("dark")
+    issues: list[tuple[str, str]] = []
+    for where, row in rows:
+        if "seg_roles" not in row:
+            continue
+        seg_roles = row["seg_roles"]
+        if not isinstance(seg_roles, dict):
+            issues.append(("error", f"{where}.seg_roles: must be a mapping "
+                                    f"{{segment tex: palette role}}"))
+            continue
+        math = str(row.get("math", ""))
+        if not texparts.has_segments(math):
+            issues.append(("error", f"{where}.seg_roles: the row has no {{{{...}}}} segments "
+                                    f"to colour"))
+            continue
+        segs = texparts.split_segments(math)
+        for key, role in seg_roles.items():
+            if str(key).strip() not in segs:
+                issues.append(("error", f"{where}.seg_roles[{key!r}]: matches no segment of "
+                                        f"the row (segments: {segs})"))
+            if not isinstance(role, str) or role not in roles:
+                issues.append(("error", f"{where}.seg_roles[{key!r}]: {role!r} is not a palette "
+                                        f"role (theme.color would silently fall back to "
+                                        f"primary); use a key of theme.DARK, e.g. secondary / "
+                                        f"accent / success"))
+    return issues
+
+
 def schema_storyboard(data) -> "list[tuple[str, str]]":
     """Return a list of (severity, message); severity is 'error' or 'warn'.
     'error' aborts the render (broken / unparseable structure); 'warn' is advisory."""
@@ -378,6 +430,7 @@ def schema_storyboard(data) -> "list[tuple[str, str]]":
             issues += _carry_issues(sid, scene, scene.get("say"), scenes, i)
             issues += _exit_issues(sid, scene)
             issues += _derivation_issues(sid, scene)
+            issues += _seg_roles_issues(sid, scene)
         elif "pauses" in scene:
             issues.append(("error", f"{sid}: 'pauses' is a content-scene field "
                                     f"(this scene is kind={kind!r})"))

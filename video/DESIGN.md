@@ -927,6 +927,24 @@ rendered in one colour`（每個 src 一次，不炸 render）；寫 `\frac{h}{2
 （如 `=`）也各自一段、純空白不算段。`brand.math_line` 建 `MathTex(*segments)` 並在 mobject 上留
 `_ml_parts=True`；分段＋色表同時存在時色片巢在段內，頂層仍是作者段（`paced:` 走的是段）。幾何逐 byte 不變。
 
+**`seg_roles`（列級）——`{{…}}` 段整段上語意色（規則 5 MUST「同量同色」；rollout T2-1）。** 例（06→07 的
+三塊面積對不等式鏈三項）：
+
+```yaml
+result:
+  math: "{{\\tfrac12\\sin\\theta}} \\;\\le\\; {{\\tfrac12\\theta}} \\;\\le\\; {{\\tfrac12\\tan\\theta}}"
+  seg_roles: { "\\tfrac12\\sin\\theta": secondary, "\\tfrac12\\theta": accent, "\\tfrac12\\tan\\theta": success }
+```
+
+key＝該段 `{{…}}` 內的 tex **原樣去頭尾空白**（是整段、不是 token），value＝palette role（值域同 `meta.color_map`）。
+`brand.math_line(..., seg_roles=)` → `_math_tex`：建好後對每個頂層段（`texparts.split_segments` 的順序）比對 key，
+命中就整段 `set_color`；**段色蓋過段內色表 token**（作者明寫的段是語意單位——同段裡的 `\theta` 不再另色，
+整段一色才讀得出「這一項＝那一塊」）；沒命中的段照舊（列底色＋token 色表）。derivation 的 `steps[i]`／`result`／
+`check`／`lines[]` 都收（`_rows_from_spec` 複製、`_eq_mob` 傳下去）；theorem_proof 的 `proof[]` dict 列待 T1-3
+合併後接。混排句（`Tex` 路徑）不吃。幾何逐 byte 不變（`_selftest_tex_parts` 釘 parity）。
+`schema._seg_roles_issues`（error，三條）：列沒有 `{{}}` 卻寫 `seg_roles`；key 沒對到任何段；role 不是 palette
+role。首用＝06 hook 的 `ineq`（藍／琥珀／綠對三塊區域）。
+
 **`anim: transform` 升級為對位。** 上一列與本列**都**分段時改用 `TransformMatchingTex(ghost, this_eq,
 transform_mismatches=True)`（key＝各段 tex：同名段原位 morph、其餘段兩兩變形），否則沿用
 `TransformMatchingShapes`。run_time 仍 `STOCK_ANIM_SECONDS["transform"]`。

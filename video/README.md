@@ -145,6 +145,9 @@ kickoff [KICKOFF-motion-language-gaps.md](KICKOFF-motion-language-gaps.md)）：
 - **`carry:`／`exit:`**（場級）——上一場的 block 這一場開場就在（keep 或飛去角落），場界改硬切；
   `exit` 在場尾把不帶走的東西淡出（規則 1）。
 
+五輪（rollout，[KICKOFF-motion-language-rollout.md](KICKOFF-motion-language-rollout.md) T2）：**`seg_roles`**
+（`derivation` 列）——`{{…}}` 段整段上 palette role，段色蓋過段內 token 色表，讓式子的一項與圖上一塊同色（規則 5）。
+
 目前生效的設計決策：
 
 - intro/outro 使用淺色紙張底；教學場景使用暗色藍圖底。

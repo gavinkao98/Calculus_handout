@@ -41,6 +41,8 @@ instead of glyph to glyph -- only the changed segment morphs, its neighbours sli
 `anim: cancel` + `cancel: [i, j]` (indexes into the PREVIOUS row's segments) fades those
 segments first, then morphs the survivors: the two-stage elimination. `frame: true` on a
 transform / cancel row boxes the previous row's equation for 0.4 s before it moves.
+`seg_roles: {segment tex: palette role}` on a segmented row colours whole segments (over the
+deck's token colour table) -- a term in the colour of the figure region it measures.
 """
 from __future__ import annotations
 
@@ -77,31 +79,34 @@ def _rows_from_spec(spec: dict[str, Any]) -> list[dict]:
             rows.append({"math": str(st.get("math", "")), "reason": st.get("reason"),
                          "kind": "step", "rid": f"step.{i}", "anim": st.get("anim") or "write",
                          "mark": st.get("mark"), "color_role": st.get("color_role"),
-                         "cancel": st.get("cancel"), "frame": st.get("frame")})
+                         "cancel": st.get("cancel"), "frame": st.get("frame"),
+                         "seg_roles": st.get("seg_roles")})
         if spec.get("result") is not None:
             r = spec["result"]
             r = r if isinstance(r, dict) else {"math": r}
             rows.append({"math": str(r.get("math", "")), "reason": r.get("reason"),
                          "kind": "result", "rid": "result", "anim": r.get("anim") or "write_glow",
                          "color_role": r.get("color_role"),
-                         "cancel": r.get("cancel"), "frame": r.get("frame")})
+                         "cancel": r.get("cancel"), "frame": r.get("frame"),
+                         "seg_roles": r.get("seg_roles")})
         if spec.get("check") is not None:
             c = spec["check"]
             c = c if isinstance(c, dict) else {"math": c}
             rows.append({"math": str(c.get("math", "")), "reason": c.get("reason"),
-                         "kind": "check", "rid": "check", "anim": "write"})
+                         "kind": "check", "rid": "check", "anim": "write",
+                         "seg_roles": c.get("seg_roles")})
     else:  # back-compat `lines`
         for i, entry in enumerate(spec.get("lines", [])):
             if isinstance(entry, dict):
                 tex, anim, reason = entry.get("tex", ""), entry.get("anim", "write"), entry.get("reason")
-                cancel, frame = entry.get("cancel"), entry.get("frame")
+                cancel, frame, seg_roles = entry.get("cancel"), entry.get("frame"), entry.get("seg_roles")
             else:
                 tex, anim, reason = entry, "write", None
-                cancel = frame = None
+                cancel = frame = seg_roles = None
             kind = "result" if anim == "highlight" else "step"
             rows.append({"math": str(tex), "reason": reason, "kind": kind,
                          "rid": f"line.{i}", "anim": "write_glow" if kind == "result" else anim,
-                         "cancel": cancel, "frame": frame})
+                         "cancel": cancel, "frame": frame, "seg_roles": seg_roles})
     return rows
 
 
@@ -117,17 +122,20 @@ def _eq_mob(row: dict, ground: str, *, role: str):
     藍/橘/綠標好了，到不等式鏈全變回白字."
 
     Both equations go through brand.math_line (same MathTex, same size), so the deck's
-    meta.color_map and the row's `{{...}}` segments apply here.
+    meta.color_map, the row's `{{...}}` segments and its `seg_roles` apply here.
     """
     override = row.get("color_role")
+    seg_roles = row.get("seg_roles")
     if row["kind"] == "result":
         role = str(override) if override else role
-        eq = brand.math_line(row["math"].strip(), ground, role=role, size=54)
+        eq = brand.math_line(row["math"].strip(), ground, role=role, size=54,
+                             seg_roles=seg_roles)
         # crisper halo (was 3.0/0.45): Codex read the heavy amber glow as fuzzy/embossed.
         return brand.text_glow(eq, ground, role=role, width=2.2, opacity=0.38)
     # a check row is a PASS, not a struck-out aside: render it as bright as the steps
     # (was role="muted"/ink_3, which read as disabled/greyed-out -- 2026-06-21 A2 finding).
-    eq = brand.math_line(row["math"].strip(), ground, role=str(override) if override else "primary")
+    eq = brand.math_line(row["math"].strip(), ground, role=str(override) if override else "primary",
+                         seg_roles=seg_roles)
     # a trailing verdict glyph: check rows + steps marked ok -> green check; bad -> red cross.
     # The ok check is the verdict marker, so it reads at full math size with a soft green
     # glow (was scale 0.8, too small to register as the "it works" payoff).

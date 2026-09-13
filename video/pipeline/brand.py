@@ -491,11 +491,17 @@ def mapped_role(text: str) -> "str | None":
     return None
 
 
-def _math_tex(src: str, ground: str, col: str, fsz: float):
+def _math_tex(src: str, ground: str, col: str, fsz: float, seg_roles=None):
     """MathTex for one math line, cut where the motion language needs it: the author's
     ``{{...}}`` segments become one submobject each (derivation's transform / cancel key on
     them), and inside a segment every colour-mapped token becomes a part in its role colour.
     Neither present -> plain ``MathTex(src)``, exactly as before.
+
+    *seg_roles* (``{segment tex: palette role}``; kickoff rollout T2-1) colours whole
+    segments: after the build, every top-level segment whose stripped tex is a key is
+    ``set_color``-ed to that role -- OVER any colour-mapped token inside it, because a segment
+    the author named is one semantic unit (06's three areas -> the three terms of the
+    inequality; SPEC rule 5 "same quantity, same colour"). Colour only; geometry untouched.
 
     Parts, not manim's ``tex_to_color_map``: that matches raw substrings, so a key ``h`` cuts
     ``\\theta`` / ``\\right`` in half and LaTeX fails. Tokens are matched whole in texparts and
@@ -508,7 +514,9 @@ def _math_tex(src: str, ground: str, col: str, fsz: float):
     pieces = [(i, piece, key) for i, seg in enumerate(segments)
               for piece, key in texparts.split_tokens(seg, keys)]
     if len(segments) == 1 and all(key is None for _, _, key in pieces):
-        return MathTex(src, color=col, font_size=fsz)
+        mob = MathTex(src, color=col, font_size=fsz)
+        _tint_segments(mob, src, segments, ground, seg_roles)
+        return mob
     try:
         mob = MathTex(*[piece for _, piece, _ in pieces], color=col, font_size=fsz)
         if len(mob.submobjects) != len(pieces):
@@ -521,6 +529,7 @@ def _math_tex(src: str, ground: str, col: str, fsz: float):
         mob = MathTex(src, color=col, font_size=fsz)
         if len(segments) > 1 and len(mob.submobjects) == len(segments):
             mob._ml_parts = True
+        _tint_segments(mob, src, segments, ground, seg_roles)
         return mob
     for part, (_, _, key) in zip(mob.submobjects, pieces):
         if key is not None:
@@ -537,10 +546,26 @@ def _math_tex(src: str, ground: str, col: str, fsz: float):
         mob.submobjects = groups
     if len(segments) > 1:
         mob._ml_parts = True
+    _tint_segments(mob, src, segments, ground, seg_roles)
     return mob
 
 
-def math_line(tex: str, ground: str, *, role: str = "math", size: str = "math"):
+def _tint_segments(mob, src: str, segments: "list[str]", ground: str, seg_roles) -> None:
+    """`seg_roles` on a built line: one top-level part per segment (texparts.split_segments
+    order), so zip them and recolour the hits. set_color walks the part's family, which is
+    what puts the segment's colour over a nested colour-table token. Only a line the author
+    cut with ``{{...}}`` qualifies (schema says so too); a line whose split LaTeX refused
+    (one part for several segments) is left alone."""
+    if not seg_roles or not texparts.has_segments(src) or len(mob.submobjects) != len(segments):
+        return
+    roles = {str(k).strip(): str(v) for k, v in seg_roles.items()}
+    for part, seg in zip(mob.submobjects, segments):
+        if seg in roles:
+            part.set_color(T.color(ground, roles[seg]))
+
+
+def math_line(tex: str, ground: str, *, role: str = "math", size: str = "math",
+              seg_roles=None):
     """A math (or math+text) line, recoloured. newtx (Times) serif.
 
     Three forms are accepted, auto-detected:
@@ -552,18 +577,19 @@ def math_line(tex: str, ground: str, *, role: str = "math", size: str = "math"):
       -> Tex (text mode).  Passing this to MathTex would nest math mode inside
       align* and crash ("Missing }"), which is the bug this guards against.
 
-    The two MathTex forms honour ``{{...}}`` segments and the deck's colour table (see
-    _math_tex); the Tex form does not -- a cut inside a ``$...$`` span leaves the delimiters
-    unbalanced, so a sentence with inline math stays one colour.
+    The two MathTex forms honour ``{{...}}`` segments, the deck's colour table and
+    *seg_roles* (whole-segment colours; see _math_tex); the Tex form does not -- a cut inside
+    a ``$...$`` span leaves the delimiters unbalanced, so a sentence with inline math stays
+    one colour.
     """
     col = T.color(ground, role)
     fsz = T.fs(size)
     stripped = tex.strip()
     if stripped.startswith("$") and stripped.endswith("$") and stripped.count("$") == 2:
-        return _math_tex(stripped[1:-1], ground, col, fsz)
+        return _math_tex(stripped[1:-1], ground, col, fsz, seg_roles)
     if "$" in tex:
         return Tex(tex, color=col, font_size=fsz)
-    return _math_tex(tex, ground, col, fsz)
+    return _math_tex(tex, ground, col, fsz, seg_roles)
 
 
 # -- math card ------------------------------------------------------------
