@@ -30,8 +30,8 @@ deck 閘失敗也算 `[FAIL]`——工具鏈綠不等於產線綠（2026-08-10 �
 |---|---|---|
 | **① Python 套件** | 共用 `.venv`（manim 0.20.1、PyYAML、ManimPango、Pillow、imageio-ffmpeg、fonttools、pymupdf…） | `setup.ps1` 從 [`requirements.lock`](requirements.lock) 精確重現 |
 | **② 系統 binary** | `ffmpeg`、`ffprobe` | 每台 `winget install --id Gyan.FFmpeg -e`（**含 ffprobe**） |
-| **③ LaTeX** | MiKTeX：`latex`、`dvisvgm` + `plex-sans`/`plex-mono`/`lmodern`/`microtype`（Route A：video 文字＋數學皆走 LaTeX；MiKTeX 首編自動補裝） | 每台裝 MiKTeX（manim 的 Tex/MathTex 沒有它就編不出來；無 code 繞法） |
-| **①b 影片字型** | **全走 LaTeX**：文字 IBM Plex Sans/Mono、數學 Latin Modern（套件見 ③）。**不再用 Pango 系統字型**（Times/Courier 已棄） | 無需安裝系統字型；只要 ③ 的 MiKTeX 套件在即可（`doctor.py` 以 kpsewhich 驗）。video 不 vendored 任何字型 |
+| **③ LaTeX** | MiKTeX：`latex`、`dvisvgm` + `plex-mono`/`lmodern`/`microtype`（Route A：video 文字＋數學皆走 LaTeX；MiKTeX 首編自動補裝）＋ **repo vendored 的 `InstrumentSans`**（無 CTAN 套件，不會自動補裝，見 ①b） | 每台裝 MiKTeX（manim 的 Tex/MathTex 沒有它就編不出來；無 code 繞法）；**再跑一次 `tools\setup.ps1`** 把 vendored 字型註冊進 MiKTeX |
+| **①b 影片字型** | **全走 LaTeX**：文字 **Instrument Sans**（2026-09-13 由 IBM Plex Sans 換過來）、eyebrow IBM Plex Mono、數學 Latin Modern（後兩者的套件見 ③）。**不再用 Pango 系統字型**（Times/Courier 已棄） | 無需安裝系統字型。**Instrument Sans 是 repo vendored**（`video/pipeline/fonts/instrument-sans/`），換機／搬 repo 後要跑 `tools\setup.ps1` 做 MiKTeX 使用者層級註冊；`plex-mono`／`lmodern`／`microtype` 由 ③ 的 MiKTeX 供應。四層檢查都在 `doctor.py`，見下方 ①b |
 | **④ Node + 瀏覽器** | Node ≥21、Google Chrome（給 `handout/figkit/shot.mjs` 截圖、`video/experiments/reference_frames/yt_frames.mjs` 抓 YouTube 幀） | 每台裝 Node LTS + Chrome |
 | **⑤ codex（審核工具，選用）** | Mode B 講義審核／video gate2 用的 `codex` CLI | 部署版控的 [`tools/codex.cmd`](tools/codex.cmd) shim（解 PATH＋stale-launcher 兩坑）；見下方 ⑤ |
 | **⑤c agy（Antigravity CLI，多模型唯讀評審，選用）** | 看片多鏡評審等要拉開模型家族（Gemini／Claude 4.6）的唯讀評審；走 Antigravity 訂閱 | 本體隨 Antigravity IDE 裝在 `%LOCALAPPDATA%\agy\bin\`（安裝程式通常已加進使用者 PATH）；找不到時部署版控 shim [`tools/agy.cmd`](tools/agy.cmd)；見下方 ⑤c |
@@ -63,8 +63,9 @@ winget install --id errata-ai.Vale -e
 python -m pip install --upgrade whisper-timestamped stable-ts
 
 # LaTeX：裝 MiKTeX（https://miktex.org）。latex/dvisvgm 會進 PATH；
-# video 文字＋數學皆走 LaTeX，需 plex(plex-sans/plex-mono)/lmodern/microtype 套件
-# （MiKTeX 首次編譯自動補裝；只能 pdflatex）。
+# video 文字＋數學皆走 LaTeX，需 plex-mono/lmodern/microtype 套件
+# （MiKTeX 首次編譯自動補裝；只能 pdflatex）。文字字體 Instrument Sans 是 repo
+# vendored、不會自動補裝——裝完 MiKTeX 要跑 tools\setup.ps1 註冊（見 ①b）。
 ```
 
 裝完跑 `tools\setup.ps1` 補 Python 端，再 `python tools\doctor.py` 應全綠。

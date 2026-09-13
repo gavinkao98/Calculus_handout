@@ -117,4 +117,38 @@ selftest 全綠、基線比對逐字相同、`doctor --smoke` 逐字相同、moc
   - **① 單頁容量＝維持規則 5**（步驟 48 px、答案 62 px），長解法一律用 `part:` 分頁、**答案框留在末頁**（D4 的續頁例外已支援）。**不**給 `worked_example` 另開 40 px 步驟階——那與規則 5「取消 `math_sm 40`」及容量契約「字級恆定不可協商」正面相撞。
   - **② 正典 §3.1 三題（`ex:3.1`–`ex:3.3`）＝不遷移。** 依據＝[`KICKOFF-shared-layer-v1.md`](KICKOFF-shared-layer-v1.md) §7「明確不做（本輪）」已列「`worked_example` 對既有 9 個 `derivation` + `prompt:` 場的遷移」；`derivation`＋`prompt:` 是合法的輕量形態，遷移另案再議（§8 backlog 有記）。
   - 附帶：D6 的 **62／34 raw px** 是本模板內的常數，**共用層 v1 的 T2 會把它升成 `theme._SCALE_PX` 的具名 token**（T4-5 回歸時模板改讀 token）。
-- **未做：** `=` 對齊欄（D3）、填色 chip／外框 SOLUTION pill（全模板共用樣式）、`statement` 的 schema error、§7.1 其餘項目。
+- **T4-5 對 v1 字體字級的回歸（2026-09-14；commit `50bf2fa`、merge `e52506f`）：** D6 的 **raw 62／34 已由共用層 v1 的 T2
+  升成 `theme._SCALE_PX` 的具名 token**（`math_conclusion 62`／`math_rail 34`），模板改讀 token、不再自帶 raw px；
+  `_selftest_worked_example` 選測與 demo deck 三份報表在 Instrument Sans＋新字級下重跑綠；
+  `companion_limit_example` 的 `strategy:` 縮成一行以符 rail 容錯（Instrument Sans 的行寬與 Plex 不同）。
+
+### demo 幀稽核（2026-09-14，v1 字體字級下）
+
+**三場**（`companion_limit_example`／`no_rail`／`multipage_p1`；不含刻意超量的 `capacity_over` 壓測 fixture）
+跑 `visual-frame-audit`：**0 blocking、2 advisory。**
+
+- **advisory ①（demo 內容，不是模板）：** 旁白提到了一條**被壓縮掉的 $\sin^{2}\theta$ 中間式**——
+  demo 的步驟鏈為了單頁容量收成 2 列，那一步只在旁白裡活著。改 demo 的 `steps[]` 即可，模板無責。
+- **advisory ②（模板結構）：** `check` 列**畫在答案框上方**，卻在 `result` **之後**才揭示——
+  空間順序與時間順序相反。要嘛把 `check` 移到答案框下方，要嘛讓它在 `result` 之前揭示；
+  兩種都是契約改動（D11 的 reveal id 順序），**待裁決**。
+
+**模板層 polish 九項（backlog，本輪不修；共用層 v1 §8 backlog ⑦ 指到這裡）：**
+
+1. **masthead 細線與 `SOLUTION` 的 y 跨場漂約 17 px**——兩者的位置由 `prompt` 實際佔幾行決定，
+   於是同一個 deck 的不同場，細線高度不一樣。修法＝把 `_masthead` 釘在 `prompt.get_bottom() - 0.26`。
+2. **步驟欄的 `fill_gap` 展開幅度與 rail 固定的 `RAIL_GAP` 不對稱**，且**兩欄頂端不在同一條起跑線**——
+   步驟欄 `_biased_y` 上偏、rail 頂齊 body zone 頂，列數少的時候看得出來。
+3. **`check` 的位置與揭示順序**（＝上面的 advisory ②）。
+4. **rail 的 `ref` tag（`tag` 32、藍）比它註解的 34 px 公式搶眼**——tag 是引用出處、應該比被註解的東西輕。
+5. **`notes` 的 `text` 欄沒有共用欄位**（每列各自排），列多的時候右緣參差。
+6. **垂直超量會壓在釘底的答案框上**——`fill` 0.10 擋不住；答案框是釘死的，超量的步驟鏈只能往它身上長。
+   目前只有 `capacity_issues` 的 split warn 會提醒，沒有硬約束。
+7. **續頁（`part.current < part.total`）沒有答案框時，下三分之一整片空置**——正是版面規則 2 要擋的，
+   但 D4 的續頁例外把它放掉了。續頁需要別的東西佔住那一帶。
+8. **`caption 30`／`ink_2` 是 rail 上最弱的承載字**——它承載 notes 的文字說明（「→ 1」這類）。
+   **這一條是共用層 token 的性質，不是這個模板的私事**，要修得在 `theme.py` 動。
+9. **答案框高度貼合內容，一行答案時「最重」的份量會浮動**——同一個 deck 裡，兩行答案的框看起來
+   比一行答案的框重得多，而規則 1 要的是「結論恆為最重」。
+
+- **未做：** `=` 對齊欄（D3）、填色 chip／外框 SOLUTION pill（全模板共用樣式）、`statement` 的 schema error、§7.1 其餘項目、上列 polish 九項。
