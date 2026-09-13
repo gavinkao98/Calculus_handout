@@ -54,6 +54,7 @@ from manim import (
 )
 
 from pipeline import brand
+from pipeline import pacing
 from pipeline import timing as TM
 from pipeline.blocks import Block, play_block
 from pipeline.visuals import theme as T
@@ -433,7 +434,12 @@ def sector_inequality(spec, ctx, blocks):
     out.append(Block("tri_inner", dst1, anim=_peel(src_inner, chip_inner), static=False, layer="graph"))
     out.append(Block("sector", dst2, anim=_peel(src_sector, chip_sector), static=False, layer="graph"))
     out.append(Block("tri_outer", dst3, anim=_peel(src_outer, chip_outer), static=False, layer="graph"))
-    out.append(Block("ineq", ineq, anim=_fade, static=False, layer="graph"))
+    # The inequality lands on a beat that grew to ~22 s when the corner-piece sentence
+    # was added (Task D), and a single fade left 20.8 s of still picture -- over the 12 s
+    # line. Its three terms are already `{{...}}` segments, so primitive 7 can walk them
+    # across the beat: each term arrives as the narration names it. (`pacing.apply` only
+    # upgrades STOCK reveals, and this one is a callable, so it is wired here by hand.)
+    out.append(Block("ineq", ineq, anim=pacing.paced_reveal, static=False, layer="graph"))
     return out
 
 
