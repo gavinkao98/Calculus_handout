@@ -64,6 +64,7 @@ from pipeline import focus
 from pipeline import pacing
 from pipeline import timing as TM
 from pipeline.blocks import Block, play_block
+from pipeline.narration import estimate_seconds, list_reveal_targets, parse_say
 from pipeline.visuals import theme as T
 
 PI = np.pi
@@ -88,19 +89,13 @@ def _centre_in_zone(title_mob, group, *, bottom_pad: float = 0.45) -> None:
     group.move_to([0, (zone_top + zone_bottom) / 2, 0])
 
 
-# Both report the renderer's clock (see `_spent`), not a constant. They used to claim
-# 0.65 / 0.75 s for a 0.55 / 0.65 s play -- 0.10 s of OVER-report each, the opposite sign
-# to the frame-quantisation loss, which the beat's hold then had to give back: measured on
-# slope_equals_height (three _draw plus one _fade) the scene ran 0.41 s SHORT of its
-# narration. Nothing in the history or the comments makes that 0.10 s deliberate, so it is
-# read as a slip, not padding.
-def _fade(scene, mob, g):
-    t0 = _elapsed(scene)
-    scene.play(FadeIn(mob), run_time=0.55)
-    scene.add(mob)
-    return _spent(scene, t0, 0.55)
-
-
+# Reports the renderer's clock (see `_spent`), not a constant. It used to claim 0.75 s for a
+# 0.65 s play -- 0.10 s of OVER-report, the opposite sign to the frame-quantisation loss,
+# which the beat's hold then had to give back: measured on slope_equals_height (three _draw
+# plus a fade) the scene ran 0.41 s SHORT of its narration. Nothing in the history or the
+# comments makes that 0.10 s deliberate, so it is read as a slip, not padding.
+# (Its twin `_fade` had the same fix and the same wording; it lost its last caller when
+# slope_equals_height's `cos_dots` became the three-pairing choreography below.)
 def _draw(scene, mob, g):
     t0 = _elapsed(scene)
     scene.play(Create(mob), run_time=0.65)
@@ -771,12 +766,60 @@ def slope_equals_height(spec, ctx, blocks):
             ml.next_to(dot, UP if h > 0 else DOWN, buff=0.14)
         cos_dots.add(VGroup(connector, dot, ml))
 
+    # The PAIRING action (SPEC-motion-language 規則 3; §3.1 rewatch, beginner lens).
+    # The whole scene is called Slope Equals Height and, until this round, that equals
+    # sign was never drawn: `m=1` / `m=0` / `m=-1` sat on the left rim, the top and the
+    # right rim, `cos 0 = 1` / `cos pi/2 = 0` / `cos pi = -1` sat elsewhere in another
+    # colour, and the beat that reads "they match exactly" was ONE 0.55 s fade of all
+    # three followed by 9.8 s of frozen picture to the end of the scene. A viewer knew
+    # they were equal because the narration said so, not because the screen ever paired
+    # them. So `cos_dots` now reveals as THREE pairing moves, one per number the
+    # narration reads ("one, zero, minus one"): the dashed connector draws down x=x0,
+    # the read-off dot and its label land on cosine, and then the tangent and that dot
+    # PULSE TOGETHER -- one synchronised move, which is what says "these two are the
+    # same thing". The beat's existing `focus[].indicate` (the three tangents) then flashes
+    # once more on "they match exactly" and closes the beat.
+    # `cos_dots` is deliberately NOT added to that indicate list: it is ONE block, so
+    # `focus.indicate` would scale all three read-off marks about the group's centroid and
+    # push them apart -- rendered and checked, `cos 0 = 1` slid onto the y-axis label for
+    # the 0.8 s of the flash. Rule 3 says an emphasis MUST NOT move other objects, so the
+    # collective flash stays tangent-only and the pairing is carried by the pulses above.
+    # NOT DONE, by the user's 2026-09-13 ruling: the same review also proposed dropping
+    # the green/blue split and recolouring the three pairs by x. Declined -- it would
+    # break this deck's semantic colour axis (琥珀=sin / 青=cos / 綠=結論) and the
+    # 品質補強輪 ⑳ rule that segment/curve colour outranks token colour (SPEC 規則 5,
+    # VISUAL-FRAME V10). The pairing is carried by MOTION only; no colour changed.
+    pairs = list(zip((tan_0, tan_halfpi, tan_pi), cos_dots))
+    PAIR_SECONDS = 1.2                 # one pairing = one narrated number
+    _F_DRAW, _F_LAND, _F_PULSE = 0.29, 0.21, 0.50    # shares of one pairing
+
+    def _pair_reveal(scene, mob, g):
+        # Budgeted against the beat, not fixed, so a re-cut narration can only make the
+        # pairings quicker, never overrun: `beat_run_time` has already subtracted the
+        # 0.8 s this beat reserves for its `focus[].indicate` and the paced tail.
+        t0 = _elapsed(scene)
+        per = min(PAIR_SECONDS, TM.beat_run_time(scene, PAIR_SECONDS * len(pairs)) / len(pairs))
+        flash = T.color(g, "amber_ink")    # the ink `focus.indicate` uses on an accent-less
+                                           # scene -- the three pairings and the flash that
+                                           # follows them must read as one gesture
+        for tan, mark in pairs:
+            connector, dot, label = mark[0], mark[1], mark[2]
+            if connector.submobjects:
+                scene.play(Create(connector), run_time=per * _F_DRAW)
+            scene.play(FadeIn(dot), FadeIn(label), run_time=per * _F_LAND)
+            scene.play(Indicate(tan, scale_factor=focus.INDICATE_SCALE, color=flash),
+                       Indicate(VGroup(dot, label), scale_factor=focus.INDICATE_SCALE,
+                                color=flash),
+                       run_time=per * _F_PULSE)
+        scene.add(mob)
+        return _spent(scene, t0, per * len(pairs))
+
     out = list(blocks)
     out.append(Block("xticks", xticks, static=True, layer="graph"))
     out.append(Block("tan_0", tan_0, anim=_draw, static=False, layer="graph"))
     out.append(Block("tan_halfpi", tan_halfpi, anim=_draw, static=False, layer="graph"))
     out.append(Block("tan_pi", tan_pi, anim=_draw, static=False, layer="graph"))
-    out.append(Block("cos_dots", cos_dots, anim=_fade, static=False, layer="graph"))
+    out.append(Block("cos_dots", cos_dots, anim=_pair_reveal, static=False, layer="graph"))
     return out
 
 
@@ -2848,3 +2891,109 @@ def shm_device(spec, ctx, blocks):
     out.append(Block("device", device, static=False,
                      anim=lambda scene, mob, ground: 0.0, layer="graph"))
     return out
+
+
+# ================================================================ hook 12
+# companion_limit -- fill the scene's reveal-less OPENING beat.
+#
+# R2/beginner lens, 2026-09-13: the first 8.5 s of this scene (+1.0 -> +9.5, the longest
+# dead opening in the film) show the header line and an empty SOLUTION lead, nothing else,
+# while the narration reads out loud the very sentence that header already spells --
+# "the quantity one minus cosine theta, over theta tends to zero". Heard and seen are the
+# same words, and nothing moves.
+#
+# Why this is a hook and not `paced:` / `pauses:`: `{show scaffold.motive}` is this scene's
+# FIRST marker, so `narration.parse_say` gives the opening beat `reveal=None`. Every motion
+# primitive in the pipeline hangs off a reveal id (`paced:` paces one block's reveal,
+# `pauses:` holds after one, a Block anim plays on one), so none of them can reach a beat
+# that reveals nothing -- and moving the marker is exactly what would re-cut the beats,
+# change their `text_hash` and force a billed re-synthesis. What CAN run there is an
+# updater: the statement line is part of the opening frame (static) and writes itself out
+# segment by segment off a time-based updater, which is also why manim renders that wait
+# frame by frame instead of freezing one (`Scene.should_update_mobjects`). Same house
+# mechanism as the SHM spring's `t_track`, which keeps the device swinging through stretches
+# that reveal nothing of it.
+#
+# The line itself lives in the storyboard's `statement:` field, so deleting `hook:` leaves
+# a perfectly good (static) scene -- the template stays the fallback, per the hook contract.
+# Out of scope by the user's ruling: the narration, this scene's ORDER, and the fact that
+# the limit it banks is never used again (an ordering finding, in the backlog).
+
+OPENING_WRITE_LEAD = 0.35        # after the narration starts, before the first segment
+OPENING_WRITE_FRACTION = 0.80    # of the opening beat, so the line finishes before it ends
+
+
+def companion_limit_opening(spec, ctx, blocks):
+    ids = _by_id(blocks)
+    stmt = ids.get("statement")
+    # `{show statement}` would make it dynamic -- then it has a beat of its own and none of
+    # this is needed (and must not run: the segments would be hidden with nothing to unhide
+    # them until that marker).
+    if stmt is None or not stmt.static:
+        return blocks
+    group = stmt.mobject
+    parts = pacing.block_parts(group)      # the `{{...}}` segments, primitive 7's own cut
+    if len(parts) < 2:
+        return blocks
+
+    beats = parse_say(spec.get("say", ""))
+    opening = beats[0].text if beats and beats[0].reveal is None else ""
+    # Open-loop, because a hook cannot see the TTS manifest: the window is the same
+    # word-count estimate the pipeline itself falls back on. It is the FLOOR that matters --
+    # the real clip is longer than the estimate here (8.5 s measured vs 7.6 s estimated), so
+    # the line finishes early and sits, which is the intended shape. The beat-2 reveal
+    # closes the loop from the other side (see `_freeze`), so it can never be caught
+    # half-written however the narration is re-cut.
+    window = max(estimate_seconds(opening) * OPENING_WRITE_FRACTION,
+                 pacing.FADE_SECONDS * len(parts))
+    start = TM.SCENE_LEAD_SECONDS + OPENING_WRITE_LEAD
+    step = window / len(parts)
+    # every member's built opacity -- glyphs AND the point-less segment containers
+    # `set_opacity` also writes to, so the finished line is exactly the built one (the frame
+    # the visual gates read, the one sizecheck measured) and a later multiplicative `fade`
+    # on a container cannot start from a stale zero.
+    built = [(m, m.get_fill_opacity(), m.get_stroke_opacity()) for m in group.get_family()]
+    for part in parts:
+        part.set_opacity(0.0)
+
+    clock = {"t": 0.0}
+
+    def _freeze():
+        for mob, fill, stroke in built:
+            mob.set_fill(opacity=fill, family=False)
+            mob.set_stroke(opacity=stroke, family=False)
+        group.clear_updaters()
+
+    def _write(m, dt):
+        # `set_opacity` (not focus.apply's save_state/fade dance) is safe here and much
+        # cheaper per frame: these are LaTeX glyphs, solid fills with zero stroke width,
+        # not the hollow rings that a flat opacity ruins. `_freeze` puts the built numbers
+        # back verbatim anyway.
+        clock["t"] += dt
+        for i, part in enumerate(parts):
+            share = (clock["t"] - (start + i * step)) / pacing.FADE_SECONDS
+            part.set_opacity(min(max(share, 0.0), 1.0))
+        if clock["t"] >= start + (len(parts) - 1) * step + pacing.FADE_SECONDS:
+            _freeze()
+
+    group.add_updater(_write)
+
+    motive = ids.get("scaffold.motive")
+    if motive is not None and motive.static and "scaffold.motive" in list_reveal_targets(
+            spec.get("say", "")):
+        # `templates._scaffold_reveal_timing` runs AFTER the hook and rewrites `anim` on any
+        # scaffold block that is still static and named by a marker -- which would throw this
+        # wrapper away. So do its job here (dynamic + "slide", verbatim) and wrap that; it
+        # then sees a block that is already dynamic and leaves it alone.
+        motive.static = False
+        stock = "slide"
+
+        def _motive_reveal(scene, mob, g):
+            """The next beat completes the line before revealing the motive: whatever the
+            real clip length turns out to be, nothing is ever seen half-written."""
+            t0 = _elapsed(scene)
+            _freeze()
+            return _spent(scene, t0, _play_stock(scene, stock, mob, g))
+
+        motive.anim = _motive_reveal
+    return blocks
