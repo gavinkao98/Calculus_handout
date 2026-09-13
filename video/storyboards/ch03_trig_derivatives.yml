@@ -568,6 +568,11 @@ scenes:
     kind: content
     template: derivation
     accent: example
+    # 里程碑六鏡審（2026-09-13）：開場拍 8.5 s 畫面零變化，且旁白念的就是標頭已寫好的字。
+    # 該拍的 reveal 是 None（`{show scaffold.motive}` 才是本場第一個標記），reveal 驅動的原語
+    # 都搆不到它，故由 hook 以 time-based updater 逐段寫出 statement（同 SHM spring 的手法）。
+    hook: animations.ch03_trig_derivatives_hooks:companion_limit_opening
+    statement: '$ {{(1-\cos\theta)/\theta}} {{\;\longrightarrow\;}} {{0\quad(\theta \to 0)}} $'
     ref: md:companion_limit
     covers: [conjugate, split, evaluate]     # step.0/1 + result (all shown)
     # 規則 2＋4：step.1 從 step.0 變形（1−cos² → sin²，先框住上一列）、result 從 step.1 變形（各因子走到極限）；
