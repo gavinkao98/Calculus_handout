@@ -7,4 +7,5 @@ asserts the REGISTRY still matches it, so the two can't drift apart again."""
 CONTENT_TEMPLATES: tuple[str, ...] = (
     "callout", "definition_math", "derivation", "graph", "procedure_steps",
     "recap_cards", "sign_chart", "theorem_proof", "value_table",
+    "worked_example",
 )

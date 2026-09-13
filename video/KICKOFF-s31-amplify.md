@@ -43,7 +43,7 @@
 | **Task B／C** 原語鋪滿 ＋ 驗收 | `calculus-handout-c5` | 🔵 進行中，見 [`KICKOFF-motion-language-rollout.md`](KICKOFF-motion-language-rollout.md)（21 個 content 場＋§5 驗收＋27 場 1080p 成片） |
 | **Task D** 計費（R6 場 06／13 改稿＋§8 對齊） | `calculus-handout-a7` | 🔵 已認領，**會先向使用者報量** |
 | rollout §6 排除的：09／12 新 hook、06 右側 glyph 疊層填色 | `calculus-handout-a7` | 🔵 已認領（等 c5 merge 完再動） |
-| **§7.1 模板系統設計其餘部分**——版面 4 條規則、數學排版 5 條、**`worked_example` 新模板**、字體 | — | ⚪ **未認領 ← 新對話接這個** |
+| **§7.1 模板系統設計其餘部分**——版面 4 條規則、數學排版 5 條、**`worked_example` 新模板**、字體 | `worked_example`＝本對話（[`KICKOFF-worked-example-template.md`](KICKOFF-worked-example-template.md)，commit `c79372c`） | ✅ **`worked_example` 已落地**（2026-09-13，REBUILD_STATUS ⑱；報告 [`_audit/REVIEW-worked-example-template-applied.html`](_audit/REVIEW-worked-example-template-applied.html)）；版面 4 條進 sizecheck／數學 5 條的字級裁決／字體 ⚪ 仍未認領 |
 | 06 主圖放大 2 倍、場間真 crossfade | — | ⚪ 未認領 |
 | §3.2 解凍、`example_coverage_enforce` | — | ⚪ 未認領 |
 | a7 的「Tex bbox × 線段取樣求相交」量測常設成 sizecheck 閘 | — | ⚪ 未認領（c5 已記進它那輪的 backlog，但不在該輪做） |
