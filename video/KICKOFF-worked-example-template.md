@@ -106,6 +106,11 @@
 selftest 全綠、基線比對逐字相同、`doctor --smoke` 逐字相同、mock render 抽幀自檢、standalone HTML 報告
 （`_audit/REVIEW-worked-example-template-applied.html`，幀 base64 內嵌）、`REBUILD_STATUS.md` 記一段、`KICKOFF-s31-amplify.md` §0.5 勾選。
 
-## 7. 結果
+## 7. 結果（2026-09-13）
 
-（執行後填）
+- **落地 commit `c79372c`**（Opus 子代理、worktree、一個 commit）；契約 `b229973`；報告與收尾另一 commit。
+- **D1–D14 全數做到**；子代理四個契約外判斷全部覆核接受（見報告「子代理判斷與覆核」）：① `sizecheck._capacity_issues` 加「完全落在 `extra_bottom` 保留帶內的 block 不計入堆疊」（否則答案框被算兩次）；② 有答案框不畫 motif；③ rail 分隔線收進 strategy group；④ 試點場收成 2 列（容量）。
+- **驗收：** `run_selftests` 40→41 全綠；22 個既有 deck × schema／lint／sizecheck 66 份輸出逐字相同；`doctor --smoke` 逐字相同；試點 mock render `[sync]`／`[stillness]` clean、抽幀自檢；零計費、正典 deck 未動。
+- **報告：** [`_audit/REVIEW-worked-example-template-applied.html`](_audit/REVIEW-worked-example-template-applied.html)（產生器 `_audit/_gen/worked_example_template.gen.py`＋digest）。
+- **交裁決：** ① 單頁容量（48 px 步驟階下每頁約 2 個分數列，mockup 的 4 列放不進去——建議維持規則 5、用 `part:` 分頁）；② 正典 §3.1 三題要不要遷到新模板（另案）。
+- **未做：** `=` 對齊欄（D3）、填色 chip／外框 SOLUTION pill（全模板共用樣式）、`statement` 的 schema error、§7.1 其餘項目。

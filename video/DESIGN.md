@@ -738,6 +738,7 @@ slope-from-definition computation）需要 7–9：
 | 內容形狀 | 模板 | 單頁容量預算 | 超量動作（DENSE） | 稀疏動作（SPARSE） |
 |---|---|---|---|---|
 | 連續推導鏈 | `derivation` | fraction 列：無 statement ~5、有 statement ~4；single 列 ~7 | 按邏輯階段切 `part:`，不硬切等號 | fill_gap 自動；勿加廢列 |
+| 例題（題目＋解＋答） | `worked_example` | 62 px 答案框固定佔下三分之一，SOLUTION 之下只剩 ≈2.9–3.3u：步驟 ≈2 個分數列（答案為單行式時 3 列）或 ≈4 個單行列；rail 一行策略句＋≤2 條 notes（實測 2026-09-13：mockup 的 4 列是 38 px 靜態圖，影片字級放不進去） | 按邏輯階段切 `part:`，答案框留到末頁（續頁可省 `result`）；rail 存在時列過寬會 raise——拆列／縮題／拿掉 rail | 拿掉 rail 讓步驟欄滿寬（D8）；勿加廢列 |
 | 陳述＋符號式 | `definition_math` | statement ≤3 行＋math ≤4 列 | 拆 part 或把長鏈改 derivation 景 | 掛 `aside` 卡（L3） |
 | 命題＋證明 | `theorem_proof` | proof ≤4 步＋qed（一般步 2–3；fraction 步更保守） | >4 步拆 statement＋proof 兩場、超頁 `part:` | statement-only 走 card＋aside 兩欄 |
 | 離散步驟 | `procedure_steps` | 3–4 步、math ≤5u 寬 | 拆 part；長式改 derivation | ——（步驟自然 ≥3） |
