@@ -35,7 +35,7 @@ meta:
   derived_from:
     inputs:
     - path: ch03_trig_derivatives.yml
-      sha256: df8ba3409e36ca6466132c498521547613158a1d067aa730d6413f5b890262f3
+      sha256: c6779dca9f4caf7ad077fa10dde5219a678add8d675a445c7cf645895b6b20c5
     - path: ../content_scripts/ch03_trig_derivatives.spoken.yml
       sha256: 57b72fd07fc8e2962cccf0885c6b45a301270829891f3d4ca5803eb1dfee15b1
 scenes:
@@ -386,9 +386,9 @@ scenes:
     anim: transform
     frame: true
     seg_roles:
-      \cos\theta: success
-      \frac{\sin\theta}{\theta}: strategy
-      '1': accent
+      \cos\theta: secondary
+      \frac{\sin\theta}{\theta}: accent
+      '1': muted
   check:
     math: 0 \;\le\; \lvert\sin\theta\rvert \;\le\; \lvert\theta\rvert
     reason: kept for later
@@ -567,10 +567,18 @@ scenes:
     '
   statement: $\lim_{\theta\to 0}\frac{\sin\theta}{\theta}=1$
   proof:
-  - $ {{\cos\theta}} \le {{\frac{\sin\theta}{\theta}}} \le {{1}} \quad (0<\theta<\frac{\pi}{2}) $
+  - tex: $ {{\cos\theta}} \le {{\frac{\sin\theta}{\theta}}} \le {{1}} \quad (0<\theta<\frac{\pi}{2}) $
+    seg_roles:
+      \cos\theta: secondary
+      \frac{\sin\theta}{\theta}: accent
+      '1': muted
   - tex: $ {{\cos\theta}} \to {{1}} \ \Rightarrow\ {{\frac{\sin\theta}{\theta}}} \to {{1}} $
     anim: transform
     frame: true
+    seg_roles:
+      \cos\theta: secondary
+      \frac{\sin\theta}{\theta}: accent
+      '1': muted
   qed: even $\Rightarrow$ two-sided limit $=1$
 - id: squeeze_graph
   kind: content

@@ -278,8 +278,10 @@ scenes:
           seg_roles: { "\\sin\\theta": accent, "\\theta": strategy, "\\tan\\theta": success } }
       - { math: "{{1}} \\;\\le\\; {{\\frac{\\theta}{\\sin\\theta}}} \\;\\le\\; {{\\frac{1}{\\cos\\theta}}}", reason: "$\\div\\sin\\theta$, $\\tan=\\tfrac{\\sin}{\\cos}$", anim: transform, frame: true,
           seg_roles: { "1": accent, "\\frac{\\theta}{\\sin\\theta}": strategy, "\\frac{1}{\\cos\\theta}": success } }
+    # result 列改函數色與 10／11 對位（V10 advisory）：cos θ／sinθ÷θ／1 是同一組函數，07 的結論列、
+    # 10 的 proof、11 的圖現在同色（藍／琥珀／muted）；上面 steps[] 仍保留面積來源色（琥珀／紫／綠）。
     result: { math: "{{\\cos\\theta}} \\;\\le\\; {{\\frac{\\sin\\theta}{\\theta}}} \\;\\le\\; {{1}} \\qquad (0<\\theta<\\frac{\\pi}{2})", reason: "reciprocate -- reverses", anim: transform, frame: true,
-              seg_roles: { "\\cos\\theta": success, "\\frac{\\sin\\theta}{\\theta}": strategy, "1": accent } }
+              seg_roles: { "\\cos\\theta": secondary, "\\frac{\\sin\\theta}{\\theta}": accent, "1": muted } }
     check:  { math: "0 \\;\\le\\; \\lvert\\sin\\theta\\rvert \\;\\le\\; \\lvert\\theta\\rvert", reason: "kept for later" }
 
   # 7 ------------------- Proposition 3.1 (part 1/2): statement + lim sin theta = 0
@@ -400,9 +402,12 @@ scenes:
       {show qed} And because the ratio is even, its left limit matches its right,
       so the two-sided limit is one as well. That is the keystone.
     statement: "$\\lim_{\\theta\\to 0}\\frac{\\sin\\theta}{\\theta}=1$"
+    # 兩列改函數色與 07 result／11 的圖對位（V10 advisory）：cos θ＝secondary、sinθ÷θ＝accent、1＝muted。
     proof:
-      - "$ {{\\cos\\theta}} \\le {{\\frac{\\sin\\theta}{\\theta}}} \\le {{1}} \\quad (0<\\theta<\\frac{\\pi}{2}) $"
-      - { tex: "$ {{\\cos\\theta}} \\to {{1}} \\ \\Rightarrow\\ {{\\frac{\\sin\\theta}{\\theta}}} \\to {{1}} $", anim: transform, frame: true }
+      - { tex: "$ {{\\cos\\theta}} \\le {{\\frac{\\sin\\theta}{\\theta}}} \\le {{1}} \\quad (0<\\theta<\\frac{\\pi}{2}) $",
+          seg_roles: { "\\cos\\theta": secondary, "\\frac{\\sin\\theta}{\\theta}": accent, "1": muted } }
+      - { tex: "$ {{\\cos\\theta}} \\to {{1}} \\ \\Rightarrow\\ {{\\frac{\\sin\\theta}{\\theta}}} \\to {{1}} $", anim: transform, frame: true,
+          seg_roles: { "\\cos\\theta": secondary, "\\frac{\\sin\\theta}{\\theta}": accent, "1": muted } }
     qed: "even $\\Rightarrow$ two-sided limit $=1$"
 
   # 10 ------------------------------------- Figure 3.2: the squeeze as a graph (stock)
