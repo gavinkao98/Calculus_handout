@@ -16,7 +16,7 @@
 | 2 | **畫出來，只動變的 token** | 曲線由點走出、文字逐字寫、式子只動變的 token；整行 FadeOut 再 FadeIn 是反模式 | `anim: transform`、`paced:`（隨旁白書寫）、`seconds: beat`、**`{{…}}` 分段＋對位 `TransformMatchingTex`＋`anim: cancel` 兩段式消去（2026-09-13 落地）**；graph function plot 本就 `create`；**theorem_proof 的 `proof[]` dict 列也收 `anim: transform`，transform 列在 `paced:` 裡時 morph 後 rail 隨讀（鋪滿輪 T1）** | hook 自建的 MathTex 不經 `math_line`，不吃分段（規則進 METHODOLOGY §5） | 新稿 derivation 場整塊淡入 ≤ 1 次（首列）；R2 ML2 finding＝0 |
 | 3 | **框、放大鏡、調暗，不靠鏡頭** | 注意力用框選預備、inset 放大（主圖不縮放）、主圖降亮；2D 場不以 zoom 為第一選擇 | `focus:`（壓暗與還原）、transform 自動把來源列退為 muted、**`focus[].indicate` 閃爍、graph `inset:` 放大鏡、`frame: true` 變動前框選（2026-09-13 落地）** | inset 只鏡射 plot spec，hook 手繪幾何鏡不到 | 每個 derivation 結果拍與 graph 關鍵拍有 focus 宣告；R2 ML3 finding＝0 |
 | 4 | **靜止是設計出來的** | 每段超過 6 s 的靜止 MUST 是宣告的（`pauses:`）或被 paced／sweep 填滿；動作只在步驟切換時發生 | `pauses:`、`paced:`、`seconds: beat`、⑧ 的 12 s 線、**`[stillness]` advisory（`make.py`＋`pipeline/stillness.py`，2026-09-13 接線；鋪滿輪起 transform／cancel／carry 以 `fixed_seconds` 誠實計入，不再免檢）** | 三門檻已對齊（6 s advisory／12 s 量測／R4 12 s） | `longest_still_seconds` ≤ 12 s（沿用）＋未宣告靜止 > 6 s＝0 |
-| 5 | **語意色貫穿圖與式** | 同一變數在圖、括號、軸標、填色、式子 token 用同色；卡類型色與箭頭色本身就是語意 | `color_role`（derivation 列、graph plot）、Direction B 色軸（accent）、**VISUAL-FRAME V10（2026-09-13 接線）**、**`meta.color_map` deck 級變數色表＋token 級上色（2026-09-13 落地；`pipeline/texparts.py`）**、**列級 `seg_roles`（`{{…}}` 一段一色，鋪滿輪 T2）** | 混排句（`Tex` 路徑）不吃色表；hook 自建 MathTex 由 METHODOLOGY §5 規則禁止；箭頭色＝目標色未做 | 同一節內同一變數不得出現兩種色；V10 blocking＝0 |
+| 5 | **語意色貫穿圖與式** | 同一變數在圖、括號、軸標、填色、式子 token 用同色；卡類型色與箭頭色本身就是語意 | `color_role`（derivation 列、graph plot）、Direction B 色軸（accent）、**VISUAL-FRAME V10（2026-09-13 接線）**、**`meta.color_map` deck 級變數色表＋token 級上色（2026-09-13 落地；`pipeline/texparts.py`）**、**列級 `seg_roles`（`{{…}}` 一段一色，鋪滿輪 T2）** | 混排句（`Tex` 路徑）不吃色表；hook 自建 MathTex 由 METHODOLOGY §5 規則禁止；箭頭色＝目標色未做 | 同一節內同一變數不得出現兩種色（段內 token 隨段色不算兩色）；V10 blocking＝0 |
 
 ## 1. 依據（一段講完）
 
@@ -99,6 +99,7 @@
 - 同一節內，同一個變數或幾何量在圖、括號、軸標、填色、讀數框、式子 token 裡 MUST 用同一色；結論式的分子分母色 MUST 等於它們在圖上的括號色。
 - 卡類型色（definition、theorem、example、caution 等）沿 Direction B 色軸；箭頭色 SHOULD 等於它指向的分類色，讓箭頭不必再加文字。
 - 填色 SHOULD 少而固定：兩到三種填色全片對應固定物件，靠填色而非標籤分辨。
+- **色優先權：** graph 的 `color_role`（曲線色）與段級 `seg_roles`（段色）蓋過 token 級 `meta.color_map`（變數 token 色）。一個量被整段上色時（段色或曲線色），段內那個量的 token 隨段上色、展示段色，而非 token 色；這不算「同量兩色」。token 色只在該量獨立出現、不被段包住時生效。
 
 **證據。** A1 的 dθ 粉紅、d(sin θ) 綠、θ 黃，從 inset 的括號一路到 989 s 的結論式 `d(sin θ)/dθ = Adj./Hyp. = cos θ` 分子分母同色。C1 的 f 紅、x 綠、t 紫從式子到軸標到填色到讀數框全片一致。A2 只有兩種填色（深藍＝基準三角、深綠＝Δ 三角）。B1 箭頭色＝目標欄色（綠箭→BEST、黃箭→OK）。
 
@@ -106,7 +107,7 @@
 - 已有：`color_role`（graph plot 一直有；derivation 列 2026-09-12 起可寫同一 role）；Direction B 色軸對位講義 `calcbook.sty`（⑨）。
 - 缺：(a) deck 級變數色表（`meta` 下宣告「θ＝黃、dθ＝粉、…」）；(b) MathTex token 上色讀同一張表（`brand.math_line` 加 token→role 映射）；(c) graph 的軸標、填色、annotation 讀同一張表；(d) 箭頭色＝目標色的慣例寫進 annotation 契約。
 
-**驗收。** 同一節內同一變數不得出現兩種色；`visual-frame-audit` 增一條（V 類，blocking）：結論式 token 色與圖上對應物件色不一致。
+**驗收。** 同一節內同一變數不得出現兩種色（段內 token 隨段色不算兩色）；`visual-frame-audit` 增一條（V 類，blocking）：結論式 token 色與圖上對應物件色不一致。
 
 ## 3. 產能與兩級製作
 
