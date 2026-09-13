@@ -41,6 +41,7 @@
   - `L-picture` 畫面有沒有幫到你，還是「只是字」？哪一格讓你恍然大悟、哪一格看了沒感覺？
   - `L-recall` 全片看完，你記得的三件事是什麼？記錯的算 finding。
 - **輸出重點**：每場的 verdict（用共同規則的四級）＋卡點；`film.patterns` 寫你整體的感受（三到五句）。
+- **證據門檻（2026-09-12 首用教訓落地）**：每條 finding 的 `evidence` **必須同時**含（a）當下的一句旁白原句與（b）你在該格看到的畫面描述。只引 `INDEX.md` 的靜止秒數門檻、或多條 finding 共用同一句模板，一律在合成時駁回（`refuted`）。
 
 ### R2 動畫導演（Director）
 
@@ -142,7 +143,24 @@
 
 - **盲的層級**：R1 兩份實例只拿 pack 的觀眾面（sheet／md／INDEX／幀），**不給** `PRODUCTION.md`、`pack.json`、storyboard、任何既有評估或裁決；在 repo 外的隔離工作區跑。R2／R5 拿 pack ＋ 本鏡段落；R3 另拿講義原節 `.tex`；R4 只拿 md／INDEX（不看圖）。**任何一鏡都不給** 7 月 grilling 結論、產線評估報告、其他鏡的輸出。
 - **模型分派（首用 2026-09-12）**：R1a Gemini 3.1 Pro（agy）、R1b Claude Sonnet 4.6（agy）、R2 Claude Opus 5（subagent）、R3 Claude Sonnet 5（subagent）、R4 Claude Haiku 4.5（subagent）、R5 Gemini 3.8 Flash（agy）；合成＝Fable。三個模型家族、單一模型不重複同鏡。
+- **模型分派（§3.1 里程碑審 2026-09-13）**：R1a Claude Opus 4.6 thinking（agy）、R1b／R2／R3／R4 Claude Opus 5（subagent ×4）、R5 Gemini 3.8 Flash high（agy）；合成＝Fable。
+  改動理由：初學者鏡依首用教訓 ① 換掉 Gemini 3.1 Pro；R3／R4 由 Sonnet 5／Haiku 4.5 升 Opus 5（根 CLAUDE.md「盲審與稽核派 Opus」）。
 - **合成（refute-by-default）**：逐條對 pack 核實——找得到的 evidence 才留；多鏡同指一場加權；套 CLAUDE.md 四級分類；產 standalone HTML（`REVIEW-<deck>-rewatch-multilens.html`，逐場並列五鏡＋ sheet ＋數字＋合成判定＋「每場最該改的一件事」），餵 Step ② 水位決定。
-- **工具**：`_gen/rewatch_prompts.py --ws <repo 外目錄> --runs … [--scenes …]`（組隔離工作區與每鏡 prompt）→ 跑鏡 → `_gen/rewatch_merge.py --ws … --verify verify.json --out …`（合併＋核實 → digest）→ `_gen/rewatch_multilens.gen.py`（digest → HTML）。
+- **工具**：`_gen/rewatch_prompts.py --ws <repo 外目錄> --runs … [--flat] [--scenes …]`（組隔離工作區與每鏡 prompt；agy 一律 `--flat`）→ 跑鏡 → `_gen/rewatch_merge.py --ws … --verify verify.json --out …`（合併＋核實 → digest）→ `_gen/rewatch_multilens.gen.py --pack <該輪 pack>`（digest → HTML）。
+- **合成前必跑 `_gen/rewatch_quotecheck.py --pack <pack> --digest <digest>`（2026-09-13 新增）**：逐條比對 finding 引的旁白是否真的存在於該場。`NOT-FOUND`＝引文捏造，該條 evidence 一律駁回（主張若被別鏡以成立的證據獨立指出，以那一鏡為準）；某一鏡**全數 NOT-FOUND 即該鏡證據不可用**，exit 1。肉眼讀不出捏造與否，這一步不能靠讀。
 - **agy 呼叫**：見根 [`../../../CLAUDE.md`](../../../CLAUDE.md)「付費 API」節（唯讀 `--mode plan`、`--add-dir` 圈定工作區、`--json-schema` 強制輸出）。
+- **agy 的隔離＝一鏡一個工作區（2026-09-13 里程碑審實跑補；違反會讓盲審審錯鏡頭）**：`agy` 的 file tool **不侷限在 cwd**——
+  `PROMPT.md` 在 cwd 找不到（或它決定再找一次）時它會往工作區樹**搜整棵**，把六份 `PROMPT.md` 全找出來再自己挑一份。
+  首次實跑三個 agy 鏡因此**有兩個審了別人的鏡頭**（R3 拿到 R3 的段落卻輸出 `L-` 維度、R1a 輸出 `T-` 維度；R5 剛好挑中自己的）。
+  **正確用法：`rewatch_prompts.py --ws <該鏡專用目錄> --runs <單一鏡> --flat`**——`PROMPT.md`／`schema.json`／`pack/`／`.tex`
+  直接落在 `<ws>`，沒有兄弟目錄可找；跑的時候 cwd＝`<ws>`、`--add-dir <ws>`。**subagent 鏡不受影響**（直接給絕對路徑）。
+  代價＝每鏡各一份 pack 複本（§3.1 約 32 MB／鏡）。
+- **agy 的額度與 `--mode plan` 的兩個坑（2026-09-13 同輪實測）**：① **額度**——一份 §3.1 pack 一鏡一次約
+  15–56 萬 input token，**五次呼叫（三鏡＋兩次重跑）就把個人額度用完**（`error: Individual quota reached…Resets in 4h`），
+  而且是在最後一鏡跑到一半時斷的。**六鏡不要整組押在 agy 上**；要用就先跑最需要跨家族的那一兩鏡。
+  ② **`--mode plan` 會把長工作變成「做計畫」**——R1a 重跑時它先寫計畫、再**派三個平行子代理**分批讀 27 場，
+  這既違反 R1 鏡「線性、一場看完才看下一場」的契約，也把時間與額度燒在編排上、最後沒有產出 JSON。
+  結論：**盲審鏡預設用 Opus 5 subagent（免費、可控、可驗）**，agy 保留給「真的需要另一個模型家族」時，且該次要
+  ① 只派一鏡 ② 過 `rewatch_quotecheck.py` ③ 檢查它有沒有自己開子代理。
 - **首用教訓（2026-09-12，§3.1）**：① 鏡頭品質差很多——R2 Opus 5 45 條逐格引證全數核實；R1b Claude Sonnet 4.6（agy）18 條 16 條成立；R4 Haiku 15 條數字主張 11 條成立；R3／R5 各 3 條全成立；**R1a Gemini 3.1 Pro 12 條全是同一句模板、只套 INDEX 的靜止門檻**——下次初學者鏡不用它，且 prompt 要求「每條 finding 必引旁白原句＋描述 tile 畫面，否則不算」。② 「與 reveal 無關的畫面變化」曾因 pack 取樣容差誤報（reveal 淡入落在前一個 1/4 秒），R4 據此推出的 4 條全駁；已修（`rewatch_pack.py` 容差 −0.3 s）。③ 差分偵測抓不到細線／小標籤的 reveal（24 的 mirror），「靜止秒數」對這類 reveal 會高估——核實時以 manifest 的 reveal 時間為準。④ 合成時把 must／should 重新校準：單鏡的 must 若無他鏡印證且屬品味，降為 should。
+- **里程碑審教訓（2026-09-13，§3.1）**：① **Gemini 家族兩度在本 rubric 上失守證據契約**——`gemini-3.8-flash-high`（R5）5 條 finding 的旁白引文**全部全片不存在**（其中一條把 `+44.3s` 掛在 38.3 s 的場上、並描述了一個全片沒出現過的畫面），首用時同一鏡同模型「3 條全成立」的評價是**沒有逐句核對引文**得出的，應視為高估；`gemini-3.1-pro` 首用模板化、本輪又審錯鏡（後者根因是工作區）。**兩者都不再列入 roster**，並新增上一條的 `rewatch_quotecheck.py` 當常設閘。② 同輪四個 Opus 5 subagent 鏡＝77 條引文逐字成立、0 條捏造，且 56 條帶數字的主張逐一對得上 pack（另 5 條被自動檢查誤標，人工複核後全部成立：3 條是合法跨場引用、1 條是兩拍相加、1 條引的是 12 s 門檻本身）。**盲審鏡優先派 Opus 5 subagent（免費）**，外部模型只用在需要拉開家族時、且必過 quotecheck。

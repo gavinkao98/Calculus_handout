@@ -8,8 +8,15 @@ Builds <ws>/pack (a COPY of the viewer-facing pack: INDEX.md, sheets, per-scene 
 dirs -- no PRODUCTION.md, no pack.json), <ws>/handout_s<sec>.tex (only used by R3), and
 <ws>/<run>/{PROMPT.md,schema.json} from PROMPT-rewatch.template.md + the rubric's common
 rules + ONLY that lens's section (blind lenses must not see the other lenses' dimensions).
-Run agy lenses from <ws>/<run> with --add-dir <ws>/pack (see CLAUDE.md "付費 API"); run
-subagent lenses by pointing them at <ws>/<run>/PROMPT.md. Nothing here is committed.
+Run subagent lenses by pointing them at <ws>/<run>/PROMPT.md. Nothing here is committed.
+
+--flat (REQUIRED for agy runs; 2026-09-13): agy does NOT confine its file tools to cwd --
+when "PROMPT.md" is not found immediately it searches the workspace tree, finds all six lens
+PROMPT.md files and picks one arbitrarily. The shared layout above therefore breaks blindness
+for external runs: of three agy lenses, two reviewed a lens they were not assigned. With
+--flat (exactly one --runs entry) the run IS the workspace: PROMPT.md, schema.json, pack/ and
+the .tex land directly in <ws>, with no sibling run dirs to find. One --ws per agy lens; run
+it with cwd=<ws> and --add-dir <ws>.
 """
 from __future__ import annotations
 
@@ -60,7 +67,13 @@ def main() -> int:
     ap.add_argument("--tex", type=Path, default=REPO / "handout" / "latex" / "src" / "ch03" / "chapter3.tex")
     ap.add_argument("--section", default="3.1")
     ap.add_argument("--scenes", default="", help="optional: restrict the review to these scene ids (comma list)")
+    ap.add_argument("--flat", action="store_true",
+                    help="single-run workspace: write PROMPT.md/schema.json into <ws> itself, no <run>/ subdir "
+                         "(REQUIRED for agy, which would otherwise find the sibling lenses' prompts)")
     args = ap.parse_args()
+    runs = args.runs.split(",")
+    if args.flat and len(runs) != 1:
+        raise SystemExit("[rewatch_prompts] --flat takes exactly one --runs entry (one workspace per agy lens)")
 
     rubric = (AUD / "REWATCH-REVIEW-RUBRIC.md").read_text(encoding="utf-8")
     template = (AUD / "PROMPT-rewatch.template.md").read_text(encoding="utf-8")
@@ -75,12 +88,12 @@ def main() -> int:
     tex_out.write_text(extract_section(args.tex, args.section), encoding="utf-8")
     extra = {
         "R1": "（無）", "R2": "（無）", "R5": "（無）",
-        "R3": f"講義原節 LaTeX 源：`{tex_out}`（判弧線與該教的東西是否被安排；不重審忠實）",
+        "R3": f"講義原節 LaTeX 源：`{tex_out.name if args.flat else tex_out}`（判弧線與該教的東西是否被安排；不重審忠實）",
         "R4": "（無）——本鏡**只讀** `INDEX.md` 與各場 `NN_<scene>.md` 的數字與時間軸，**不要開任何 .jpg**。",
     }
     scope = (f"\n\n**本次只審這些場**（其餘場在 JSON 裡仍要列出、verdict 填 `ok`、findings 留空）：`{args.scenes}`"
              if args.scenes else "")
-    for run in args.runs.split(","):
+    for run in runs:
         lens = RUN_LENS[run]
         body = (template.split("-->", 1)[1].strip()
                 .replace("{{LENS_ID}}", lens)
@@ -91,9 +104,10 @@ def main() -> int:
                 .replace("{{OUTPUT_SCHEMA}}", schema.strip())
                 .replace("{{RULE_FIELD}}", rule_field))
         if lens == "R4":
-            body = body.replace("每場：先看 sheet（整張看過每一格與標籤），再讀 md（時間軸與數字）",
-                                "每場：只讀 md（時間軸與數字；本鏡不看圖）")
-        d = ws / run
+            body = body.replace("每場：先看 sheet（整張看過每一格與標籤），再讀 md（時間軸與數字），然後記下 verdict 與 findings。"
+                                "看不清的格開原尺寸幀。",
+                                "每場：只讀 md（時間軸與數字；本鏡不看圖），然後記下 verdict 與 findings。")
+        d = ws if args.flat else ws / run
         d.mkdir(parents=True, exist_ok=True)
         (d / "PROMPT.md").write_text(body, encoding="utf-8")
         shutil.copy(AUD / "rewatch-findings.schema.json", d / "schema.json")
