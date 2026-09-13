@@ -775,8 +775,8 @@ scenes:
     paced: [result]                  # 15.5 s beat: s'' = -s, then its SHM annotation
     # 規則 2：result 從 step.2 變形（−sin t 就地接上 = −s(t)，先框住）；規則 3：result 旁白「is just −s(t)」
     # 閃 step.0；規則 1：24 帶走 result，三個 step 在場尾先淡出。
-    focus:
-      - { at: result, dim: [], indicate: [step.0] }
+    # focus indicate step.0 @result 已移除（2026-09-13）：shm_device hook 用整拍演「加速度永遠與位移反向」，
+    # 閃爍被擠到拍尾與 exit 疊在一起（sync 飄 +0.8 s），而裝置本身已把 −s(t) 對回 step.0。
     exit: [step.0, step.1, step.2, device]
     scaffold: { motive: "Put the new derivatives to work: a weight on a spring." }
     source: "chapter3-print-standalone.html SS3.1 . Example 3.3 (simple harmonic motion)"
