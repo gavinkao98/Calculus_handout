@@ -41,6 +41,14 @@ tts.py --backend mock             # 離線 TTS mock（不計費，可逕行）
 - **〔2026-07-01 使用者授權〕Codex 唯讀調用（review／覆核／詢問意見／second-opinion）需逐次徵詢。** 範圍＝**`codex exec -s read-only`**（計畫／code／doc 對抗式 review、徵第二意見，唯讀不改檔；模型走 `~/.codex/config.toml` 預設 gpt-5.6-terra／max；`-i <圖檔>` 可附圖）。
 - **〔2026-09-12 使用者授權〕Antigravity CLI（`agy`）唯讀調用比照 Codex：逐次徵詢；走使用者的 Antigravity 訂閱額度（不另計費，但仍是外部生成式 API）。** 本體＝`%LOCALAPPDATA%\agy\bin\agy.exe`（安裝程式已把該目錄加進使用者 PATH，本機 2026-09-12 驗證 `which agy` 找得到；它會**自我更新**、binary 隨時換版，1.1.27→1.2.2 就在同一天發生）；換機找不到時才部署 shim [`tools/agy.cmd`](tools/agy.cmd)（比照 `tools/codex.cmd`，放 `%APPDATA%\npm`；`tools/setup.ps1` 會自動判斷）。**已驗證的 headless 用法**（2026-09-12，看片多鏡評審首用）：`agy --print "<prompt>" --model <id> --mode plan --dangerously-skip-permissions --output-format json --json-schema <schema.json> --print-timeout 45m`。要點：`--mode plan`＝**不動 repo，但不是全然唯讀**——它會在 `--add-dir` 資料夾內寫檔並執行腳本（2026-09-12 實測：內建 `search_web` 壞掉時它自己寫了三支 Python 爬蟲跑 YouTube 搜尋），所以 add-dir 一律指 repo 外的工作資料夾；`--dangerously-skip-permissions` 只是讓非互動模式不停下來問（唯讀下無風險，非互動必加）；**盲審隔離＝cwd 設在 repo 外的工作資料夾＋`--add-dir <資料夾>` 圈定它能讀的東西**；圖檔放進資料夾它自己用 file tool 讀（多模態，contact sheet 實測可讀）；`--output-format json` 回傳含 `structured_output`（依 `--json-schema`）與 `usage`；長工作一定給 `--print-timeout`（預設 5 分鐘會被切）。**搜尋類任務的結果要逐條核對**（2026-09-12 教訓）：`search_web` 失敗時它改用爬蟲，把「頁面第一個影片 ID」配「第一個標題」，17 條裡 5 條標題與連結不符、2 條工具判斷錯——凡它給的 URL／標題／出處一律自己打開驗證再用。首次呼叫吃到 503 會自動重試，回傳的 `status` 仍可能是 `ERROR` 但 `structured_output` 有值，讀結果時兩個欄位都看。模型清單 `agy models`（帳號現有：`gemini-3.8/3.7/3.6-flash-{high,medium,low}`、`gemini-3.1-pro-{high,low}`、`claude-sonnet-4-6`、`claude-opus-4-6-thinking`、`gpt-oss-120b-medium`）。與 Codex 分工：Codex＝GPT 家族 second opinion；agy＝Gemini／Claude 4.6 家族，多鏡評審要拉開模型家族時用（契約見 [`video/content_scripts/_audit/REWATCH-REVIEW-RUBRIC.md`](video/content_scripts/_audit/REWATCH-REVIEW-RUBRIC.md)）。
 
+## 任務分派：主模型只做拍板／審核／難題，簡單任務派給便宜模型，獨立項目開新對話（2026-09-13 使用者裁決）
+
+- **主對話的模型（Fable 5.1）只做四件事：** 拍板方案、決策、審核（review／驗收／回歸）、真正困難的任務（跨模組的設計、卡住的除錯）。**其餘一律派出去**，不要自己動手做可以交代清楚的工作。
+- **派工規則：** 簡單、契約寫得清楚的任務 → `Agent` 子代理，`model: sonnet`（code、hook、文件）或 `haiku`（純文字整理、逐條核對）；有檔案改動的一律 `isolation: worktree`、一個 task 一個 commit、主對話只做 merge＋審核。難以交代清楚的（要邊看邊判斷）才留給主模型。
+- **獨立項目開新對話：** 與當前輪次不共用檔案、可以獨立驗收的項目（新模板、另一節、工具閘），用 `spawn_task` 開成新對話的 chip（自帶 worktree、prompt 要自足），不要塞進同一個對話把上下文撐滿；主對話只留「這一輪」的主線。
+- **契約先於派工：** 派工前先把成功標準寫進 kickoff／prompt（改哪些檔、測試怎麼證明、零行為改變怎麼證明、不准動什麼）；子代理回報必須含：改了哪些檔、測試數字、沒做到的條款。主模型只看回報＋抽查（幀、diff），不重做。
+- **並行紀律（同一工作樹多個 session，2026-09-13 教訓）：** 開工先 `git status`；別人 dirty 的 hunk 不碰、只 commit 自己的路徑；render／tts 的時間窗用 `ListAgents`＋`SendMessage` 互相通知；子代理各自 worktree（Tex cache 各自一份）。
+
 ## 安裝環境：缺套件／軟體先問、勿造輪子替代、裝完更新文檔
 
 跨機環境的權威清單在 [`ENVIRONMENT.md`](ENVIRONMENT.md)，可執行版是 [`tools/doctor.py`](tools/doctor.py)（換機先跑它看缺什麼）。在此前提下：
