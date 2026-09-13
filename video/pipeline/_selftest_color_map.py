@@ -11,11 +11,18 @@ Pins four things:
     a \\frac argument -- and a key never cuts a macro name (`h` leaves `\\theta` / `\\cosh`
     alone; manim's own tex_to_color_map would split them and LaTeX refuses to compile).
     A split LaTeX rejects falls back to one colour with ONE printed warning, never a crash.
+  * _tex_with_map: a MIXED line (words + inline `$math$`, the Tex path -- math_line's mixed
+    branch, _prose_lines, heading_rich) colours a mapped token INSIDE its `$...$` span too
+    (round17 task B, 2026-09-13), via a dvisvgm colour push/pop special injected into the
+    compiled LaTeX rather than manim `*parts` (a `$...$` span can't be cut without unbalancing
+    its delimiters). No table, or no token hit in the line -> the old one-colour Tex, byte for
+    byte (geometry never moves -- the special is zero-width). A mapped token as an unbraced
+    macro argument falls back the same way as _math_tex.
   * plumbing: build_blocks reads the table off ctx["meta"] for every template and a deck
     without one reads an empty table -- no leak from the previous scene.
   * graph: the x/y axis labels take the table, and a plot with no colour of its own whose
     label names a mapped token takes that role (kickoff T1-3).
-Zero behaviour change: with no table every path is the old single-colour MathTex.
+Zero behaviour change: with no table every path is the old single-colour MathTex/Tex.
 """
 from pipeline import _bootstrap
 
@@ -23,6 +30,7 @@ _bootstrap.bootstrap()   # brand / templates import manim at module level -- boo
 
 import contextlib
 import io
+from collections import Counter
 
 from manim import MathTex, Tex
 
@@ -45,6 +53,15 @@ def _hex(mob) -> str:
 
 def _c(role: str) -> str:
     return T.color("dark", role).lower()
+
+
+def _glyph_colors(mob) -> "Counter[str]":
+    """Every family member with points, by its own rendered colour -- the granularity a
+    mixed line's per-token injected colour needs. Unlike `_leaves` (which walks
+    tex_string-tagged parts, one per manim `*parts` cut), a mixed Tex line compiles as ONE
+    unsplit string: it has exactly one tex_string-tagged part regardless of how many glyphs
+    a colour special painted, so `_leaves` cannot see inside it."""
+    return Counter(str(g.get_color()).lower() for g in mob.family_members_with_points())
 
 
 def _leaves(mob) -> "list[tuple[str, str]]":
@@ -152,17 +169,82 @@ def test_the_dollar_wrapped_form_is_coloured_too():
     assert isinstance(m, MathTex) and _leaves(m) == [("h", _c("caution"))], _leaves(m)
 
 
-def test_a_mixed_text_and_math_line_is_left_alone():
-    """The Tex path (words + inline $math$) is not split: cutting inside a `$...$` span leaves
-    unbalanced delimiters. Documented limitation -- a pure-math annotation is coloured, a
-    sentence with inline math is not."""
+def test_a_mixed_text_and_math_line_colours_mapped_tokens_inside_its_math_spans():
+    """The Tex path (words + inline $math$) cannot be cut into manim `*parts` -- a cut inside
+    a `$...$` span leaves the delimiters unbalanced, see `_math_tex` -- so a mapped token's
+    colour rides inside the compiled LaTeX as a dvisvgm colour push/pop special
+    (`_tex_with_map`, round17 task B). Every OTHER glyph, prose or math, keeps the line's own
+    role colour; previously the whole line stayed one colour (superseded 2026-09-13)."""
     brand.set_color_map(_MAP)
     try:
-        m = brand.math_line("if $h$ then", "dark", role="text")
+        m = brand.math_line("if $\\theta>0$ then $\\sin\\theta$", "dark", role="text")
     finally:
         brand.set_color_map(None)
     assert isinstance(m, Tex) and not getattr(m, "_ml_parts", False)
-    assert {col for _, col in _leaves(m)} == {_c("text")}, _leaves(m)
+    counts = _glyph_colors(m)
+    assert counts[_c("concept")] == 2, counts    # the two \theta
+    assert counts[_c("result")] == 3, counts     # \sin
+    assert counts[_c("text")] == 8, counts       # "if", ">0", "then"
+
+
+def test_no_table_leaves_a_mixed_line_untouched_and_geometry_never_moves():
+    """Zero behaviour change: no meta.color_map, or a table with no token hit in the line, is
+    the old single-colour Tex, byte for byte. And even where the table DOES hit, the injected
+    special is zero-width (dvisvgm) -- the bounding box never moves, only glyph colour does."""
+    src = "if $\\theta>0$ then $\\sin\\theta$"
+    brand.set_color_map(None)
+    plain = brand.math_line(src, "dark", role="text")
+    assert isinstance(plain, Tex) and not getattr(plain, "_ml_parts", False)
+    assert set(_glyph_colors(plain)) == {_c("text")}
+
+    brand.set_color_map(_MAP)
+    try:
+        tinted = brand.math_line(src, "dark", role="text")
+        absent = brand.math_line("if $x>0$ then $y$", "dark", role="text")  # no mapped token
+    finally:
+        brand.set_color_map(None)
+    assert (tinted.width, tinted.height) == (plain.width, plain.height), (tinted.width, plain.width)
+    assert set(_glyph_colors(absent)) == {_c("text")}
+
+
+def test_prose_lines_two_line_wrap_matches_geometry_with_and_without_the_table():
+    """`_wrap_mixed` decides line breaks from the ORIGINAL text before any colour is injected,
+    and the injected specials add no width, so the table changes colour, never the wrap."""
+    text = "The angle $\\theta$ grows slowly then $\\sin\\theta$ grows quickly here"
+    brand.set_color_map(None)
+    plain = brand._prose_lines(text, "dark", "text", "body", 6.0, "LEFT")
+    brand.set_color_map(_MAP)
+    try:
+        tinted = brand._prose_lines(text, "dark", "text", "body", 6.0, "LEFT")
+    finally:
+        brand.set_color_map(None)
+    assert len(plain.submobjects) == len(tinted.submobjects) == 2
+    for p, t in zip(plain.submobjects, tinted.submobjects):
+        assert (p.width, p.height) == (t.width, t.height)
+    counts = _glyph_colors(tinted.submobjects[0])
+    assert counts[_c("concept")] == 2 and counts[_c("result")] == 3, counts
+
+
+def test_a_colour_injected_frac_argument_that_latex_refuses_falls_back_to_one_colour():
+    """Same class of failure as `_math_tex`: a mapped token as `\\frac`'s UNBRACED argument
+    makes the coloured source refuse to compile (inserting `\\special` before the token
+    breaks the single-token argument grab) -- retry the plain source in one colour, warn
+    once. Forced with a real case (`h` unbraced) rather than monkeypatching, since the
+    injected source, not the *parts split, is what fails here."""
+    out = io.StringIO()
+    brand.set_color_map(_MAP)
+    try:
+        with contextlib.redirect_stdout(out):
+            m = brand.math_line("the ratio $\\frac h2$ is small", "dark", role="text")
+            again = brand.math_line("the ratio $\\frac h2$ is small", "dark", role="text")
+    finally:
+        brand.set_color_map(None)
+    assert isinstance(m, Tex)
+    assert set(_glyph_colors(m)) == {_c("text")}
+    assert set(_glyph_colors(again)) == {_c("text")}
+    lines = [ln for ln in out.getvalue().splitlines() if ln.startswith("[color_map]")]
+    assert len(lines) == 1, out.getvalue()
+    assert "the ratio $\\frac h2$ is small" in lines[0] and "one colour" in lines[0], lines
 
 
 def test_a_split_latex_rejects_falls_back_to_one_colour_with_one_warning():
