@@ -43,7 +43,7 @@ scene `kind` 是 first-class 的，且支援 silent（no-narration）scene。
 
 | 原封沿用（已驗證，重寫無收益） | 從零重寫 |
 |---|---|
-| `visuals/theme.py`（Midnight Canvas palette + Plex/LaTeX type scale + layout metrics） | storyboard schema + format |
+| `visuals/theme.py`（Midnight Canvas palette + LaTeX type scale + layout metrics） | storyboard schema + format |
 | `visuals/graph_utils.py`（safe expr eval + sampling） | narration → beats compiler |
 | `visuals/layout.py`（16:9 zone layout） | scene templates |
 | ffmpeg mux/concat logic *（現於 `make.py` compose；gen-2 的 `mux.py` 已刪）* | TTS backend（MiMo；Gemini 已退場） |
@@ -172,6 +172,7 @@ Demo storyboard 在 `storyboards/_demo_*.yml`。
 | `theorem_proof` | gold-bar 面板 statement + 藍點 proof steps + 綠 QED | `statement`、`proof[]`（字串，或 `{tex, anim: transform, frame}` dict 列）、`qed` | `proof.N`、`qed`、`statement`（寫了 `{show statement}` 才動態；`PROOF` 小標跟 `proof.0` 同進） |
 | `procedure_steps` | 01/02 藍數字步驟 + 底部圓角 worked strip | `steps[{text,math}]`、`worked[]` | `math.N`、`worked` |
 | `derivation` ★ | **統一數學系統**：式子左欄 + reason rail（dotted leader）+ amber ∴ result + 綠 ✓ check | `steps[{math, reason?, anim?}]`、`result:{math, reason?, anim?}`、`check:{math, reason?}`；**或** back-compat `lines[]`（`anim: highlight` → result）、`statement`。`anim: transform` ＝原地改寫（見下方 motion primitive 節） | `step.N`/`result`/`check`（或 `line.N`）、`statement`（寫了 `{show statement}` 才動態） |
+| `worked_example` ★ | **例＋解**（講義的 `workedexample` 容器）：題目當 masthead ＋ `SOLUTION` 步驟鏈 ＋ 右 rail（策略／notes）＋ 釘在下三分之一的**答案框**（62 px，畫面最重）。列文法＝`derivation` 逐字相同但**不收 `reason`**（rail 給了 strategy／notes）。詳見下方專節 | `prompt`(必填)、`result:{math, reason?}`(必填,續頁除外)、`steps[{math, anim?, frame?, cancel?, seg_roles?, color_role?, mark?}]`、`check`、`number`、`title`(tagline)、`strategy`、`notes[{math, text?, ref?}]`、`notes_label` | `step.N`／`result`／`check`／`strategy`／`note.N`（`strategy`／`note.N` 寫了 `{show …}` 才動態；`result` 恆動態） |
 | `callout` ★ | Remark / Caution / Note：eyebrow `[ TYPE n.n ]`＋title masthead，body 文字置於標題下方（色隨 type：remark 藍／caution 紅／note 琥珀）；`body` 字串→散文、list→條列（同色圓點）。同 `definition_math` 走 `scene_head`＋`place_body`（2026-06-29 改版，見下） | `type: remark\|caution\|note`、`number`(opt)、`title`、`body`(字串或 list) | `body` |
 | `graph` ★ | **統一 graph 引擎**：`mode: single`（一張全幅 plot）或 `mode: 2up`（兩張並排比較） | single：`axes`、`plots[]`、`annotations[]`；2up：`left`/`right` `{axes, plots, caption, verdict}`、`annotations[]`。plot kind＝`function`／`line`／`band`／`point`／`sweep`（游標掃描，見下方 motion primitive 節） | single：`annotation.N`、`plot.N`(`reveal:true`；`sweep` 恆為動態)；2up：`caption.left/right`、`left.plot.N`/`right.plot.N`、`annotation.N` |
 | `value_table` | 數值 limit 表 / formula grid（punchline 欄／列鋪 scene accent 同色 tint + 抬升 ink） | `header[]`、`rows[][]`、`reveal: rows\|cols`、`accent_col`/`accent_row`、`statement` | `row.N` 或 `col.N` |
@@ -478,6 +479,77 @@ freeform 人讀標籤、不被解析為 provenance**（provenance 只認 `ref:`�
 
 把關：[`lint._example_missing_prompt`](pipeline/lint.py) 對「`derivation` 場的 `source` 指到 handout『Example N.N』卻無 `prompt:`」**warn**（advisory，不擋 build；待全章補齊後可升為 error）。
 
+**2026-09-13 起「是課本 Example」有專屬模板 `worked_example`**（見下節）：它把上述 masthead 收進自己的模板檔，
+再補 `derivation`＋`prompt:` 缺的兩件事——**答案框**與**策略 rail**。既有的 `derivation`＋`prompt:` 場不受影響、
+不強制遷移（`example_head` 與 `lint._example_missing_prompt` 原樣保留）。
+
+**兩者的分工（怎麼選）：**
+
+- **`derivation` ＋ `prompt:` ＝合法的輕量形態**：有題目、但畫面上**只要那條推導鏈**——不需要答案框、
+  不需要策略 rail，理由用逐列 `reason` 的 dotted leader 交代就夠。
+- **`worked_example` ＝課本例題的完整形狀**：需要**答案框**（結論是畫面最重元素）、**策略 rail**
+  （一句話說為什麼這樣下手）、或**逐項 `notes:`**（每個因子 → 它的去向 → `ref:` 出處引用）時用它。
+  列不收 `reason`——右 rail 同一欄已經給了 `strategy:`／`notes:`。
+- **既有 9 個 `derivation`＋`prompt:` 例題場（§3.1 四場、§3.2 五場）＝不遷移**
+  （2026-09-13 裁決；遷移要重 derive `_mimo`、reveal id 改名會讓 beat 級 TTS reuse 失配）。
+  遷移是另一輪的事，見 [`KICKOFF-shared-layer-v1.md`](KICKOFF-shared-layer-v1.md) §7「明確不做」。
+
+## Worked-example 模板 `worked_example`（2026-09-13）
+
+**為什麼另開一個模板：** 全書 935 個語意塊裡 `workedexample`（例＋解）有 **220 個（24%）**，是單一最大宗，
+但影片產線只能借 `derivation`＋`prompt:`。借來的形狀缺三件事：① 右 rail 被逐列 `reason` 佔住，沒地方放「策略」；
+② 沒有答案框，**結論不是畫面上最重的元素**（違反版面規則 1）；③ 題號與 `title` 無處安放（`example_head` 直接忽略 `title`）。
+視覺依據＝設計畫布 [`_audit/design-template-system/WorkedExample.dc.html`](_audit/design-template-system/WorkedExample.dc.html)。
+
+**版面（Lectern）：** masthead（`[ EXAMPLE 3.1 ]` chip＋`title` 小字 tagline／右上 `part` 指示 → 題目 → 細線 → `SOLUTION`）
+→ 步驟欄左齊 `SPINE_X`、彈性撐開；右 rail 左緣 `RAIL_X`（左側一條直線）＝`strategy` 上段＋`notes` 下段；
+答案框滿 `CONTENT_W`、底邊釘底安全邊界、答案 **62 px** 語意色、右端 mono tag。**有答案框的場不畫角落 motif**
+（motif 是用來壓住空的右下角，而答案框已經把那個角落填滿）。
+
+**欄位契約**（列文法與 `derivation` **逐字相同**，`steps[]`／`result`／`check` 收 `{math, anim, frame, cancel, seg_roles, color_role, mark}`；
+模板直接 import `derivation` 的 `_eq_mob`／`_transform_anim`／`_cancel_anim`／常數，所以 `{{…}}` 分段、`meta.color_map`、
+`seg_roles`、`paced:` 的行為一致，derivation 改了這裡自動跟）：
+
+| 欄位 | 必填 | 說明 |
+|---|:--:|---|
+| `prompt` | ✅ | 題目。**沒題目不是例題**（schema error）。 |
+| `result` | ✅* | 答案框；`reason` ＝右端 tag 字（預設 `answer`）。*唯一例外＝`part.current < part.total` 的續頁（答案還沒到）。 |
+| `number` | | `"3.1"` → eyebrow `[ EXAMPLE 3.1 ]`；省略則 `[ EXAMPLE ]`。 |
+| `title` | | chip 右側的小字 tagline（`caption` 30 px），**不是標題**；critic 仍用它當場景標籤。 |
+| `strategy` | | 右 rail 上段（`STRATEGY` 小標＋散文）。 |
+| `notes` / `notes_label` | | 右 rail 下段，每項 `{math, text?, ref?}`；`ref` 是靠右的藍色 mono 引用 tag。`notes_label` 預設 `notes`，跟 `note.0` 一起進場（行為比照 `theorem_proof` 的 `PROOF` 小標跟 `proof.0`，但機制不同：此處小標併進 `note.0` 的 mobject——rail 內、相距 0.16u；`theorem_proof` 走 `reveal_with` 的獨立 Block，理由見該節）。 |
+| `steps[]` / `check` | | 步驟鏈；`check` 得綠 ✓。**列不收 `reason`**（schema error）——右 rail 給 `strategy`／`notes`，與 derivation 的 reason rail 是同一欄，不能並存；理由進 `strategy:`／`notes:`／旁白。**不收 back-compat `lines[]`**（schema error）。 |
+| `accent` | | **省略＝`example`（practice 綠）**——它就是講義的 `workedexample` 容器，講義裡永遠綠。 |
+| `scaffold` | | 比照 `derivation` 掛在 SOLUTION 之下。`statement` 不收（`prompt` 就是題目）。 |
+
+**reveal id：** `step.N`／`result`／`check`／`strategy`／`note.N`。`strategy`／`note.N` 預設 static（開場就在），
+`say` 寫了 `{show …}` 才動態（同 `statement` 的 `_common.reveals` 慣例）；**`result` 恆動態**（它是 payoff，
+不該從 t=0 就擺在題目底下）。變形鏈＝`steps[] → result`（同 derivation），`check` 固定 stock reveal。
+
+**容量（L2）：** `capacity_meta(spec)` 回**兩個** `ColumnPlan`——步驟欄（`min_pitch` ＝ derivation 的 `MIN_PITCH`）＋
+rail 欄（`min_pitch=RAIL_GAP`，`x_bucket=round(RAIL_X)`），兩條獨立流各自被稽核。`extra_bottom` ＝答案框高＋間距，
+**由模板自己的答案框 helper 量出來**（放置與稽核同一個數）。配套改了 `sizecheck._capacity_issues` 一處：
+**完全落在 `extra_bottom` 保留帶內的 block 不再計入縱向堆疊**——否則答案框會被算兩次（一次是從 zone 挖掉的空間、
+一次又當成要塞進剩餘 zone 的一列），使每個有答案框的場都誤報「拆頁」。只有「整塊都在保留帶內」才跳過，
+**溢出到保留帶的列（下緣穿出底安全邊界）照算**，所以真正超量的場仍然會 warn。
+
+**兩處刻意偏離 mockup：**
+
+1. **列一律左齊 `SPINE_X`，不做 mockup 的 `=` 對齊欄。** 要做 `=` 對齊欄，得嘛改 `sizecheck._capacity_issues`
+   以 `round(left)` 分欄的做法（會動到既有 deck 的容量判定），得嘛在每列塞一段看不見的幾何（`paced` 與
+   derivation 的 `_rail` 都會把它當內容走一遍）。正典 deck 的續行 `= …` 左齊已經是 house look。
+2. **列寬超過步驟欄寬 → `build` 直接 `raise ValueError`（點名該列、寬多少、上限多少、三條出路：拆列／縮題／拿掉 rail）**，
+   不縮字。版面規則 3 只在主內容佔寬 <58% 時才展開右欄（`RAIL_COL=7` ＝ 58.3%），而本專案已明確否決 auto-fit 縮字
+   （見下方容量契約）：超量是 authoring 決策。sizecheck 會以「could not build scene」把它報成 error。**沒有 rail 時**
+   步驟欄吃滿 `CONTENT_W`，過寬回到反應式（`sizecheck._overflow_issues`），與其餘模板一致。
+
+**稽核模組接線：** `template_names.CONTENT_TEMPLATES`（tts `--unit auto` allowlist 自動跟）、
+`schema._worked_example_issues`（上表的 error）＋`_seg_roles_issues`＋與 derivation 共用的 `_row_anim_issues`、
+`step_coverage._SCOPED_TEMPLATES`、`provenance._present_text_fields`（`strategy` 與 `notes.i.text` 是上畫面教學文字，
+走 `ref:`／`refs:`）。`pedagogy._MOTIVE_TEMPLATES` **不加**（`prompt` 就是 motive）。
+demo／回歸稿＝[`storyboards/_demo_worked_example.yml`](storyboards/_demo_worked_example.yml)（四場：完整形狀／無 rail／
+容量超量／分頁續頁），selftest＝`pipeline/_selftest_worked_example.py`。
+
 ## 內容分量自適應 ＋ 多頁拆分（2026-06-21）
 
 固定 body zone（≈5u）要容納 1–7 列的內容。原則：**字型保持統一，用「間距帶＋拆分」吸收差異**，
@@ -546,6 +618,67 @@ V/A code**。
   build 前另有 **warn-default check**（[`pipeline/sizecheck.py`](pipeline/sizecheck.py) `_floor_issues`，opt-in
   `meta.fontfloor_enforce` 才升 error）浮現過小文字。判斷層：承載值小到不可讀 → `V4`（blocking）；小但可辨
   → `A6` 扣分，並補一條「以手機寬度檢核次要文字」的尺標。
+
+## 設計系統規則落地：LayoutRules L1–L3／MathRules M1–M3（2026-09-14 T3）
+
+設計畫布 [`_audit/design-template-system/LayoutRules.dc.html`](_audit/design-template-system/LayoutRules.dc.html)
+（版面四條 L1–L4）與 [`MathRules.dc.html`](_audit/design-template-system/MathRules.dc.html)（數學五條
+M1–M5）是 §3.1 成片 rewatch 之後訂下的設計法。**九條裡六條可以寫成確定性檢查**，本輪落進
+[`sizecheck.py`](pipeline/sizecheck.py)。**分流表（哪三條只能人審、各歸哪個既有判斷閘）在
+[`REVIEW_GATES.md`](REVIEW_GATES.md) §一 層 6**；本節寫的是落地那六條的**判準、門檻、以及門檻為什麼是這個數字**。
+
+**六條全部 warn-default，一條都不預設 error。** 理由：deck 全部早於規則，一上來就 error 只會讓人用
+`--skip-sizecheck` 把整個 sizecheck 關掉，連既有的 11 項一起失效。升級路徑是**逐節 opt-in**：
+`meta.layout_enforce: true` 把 L 系升成 error、`meta.mathtype_enforce: true` 把 M 系升成 error
+（形狀比照 [`pedagogy.assumptions_registry_issues`](pipeline/pedagogy.py) 的 `sev = "error" if enforce else "warn"`）。
+**改預設的條件**：某一節開了旗標、跑完一整輪零誤報，**下一輪**才拿出來討論（T3 本輪明確不改預設）。
+
+| 規則 | 判準（函式） | 門檻／常數 | 為什麼是這個門檻 |
+|---|---|---|---|
+| **L1** 結論最重 | `_conclusion_weight_issues`：`result`／`qed` 區塊的最大 authored px vs 其餘 body 區塊的最大 authored px | `L1_WEIGHT_RATIO = 1.15` | 規則原文寫 `>=`（嚴格）。但 `theorem_proof` 的 `statement` 卡是 44 px、`qed` 行是 43 px——**1 px 的「反轉」沒有人看得見**，嚴格比較會讓每一場帶 qed 的證明都噴 warn。規則舉證的真實反轉是 30% 級距（結論掉到 rail 階 34 vs statement 44＝1.29；今天的 payoff 62 vs body 48 也是 1.29），所以 1.15 兩邊都分得開 |
+| **L2** 下三分之一不得空置 | `_bottom_band_issues`：body 區塊 bbox 聯集 ∩ 下三分之一 ÷ 該帶面積 | `L2_BAND_FRAC = 1/3`、`L2_MIN_FILL = 0.15` | **門檻就是規則原文的 0.15，沒有調過。** 用 bbox 聯集近似墨覆蓋是**刻意高估**（bbox 恆 ≥ 框內的墨），所以「連 bbox 都不到 15%」比規則要求的更強——只會少報，不會誤報 |
+| **L3** 右欄有條件展開 | `_main_width_issues`：body 區塊的水平總跨距 ÷ 幀寬；不足時要求 `aside:` 或置中 | `L3_MAIN_W_FRAC = 0.58`、`L3_CENTER_TOL = 0.6u` | 0.58 是規則原文。`0.6u` 的置中容差＝圖／表天生置中（實測 `cx = 0.00`），左掛的文字欄實測 `cx = −2.7…−6.0u`，兩群相差一個數量級，容差落在中間任何值結果都一樣 |
+| **M1** 數學行不得混入散文 | `_math_register_issues`：`\text{}`／`\mbox{}`，或控制序列剝掉後仍有連續 ≥2 個多字母單字 | 兩個豁免（見下） | 規則原文沒有門檻，只有形狀。誤報全出在**範圍**而不是門檻，所以校準的是範圍 |
+| **M2** rail 只有兩種語域 | `_rail_register_issues`：一個 `reason` 同時有 `$…$` 與裸英文字 | 無門檻 | 規則原文「整段數學，或整段 sans 小型大寫。不混。」逐字可判 |
+| **M3** 運算元正體 | `_operator_upright_issues`：已知運算元名寫成裸字母序列（少 `\`） | `_UPRIGHT_OPS` 名單 | 只取原文可判定的那一半；完整正斜體判斷歸人審（分流表） |
+
+**M1 的範圍是這一輪最花時間的校準，兩個豁免都寫成測試：**
+
+1. **只查「渲成 display 數學行」的欄位。** `derivation`／`worked_example` 的鏈列（`steps[].math`／
+   `result.math`／`check.math`／舊 `lines[].tex`）一律走 `brand.math_line`，恆在範圍內——而且**正是這些列有
+   規則要你把說明搬進去的 reason rail**。`definition_math.math[]` 也走 `math_line`，但 `math_line` 有**文件寫明的
+   混排分支**（`"if $f(x)=0$ then $x=a$"` → 文字模式 `Tex`），那是散文行不是數學行，因此只收 display 形態。
+   `theorem_proof.proof[]` 走的是 `brand.prose`：**整列一個 `$…$` 才是 display 數學行**，其餘是作者寫的散文句
+   （`"Take any two distinct inputs in the interval $[a,b]$."`），查它等於在罰模板照設計運作。
+   未收範圍的還有 `statement:`（散文可以是公式，混排是它的本職）、graph 曲線標籤、`procedure_steps.worked[]`。
+   `sizecheck._math_fields` 的 docstring 逐條寫出這個邊界。
+2. **`\underbrace{X}_{\text{label}}` 不算。** 開在 sub／superscript 群組裡的字串是**掛在式子下方的標籤**，
+   不是坐在行內的散文——它本身就已經是規則要的那個動作（把字移出行）。`_SCRIPT_LABEL` 在兩個偵測器之前剝掉。
+
+**L1 的量測有一個 manim 陷阱，值得單獨記：** 不能用 manim 公開的 `font_size` getter
+（`height / initial_height / SCALE_FACTOR_PER_FONT_POINT`）。凡是用 `substrings_to_isolate` 建的 `MathTex`
+（**每一個 `{{…}}` 段、每一個 deck `color_map` 命中**都走這條）都會在 `initial_height` 取樣**之後**重建
+submobject，於是 getter 拿重建後的高度去比未重建的基準——`_demo_tex_parts` 的
+`{{\lim}} {{\frac{h+h^2}{h}}}` 那一列實測報 **102 px**，實際授權字級是 48 px（2.1 倍）。
+`sizecheck._authored_font_px` 改讀 manim 在建構時記下的 `_font_size`（不受重建影響），
+校準前 23 deck 有 9 個假 L1 warn，校準後 **0 個**。
+**連帶發現（本輪不修，屬另案）：** 既有的 `_effective_font_px` 仍走公開 getter，`_floor_issues` 因此
+在這類節點上**高估**字級——方向是少報 floor warn，不是誤報，但值得另開一輪處理
+（見 [`KICKOFF-shared-layer-v1.md`](KICKOFF-shared-layer-v1.md) §8）。
+
+**23 deck 校準結果（139 個 content 場，全部 warn、error 行逐字不變）：**
+L1 **0**／L2 **63**／L3 **7**／M1 **22**／M2 **30**／M3 **0**，合計 122 條。
+逐條都能指出違反在哪（deck→場→欄位）。兩個數字值得留著當基準：
+
+- **L1 = 0 不是規則沒生效，是 T2 之後 storyboard 表面已經做不出違反**——payoff 階 62 px 高於任何 body 區塊
+  能被授權的字級，模板也不會把結論縮小。L1 因此是**擋未來模板／hook 迴歸**的閘（hook 自建 `MathTex`
+  可以是任意字級），不是擋撰稿錯誤的閘；它的違反案例只能用合成區塊測（`_selftest_layout_rules.py`）。
+- **M3 = 0**：現有 deck 的 `\sin`／`\lim` 全部寫對。fixture 證明偵測器會動。
+
+回歸網＝[`pipeline/_selftest_layout_rules.py`](pipeline/_selftest_layout_rules.py) ＋
+fixture [`storyboards/_fixtures/layout_rules.yml`](storyboards/_fixtures/layout_rules.yml)：
+fixture 的六個場把**每一條規則的違反與乾淨兩側都釘住**（EXPECT 是 scene × rule 的完整矩陣，
+沒列到的規則必須靜默），另加純函式探針釘住 M1–M3 的偵測器邊界與 L1 的幾何。
 
 ## 內容分量變異：容量契約三層架構（2026-06-21 設計拍板）
 
@@ -681,6 +814,7 @@ slope-from-definition computation）需要 7–9：
 | 內容形狀 | 模板 | 單頁容量預算 | 超量動作（DENSE） | 稀疏動作（SPARSE） |
 |---|---|---|---|---|
 | 連續推導鏈 | `derivation` | fraction 列：無 statement ~5、有 statement ~4；single 列 ~7 | 按邏輯階段切 `part:`，不硬切等號 | fill_gap 自動；勿加廢列 |
+| 例題（題目＋解＋答） | `worked_example` | 62 px 答案框固定佔下三分之一，SOLUTION 之下只剩 ≈2.9–3.3u：步驟 ≈2 個分數列（答案為單行式時 3 列）或 ≈4 個單行列；rail 一行策略句＋≤2 條 notes（實測 2026-09-13：mockup 的 4 列是 38 px 靜態圖，影片字級放不進去） | 按邏輯階段切 `part:`，答案框留到末頁（續頁可省 `result`）；rail 存在時列過寬會 raise——拆列／縮題／拿掉 rail | 拿掉 rail 讓步驟欄滿寬（D8）；勿加廢列 |
 | 陳述＋符號式 | `definition_math` | statement ≤3 行＋math ≤4 列 | 拆 part 或把長鏈改 derivation 景 | 掛 `aside` 卡（L3） |
 | 命題＋證明 | `theorem_proof` | proof ≤4 步＋qed（一般步 2–3；fraction 步更保守） | >4 步拆 statement＋proof 兩場、超頁 `part:` | statement-only 走 card＋aside 兩欄 |
 | 離散步驟 | `procedure_steps` | 3–4 步、math ≤5u 寬 | 拆 part；長式改 derivation | ——（步驟自然 ≥3） |
@@ -733,7 +867,18 @@ say: |
   `theorem_proof` 與 `derivation` 的 `statement` 預設是開場畫面的一部分（static）；
   **`say` 一旦寫了 `{show statement}`，它就改為該 beat 滑入**（`slide`，0.5 s）。
   marker 即 opt-in：沒寫的場逐 token 不變。同理 `theorem_proof` 的 **`PROOF` 小標
-  在 `say` 有 `{show proof.0}` 時跟第一行證明一起進場**（否則照舊 static）。
+  在 `say` 有 `{show proof.0}` 時跟第一行證明一起進場**（否則照舊 static）。小標
+  **始終是自己的 Block**，靠 `blocks.Block.reveal_with="proof.0"` 宣告「沒有自己的
+  marker，跟那一拍進場」，player（`scene._play_content`）在該 beat 先播小標再播那一
+  列（2026-09-14）。在此之前它折在 `proof.0` 的 **anim** 裡，於是只要 hook **覆寫**
+  （而非包住）`proof.0` 的 anim，字卡就整場不見——`ch03_trig_derivatives_hooks:
+  continuity_template` 正是如此，§3.1 場 09 的證明從頭到尾沒有 `PROOF`。也不採
+  `worked_example` 把小標併進 `note.0` mobject 的做法：§3.1 的 hook 以位置定址
+  `proof.0.mobject`（`_mark_factors` 取 `.submobjects[1]` 當 `{{…}}` 分段、
+  `cosine_identity_draft` 對它跑 `derivation._eq_core`），且 `reaches_rail` 會把證明鏈
+  推到字卡下方，小標到首列的 VGroup 會給佈局閘一個中空的框（`_demo_tall_rows` 的
+  overlap／capacity 誤判）。副作用：`paced: [proof.0]` 不再需要模板自己接手——
+  `proof.0` 回到 stock reveal，`pacing.apply` 照一般列升級它。
   在此之前，reveal 打在 static block 上只是對已在畫面上的 mobject 再播一次 FadeIn，
   「揭示」前後兩幀無差（ch03 `continuity_statement_sin_limit`，rewatch R2 2026-09-12）。
 - `say` 中的 LaTeX 是正典寫法（mock 與閱讀版直接用）。**真旁白走 MiMo**，由
@@ -1151,20 +1296,20 @@ assert 回傳的秒數，沒有這層 fallback 會拿到 0.0。所以 hook 一�
 
 ### Text rendering：prose vs math（no garble）
 
-**Route A（2026-06-24 落地）：所有螢幕文字都走 LaTeX/pdflatex** 以拿到正確 kerning——內文/標題 **IBM Plex Sans**、eyebrow **IBM Plex Mono**、數學 **Latin Modern**。根因：實測 manim `Text`/`MarkupText`（Pango）完全不套 kerning（`W("AVAVAV")`≈各字寬相加），sans 尤其鬆；LaTeX 會 kerning。字體在 TeX preamble 設定（`_bootstrap.apply_tex_template`：`plex-sans`＋`plex-mono`＋`lmodern`＋`microtype`，`familydefault=\sfdefault`，`\everymath{\displaystyle}`），所以本模組不再出現任何 Pango family 名。硬約束：只能 pdflatex（lualatex/xelatex 會破壞 manim 的 `\special{dvisvgm:raw}` 數學子部件定址）。計畫見 [`content_scripts/_audit/PLAN-routeA-plex-latex.md`](content_scripts/_audit/PLAN-routeA-plex-latex.md)。
+**Route A（2026-06-24 落地）：所有螢幕文字都走 LaTeX/pdflatex** 以拿到正確 kerning——內文/標題 **Instrument Sans**（2026-09-13 由 IBM Plex Sans 換過來；沒有 CTAN 套件，OTF＋autoinst 生成物 vendored 在 `pipeline/fonts/instrument-sans/`，換機設定見 [`../ENVIRONMENT.md`](../ENVIRONMENT.md) ①b）、eyebrow **IBM Plex Mono**、數學 **Latin Modern**。根因：實測 manim `Text`/`MarkupText`（Pango）完全不套 kerning（`W("AVAVAV")`≈各字寬相加），sans 尤其鬆；LaTeX 會 kerning。字體在 TeX preamble 設定（`_bootstrap.apply_tex_template`：`InstrumentSans`＋`plex-mono`＋`lmodern`＋`microtype`，`familydefault=\sfdefault`，`\everymath{\displaystyle}`），所以本模組不再出現任何 Pango family 名。硬約束：只能 pdflatex（lualatex/xelatex 會破壞 manim 的 `\special{dvisvgm:raw}` 數學子部件定址）。計畫見 [`content_scripts/_audit/PLAN-routeA-plex-latex.md`](content_scripts/_audit/PLAN-routeA-plex-latex.md)。
 
-> **每景重套 template（坑）：** manim 的 `tempconfig`（`make.py`／`scratch_frames` 每景 `with tempconfig(cfg): LessonScene().render()`）退出時會把 `config.tex_template` 重設回預設（serif CM、缺 `\sfdefault` 與 `\arccsc` 等），所以 `LessonScene.construct()` 在 build 前都呼叫 `_bootstrap.apply_tex_template()` 重套，否則一個 batch 只有第一景拿到 Plex。
+> **每景重套 template（坑）：** manim 的 `tempconfig`（`make.py`／`scratch_frames` 每景 `with tempconfig(cfg): LessonScene().render()`）退出時會把 `config.tex_template` 重設回預設（serif CM、缺 `\sfdefault` 與 `\arccsc` 等），所以 `LessonScene.construct()` 在 build 前都呼叫 `_bootstrap.apply_tex_template()` 重套，否則一個 batch 只有第一景拿到正確字體。
 
 螢幕文字現在全走 LaTeX（`Tex`／`MathTex`），按角色分：
 
 | 角色 | 函式 | 字體 | LaTeX |
 |---|---|---|---|
-| 標題 | `brand.heading` / `brand.heading_rich` | Plex Sans Bold | `\textbf{…}` |
-| 內文 prose | `brand.body_text` / `brand.prose` | Plex Sans | text-mode（含 `$math$`） |
+| 標題 | `brand.heading` / `brand.heading_rich` | Instrument Sans Bold | `\textbf{…}` |
+| 內文 prose | `brand.body_text` / `brand.prose` | Instrument Sans | text-mode（含 `$math$`） |
 | eyebrow / label | `brand.eyebrow` | Plex Mono | `\texttt{…}` |
 | 數學 | `brand.math_line` / `MathTex` | Latin Modern | math-mode |
 
-`Tex` 在 text mode 原生排「文字＋內聯 `$math$` 同行」、baseline 正確、kerned，所以**舊的 Pango↔Tex 拼接機制已全部移除**：`theme.TEX_TEXT_SCALE`（Pango↔Tex 尺寸對齊，今 = 1.0 no-op）、`brand._pango_dashes`、`brand._compose`／`_prose_mixed`（手動 baseline 拼接）。換行寬度估計 `_WIDTH_K`／`estimate_text_width` 與 kerning 無關，保留並已重校為 Plex-LaTeX。
+`Tex` 在 text mode 原生排「文字＋內聯 `$math$` 同行」、baseline 正確、kerned，所以**舊的 Pango↔Tex 拼接機制已全部移除**：`theme.TEX_TEXT_SCALE`（Pango↔Tex 尺寸對齊，今 = 1.0 no-op）、`brand._pango_dashes`、`brand._compose`／`_prose_mixed`（手動 baseline 拼接）。換行寬度估計 `_WIDTH_K`／`estimate_text_width` 與 kerning 無關，保留並在每次換字時重校（2026-09-13：Instrument Sans）。
 
 **規則（template 必須遵循）：** 作者可能放入 `$` 或 `\` 的任何欄位——`title`、
 `statement`、step `text`、`takeaway`、recap `points`——透過 **`brand.prose`**
@@ -1210,30 +1355,41 @@ standalone display line**——`heading`/`heading_rich` title——即使在那�
 
 ### 型階與量測表（2026-07-05 體檢存檔）
 
-**型階承載表**（`theme._SCALE_PX`，px＠1920×1080；由大到小）：
+**型階承載表**（**第一欄＝`theme._SCALE_PX` 的真實鍵**，px＠1920×1080；由大到小。2026-09-14 T2
+更正：舊表把「divider」「result」當成鍵列，前者是 alias、後者根本不是鍵而是 `derivation.py`
+的 raw px——兩者都已收成真鍵）：
 
-| 型階 | px | 用途 |
+| `_SCALE_PX` 鍵 | px | 用途 |
 |---|---|---|
-| hero | 112 | 無 call site 保留 |
-| divider | 92 | divider title（`heading_rich size="intro_headline"`；2026-07-05 由 raw 92 掛回 token。outro title 亦由 raw 72 → `outro_headline`=78） |
+| hero | 112 | 無 call site 保留（back-compat alias `display`） |
+| intro_headline | 92 | intro／divider title（`heading_rich size="intro_headline"`；**舊表列名「divider」不是鍵**。outro title 走 `outro_headline`=78） |
 | h1 | 78 | 一級標題 |
+| **math_conclusion** | **62** | **數學三階①結論**：derivation result line、`worked_example` 的 ANSWER 帶（2026-09-14 T2 由 `derivation.py` 的 raw `size=54` 升成具名 token 並改 62；**舊表列的「result 54」不是鍵、值也不是 54**） |
 | h2 | 58 | 二級標題 |
-| result | 54 | derivation result line |
-| math | 48 | display 數學 |
+| **math** | **48** | **數學三階②body**：display 數學（未變） |
 | h3 | 44 | 三級標題（example prompt） |
 | statement | 44 | **命題/定義/value_table/sign_chart 的 `statement`**（2026-07-05 統一 raw-px 落單；原散落 h3=44／prose=42／raw 40） |
-| prose / step | 42 | 內文、離散步驟文字、value_table 內文 cell |
-| math_sm | 40 | 刻度／軸名（graph carrier label 現已升為 math_sm） |
-| prose_sm | 35 | reason rail／aside／divider 副標／value_table 表頭（2026-07-05 收 raw 40／38 落單） |
-| tag | 30 | derivation result-reason、part pager |
+| prose | 42 | 內文、離散步驟文字、value_table 內文 cell（back-compat alias `body`／`step`） |
+| prose_sm | 38 | reason rail／aside／divider 副標／value_table 表頭（2026-07-05 收 raw 40／38 落單；**2026-09-14 T2 由 35 → 38**，A/B 開放值定案） |
+| **math_rail** | **34** | **數學三階③rail·inline**：graph 刻度／軸名／carrier label、QED 字形、sign_chart 點標、procedure 鏈（2026-09-14 T2 取代 `math_sm` 40） |
+| tag | 32 | derivation result-reason、part pager（**2026-09-14 T2 由 30 → 32**，A/B 開放值定案） |
 | eyebrow | 26 | floor（`MIN_FONT_FLOOR`） |
+
+**數學只有三階**（`MathRules.dc.html` 規則 5，2026-09-14 T2 落地）：結論 62 ／ body 48 ／
+rail·inline 34。`math_sm 40` **已刪除、不留 alias**——實測它與 48 在螢幕上分不出來，只製造不一致；
+刪鍵之後任何殘留 call site 會直接 `KeyError`，那就是編譯期的閘。守門＝`pipeline/_selftest_type_scale.py`
+（AST 掃 `templates/` 的 `brand.math_line`／`brand.glyph` 的 `size=`，斷言落在 62／48／34 或明列例外）。
+**三階的 34 與 `prose_sm` 38、`tag` 32 是三個不同 family／不同路徑的 token，不合併**：34 走 MathTex
+（Latin Modern，不吃 `TEXT_SCALE`），38 走文字（Instrument Sans，`×TEXT_SCALE`），32 走 mono eyebrow，
+三者同一個 px 數字在畫面上也不會一樣大。目前**明列的非三階例外**：`sign_chart` 的 ±／箭號 mark（raw 64）
+與 `procedure_steps` 的 step 算式（raw 44），兩者早於 T2、不在 T2 契約內（見 `KICKOFF-shared-layer-v1.md` §8）。
 
 **數學三路徑表**：
 
 | 路徑 | 公式 | 說明 |
 |---|---|---|
 | `MathTex`（display） | `px × PX_TO_FS(0.698)` | 基準：math-anchored 換算 |
-| inline-in-prose | 同基準 `× TEXT_SCALE(1.3102)` ＝ **+31%** | `brand.prose` 中的 inline `$...$` |
+| inline-in-prose | 同基準 `× TEXT_SCALE(1.2748)` ＝ **+27%** | `brand.prose` 中的 inline `$...$` |
 | inline-in-heading | 同基準 `× HEADING_MATH_SCALE(1.0)` | 標題中的 inline `$...$`，無額外放大 |
 
 Divider hook 案例：`divider` 的 **title 走 92px**（heading 路徑）；其 optional `scaffold.problem`（hook 式問句，P-A3）走 **56px raw px**——純 `$math$` 因此走 `MathTex` display 路徑（不吃 `TEXT_SCALE`），讀來高於 subtitle 而非其 ~80%（見上方 Authoring Playbook「章節轉場」列）。
@@ -1252,9 +1408,9 @@ Divider hook 案例：`divider` 的 **title 走 92px**（heading 路徑）；其
 | procedure pitch | row_gap 1.4 / min_clear 0.35 / title_clear 0.2u | `procedure_steps.py` 設計 rhythm |
 | recap pitch | 47 | recap card 節奏 |
 
-**行長量測法：** 權威＝`brand._WIDTH_K = 0.00507`（＋CJK 字元 ×2 加權）；
+**行長量測法：** 權威＝`brand._WIDTH_K = 0.00521`（＋CJK 字元 ×2 加權）；
 `CONTENT_W ≈ 65` 加權字元＝可讀上緣。**勿再用 0.5em 粗估**——`_WIDTH_K` 已為
-Plex-LaTeX kerning 重新校正，粗估法未計入 kerning 與 CJK 加權，會系統性低估
+實際字體的 LaTeX kerning 重新校正，粗估法未計入 kerning 與 CJK 加權，會系統性低估
 真實跨度。
 
 自動強制：`pipeline/sizecheck.py` build 每個 scene（不 render），在每個

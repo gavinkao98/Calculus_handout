@@ -1,0 +1,58 @@
+\NeedsTeXFormat{LaTeX2e}[2020/02/02]
+\ProvidesPackage{InstrumentSans}
+    [2026/09/13 (autoinst)  Style file for InstrumentSans fonts.]
+
+\RequirePackage{xkeyval}
+\newcommand*{\InstrumentSans@scale}{1}
+\DeclareOptionX{scale}{\renewcommand*{\InstrumentSans@scale}{#1}}
+\DeclareOptionX{scaled}{\renewcommand*{\InstrumentSans@scale}{#1}}
+
+\DeclareOptionX{lining}{\edef\InstrumentSans@figurestyle{LF}}
+\DeclareOptionX{proportional}{\edef\InstrumentSans@figurealign{}}
+\edef\InstrumentSans@figurestyle{LF}
+\edef\InstrumentSans@figurealign{}
+
+\DeclareOptionX{mainfont}{
+    \renewcommand{\familydefault}{\sfdefault}
+}
+\DeclareOptionX{semibold}{\edef\bfseries@sf{semibold}}
+\DeclareOptionX{bold}{\edef\bfseries@sf{bold}}
+\DeclareOptionX{regular}{\edef\mdseries@sf{regular}}
+
+\ProcessOptionsX\relax
+
+\RequirePackage[T1]{fontenc}
+\RequirePackage{textcomp}
+\RequirePackage{ifthen}
+\RequirePackage{xspace}
+
+\ExplSyntaxOn
+\IfFileExists{figureversions.sty}{
+    \RequirePackage{figureversions}
+
+}{}
+\ExplSyntaxOff
+
+%   Here we implement the scale=MatchLowercase option.
+%   If this is given, we must compute the correct value of
+%   the "\InstrumentSans@scale" parameter before loading the .fd files;
+%   but to determine that value we of course need the font's x-height.
+%   To avoid triggering the loading of .fd files,
+%   we use plain TeX's \font primitive to load the testfont.
+%   We then compute the ratio of the current x-height to our font's x-height;
+%   this is the "\InstrumentSans@scale" we will pass to the .fd files.
+\ifthenelse{\equal{\InstrumentSans@scale}{MatchLowercase}}
+    {   \newlength{\InstrumentSans@currentx}
+        \settoheight{\InstrumentSans@currentx}{x}
+        \newlength{\InstrumentSans@xheight}
+        \settoheight{\InstrumentSans@xheight}
+            {{\font\testfont=InstrumentSans-Regular-lf-t1 at \f@size pt\testfont x}}
+        \renewcommand*{\InstrumentSans@scale}
+            {\fpeval{\InstrumentSans@currentx / \InstrumentSans@xheight}}}
+    {}
+
+\renewcommand*
+    {\sfdefault}
+    {InstrumentSans-\InstrumentSans@figurealign\InstrumentSans@figurestyle}
+
+\endinput

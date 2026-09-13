@@ -6,7 +6,8 @@
 # 做什麼：
 #   1) 沒有 repo 根 .venv 就用全域 python 建一個
 #   2) 從 requirements.lock 裝鎖定版本的 Python 依賴（精確可重現）
-#   3) 跑 tools/doctor.py，把系統層缺漏（ffmpeg／LaTeX／Node／Chrome）連同補法印出來
+#   3) 把 repo 內 vendored 的 Instrument Sans（影片文字字型）註冊給本機 MiKTeX（使用者層級）
+#   4) 跑 tools/doctor.py，把系統層缺漏（ffmpeg／LaTeX／Node／Chrome）連同補法印出來
 #
 # 不碰計費 API、不裝系統軟體（系統層由 doctor 給 winget 指令，由你決定何時裝）。
 $ErrorActionPreference = "Stop"
@@ -40,6 +41,21 @@ $agyExe = Join-Path $env:LOCALAPPDATA "agy\bin\agy.exe"
 if ((Test-Path $agyExe) -and -not (Get-Command agy -ErrorAction SilentlyContinue) -and (Test-Path $npmDir)) {
     Copy-Item (Join-Path $repo "tools\agy.cmd") (Join-Path $npmDir "agy.cmd") -Force
     Write-Host "[setup] 已部署 agy shim → $npmDir\agy.cmd" -ForegroundColor Cyan
+}
+
+# 影片文字字型 Instrument Sans：vendored 在 repo，但 dvisvgm 只讀它預設找到的第一個 map 檔，
+# 沒有環境變數能加 map（實測 2026-09-13），所以要兩步 MiKTeX 使用者層級設定。冪等，可重複跑。
+# 換機／搬 repo 後重跑本腳本即可對齊；驗收＝doctor.py 的 fonts 區三項全綠。見 ENVIRONMENT.md ①b。
+$isTexmf = Join-Path $repo "video\pipeline\fonts\instrument-sans\texmf"
+if ((Test-Path $isTexmf) -and (Get-Command initexmf -ErrorAction SilentlyContinue)) {
+    Write-Host "[setup] 註冊 vendored Instrument Sans 給 MiKTeX ..." -ForegroundColor Cyan
+    & initexmf "--register-root=$isTexmf"
+    & miktex fontmaps configure
+    Write-Host "[setup] 已註冊 $isTexmf 並重建字型 map" -ForegroundColor Cyan
+} elseif (-not (Test-Path $isTexmf)) {
+    Write-Host "[setup] 找不到 $isTexmf（vendored 字型應隨 git 而來；git status 檢查）" -ForegroundColor Yellow
+} else {
+    Write-Host "[setup] initexmf 不在 PATH，略過 Instrument Sans 註冊（先裝 MiKTeX）" -ForegroundColor Yellow
 }
 
 Write-Host "`n[setup] Python 端就緒。跑環境健檢：`n" -ForegroundColor Green

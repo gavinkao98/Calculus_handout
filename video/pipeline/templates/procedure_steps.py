@@ -112,9 +112,9 @@ def build(spec: dict[str, Any], ctx: dict[str, Any]) -> list[Block]:
         tag = brand.eyebrow("worked", ground, role="amber_ink")
         chain = []
         for j, piece in enumerate(worked):
-            chain.append(brand.math_line(piece, ground, role="blue_ink", size="math_sm"))
+            chain.append(brand.math_line(piece, ground, role="blue_ink", size="math_rail"))
             if j < len(worked) - 1:
-                chain.append(brand.math_line(r"\to", ground, role="muted", size="math_sm"))
+                chain.append(brand.math_line(r"\to", ground, role="muted", size="math_rail"))
         row = VGroup(tag, *chain).arrange(RIGHT, buff=0.4)
         box = RoundedRectangle(
             corner_radius=T.RADIUS_MD, width=row.width + 0.9, height=row.height + 0.7,

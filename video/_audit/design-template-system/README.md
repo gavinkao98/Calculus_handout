@@ -22,8 +22,14 @@
 | | `WorkedExample.dc.html` | `worked_example` 新模板 mockup（全書 220 單元、最大缺口） |
 
 **使用者裁決＝方向 B「對位」**，已落地到 `theme.py`／`blocks.py`／模板層
-（commit `de3004c`）。**版面 4 條、數學 5 條、`worked_example` 模板、字體都還沒做**
-（KICKOFF §7.1）。
+（commit `de3004c`）。四項未竟項的落地狀態（2026-09-13 更新）：
+
+| 項目 | 狀態 |
+|---|---|
+| **`worked_example` 模板**（`WorkedExample.dc.html`） | ✅ **已落地**（commit `c79372c`，2026-09-13 併入 main）。契約與兩處刻意偏離 mockup 見 [`../../KICKOFF-worked-example-template.md`](../../KICKOFF-worked-example-template.md)，驗收報告 [`../REVIEW-worked-example-template-applied.html`](../REVIEW-worked-example-template-applied.html) |
+| **版面 4 條規則**（`LayoutRules.dc.html`）能自動的寫進 `sizecheck` | 🔵 共用層 v1 進行中，見 [`../../KICKOFF-shared-layer-v1.md`](../../KICKOFF-shared-layer-v1.md)（T3） |
+| **數學排版 5 條**（`MathRules.dc.html`）＝數學字級收成三階 | 🔵 共用層 v1 進行中，見 [`../../KICKOFF-shared-layer-v1.md`](../../KICKOFF-shared-layer-v1.md)（T2） |
+| **字體**（Instrument Sans） | 🔵 共用層 v1 進行中，見 [`../../KICKOFF-shared-layer-v1.md`](../../KICKOFF-shared-layer-v1.md)（T1；本機無 CTAN pdflatex 套件，T1-0 有退路選項） |
 
 ## 為什麼只有工作檔、沒有成品
 

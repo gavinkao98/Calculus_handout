@@ -14,7 +14,7 @@ from __future__ import annotations
 from pipeline import _screen_contract as _sc
 from pipeline.provenance import parse_ref
 
-_SCOPED_TEMPLATES = frozenset({"theorem_proof", "derivation"})
+_SCOPED_TEMPLATES = frozenset({"theorem_proof", "derivation", "worked_example"})
 
 
 def covers_by_unit(storyboard: dict) -> "dict[str, set[str]]":

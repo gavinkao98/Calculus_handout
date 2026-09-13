@@ -1,0 +1,133 @@
+# worked_example 模板 demo／回歸樣本（非正式節，檔名底線前綴）
+#
+# 四場，各驗一條契約（KICKOFF-worked-example-template.md §3 第 5 條）：
+#   companion_limit_example : 照 mockup 的完整形狀——題目＋策略 rail＋notes＋答案框；
+#                             取材 §3.1 Example 3.1（伴隨極限），旁白取自
+#                             content_scripts/ch03_trig_derivatives.md 的 companion_limit 單元。
+#   no_rail                 : 無 strategy／notes → 步驟欄吃滿 CONTENT_W（D8）。
+#   capacity_over           : 7 個分數列 → sizecheck 的 L2 預測式拆頁 warn。
+#   multipage_p1            : part 1/2 且無 result → 證 D4 的唯一例外（續頁答案還沒到）。
+#
+# demo 專用：不進正典 deck、不跑 TTS、不 render 成片。只有第一場帶 `ref:`（它真的出自
+# Example 3.1，`ex:3.1` 是 chapter3.tex 的 label）；另外三場是合成例，不掛 ref 以免假造出處。
+# 本 deck 的 `meta.chapter` 是 "Demo"，`provenance.Loci` 因此讀不到任何章錨點——四場都會有
+# provenance WARN，這是 demo deck 的預期狀態（warn-only，不擋 build，比照其餘 `_demo_*`）。
+
+meta:
+  id: demo_worked_example
+  chapter: "Demo"
+  chapter_title: "Template Validation"
+  section: "0.0"
+  title: "Worked Example Template Demo"
+  language: en
+  theme: midnight
+  voice: Mia
+  video: { w: 1920, h: 1080, fps: 30 }
+  # 語意色：θ 是這題的主變數，在每條式子與 rail 的公式裡同色（SPEC-motion-language 規則 5）。
+  color_map:
+    "\\theta": concept
+  sections:
+    - { id: "0.0", title: "Worked Example Template Demo" }
+
+scenes:
+
+  # 1 ------------------------------ 完整形狀：題目＋rail＋答案框（照 mockup）
+  - id: companion_limit_example
+    kind: content
+    template: worked_example
+    accent: example
+    number: "3.1"
+    title: "the companion limit"
+    ref: doc:ex:3.1
+    source: "chapter3.tex §3.1 . Example 3.1 (companion limit)"
+    prompt: "Establish the companion limit $(1-\\cos\\theta)/\\theta \\to 0$ as $\\theta \\to 0$."
+    # 一行的祈使句：rail 的策略欄放「怎麼下手」，推理（化成平方差）由旁白承載。
+    # 實測：62 px 答案框（1.37u）＋題目 masthead（1.9u）之下，rail 只剩約 2.9u——
+    # T2 定案 prose_sm 38 之後，原長版策略句（帶 "$1+\cos\theta$"）在 T4-5 幀稽核量出會
+    # 折成兩行、頂到答案框（rail 容錯僅 ~33 px），故縮成單行版本（Authoring Playbook：
+    # rail 策略句限一行）。同理步驟鏈取 2 列（＝正典 ch03 companion_limit 的寫法）而不是
+    # mockup 的 4 列：mockup 是靜態版面圖，不含影片的安全邊界與答案框。
+    strategy: "Multiply by the conjugate."
+    notes_label: "what each factor does"
+    notes:
+      - { math: "\\frac{\\sin\\theta}{\\theta}", text: "$\\to 1$", ref: "Prop 3.2" }
+      - { math: "\\frac{\\sin\\theta}{1+\\cos\\theta}", text: "$\\to 0$", ref: "Prop 3.1" }
+    # step.1 從 step.0 原地變形（先框住上一列）；result 隨旁白落在最後一拍。
+    paced: [step.0, result]
+    say: |
+      The fundamental limit has a companion worth knowing.
+      {show strategy} The way in is the conjugate: multiply top and bottom by
+      $1+\cos\theta$.
+      {show step.0} The numerator becomes a difference of squares, which is
+      $\sin^2\theta$.
+      {show step.1} So the whole thing splits into two familiar factors.
+      {show note.0} The first is the fundamental limit: it goes to one.
+      {show note.1} The second goes to zero over two, which is zero.
+      {show result} One times zero is zero -- there is the companion limit.
+    steps:
+      - { math: "\\frac{1-\\cos\\theta}{\\theta} = \\frac{1-\\cos^{2}\\theta}{\\theta\\,(1+\\cos\\theta)}" }
+      - { math: "= \\frac{\\sin\\theta}{\\theta}\\cdot\\frac{\\sin\\theta}{1+\\cos\\theta}", anim: transform, frame: true }
+    result: { math: "\\lim_{\\theta\\to 0}\\frac{1-\\cos\\theta}{\\theta} = 1\\cdot 0 = 0", reason: "answer" }
+
+  # 2 ---------------------------------- 無 rail：步驟欄吃滿 CONTENT_W（D8）
+  - id: no_rail
+    kind: content
+    template: worked_example
+    accent: example
+    number: "3.2"
+    source: "合成例（無 strategy／notes，驗 D8 全寬步驟欄）"
+    prompt: "Differentiate $y=\\tan x$ from the quotient rule."
+    say: |
+      With sine and cosine in hand, tangent costs almost nothing.
+      {show step.0} Write it as a quotient and apply the rule.
+      {show step.1} The numerator collapses by the Pythagorean identity.
+      {show result} So the derivative of tangent is secant squared.
+      {show check} And the answer checks out against the known value at zero.
+    steps:
+      - { math: "\\frac{d}{dx}\\tan x = \\frac{(\\cos x)(\\cos x) - (\\sin x)(-\\sin x)}{\\cos^{2} x}" }
+      - { math: "= \\frac{\\cos^{2} x + \\sin^{2} x}{\\cos^{2} x} = \\frac{1}{\\cos^{2} x}" }
+    result: { math: "\\frac{d}{dx}\\tan x = \\sec^{2} x" }
+    check: { math: "\\sec^{2} 0 = 1" }
+
+  # 3 -------------------- 容量壓測：7 個分數列 → L2 預測式「拆 ~N 頁」warn
+  - id: capacity_over
+    kind: content
+    template: worked_example
+    accent: example
+    source: "容量壓測（合成例，非講義內容）"
+    prompt: "Simplify the compound quotient, one factor at a time."
+    say: |
+      A deliberately over-long chain, to trip the capacity gate.
+      {show step.0} One. {show step.1} Two. {show step.2} Three.
+      {show step.3} Four. {show step.4} Five. {show step.5} Six.
+      {show step.6} Seven. {show result} And the answer.
+    steps:
+      - { math: "S = \\frac{(a+b)^{2} - (a-b)^{2}}{4ab}\\cdot\\frac{a^{2}-b^{2}}{a+b}" }
+      - { math: "= \\frac{4ab}{4ab}\\cdot\\frac{(a+b)(a-b)}{a+b}" }
+      - { math: "= \\frac{a^{2}-b^{2}}{a+b}\\cdot\\frac{a+b}{a+b}" }
+      - { math: "= \\frac{(a+b)(a-b)}{a+b}" }
+      - { math: "= \\frac{a-b}{1}" }
+      - { math: "= \\frac{2(a-b)}{2}" }
+      - { math: "= \\frac{a-b}{1}\\cdot\\frac{1}{1}" }
+    result: { math: "S = a - b", reason: "answer" }
+
+  # 4 ------------------- 分頁：part 1/2 且無 result（D4 的唯一例外）
+  - id: multipage_p1
+    kind: content
+    template: worked_example
+    accent: example
+    number: "3.3"
+    title: "page one of two"
+    part: { current: 1, total: 2 }
+    source: "合成例（驗 D4 續頁例外：前幾頁答案還沒到）"
+    prompt: "Find $f^{-1}$ for $f(x)=3/(x-5)$, and verify both directions."
+    strategy: "Solve for $x$ first; the naming swap comes last."
+    say: |
+      This page only gets as far as solving for $x$.
+      {show step.0} Set $y=f(x)$.
+      {show step.1} Clear the fraction.
+      {show step.2} And isolate $x$ -- the answer waits for page two.
+    steps:
+      - { math: "y = \\frac{3}{x-5}" }
+      - { math: "x - 5 = \\frac{3}{y}" }
+      - { math: "x = 5 + \\frac{3}{y}" }

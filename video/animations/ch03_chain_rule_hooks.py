@@ -139,7 +139,7 @@ def composed_mapping(spec, ctx, blocks):
 
     product = brand.math_line(
         r"\times\, g'(x_0)\ \text{then}\ \times\, f'(g(x_0))\ \Rightarrow\ \times\, f'(g(x_0))\,g'(x_0)",
-        ground, role="text", size="math_sm")
+        ground, role="text", size="math_rail")
     product.move_to([0.0, y_of["y"] - 1.0, 0.0])
 
     full = VGroup(scaffold, inc_h, stretch_g, stretch_f, product)
@@ -211,7 +211,7 @@ def remainder_tangent(spec, ctx, blocks):
     gap_halved = gap(h / 2, green, "success", "R(h/2)", lab_dir=UP)
     local_fact = brand.math_line(
         r"\tfrac{R(h)}{h}\to 0:\ \text{up close, } f \text{ is its tangent line}",
-        ground, role="accent", size="math_sm")
+        ground, role="accent", size="math_rail")
 
     full = VGroup(scaffold, gap_Rh, gap_halved)
     _centre_in_zone(title, full)

@@ -24,6 +24,7 @@ to bypass).
 """
 from __future__ import annotations
 
+import re
 import sys
 from pathlib import Path
 
@@ -386,7 +387,9 @@ def _capacity_issues(scene: dict, blocks) -> "list[tuple[str, str]]":
     if not header_bottoms:
         return []
     zone_top = min(header_bottoms)
-    zone_h = zone_top - (-T.FRAME_H / 2 + T.SAFE_MARGIN + extra_bottom)
+    floor_y = -T.FRAME_H / 2 + T.SAFE_MARGIN     # the frame's own bottom safe margin
+    zone_floor = floor_y + extra_bottom          # ... raised by any reserved bottom band
+    zone_h = zone_top - zone_floor
     if zone_h <= 0.5:
         return []
 
@@ -401,6 +404,18 @@ def _capacity_issues(scene: dict, blocks) -> "list[tuple[str, str]]":
             left = float(mob.get_left()[0])
             top, bottom = float(mob.get_top()[1]), float(mob.get_bottom()[1])
         except Exception:  # noqa: BLE001
+            continue
+        # A block that sits wholly INSIDE the band the template reserved (extra_bottom)
+        # IS that reserved content -- counting it as a zone row too would charge it twice:
+        # once as the room taken out of the zone, once as a row that must fit what is
+        # left. The double charge was invisible while the only pinned element had its own
+        # x-bucket (procedure's worked strip is centred), but worked_example's answer band
+        # is flush left on SPINE_X, in the step column's own bucket, so every scene with
+        # one read as over capacity by roughly the band's own height. "Wholly inside"
+        # means BOTH edges: a row that merely spilled down into the band (an over-capacity
+        # chain) breaks the bottom edge and is still counted, so the split warn it exists
+        # to raise still fires.
+        if extra_bottom and top <= zone_floor + 1e-6 and bottom >= floor_y - 1e-6:
             continue
         if top - bottom <= 1e-6:
             continue
@@ -602,6 +617,362 @@ def _floor_issues(scene: dict, blocks, enforce: bool) -> "list[tuple[str, str]]"
     return _floor_findings(scene.get("id"), sizes, T.MIN_FONT_FLOOR, enforce)
 
 
+# == design-system rules (T3, 2026-09-14) ====================================================
+#
+# The four LAYOUT rules (_audit/design-template-system/LayoutRules.dc.html `RULES`) and the five
+# MATH rules (MathRules.dc.html) were written as design law after the §3.1 rewatch; three of each
+# are deterministic enough to be a gate. What landed here, and why the rest did not, is the
+# triage table in REVIEW_GATES.md §一 layer 6 / DESIGN.md §設計系統規則.
+#
+# ALL SIX ARE WARN-DEFAULT. The decks predate the rules, so a rule that errored on day one would
+# simply be switched off with --skip-sizecheck; instead each family has an opt-in escalation flag
+# (`meta.layout_enforce` for L*, `meta.mathtype_enforce` for M*), shaped after
+# pedagogy.assumptions_registry_issues (`sev = "error" if enforce else "warn"`). A section opts in
+# when it is clean; only after a section has run a full round enforcing with no false positive
+# does changing the DEFAULT come up for discussion (kickoff T3-5).
+
+L1_WEIGHT_RATIO = 1.15     # L1: how much heavier than the conclusion a set-up element must be
+                           # before the hierarchy actually reads inverted. Calibrated, not
+                           # invented: the rule's own evidence is a conclusion at the rail tier
+                           # under a statement card (44/34 = 1.29) and today's payoff tier over
+                           # the body tier (62/48 = 1.29), while theorem_proof's `qed` prose
+                           # (43 px measured) under its `statement` card (44 px) is a 1 px gap
+                           # nobody can see. Below this ratio the two read as the same weight, so
+                           # warning would be noise, not a finding.
+L2_BAND_FRAC = 1.0 / 3.0   # L2: the "bottom third" the rule names (360 px of 1080)
+L2_MIN_FILL = 0.15         # L2: bbox-union coverage of that band below which it reads as dead space
+L3_MAIN_W_FRAC = 0.58      # L3: main-content width below which a right column must open (or centre)
+L3_CENTER_TOL = 0.6        # L3: |centre x| (manim u) within which narrow content counts as centred
+CONCLUSION_IDS = ("result", "qed")   # the block a scene builds for its payoff: derivation /
+                                     # worked_example answer band (`result`), theorem_proof (`qed`)
+
+
+def _type_nodes(mob) -> list:
+    """Every type-setting leaf under *mob* (Text / Tex / MathTex), stopping AT each one.
+
+    Deliberately unlike `_prose_nodes`, which only sees nodes `brand.prose` tagged: a scene's
+    conclusion is usually a bare `brand.math_line` MathTex (no prose tag), so the whole-tree walk
+    is what L1 needs to compare it against the rest of the frame. Scope is kept to the new rules on
+    purpose -- widening the EXISTING muted / floor checks to the whole tree is a separate change
+    with its own blast radius (kickoff §8)."""
+    from manim import MathTex, Tex, Text
+    if isinstance(mob, (Tex, MathTex, Text)):
+        return [mob]
+    out: list = []
+    for sub in getattr(mob, "submobjects", []):
+        out += _type_nodes(sub)
+    return out
+
+
+def _authored_font_px(node) -> float:
+    """The px the node's TYPE was authored at -- the quantity L1 compares.
+
+    NOT `_effective_font_px`, which reads manim's public `font_size` getter
+    (`height / initial_height / SCALE_FACTOR_PER_FONT_POINT`). A MathTex built with
+    `substrings_to_isolate` -- every `{{...}}` segment and every deck `color_map` hit goes that
+    way -- rebuilds its submobjects AFTER `initial_height` was taken, so the getter reads the
+    rebuilt height against the un-rebuilt reference: measured 2.1x over on `_demo_tex_parts`'s
+    `{{\\lim}} {{\\frac{h+h^2}{h}}}` step (102 px reported for a 48 px row). The `_font_size`
+    manim records at construction is the authored value and survives the rebuild, so prefer it.
+    The trade-off is that `_font_size` does not follow a later `.scale()`; that is the right call
+    here (an authored TIER is what the rule compares) and shrink-after-the-fact is already the
+    sibling and floor checks' business.
+
+    Tex FIRST: in this manim `Tex` subclasses `MathTex`, so testing MathTex first mis-types every
+    text node as math (same trap `_effective_font_px` documents)."""
+    from manim import Tex
+    from pipeline.visuals import theme as T
+    fs = float(getattr(node, "_font_size", None) or node.font_size)
+    return fs / (T.PX_TO_FS * T.TEXT_SCALE) if isinstance(node, Tex) else fs / T.PX_TO_FS
+
+
+def _block_max_px(block) -> "float | None":
+    """The largest authored on-screen px in *block* (None when it sets no type). Max, not min:
+    a payoff band carries its equation AND a 26 px mono tag, and the equation is what "heaviest
+    element" means."""
+    mob = getattr(block, "mobject", None)
+    if mob is None:
+        return None
+    sizes = [_authored_font_px(n) for n in _type_nodes(mob)]
+    return max(sizes) if sizes else None
+
+
+def _body_blocks(blocks) -> list:
+    """The blocks that make up a scene's BODY: content and graph layers, minus the masthead.
+    Decoration (motifs, column rules, pagers) and backgrounds are not content ink; the header ids
+    (title / eyebrow / prompt / ...) are the frame's furniture, not the thing being argued -- an
+    h1 title would otherwise be "the heaviest element" in every single scene."""
+    return [b for b in blocks
+            if getattr(b, "layer", "content") in ("content", "graph")
+            and str(getattr(b, "id", "")) not in _HEADER_IDS
+            and getattr(b, "mobject", None) is not None]
+
+
+def _conclusion_weight_issues(scene: dict, blocks, sev: str) -> "list[tuple[str, str]]":
+    """L1: the conclusion must be the heaviest type in the frame.
+
+    `assert fs(conclusion) >= max(fs(x) for x in scene.blocks)` from the rule card, with "blocks"
+    read as the BODY (see `_body_blocks`). Scenes that build no conclusion block return nothing --
+    a definition or a graph has no payoff line to weigh, and inventing one is authoring, not a gate.
+    The rule's second half ("and it must carry a semantic colour") is NOT checked here: which role
+    counts as semantic is an authoring judgement, and the VISUAL-FRAME rubric already owns it
+    (A7 hierarchy/focus for "the payoff is the accented thing", V10 for colour consistency)."""
+    body = _body_blocks(blocks)
+    concl = [b for b in body if str(b.id) in CONCLUSION_IDS]
+    if not concl:
+        return []
+    concl_px = max((p for p in (_block_max_px(b) for b in concl) if p is not None), default=None)
+    if concl_px is None:
+        return []
+    rest = [(str(b.id), _block_max_px(b)) for b in body if str(b.id) not in CONCLUSION_IDS]
+    heavier = [(bid, px) for bid, px in rest
+               if px is not None and px > concl_px * L1_WEIGHT_RATIO]
+    if not heavier:
+        return []
+    bid, px = max(heavier, key=lambda t: t[1])
+    return [(sev,
+        f"{scene.get('id')}: the conclusion renders at {concl_px:.0f}px but '{bid}' renders at "
+        f"{px:.0f}px -- the payoff must be the heaviest element on screen (LayoutRules L1); "
+        f"lift the conclusion tier or lighten the set-up.")]
+
+
+def _rect_union_area(rects: "list[tuple[float, float, float, float]]") -> float:
+    """Area covered by (x0, x1, y0, y1) boxes, overlaps counted once. Coordinate-compressed
+    sweep -- exact for axis-aligned boxes and small n (a scene has a dozen blocks)."""
+    if not rects:
+        return 0.0
+    xs = sorted({x for r in rects for x in (r[0], r[1])})
+    total = 0.0
+    for i in range(len(xs) - 1):
+        x0, x1 = xs[i], xs[i + 1]
+        dx = x1 - x0
+        if dx <= 0:
+            continue
+        spans = [(r[2], r[3]) for r in rects if r[0] <= x0 and r[1] >= x1]
+        total += dx * _union_len(spans)
+    return total
+
+
+def _bottom_band_issues(scene: dict, blocks, sev: str) -> "list[tuple[str, str]]":
+    """L2: the bottom third must not sit empty on the fullest frame.
+
+    A content scene's reveal is additive (same premise `_overlap_issues` rests on), so the union of
+    its body blocks IS the fullest frame. Coverage is measured as the BBOX union clipped to the
+    band, not real ink: a bbox is always >= the ink inside it, so this over-states fill and can only
+    ever under-report -- the direction a warn-default advisory should err in."""
+    from pipeline.visuals import theme as T
+
+    body = _body_blocks(blocks)
+    if not body:
+        return []
+    band_top = -T.FRAME_H / 2 + T.FRAME_H * L2_BAND_FRAC
+    band_area = T.FRAME_W * T.FRAME_H * L2_BAND_FRAC
+    rects: list[tuple[float, float, float, float]] = []
+    for b in body:
+        box = _aabb(b.mobject)
+        if box is None:
+            continue
+        x0, x1, y0, y1 = box
+        lo, hi = max(y0, -T.FRAME_H / 2), min(y1, band_top)
+        if hi > lo:
+            rects.append((max(x0, -T.FRAME_W / 2), min(x1, T.FRAME_W / 2), lo, hi))
+    fill = _rect_union_area(rects) / band_area
+    if fill >= L2_MIN_FILL:
+        return []
+    # Wording note: this message must not contain "band" -- _selftest_theorem_regime._band_warns
+    # picks the statement-promotion advisory out of check_scenes' output by matching
+    # `sid in msg and "band" in msg.lower()`, so any other warn using that word on a
+    # theorem_regime scene reads as a false promotion advisory there.
+    return [(sev,
+        f"{scene.get('id')}: the bottom third is {fill:.0%} filled (< {L2_MIN_FILL:.0%}) -- the "
+        f"frame reads as half-loaded, and that strip is the most visible one in a lecture hall "
+        f"(LayoutRules L2); drop the conclusion into it, keep the figure on screen, or pull the "
+        f"body down.")]
+
+
+def _main_width_issues(scene: dict, blocks, sev: str) -> "list[tuple[str, str]]":
+    """L3: a narrow main column must either open the right column or move to the centre.
+
+    `if main_width < 0.58 * W: require(aside or centered)`. Main width = the horizontal extent of
+    the body blocks; `_common.build_aside` is the right column the rule means (`aside:` in the
+    storyboard), and "centred" means the body's own centre sits near x=0 rather than hanging off
+    the left spine. Fires often on today's decks by design -- the rule exists because 27 scenes of
+    §3.1 never opened an aside and every one of them is left-hung with a dead right margin."""
+    from pipeline.visuals import theme as T
+
+    body = _body_blocks(blocks)
+    boxes = [box for box in (_aabb(b.mobject) for b in body) if box is not None]
+    if not boxes:
+        return []
+    left, right = min(b[0] for b in boxes), max(b[1] for b in boxes)
+    width = right - left
+    if width >= L3_MAIN_W_FRAC * T.FRAME_W:
+        return []
+    if scene.get("aside"):
+        return []
+    center = (left + right) / 2
+    if abs(center) <= L3_CENTER_TOL:
+        return []
+    return [(sev,
+        f"{scene.get('id')}: main content is {width / T.FRAME_W:.0%} of frame width "
+        f"(< {L3_MAIN_W_FRAC:.0%}), hangs off centre (centre x={center:+.1f}u) and opens no "
+        f"`aside:` -- a narrow column must either put something in the right column or move to the "
+        f"centre (LayoutRules L3).")]
+
+
+# -- math register (MathRules 1-3) ------------------------------------------------------------
+#
+# These read the STORYBOARD text, not the built mobjects: the rules are about what the author put
+# in a math slot, and once LaTeX has set it the prose and the math are indistinguishable glyphs.
+
+_TEXT_MACRO = re.compile(r"\\(?:text|textrm|textit|mbox|operatorname|mathrm|mathop)\*?\s*\{[^{}]*\}")
+# `\underbrace{X}_{\text{outer at inner}}`: a word run opening a sub/superscript group is a LABEL
+# hung under (or over) the formula, not prose sitting IN the line -- it is already the move the
+# rule prescribes (get the words off the line), so M1 skips it.
+_SCRIPT_LABEL = re.compile(r"[_^]\s*\{\s*\\(?:text|mbox)\*?\s*\{[^{}]*\}")
+_TEX_CMD = re.compile(r"\\[A-Za-z]+\*?|\\[^A-Za-z]")
+_MATH_SPAN = re.compile(r"\$[^$]*\$")
+_WORD_RUN = re.compile(r"[A-Za-z]{2,}(?:[ \t]+[A-Za-z]{2,})+")
+_LETTER_RUN = re.compile(r"(\\?)([A-Za-z]+)")
+
+# Operators / function names that must be set upright, i.e. written as a LaTeX control sequence
+# (`\sin`) and not as bare italic letters (`sin`, which sets as the product s*i*n).
+_UPRIGHT_OPS = frozenset("""
+sin cos tan sec csc cot sinh cosh tanh coth arcsin arccos arctan arcsec arccsc arccot
+lim limsup liminf log ln lg exp max min sup inf det gcd deg dim ker arg hom
+""".split())
+
+
+def _is_whole_math_span(s: str) -> bool:
+    """The storyboard convention for "this whole field is one display equation": a single
+    `$...$` wrapping everything. `brand.prose` and `brand.math_line` both branch on exactly
+    this test, so reading it here keeps the audit and the renderer on one definition."""
+    s = s.strip()
+    return s.startswith("$") and s.endswith("$") and s.count("$") == 2
+
+
+def _math_fields(scene: dict) -> "list[tuple[str, str]]":
+    """(locus, tex) for every storyboard field that renders as a DISPLAY MATH LINE -- the only
+    thing MathRules 1 and 3 can be about.
+
+    Not every math-ish field qualifies, and the split follows what the templates actually build:
+
+    * `derivation` / `worked_example` chain rows (`steps[].math`, `result.math`, `check.math`,
+      legacy `lines[].tex`) always go to `brand.math_line`, so they always count -- and these are
+      the rows that HAVE the reason rail the rule tells you to move the wording into.
+    * `definition_math.math[]` also goes to `math_line`, but `math_line` has a documented mixed
+      branch: text with several inline `$...$` spans ("if $f(x)=0$ then $x=a$") is set as text-mode
+      Tex, which is a prose line, not a math line. Only the display forms count.
+    * `theorem_proof.proof[]` goes to `brand.prose`: a row is a display equation only when the
+      whole row is one `$...$` span (`prose` routes exactly that case to `math_line`). Its other
+      rows are authored prose sentences -- flagging those would be flagging the template for
+      working as designed.
+
+    Out of scope entirely: `statement:` (prose that MAY be a formula -- mixing is its documented
+    job), graph curve labels (whole-label names, not lines), and `procedure_steps.worked[]`
+    (whole-cell captions). Named here so the boundary is reviewable."""
+    sid = scene.get("id", "?")
+    out: list[tuple[str, str]] = []
+
+    def _add(where: str, entry, *, display_only: bool = False, span_only: bool = False) -> None:
+        tex = entry.get("math", entry.get("tex")) if isinstance(entry, dict) else entry
+        if not isinstance(tex, str) or not tex.strip():
+            return
+        if span_only and not _is_whole_math_span(tex):
+            return
+        if display_only and "$" in tex and not _is_whole_math_span(tex):
+            return
+        out.append((f"{sid}.{where}", tex))
+
+    for i, st in enumerate(scene.get("steps") or []):
+        _add(f"steps[{i}]", st)
+    for key in ("result", "check"):
+        if scene.get(key) is not None:
+            _add(key, scene[key])
+    for i, ln in enumerate(scene.get("lines") or []):
+        _add(f"lines[{i}]", ln)
+    for i, m in enumerate(scene.get("math") or []):
+        _add(f"math[{i}]", m, display_only=True)
+    for i, p in enumerate(scene.get("proof") or []):
+        _add(f"proof[{i}]", p, span_only=True)
+    return out
+
+
+def _reason_fields(scene: dict) -> "list[tuple[str, str]]":
+    """(locus, reason) for every annotation-rail field: the `reason` of each chain row."""
+    sid = scene.get("id", "?")
+    out: list[tuple[str, str]] = []
+    rows: list[tuple[str, object]] = [(f"steps[{i}]", st) for i, st in enumerate(scene.get("steps") or [])]
+    rows += [(f"lines[{i}]", ln) for i, ln in enumerate(scene.get("lines") or [])]
+    rows += [(k, scene.get(k)) for k in ("result", "check")]
+    for where, row in rows:
+        if isinstance(row, dict) and isinstance(row.get("reason"), str) and row["reason"].strip():
+            out.append((f"{sid}.{where}.reason", row["reason"]))
+    return out
+
+
+def _math_register_issues(scene: dict, sev: str) -> "list[tuple[str, str]]":
+    """M1: no prose inside a math line -- the explanation belongs in the right rail.
+
+    Two detectors: an explicit `\\text{}` / `\\mbox{}` run, or two or more adjacent multi-letter
+    words once the control sequences are stripped (`(chord \\le arc)` -> `(chord   arc)`). Braces
+    and sub/superscript markers break adjacency, so `\\frac{dy}{dx}` is not a sentence. A word run
+    that OPENS a sub/superscript group is an `\\underbrace` label, not prose in the line
+    (`_SCRIPT_LABEL`), and is dropped before either detector runs."""
+    out: list[tuple[str, str]] = []
+    for where, raw in _math_fields(scene):
+        tex = _SCRIPT_LABEL.sub(" ", raw)
+        if "\\text{" in tex or "\\mbox{" in tex:
+            out.append((sev, f"{where}: a math line carries \\text{{}}/\\mbox{{}} prose -- move the "
+                              f"wording to the reason rail and leave the line pure math (MathRules 1)."))
+            continue
+        bare = _TEX_CMD.sub(" ", tex)
+        bare = re.sub(r"[{}$^_&]", "\x00", bare)
+        hit = _WORD_RUN.search(bare)
+        if hit:
+            out.append((sev, f"{where}: a math line carries running prose ({hit.group(0).strip()!r}) "
+                              f"-- move the wording to the reason rail (MathRules 1)."))
+    return out
+
+
+def _rail_register_issues(scene: dict, sev: str) -> "list[tuple[str, str]]":
+    """M2: the annotation rail speaks ONE register -- all math, or all sans caps, never both.
+
+    A reason mixing `$...$` with bare running words ("write $h=2\\cdot(h/2)$") is the mixed case the
+    rule names. A pure-math reason ("$A=x+h$, $B=x$" -- punctuation between spans is not prose) and
+    a pure-words reason ("sum-to-product") both pass."""
+    out: list[tuple[str, str]] = []
+    for where, reason in _reason_fields(scene):
+        if "$" not in reason:
+            continue
+        rest = _MATH_SPAN.sub(" ", reason)
+        words = re.findall(r"[A-Za-z]{2,}", rest)
+        if words:
+            out.append((sev, f"{where}: the rail mixes registers -- math spans plus running words "
+                              f"({', '.join(words[:3])}) in one reason; make it all math or all "
+                              f"sans caps (MathRules 2)."))
+    return out
+
+
+def _operator_upright_issues(scene: dict, sev: str) -> "list[tuple[str, str]]":
+    """M3 (the automatable half): a named operator written as bare letters sets as italic variables.
+
+    `sin x` typesets as s*i*n*x; only `\\sin x` gets the upright roman operator and its spacing.
+    Checks the known operator names outside `\\text{}`-family bodies. The FULL upright/italic rule
+    (every variable italic, every constant upright) is not decidable from the source and stays with
+    the VISUAL-FRAME rubric."""
+    out: list[tuple[str, str]] = []
+    for where, tex in _math_fields(scene):
+        stripped = _TEXT_MACRO.sub(" ", tex)
+        bad = sorted({m.group(2) for m in _LETTER_RUN.finditer(stripped)
+                      if not m.group(1) and m.group(2) in _UPRIGHT_OPS})
+        if bad:
+            out.append((sev, f"{where}: operator name(s) {', '.join(bad)} written as bare letters "
+                              f"-- they set as italic variables; use \\{bad[0]} so the operator is "
+                              f"upright and spaced (MathRules 3)."))
+    return out
+
+
 def check_scenes(meta: dict, scenes: list[dict], deck: "list[dict] | None" = None) -> "list[tuple[str, str]]":
     """Return (severity, message) tuples for the given scenes.
     'error' = stacked-prose size mismatch, or an element clipped off-frame (both
@@ -732,6 +1103,16 @@ def check_scenes(meta: dict, scenes: list[dict], deck: "list[dict] | None" = Non
         # -- font floor: warn (or error when fontfloor_enforce) for prose below MIN_FONT_FLOOR --
         enforce = bool(meta.get("fontfloor_enforce"))
         issues += _floor_issues(scene, blocks, enforce)
+
+        # -- design-system rules (T3): warn-default, opt-in escalation per family --
+        layout_sev = "error" if meta.get("layout_enforce") else "warn"
+        issues += _conclusion_weight_issues(scene, blocks, layout_sev)   # L1
+        issues += _bottom_band_issues(scene, blocks, layout_sev)         # L2
+        issues += _main_width_issues(scene, blocks, layout_sev)          # L3
+        math_sev = "error" if meta.get("mathtype_enforce") else "warn"
+        issues += _math_register_issues(scene, math_sev)                 # M1
+        issues += _rail_register_issues(scene, math_sev)                 # M2
+        issues += _operator_upright_issues(scene, math_sev)              # M3
     return issues
 
 

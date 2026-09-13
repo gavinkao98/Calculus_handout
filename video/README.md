@@ -55,7 +55,7 @@ video/
         frames_before/ 修改前 bug-state 幀（不可重生的證據；唯一進版控的 render 幀）
   animations/          客製動畫 hook code（`# HOOK` 接入點；進版控）
   storyboards/         Stage 2 工程稿（進版控）
-    _demo_*.yml        模板示範／回歸樣本（asymptote／derivation／graph_compare／sign_chart／…）
+    _demo_*.yml        模板示範／回歸樣本（asymptote／derivation／graph_compare／sign_chart／worked_example／…）
     <deck>.yml         逐節正式 storyboard（依方法論產生）
   experiments/         實驗線（不碰成熟產線；forced_alignment_dean 測整段音訊＋alignment；reference_frames＝YouTube 參考影片抓幀／拆解／對照表工具，2026-09-13）
   pipeline/assets/brand/  NTU logo 向量源（icon／lockup ×3 色；進版控）
@@ -94,7 +94,7 @@ video/
 逐節進度與跨對話狀態以 [REBUILD_STATUS.md](REBUILD_STATUS.md) 頂部現況快照為準（本檔不重複）。
 
 - **TTS＝MiMo builtin voice `Dean` 單一路線**（Gemini/Charon 已退場 2026-06-16；voice-design／「Calm Professor」persona 2026-07-05 退役）；**scene-level TTS＋forced alignment（stable-ts）為正式路線**，`--unit auto` 涵蓋全部 content template。
-- **文字渲染＝Route A（全 LaTeX/pdflatex，2026-06-25 落地）**：內文/標題 IBM Plex Sans、eyebrow IBM Plex Mono、數學 Latin Modern（見下方「文字渲染」節與 [DESIGN.md](DESIGN.md)）。
+- **文字渲染＝Route A（全 LaTeX/pdflatex，2026-06-25 落地）**：內文/標題 Instrument Sans（vendored）、eyebrow IBM Plex Mono、數學 Latin Modern（見下方「文字渲染」節與 [DESIGN.md](DESIGN.md)）。
 - **語意色＝講義色軸（Direction B「對位」，2026-09-12 落地）**：`accent` 的六個語意族對位到講義 `calcbook.sty` 的 `\definecolor`——definition＝赭、theorem/proof＝藍、example＝綠、caution＝紅、strategy＝紫、remark＝灰；`LIGHT` 逐字沿用講義 hex，`DARK` 保色相提亮。**definition 與 theorem 原本與講義對調，本輪修正。** 契約與對照表見 [DESIGN.md](DESIGN.md) §語意色軸；`pipeline/_selftest_semantic_palette.py` 重讀 `calcbook.sty` 守住兩線不漂開。
 - 引擎完整：`make.py` orchestrator、**五道 render 前確定性檢查（schema → provenance → pedagogy → lint → sizecheck，後兩者 warn-default；另掛 `source_rev` 講義源 freshness，永遠 warn-only）**、模板 catalog＋容量契約 G1–G6、`hook:` 機制、MiMo TTS、`timing.py` 同步守衛、**七份判斷閘 SSOT rubric**（six-lens／copyedit／NFA／VISUAL-FRAME／hook-engineering／pedagogy-firstlearner／amplification）。
 - 音訊驅動對齊（beat-level：每 beat 影片長度＝該 beat 音檔長度；scene-level：FA 逐字對位映回 beat）為產線核心；mock 路徑（`make.py --backend mock`）離線、不計費，供版面／時序迭代。`video/output/` 是 gitignored。
@@ -121,13 +121,24 @@ video/
   （`align_on`，預設 `=`）；`anim: highlight` 標結果行。與左右並列模板的
   選用判準、容量上限見 [DESIGN.md](DESIGN.md)「Template selection」；demo
   稿 `storyboards/_demo_derivation.yml`。
+- **`worked_example`**（2026-09-13 新增）：課本例題（講義的 `workedexample`
+  容器，全書語意塊的 24%）。題目當 masthead（`[ EXAMPLE 3.1 ]` 字卡＋
+  `title` 小字 tagline）、`SOLUTION` 步驟鏈在左、策略／notes rail 在右、
+  **答案框**釘在下三分之一（62 px，畫面最重的元素）。列文法與 `derivation`
+  逐字相同（直接 import 它的變形函式，所以 `{{…}}` 分段／`anim: transform`／
+  `cancel`／`seg_roles`／`paced:` 行為一致），但**列不收 `reason`**——右 rail
+  已經給了 `strategy:`／`notes:`。`accent` 省略時預設 `example`（綠）。
+  契約與兩處刻意偏離設計畫布的理由見 [DESIGN.md](DESIGN.md)
+  「Worked-example 模板 `worked_example`」；demo 稿
+  `storyboards/_demo_worked_example.yml`。
 
 模板層的 **motion primitive**（2026-09-12 首輪，全部 opt-in；契約與理由見
 [DESIGN.md](DESIGN.md)「motion primitive」節）：
 
 - **揭示時序**——`say` 寫了 `{show statement}` 時，`theorem_proof`／`derivation`
   的字卡才改為該拍滑入（否則仍屬開場畫面）；`theorem_proof` 的 `PROOF` 小標
-  在有 `{show proof.0}` 時跟第一行證明一起進場。
+  在有 `{show proof.0}` 時跟第一行證明一起進場（小標是獨立 Block，以
+  `Block.reveal_with` 宣告同拍，不折進 `proof.0` 的 anim，故 hook 覆寫該 anim 也掉不了）。
 - **`pauses:`**（場級）——某個 reveal 之後讓畫面靜靜停 N 秒（旁白不動、不重合成）。
 - **`anim: transform`**（`derivation` 的 `steps[i]`／`result`）——把上一列的式子
   原地變形成這一列，來源那列退為 muted。
@@ -245,7 +256,7 @@ python video\make.py          --storyboard video\storyboards\<deck>_mimo.yml --r
 
 ## 文字渲染（避免亂碼）
 
-**Route A（2026-06-25 落地）：所有螢幕文字都走 LaTeX/pdflatex** 以取得正確 kerning——內文/標題 **IBM Plex Sans**、eyebrow **IBM Plex Mono**、數學 **Latin Modern**（實測 manim `Text`/Pango 不套 kerning，故 Pango 路徑與 `TEX_TEXT_SCALE` 拼接機制已全部移除）。角色分派表、display-style 慣例（`\frac` vs `\tfrac`）、wrap-don't-shrink 規則的權威描述見 [`DESIGN.md`](DESIGN.md) §Text rendering；落地計畫存 [`content_scripts/_audit/PLAN-routeA-plex-latex.md`](content_scripts/_audit/PLAN-routeA-plex-latex.md)。
+**Route A（2026-06-25 落地）：所有螢幕文字都走 LaTeX/pdflatex** 以取得正確 kerning——內文/標題 **Instrument Sans**（2026-09-13 由 IBM Plex Sans 換過來；repo vendored，見 [`../ENVIRONMENT.md`](../ENVIRONMENT.md) ①b）、eyebrow **IBM Plex Mono**、數學 **Latin Modern**（實測 manim `Text`/Pango 不套 kerning，故 Pango 路徑與 `TEX_TEXT_SCALE` 拼接機制已全部移除）。角色分派表、display-style 慣例（`\frac` vs `\tfrac`）、wrap-don't-shrink 規則的權威描述見 [`DESIGN.md`](DESIGN.md) §Text rendering；落地計畫存 [`content_scripts/_audit/PLAN-routeA-plex-latex.md`](content_scripts/_audit/PLAN-routeA-plex-latex.md)。
 
 > **鐵則:任何作者可能填入 `$` 或 `\` 的散文／標題欄位，模板一律用 `brand.prose`
 > 或 `brand.heading_rich` 渲染，不要直接用 `body_text` / `heading`。**

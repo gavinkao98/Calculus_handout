@@ -1,0 +1,111 @@
+{
+  "title": "worked_example 模板落地——驗收報告",
+  "date": "2026-09-13",
+  "kickoff": "video/KICKOFF-worked-example-template.md",
+  "mockup": "video/_audit/design-template-system/WorkedExample.dc.html",
+  "commits": {
+    "kickoff": "b229973",
+    "template": "c79372c",
+    "closing": "（收尾 commit，產生器執行時由 git 讀 HEAD）"
+  },
+  "one_line": "worked_example 模板已落地並通過全部離線閘：新 selftest 28 支＋既有 40 支全綠、22 個既有 deck 的 schema／lint／sizecheck 輸出逐字相同、doctor --smoke 逐字相同；試點場＝§3.1 Example 3.1（伴隨極限）mock render 抽幀自檢通過。全程離線零計費，正典 deck 未動。",
+  "decisions_for_user": [
+    {
+      "id": "①",
+      "title": "單頁容量：影片字級下 mockup 的 4 列步驟鏈放不進去",
+      "body": "mockup 的步驟用 38 px、且沒有影片的安全邊界；落地照 MathRules 規則 5 用 48 px 步驟階＋62 px 答案框後，SOLUTION 之下到答案框之上只剩約 2.9–3.3u：每頁約 2 個分數列（答案為單行式時 3 列）或 4 個單行列，rail 側的策略句只能一行。試點場因此收成 2 列（＝正典 companion_limit 場的寫法）。",
+      "recommendation": "維持規則 5（步驟 48、答案 62），長解法用 part: 分頁、答案框留到末頁（D4 已支援續頁省略 result）。替代方案＝給 worked_example 一個 40 px 步驟階，但那與規則 5「取消 math_sm 40」、容量契約「字級恆定不可協商」正面相撞，不建議。"
+    },
+    {
+      "id": "②",
+      "title": "正典 §3.1 的三個例題（ex:3.1–3.3）要不要遷到 worked_example",
+      "body": "現在正典 deck 的 companion_limit（場 13）用 derivation＋prompt:，ex:3.2／3.3 分散在其他場。遷移要改正典 yml → _mimo 重 derive → TTS reuse 需驗（旁白不改就 backend_calls 0，但 reveal id 若改名，beat 級 reuse 會失配——⑯ 的教訓）。",
+      "recommendation": "另案；先看本報告的幀決定要不要遷。本輪刻意不動 ch03_trig_derivatives*.yml。"
+    },
+    {
+      "id": "③",
+      "title": "兩處刻意偏離 mockup（已拍板，告知）",
+      "body": "D3：列一律左齊 SPINE_X、不做 mockup 的「=」對齊欄（要嘛動 sizecheck 以 round(left) 分欄的做法而影響既有 deck，要嘛塞看不見的幾何進列、paced 與 _rail 會把它當內容走）。D7：rail 存在時列寬超過步驟欄（PRIMARY_W − 0.42u）→ build 直接 raise、不縮字（版面規則 3＋否決 auto-fit）。另外 masthead 的 chip 與 SOLUTION 小標沿用既有 example_head 的樣式（`[ EXAMPLE 3.1 ]` 中括號字卡、muted 小標），沒有做 mockup 的填色 chip 與外框 pill——那是全模板共用的 masthead 樣式，要改應一次改所有模板，不在本輪。",
+      "recommendation": "維持。"
+    }
+  ],
+  "verification": {
+    "selftests": "run_selftests.py 41/41 綠（既有 40＋新 _selftest_worked_example 28 支 assert）",
+    "gates_identical": "22 個既有 storyboard × schema／lint／sizecheck ＝ 66 份輸出，改前改後逐字相同（sizecheck 只濾掉 manim 的 Tex cache INFO 記錄——基線是冷 cache）",
+    "smoke_identical": "tools/doctor.py --smoke 影片線 video-smoke 段逐字相同（含正典 deck schema／lint／derive --check）",
+    "demo_gates": "storyboards/_demo_worked_example.yml：schema structure OK（provenance 10 條 warn 為 demo deck 預期：meta.chapter=Demo 無章錨、合成場無 ref）、lint clean、sizecheck 2 error／3 warn 全部落在刻意超量的 capacity_over fixture（比照 _demo_capacity 等四個既有壓測 fixture）",
+    "mock_render": "make.py --backend mock --quality low 三場（companion_limit_example／no_rail／multipage_p1）：[sync] beat timing clean、[stillness] 無未宣告靜止 > 6 s、[sync] render/audio lengths clean、compose 成功",
+    "billing": "全程離線；未呼叫任何 TTS／VLM／生成式 API；未動 ch03_trig_derivatives*.yml"
+  },
+  "contract_rows": [
+    ["D1", "列文法＝derivation 逐字相同；直接 import 其 _eq_mob／_transform_anim／_cancel_anim／_eq_core／常數", "做到"],
+    ["D2", "列不收 reason、不收 lines[]（schema error）；result.reason 豁免（它是答案框 tag）", "做到"],
+    ["D3", "列左齊 SPINE_X，不做 = 對齊欄（刻意偏離 mockup）", "做到"],
+    ["D4", "prompt 必填；result 必填，唯一例外＝part.current < part.total", "做到"],
+    ["D5", "答案框：滿 CONTENT_W、釘底安全邊界、62 px 語意色、flat 填色 0.10＋accent hairline、右端 mono tag、無漸層無左色條", "做到"],
+    ["D6", "62／34 為模板內常數；theme._SCALE_PX 未動", "做到"],
+    ["D7", "rail 存在時列過寬 → raise ValueError（點名列、實寬、上限、三條出路）", "做到"],
+    ["D8", "無 rail → 步驟欄 CONTENT_W、左錨", "做到"],
+    ["D9", "accent 省略＝example（practice 綠）；scene_spine 的 cap 同色", "做到"],
+    ["D10", "masthead 在模板內自建、沿用 example_head 五個 block id；number 進 chip、title 成 tagline", "做到"],
+    ["D11", "reveal id step.N／result／check／strategy／note.N；strategy／note.N 有 marker 才動態；result 恆動態；notes_label 跟 note.0 同進", "做到"],
+    ["D12", "capacity_meta 兩欄（步驟欄 MIN_PITCH；rail 欄 RAIL_GAP＋x_bucket）；extra_bottom 由答案框 helper 量出", "做到（配套改 sizecheck 一處，見裁決紀錄）"],
+    ["D13", "scaffold 掛 SOLUTION 之下；statement 不收（未另加 schema error——未被要求的驗證不加）", "做到"],
+    ["D14", "template_names／_seg_roles_issues／共用 _row_anim_issues／step_coverage／provenance（strategy、notes.i.text）接線；pedagogy motive 不加；lint 不動", "做到"]
+  ],
+  "agent_judgments": [
+    {
+      "n": 1,
+      "what": "改了 sizecheck._capacity_issues 一處：完全落在 extra_bottom 保留帶內的 block 不計入縱向堆疊",
+      "why": "D12 的既有介面會把答案框算兩次（一次從 zone 挖掉、一次又因為它左緣在 SPINE_X 落進步驟欄 bucket 而當成一列），每個有答案框的場都會誤報「拆頁」（實測 no_rail 4.5u vs 3.7u）。只有上下緣都在保留帶內才跳過；溢出到保留帶的列照算，capacity_over 仍 warn。",
+      "verdict": "接受。證據：22 個既有 deck 的 sizecheck 輸出逐字相同（唯一宣告 extra_bottom 的 procedure_steps 不受影響）；_selftest_capacity 12 場綠。順帶記下子代理指出的既有不一致：_capacity_issues 的 zone_top 不扣 TITLE_GAP、比放置寬鬆約 0.42u——本輪不動（動了會移動所有既有 deck 的判定）。"
+    },
+    {
+      "n": 2,
+      "what": "有答案框的場不畫角落 motif",
+      "why": "motif 與答案框都釘在右下安全邊界，實測疊在一起；續頁（無答案框）保留 motif。",
+      "verdict": "接受。"
+    },
+    {
+      "n": 3,
+      "what": "rail 的分隔細線收進 strategy group 內、不另成 decoration block",
+      "why": "零高度的 rule 上下各吃一個 RAIL_GAP，而 capacity_meta 看不見 decoration 列，放置會悄悄超出自己的稽核。",
+      "verdict": "接受。"
+    },
+    {
+      "n": 4,
+      "what": "試點場的內容量收成「一行策略句＋2 列步驟鏈」，不是 mockup 的 4 列",
+      "why": "62 px 答案框（1.37u）＋題目 masthead（1.9u）之後 body zone 只剩約 2.9u；mockup 的策略句兩行＋兩條 notes 需約 3.45u、4 列步驟鏈需約 3.2u。",
+      "verdict": "接受為 authoring 決策，並升格為裁決 ①（單頁容量預算已寫進 DESIGN 的 Authoring Playbook 表）。"
+    }
+  ],
+  "advisories": [
+    "rail 左側的直線（rail.axis）是 static decoration，在 `{show strategy}` 之前的開場幀會先孤零零站著（見逐拍幀 00）。可改成跟第一個 rail block 同進；本輪不動，列為 advisory。",
+    "demo deck 的 `ref: doc:ex:3.1` 在 provenance 解不到，是因為 meta.chapter=\"Demo\" 沒有章錨；在真正的 ch03 deck 裡 ex:3.1–3.16 都解得到（品質補強輪 ⑩ 已驗）。",
+    "答案為單行式（如 s''=−s）時答案框較矮（約 0.9u），單頁可多放一列。"
+  ],
+  "files": [
+    ["video/pipeline/templates/worked_example.py", "新模板（capacity_meta／build；docstring 含契約與兩處偏離）"],
+    ["video/pipeline/templates/__init__.py", "REGISTRY 登錄"],
+    ["video/pipeline/template_names.py", "CONTENT_TEMPLATES 加 worked_example（tts --unit auto allowlist 自動跟）"],
+    ["video/pipeline/schema.py", "_row_anim_issues 抽共用、_chain_rows、_worked_example_issues、_seg_roles_issues 收新模板"],
+    ["video/pipeline/sizecheck.py", "_capacity_issues 保留帶跳過規則（16 行）"],
+    ["video/pipeline/step_coverage.py", "_SCOPED_TEMPLATES 加 worked_example"],
+    ["video/pipeline/provenance.py", "_present_text_fields 加 strategy、notes.i.text"],
+    ["video/pipeline/_selftest_worked_example.py", "28 支 assert（幾何／reveal／schema／derivation 訊息逐字比對／容量）"],
+    ["video/storyboards/_demo_worked_example.yml", "四場 demo／回歸稿"],
+    ["video/DESIGN.md", "Template catalog 一列＋新節「Worked-example 模板」＋Authoring Playbook 一列"],
+    ["video/README.md", "模板清單 bullet＋_demo_* 清單"],
+    ["video/KICKOFF-worked-example-template.md", "契約（D1–D14）＋§7 結果"],
+    ["video/_audit/_gen/worked_example_template.digest.json ＋ worked_example_template.gen.py", "本報告的資料與產生器"],
+    ["video/REBUILD_STATUS.md", "品質補強輪 ⑱ 一段"]
+  ],
+  "not_done": [
+    "正典 §3.1 三個例題遷移（裁決 ②）",
+    "mockup 的「=」對齊欄（D3 刻意不做）",
+    "masthead 的填色 chip／外框 SOLUTION pill（全模板共用樣式，另案）",
+    "pedagogy._MOTIVE_TEMPLATES 不收 worked_example（prompt 就是 motive）",
+    "statement 欄位在 worked_example 不報 schema error（未被要求的驗證）",
+    "版面 4 條寫進 sizecheck 當確定性檢查、數學 5 條的「取消 math_sm 40」——KICKOFF-s31-amplify §7.1 其餘項目，仍未認領"
+  ]
+}

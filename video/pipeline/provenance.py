@@ -132,7 +132,10 @@ def _present_text_fields(scene: dict) -> "list[str]":
     """Field paths of present teaching-text fields. Scalars -> the name; lists ->
     name.i per index; scaffold.* -> dotted. Order: stable for readable findings."""
     paths: list[str] = []
-    for name in ("statement", "problem", "body", "reason", "prompt"):
+    # `strategy` is worked_example's rail headline -- authored teaching prose on screen,
+    # so it carries provenance like any other. Appended LAST of the scalars so every
+    # existing scene's field order is untouched.
+    for name in ("statement", "problem", "body", "reason", "prompt", "strategy"):
         if isinstance(scene.get(name), str) and scene[name].strip():
             paths.append(name)
     scaffold = scene.get("scaffold")
@@ -160,6 +163,14 @@ def _present_text_fields(scene: dict) -> "list[str]":
         v = scene.get(name)
         if isinstance(v, dict) and isinstance(v.get("reason"), str) and v["reason"].strip():
             paths.append(f"{name}.reason")
+    # worked_example's rail notes (templates/worked_example.py _note_row): `text` is the
+    # commentary beside the formula -- on-screen teaching prose. `math` is maths and `ref`
+    # is a citation tag, so neither is a text field.
+    notes = scene.get("notes")
+    if isinstance(notes, list):
+        for i, v in enumerate(notes):
+            if isinstance(v, dict) and isinstance(v.get("text"), str) and v["text"].strip():
+                paths.append(f"notes.{i}.text")
     return paths
 
 
