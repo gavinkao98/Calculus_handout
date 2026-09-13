@@ -222,14 +222,15 @@ definition＝赭、theorem＝藍，影片卻是 definition＝藍、theorem＝琥
 `calcbook.sty` 並比對色相（DARK 容差 4°）——**任一條產線動了自己的色軸，這支會紅**，不會讓兩線
 靜默漂開。
 
-**影片層物件色慣例（2026-09-13 使用者裁決）。** 上面的 `accent` 軸管的是「這一場是什麼卡類型」；
-hook 手繪幾何裡「這個物件代表哪個三角函數量」是另一條正交的軸，全片統一照 11／18／24 三場已有的
-用法：`secondary` 藍＝cos、`accent` 琥珀＝sin、`success` 綠＝斜率／加速度／tan；θ 本身（弧、扇形、
-θ 標籤等「角度物件」）一律 `concept` 赭（`meta.color_map` 已把 `\theta` token 設 concept）。
-06 `sector_inequality`／07 `squeeze_to_the_bound`／08 `chord_vs_arc` 三場原本各自一套配色，
-本輪對齊到這條軸。**已知取捨：** `accent`（琥珀）與 `concept`（赭）色相相近，兩者相鄰時（如 08
-的 sin 半弦緊挨著 θ 弧）主要靠明度／飽和度分辨，不靠色相——若要拉開只能換 θ 的顏色，留待下一個
-裁決點，這一輪不動。
+**影片層物件色慣例（θ 物件與 θ token＝strategy 紫，使用者 2026-09-13 第二次裁決，取代赭）。** 上面的
+`accent` 軸管的是「這一場是什麼卡類型」；hook 手繪幾何裡「這個物件代表哪個三角函數量」是另一條正交的
+軸，全片統一照 11／18／24 三場已有的用法：`secondary` 藍＝cos、`accent` 琥珀＝sin、`success` 綠＝
+斜率／加速度／tan；θ 本身（弧、扇形、θ 標籤等「角度物件」）一律 `strategy` 紫（`meta.color_map` 已把
+`\theta` token 設 strategy）。06 `sector_inequality`／07 `squeeze_to_the_bound`／08 `chord_vs_arc`
+三場原本各自一套配色，本輪對齊到這條軸。**已知取捨：** `accent`（琥珀）與 `concept`（赭）色相相近，
+兩者相鄰時（如 08 的 sin 半弦緊挨著 θ 弧）原本主要靠明度／飽和度分辨、不靠色相；因此 θ 不用
+`concept`，改用與其他五軸色相都拉開一截、且 §3.1 沒有 procedure／strategy 場而完全空著的
+`strategy` 紫。
 
 ### Eyebrow 字卡 resolver（`scene_role`；2026-07-01）
 
@@ -928,7 +929,7 @@ hook 手繪的物件（如 06 `sector_inequality` 的 `plots: []`＋hook）鏡�
 ```yaml
 meta:
   color_map:                 # tex token → palette role（theme.DARK 的 key）；opt-in
-    "\\theta": concept
+    "\\theta": strategy
     "h": caution
     "\\sin": result
 ```
