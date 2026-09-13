@@ -440,10 +440,44 @@ def _capacity_issues(scene: dict, blocks) -> "list[tuple[str, str]]":
 
 SPARSE_FILL_MIN = 0.35   # G3: single-block content below this fraction of the body zone -> advisory
 
+# ids scene_head (and friends) add above/beside the body zone -- never part of a scene's
+# content fill. Mirrors _capacity_issues' local HEADER; kept separate so the two checks
+# stay independently readable (no shared-constant refactor for a one-line duplication).
+_HEADER_IDS = {"eyebrow", "title", "prompt", "solrule", "sollead", "part"}
+
+
+def _union_len(spans: "list[tuple[float, float]]") -> float:
+    """Total length covered by 1-D (lo, hi) intervals, merging overlaps (so two blocks
+    sharing vertical space are not double-counted)."""
+    ivals = sorted(s for s in spans if s[1] > s[0])
+    total = 0.0
+    cur_lo = cur_hi = None
+    for lo, hi in ivals:
+        if cur_hi is None or lo > cur_hi:
+            if cur_hi is not None:
+                total += cur_hi - cur_lo
+            cur_lo, cur_hi = lo, hi
+        else:
+            cur_hi = max(cur_hi, hi)
+    if cur_hi is not None:
+        total += cur_hi - cur_lo
+    return total
+
+
 # G3 (2026-07-05): fill_gap needs n>=2 rows -- a SINGLE prose block (callout string body,
 # statement-only definition) has no inter-row gap to open, so a one-liner strands ~half the
 # zone (s3.1 frames 11/12/24). Advisory only; `sparse_ok: true` is the author's ack (read
 # HERE only -- render never reads it, so it is not a render-behaviour flag).
+#
+# G3 measurement blind spot (2026-09-13, hook-13-degrees): a hook can append its OWN block
+# below `target` that fills the very whitespace this check exists to catch (radians_essential's
+# degrees_flatten hook adds a `layer: graph` figure under `body`) -- measuring only `target`'s
+# own height missed that fill entirely and reported "sparse" on a scene the hook had just
+# filled. So this measures the UNION of vertical coverage, inside the zone, of every block
+# except header (title/eyebrow/...), decoration and background layers -- `target` included --
+# against the zone height, instead of `target` alone. In the common case (no such extra
+# block) `target` sits fully inside the zone by construction of place_body, so the union
+# collapses to exactly `target.height` -- the same number this used to compute directly.
 def _sparse_issues(scene: dict, blocks) -> "list[tuple[str, str]]":
     from pipeline.visuals import theme as T   # sizecheck has no module-level T (helpers import locally)
 
@@ -462,10 +496,31 @@ def _sparse_issues(scene: dict, blocks) -> "list[tuple[str, str]]":
         return []
     zone_top = title.get_bottom()[1] - T.TITLE_GAP
     zone_bottom = -T.FRAME_H / 2 + T.SAFE_MARGIN
-    ratio = mob.height / max(zone_top - zone_bottom, 1e-6)
+    zone_h = max(zone_top - zone_bottom, 1e-6)
+
+    spans: list[tuple[float, float]] = []
+    for b in blocks:
+        if str(getattr(b, "id", "")) in _HEADER_IDS:
+            continue
+        if getattr(b, "layer", "content") in ("decoration", "background"):
+            continue
+        bm = getattr(b, "mobject", None)
+        if bm is None:
+            continue
+        try:
+            top, bottom = float(bm.get_top()[1]), float(bm.get_bottom()[1])
+        except Exception:  # noqa: BLE001
+            continue
+        lo, hi = max(bottom, zone_bottom), min(top, zone_top)
+        if hi > lo:
+            spans.append((lo, hi))
+    ratio = _union_len(spans) / zone_h
     if ratio >= SPARSE_FILL_MIN:
         return []
     sid = scene.get("id", "?")
+    # Message text kept as "single-block fill" (not renamed to e.g. "content fill") --
+    # _selftest_capacity.py's _has_sparse_warn matches this exact substring, and that file
+    # is out of this change's scope (sizecheck.py / _selftest_sizecheck.py / DESIGN only).
     return [("warn",
         f"{sid}: single-block fill {ratio:.0%} < {SPARSE_FILL_MIN:.0%} of body zone -- exits: "
         f"(a) bullet the body (list form), (b) merge into a neighbour (scaffold.flag/aside), "
