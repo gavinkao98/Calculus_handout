@@ -1416,7 +1416,10 @@ def chord_vs_arc(spec, ctx, blocks):
 #     spoken over a screen that shows the one finished row and then holds: 25.8 s of measured
 #     stillness (rewatch_pack_after17, fine threshold) against a 12 s acceptance line. The
 #     derivation now happens where the narration puts it, as a TEMPORARY draft in the band
-#     step.1 / step.2 / result will occupy, which is empty for the whole of this beat.
+#     step.1 / step.2 / result will occupy, which is empty for the whole of this beat. The
+#     milestone six-lens round re-filed it (R3/R4, independently): splitting the reveal was
+#     only half of it -- the draft is a SIDE BRANCH off the main line, and nothing on screen
+#     said so, so it now carries a tag and leaves as one block (`_DRAFT_TAG` below).
 #   beat 4 (20.9 s, step.2) is "the decisive step" -- write h as 2*(h/2) so the denominator
 #     carries the very h/2 that is inside the sine. The stock row posts the FINISHED line
 #     and holds: "畫面把它當成又一行結果貼出來，再停 20 秒，觀眾沒有機會看到中間發生了什麼"
@@ -1436,6 +1439,14 @@ def chord_vs_arc(spec, ctx, blocks):
 # layout gate still measures exactly the terminal frame it measured before.
 _DRAFT_X = -5.85                      # the chain's left edge (-6.37) plus one indent
 _DRAFT_Y = (-0.55, -1.30, -2.25)      # the empty band between step.0 and the bottom margin
+# ... and it SAYS it is a side branch. The indent and the dimmer ink make the block subordinate;
+# the tag makes it nameable, which is what the beginner needs to know the block can be set aside
+# and the main line (we are computing (sin(x+h) - sin x)/h) resumed. Without it the six-lens
+# review's R3/R4 `must` is only half closed: the derivation is visible but unmarked.
+_DRAFT_TAG = "[ where it comes from ]"
+_DRAFT_TAG_Y = 0.10                   # the gap between step.0's row (bottom 0.47) and _DRAFT_Y[0]
+_DRAFT_TAG_ROLE = "muted"             # quieter than the draft's own `text` ink: a marker, not content
+_DRAFT_EXIT_SCALE = 0.82              # 規則 1: 臨時標註退場用縮小加淡出 -- the block leaves as one
 # The substitution line is split at the narration's own comma ("put u equals ... AND v equals
 # ..." is 9 s of speech), so the two halves arrive on the two clauses instead of together.
 _DRAFT_SUBS = (r"{{u=\frac{A+B}{2},}} {{\quad v=\frac{A-B}{2}}}",
@@ -1502,6 +1513,8 @@ def difference_quotient_for_sine(spec, ctx, blocks):
     step0_eq = _core(step0_row)
     step0_rail = _rail(step0_row, step0_row.submobjects[0])
 
+    tag = brand.eyebrow(_DRAFT_TAG, ground, role=_DRAFT_TAG_ROLE)
+    tag.move_to([_DRAFT_X, _DRAFT_TAG_Y, 0], aligned_edge=LEFT)
     subs = [_draft_line(tex, ground, y) for tex, y in zip(_DRAFT_SUBS, _DRAFT_Y)]
     work = _draft_line(_DRAFT_START, ground, _DRAFT_Y[2])
     expanded = _draft_line(_DRAFT_EXPANDED, ground, _DRAFT_Y[2])
@@ -1540,8 +1553,13 @@ def difference_quotient_for_sine(spec, ctx, blocks):
         #     capped so it is finished by the time the narration starts deriving it).
         w = max(at("u") - pacing.FADE_SECONDS - 0.4, 1.0)
         play(Write(step0_eq), run_time=min(pacing.write_seconds(step0_eq, w), w))
+        # The reason rail rides in with the side-branch tag, on "... it did not:" -- the band
+        # below is labelled BEFORE anything is written into it, so the block reads as scratch
+        # work from its first glyph. One play, so the cue clock is unchanged.
+        entrance = [FadeIn(tag, shift=0.1 * UP)]
         if step0_rail.submobjects:
-            play(FadeIn(step0_rail), run_time=pacing.FADE_SECONDS)
+            entrance.append(FadeIn(step0_rail))
+        play(*entrance, run_time=pacing.FADE_SECONDS)
         scene.add(mob)
         hold(at("u"))
 
@@ -1587,10 +1605,12 @@ def difference_quotient_for_sine(spec, ctx, blocks):
         play(TransformMatchingShapes(flyer, landed), run_time=1.1)
         play(FadeOut(landed), run_time=0.4)     # step.0's own RHS is underneath, untouched
 
-        # (6) "A product is also exactly what we want ..." -- clear the band well before
+        # (6) "A product is also exactly what we want ..." -- the side branch closes: tag and
+        #     result leave TOGETHER, shrinking as they fade (規則 1 的臨時標註退場), so the
+        #     main line is what is left standing, and the band is clear well before
         #     {show step.1} needs it.
         hold(at("clear"))
-        play(FadeOut(product), run_time=0.8)
+        play(FadeOut(VGroup(tag, product), scale=_DRAFT_EXIT_SCALE), run_time=0.8)
         hold(total)
         return _spent(scene, t0, max(total, t))
 
