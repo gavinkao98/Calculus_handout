@@ -51,6 +51,7 @@ from pipeline.stillness import UNDECLARED_STILL_SECONDS, undeclared_still_beats 
 from pipeline.timing import (  # noqa: E402
     SCENE_LEAD_SECONDS,
     SCENE_TAIL_SECONDS,
+    SYNC_HARD_GATE_FRAMES,
     SYNC_TOLERANCE_SECONDS,
     beat_extra_padding_seconds,
     expected_content_video_seconds,
@@ -484,6 +485,31 @@ def _probe_duration(path: Path) -> float:
         return 0.0
 
 
+def _probe_duration_fps(path: Path) -> tuple[float, float]:
+    """(seconds, fps) of a video in ONE ffprobe call; either is 0.0 if it cannot be read.
+
+    The sync gate's tolerance is counted in frames, so the frame rate has to come from the
+    very file being judged -- and an unreadable `r_frame_rate` (ffprobe prints it as
+    `num/den`) must surface as 0.0 for the caller to fail on, never as a guessed 30."""
+    result = subprocess.run(
+        ["ffprobe", "-v", "error", "-select_streams", "v:0",
+         "-show_entries", "format=duration:stream=r_frame_rate",
+         "-of", "default=noprint_wrappers=1", str(path)],
+        capture_output=True, text=True,
+    )
+    fields = dict(ln.split("=", 1) for ln in result.stdout.splitlines() if "=" in ln)
+    try:
+        duration = float(fields.get("duration", ""))
+    except ValueError:
+        duration = 0.0
+    num, _, den = fields.get("r_frame_rate", "").partition("/")
+    try:
+        fps = float(num) / float(den or 1)
+    except (ValueError, ZeroDivisionError):
+        fps = 0.0
+    return duration, fps
+
+
 def _git_commit() -> str:
     """Short HEAD for timeline provenance; 'unknown' if git is unavailable."""
     try:
@@ -526,7 +552,7 @@ def _audit_render_sync(scenes: list[dict], manifest: dict, rendered: dict[str, P
     """Return True if rendered scene lengths are compatible with manifest audio."""
     by_scene = _scene_manifest_map(manifest)
     fatals: list[str] = []
-    warnings: list[str] = []
+    fps_seen: set[float] = set()
     for scene in scenes:
         if scene.get("kind", "content") != "content":
             continue
@@ -543,33 +569,40 @@ def _audit_render_sync(scenes: list[dict], manifest: dict, rendered: dict[str, P
             if abs(beat_sum - audio_seconds) > SYNC_TOLERANCE_SECONDS:
                 fatals.append(f"{sid}: sum(beat durations)={beat_sum:.3f}s != audio_seconds="
                               f"{audio_seconds:.3f}s (hand-edited manifest?)")
-        actual = _probe_duration(video)
+        actual, fps = _probe_duration_fps(video)
+        if fps <= 0:
+            fatals.append(f"{sid}: ffprobe read no frame rate from {video}; the gate is "
+                          "measured in frames and will not guess one")
+            continue
+        fps_seen.add(fps)
         audio_end = lead + audio_seconds
         expected = expected_content_video_seconds(audio_seconds, lead_seconds=lead)
+        tolerance = SYNC_HARD_GATE_FRAMES / fps
         if actual + SYNC_TOLERANCE_SECONDS < audio_end:
             fatals.append(
                 f"{sid}: video={actual:.3f}s, narration ends at {audio_end:.3f}s "
                 f"(audio={audio_seconds:.3f}s + lead={lead:.3f}s)"
             )
-        elif abs(actual - expected) > SYNC_TOLERANCE_SECONDS:
-            warnings.append(
-                f"{sid}: video={actual:.3f}s, expected ~{expected:.3f}s "
-                f"(audio={audio_seconds:.3f}s + lead/tail={lead + SCENE_TAIL_SECONDS:.3f}s)"
+        elif abs(actual - expected) > tolerance:
+            delta = actual - expected
+            fatals.append(
+                f"{sid}: video={actual:.3f}s, expected {expected:.3f}s, "
+                f"delta={delta:+.3f}s = {delta * fps:+.2f} frames @ {fps:g} fps "
+                f"(gate {SYNC_HARD_GATE_FRAMES} frames = {tolerance:.3f}s; "
+                f"audio={audio_seconds:.3f}s + lead/tail={lead + SCENE_TAIL_SECONDS:.3f}s)"
             )
 
+    gate = f"[sync] hard gate: |video-expected| <= {SYNC_HARD_GATE_FRAMES} frames"
+    if len(fps_seen) == 1:
+        fps_one = next(iter(fps_seen))
+        gate += f" ({SYNC_HARD_GATE_FRAMES / fps_one:.3f} s @ {fps_one:g} fps)"
+    print(gate, flush=True)
     if fatals:
         print(f"[sync] {len(fatals)} render/audio fatal mismatch(es):", flush=True)
         for item in fatals:
             print(f"  ERROR  {item}", flush=True)
         return False
-    if warnings:
-        print(f"[sync] {len(warnings)} render/audio length warning(s):", flush=True)
-        for item in warnings[:20]:
-            print(f"  WARN   {item}", flush=True)
-        if len(warnings) > 20:
-            print(f"  WARN   ... and {len(warnings) - 20} more", flush=True)
-    else:
-        print("[sync] render/audio lengths clean", flush=True)
+    print("[sync] render/audio lengths clean", flush=True)
     return True
 
 

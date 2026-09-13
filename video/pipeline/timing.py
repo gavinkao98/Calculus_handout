@@ -10,6 +10,13 @@ MIN_BEAT_HOLD_SECONDS = 0.3
 
 SYNC_TOLERANCE_SECONDS = 0.12
 
+# Render-vs-audio HARD GATE, measured in FRAMES because the error it catches is a
+# frame-rounding error (see `elapsed`), not a wall-clock one. Measured on the ch03 §3.1
+# final cut (2026-09-13, 30 fps, `pauses:` folded into the manifest): of 21 content scenes
+# the worst |video - expected| was exactly 1.0 frame, so a 1-frame gate has zero headroom;
+# 2 leaves one frame spare. SYNC_TOLERANCE_SECONDS keeps its own seconds-based jobs.
+SYNC_HARD_GATE_FRAMES = 2
+
 STOCK_ANIM_SECONDS = {
     "fade": 0.5,
     "create": 0.8,
