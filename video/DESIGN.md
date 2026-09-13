@@ -694,7 +694,10 @@ slope-from-definition computation）需要 7–9：
 **G3 稀疏出口（單塊 prose 場景）：** callout（字串 body）／definition_math（statement-only）實測佔 body zone
 <35% 時 sizecheck advisory 提示三出口——① 條列化（callout body 用 list 形式）；② 併景（掛相鄰場景
 `scaffold.flag`／`aside`）；③ `sparse_ok: true` 接受留白（pull-quote 式刻意孤句合法；render 不讀此欄位，
-僅 sizecheck 讀＝advisory ack，非 magic boolean）。
+僅 sizecheck 讀＝advisory ack，非 magic boolean）。**量測範圍（2026-09-13 修正量測盲點）：** 這 <35%
+量的是 body zone 內「非 header／非 decoration／非 background」全部 block 的聯集垂直覆蓋（含 hook 加的
+`layer: graph` 圖），不是只看單一 prose block 自己的高度——否則 hook 補的圖填滿留白時仍會誤報稀疏
+（`radians_essential` 的 `degrees_flatten` 即一例）。
 
 **G4 卡片孤字：** aside／rail statement 的 prose 尾端孤 math token（frame 07 的孤 `$x_0$`）由 lint advisory
 提示，修法＝改寫文案（如 `at every point $x_0$.`）。**不用 `~`**——`brand._escape_tex` 會把它印成可見波浪號。

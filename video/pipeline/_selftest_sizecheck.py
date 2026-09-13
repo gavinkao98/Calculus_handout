@@ -128,6 +128,61 @@ def test_floor_findings_tolerates_clamp_boundary():
     assert len(flagged) == 1 and "tiny" in flagged[0][1]
 
 
+def _rect_at(bottom: float, top: float, width: float = 2.0):
+    """A Rectangle whose bounding box is exactly [bottom, top] in y -- render-free
+    geometry for the G3 sparse-union tests below (no Tex build needed)."""
+    from manim import Rectangle
+
+    h = top - bottom
+    r = Rectangle(width=width, height=h)
+    r.move_to([0.0, bottom + h / 2.0, 0.0])
+    return r
+
+
+def test_sparse_single_block_warns():
+    """G3 pure sparse: a lone small `body` block in an otherwise-empty zone still warns
+    (the common case this check exists for, unchanged by the union rewrite)."""
+    from pipeline.blocks import Block
+
+    title_bottom = 2.0
+    title = _rect_at(title_bottom, title_bottom + 0.01, width=1.0)
+    zone_top = title_bottom - T.TITLE_GAP
+    body = _rect_at(zone_top - 0.3, zone_top)   # a thin top-anchored slice
+    scene = {"id": "sparse_probe", "template": "callout", "body": "x"}
+    warns = S._sparse_issues(scene, [Block(id="title", mobject=title),
+                                     Block(id="body", mobject=body)])
+    assert len(warns) == 1 and "single-block fill" in warns[0][1] and "sparse_probe" in warns[0][1]
+
+
+def test_sparse_silent_when_graph_block_fills_zone():
+    """G3 measurement blind spot (hook-13-degrees): a hook's `layer: graph` block filling
+    the rest of the zone below a small `body` must silence the advisory -- the fix measures
+    the UNION of body+graph, not `body` alone."""
+    from pipeline.blocks import Block
+
+    title_bottom = 2.0
+    title = _rect_at(title_bottom, title_bottom + 0.01, width=1.0)
+    zone_top = title_bottom - T.TITLE_GAP
+    zone_bottom = -T.FRAME_H / 2 + T.SAFE_MARGIN
+    body = _rect_at(zone_top - 0.3, zone_top)                 # same thin slice as above
+    fig = _rect_at(zone_bottom, zone_top - 0.3, width=4.0)    # fills the rest of the zone
+    scene = {"id": "graph_fill_probe", "template": "callout", "body": "x"}
+    blocks = [Block(id="title", mobject=title), Block(id="body", mobject=body),
+              Block(id="degfig", mobject=fig, layer="graph")]
+    assert S._sparse_issues(scene, blocks) == []
+
+
+def test_sparse_ok_still_acks():
+    """`sparse_ok: true` still short-circuits the advisory outright, unchanged."""
+    from pipeline.blocks import Block
+
+    title = _rect_at(2.0, 2.01, width=1.0)
+    body = _rect_at(-0.05, 0.05)   # tiny -- would warn without the ack
+    scene = {"id": "acked", "template": "callout", "body": "x", "sparse_ok": True}
+    blocks = [Block(id="title", mobject=title), Block(id="body", mobject=body)]
+    assert S._sparse_issues(scene, blocks) == []
+
+
 if __name__ == "__main__":
     test_effective_px_recovers_authored_size()
     test_floor_findings_flags_below()
@@ -144,4 +199,7 @@ if __name__ == "__main__":
     test_clamp_cur_size_nonpositive_uses_fit()
     test_clamp_none_max_w_safe()
     test_floor_findings_tolerates_clamp_boundary()
+    test_sparse_single_block_warns()
+    test_sparse_silent_when_graph_block_fills_zone()
+    test_sparse_ok_still_acks()
     print("OK sizecheck self-test")
