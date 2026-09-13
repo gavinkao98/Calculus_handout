@@ -52,6 +52,7 @@ tts.py --backend mock             # 離線 TTS mock（不計費，可逕行）
 - **獨立項目開新對話：** 與當前輪次不共用檔案、可以獨立驗收的項目（新模板、另一節、工具閘），用 `spawn_task` 開成新對話的 chip（自帶 worktree、prompt 要自足），不要塞進同一個對話把上下文撐滿；主對話只留「這一輪」的主線。
 - **契約先於派工：** 派工前先把成功標準寫進 kickoff／prompt（改哪些檔、測試怎麼證明、零行為改變怎麼證明、不准動什麼）；子代理回報必須含：改了哪些檔、測試數字、沒做到的條款。主模型只看回報＋抽查（幀、diff），不重做。
 - **並行紀律（同一工作樹多個 session，2026-09-13 教訓）：** 開工先 `git status`；別人 dirty 的 hunk 不碰、只 commit 自己的路徑；render／tts 的時間窗用 `ListAgents`＋`SendMessage` 互相通知；子代理各自 worktree（Tex cache 各自一份）。
+- **影片線輪次協定（內容鎖／硬閘／停止條件／批次化／多 session）＝ [`video/REVIEW_GATES.md`](video/REVIEW_GATES.md) §六（2026-09-13 裁決）；每節開工前先過該節 §6.4 的 G4 清單。**
 
 ## 安裝環境：缺套件／軟體先問、勿造輪子替代、裝完更新文檔
 
