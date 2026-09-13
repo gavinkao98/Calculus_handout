@@ -32,6 +32,41 @@
 
 ---
 
+## 0.5 認領狀態（2026-09-13 三個 session 交叉確認後更新）
+
+> 本檔立檔後，同一個工作樹上有另外兩個 session 在跑，已逐項確認分工。
+> **新對話請接「未認領」那幾項**，不要碰已認領的（會撞車）。
+
+| 項目 | 認領者 | 狀態 |
+|---|---|---|
+| **Task A** 場 08 單位圓 hook | — | ✅ **已完成**（commit `8e1d5d5`，storyboard 已接上 `chord_vs_arc`） |
+| **Task B／C** 原語鋪滿 ＋ 驗收 | `calculus-handout-c5` | 🔵 進行中，見 [`KICKOFF-motion-language-rollout.md`](KICKOFF-motion-language-rollout.md)（21 個 content 場＋§5 驗收＋27 場 1080p 成片） |
+| **Task D** 計費（R6 場 06／13 改稿＋§8 對齊） | `calculus-handout-a7` | 🔵 已認領，**會先向使用者報量** |
+| rollout §6 排除的：09／12 新 hook、06 右側 glyph 疊層填色 | `calculus-handout-a7` | 🔵 已認領（等 c5 merge 完再動） |
+| **§7.1 模板系統設計其餘部分**——版面 4 條規則、數學排版 5 條、**`worked_example` 新模板**、字體 | — | ⚪ **未認領 ← 新對話接這個** |
+| 06 主圖放大 2 倍、場間真 crossfade | — | ⚪ 未認領 |
+| §3.2 解凍、`example_coverage_enforce` | — | ⚪ 未認領 |
+| a7 的「Tex bbox × 線段取樣求相交」量測常設成 sizecheck 閘 | — | ⚪ 未認領（c5 已記進它那輪的 backlog，但不在該輪做） |
+
+**建議新對話接 `worked_example` 模板**，兩個理由：
+
+1. **與 c5 的 rollout 零重疊**——rollout 動的是既有 storyboard 的欄位與 marker，`worked_example`
+   動的是一個全新的模板檔（`pipeline/templates/worked_example.py`，目前不存在）。碰不到同一行。
+2. **它是全書最大的缺口**——220 個 worked example 佔 935 個語意塊的 **24%**、單一最大宗，而影片
+   產線**完全沒有對應模板**；§3.1 講義有 16 個例題、影片一場都沒有（不是那節沒例題，是沒地方放）。
+   覆蓋率盤點與 mockup 都在版控裡：[`_audit/design-template-system/`](_audit/design-template-system/)
+   （`Main.dc.html`＝覆蓋矩陣、`TemplateSet.dc.html`＝13 模板提案、`WorkedExample.dc.html`＝mockup、
+   `README.md`＝怎麼改與怎麼重新發布）。
+
+**多 session 共用同一個工作樹的紀律**（今天踩過一次，記下來）：只用局部 Edit、不要整檔覆寫；
+`git add` 只加自己的檔；**絕對不要 `git add -A` 或 `git commit -a`**（會把別人進行中的半成品
+一起釘進你的 commit）。同一個檔被兩個 session 改到時，a7 用過一個更保守的做法可以參考：
+`git show HEAD:<path>` 取 HEAD 版 → 只套自己的替換 → `git hash-object -w` →
+`git update-index --cacheinfo` 把 index 指過去，於是 index ＝「HEAD ＋ 自己的 hunk」，
+別人的東西連碰都沒碰到。另：跑 manim render 前先問一下，27 場 1080p 會撞 Tex cache。
+
+---
+
 ## 1. 全域護欄
 
 1. **旁白一個字不改。** 加減 `{show}` marker 本身不改 `scene_text_hash`，所以**可以**零計費重對映——
