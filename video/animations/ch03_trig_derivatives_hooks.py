@@ -356,19 +356,28 @@ def sector_inequality(spec, ctx, blocks):
     e_caption.next_to(e_circle, DOWN, buff=0.42)
     evenness = VGroup(e_circle, e_axis, e_live, e_caption)
 
+    IN_SECONDS, OUT_SECONDS = 0.7, 0.35     # entrance (circle+axis, caption) / exit fade
+
     def _evenness_anim(scene, mob, _ground) -> float:
-        """Swing +theta -> -theta -> +theta, twice, filling whatever beat this lands on."""
+        """Swing +theta -> -theta -> +theta, twice, filling whatever beat this lands on.
+
+        Everything is budgeted INSIDE `total`, exit fade included: the old version added
+        the 0.35 s fade after the beat's budget and returned `total + 0.35`, so the scene ran
+        long by that much every time -- harmless while this was a middle beat that later
+        beats absorbed, a real `[sync] render/audio length` warning now that it is the LAST
+        beat (measured: scene 06 went from -0.27 s under to +0.53 s over)."""
         total = TM.beat_run_time(scene, 6.0)
+        t0 = _elapsed(scene)
         scene.play(FadeIn(e_circle), FadeIn(e_axis), run_time=0.4)
         scene.add(e_live)
         scene.play(FadeIn(e_caption), run_time=0.3)
-        swing = max((total - 0.7) / 2.0, 0.8)
+        swing = max((total - IN_SECONDS - OUT_SECONDS) / 2.0, 0.8)
         for _ in range(2):
             scene.play(e_ang.animate.set_value(-th), run_time=swing,
                        rate_func=there_and_back)
-        # the aside has done its job; the geometry beats need the space back
-        scene.play(FadeOut(mob), run_time=0.35)
-        return total + 0.35
+        # the aside has done its job; the figure underneath gets the frame back
+        scene.play(FadeOut(mob), run_time=OUT_SECONDS)
+        return _elapsed(scene) - t0
 
     def _peel(src, chip):
         def anim(scene, mob, ground):
@@ -1251,26 +1260,39 @@ def ratio_readouts(spec, ctx, blocks):
 
     def _open(scene, mob, _ground) -> float:
         """The corner close-up grows back out into the full picture."""
-        secs = min(max(TM.beat_run_time(scene, 1.4) * 0.6, 0.9), 1.8)
-        scene.play(ReplacementTransform(inset, mob), run_time=secs)
+        t0 = _elapsed(scene)
+        scene.play(ReplacementTransform(inset, mob),
+                   run_time=min(max(TM.beat_run_time(scene, 1.4) * 0.6, 0.9), 1.8))
         scene.add(mob)
-        return secs
+        return _elapsed(scene) - t0
 
     def _land(scene, mob, _ground) -> float:
         """Draw the read-off one part at a time, spread over the beat it is read on."""
         parts = list(mob)
-        each = min(max(TM.beat_run_time(scene, 0.9) / len(parts), 0.35), 1.1)
+        # an equal share of the beat, capped so a long beat is not crawled out;
+        # never MORE than the share, or the scene outruns its own narration.
+        each = min(TM.beat_run_time(scene, 0.9) / len(parts), 1.1)
+        t0 = _elapsed(scene)
         for part in parts:
             scene.play(Create(part) if isinstance(part, DashedLine) else FadeIn(part),
                        run_time=each)
         scene.add(mob)
-        return each * len(parts)
+        return _elapsed(scene) - t0
 
     out = list(blocks)
     out.append(Block("opened", wide, anim=_open, static=False, layer="graph"))
     out.append(Block("at_half_pi", half, anim=_land, static=False, layer="graph"))
     out.append(Block("at_pi", at_pi, anim=_land, static=False, layer="graph"))
     return out
+
+
+def _elapsed(scene) -> float:
+    """The renderer's own clock. A reveal must report what it ACTUALLY consumed, not the
+    sum of its `run_time`s: manim rounds every `play` up to a whole frame, so a reveal made
+    of several plays under-reports by a frame each, the beat then holds for a remainder that
+    is too long, and the scene ends up longer than its narration ([sync] render/audio length).
+    Measured on continuity_argument: 3 plays instead of 1 put the scene 0.23-0.33 s over."""
+    return float(getattr(scene.renderer, "time", 0.0))
 
 
 def _play_stock(scene, anim, mob, ground) -> float:
@@ -1311,12 +1333,13 @@ def continuity_template(spec, ctx, blocks):
     # -- the second identity: the first one with the changed tokens flipped ------
     def _fill_second(scene, mob, _ground) -> float:
         total = TM.beat_run_time(scene, 1.6)
+        t0 = _elapsed(scene)
         ghost = row0.copy()
         scene.add(ghost)
-        secs = min(max(total * 0.30, 0.7), 1.4)
-        scene.play(TransformMatchingShapes(ghost, mob), run_time=secs)
+        scene.play(TransformMatchingShapes(ghost, mob),
+                   run_time=min(max(total * 0.30, 0.7), 1.4))
         scene.add(mob)
-        return secs
+        return _elapsed(scene) - t0
 
     ids["proof.1"].anim = _fill_second
 
@@ -1378,15 +1401,20 @@ def continuity_template(spec, ctx, blocks):
         """Reveal the qed line, draw the number line, then walk x into x_0 across whatever
         is left of the beat -- the narration's own 'let x -> x_0' happening rather than
         being asserted."""
-        used = _play_stock(scene, stock_qed, mob, _ground)
+        t0 = _elapsed(scene)
+        _play_stock(scene, stock_qed, mob, _ground)
         scene.play(Create(axis), FadeIn(dot_x0), FadeIn(lab_x0), run_time=0.6)
         scene.add(halfgap)
         scene.play(FadeIn(lab_half), run_time=0.35)
-        used += 0.95
-        total = TM.beat_run_time(scene, used + 1.2)
-        walk = max(total - used - 0.4, 0.8)
-        scene.play(gap.animate.set_value(0.0), run_time=walk, rate_func=smooth)
-        return used + walk
+        # whatever the beat has left, never more: a floor here would run the scene
+        # past its own narration and trip the [sync] render/audio length gate.
+        used = _elapsed(scene) - t0
+        walk = TM.beat_run_time(scene, used + 1.2) - used - 0.4
+        if walk >= 0.25:
+            scene.play(gap.animate.set_value(0.0), run_time=walk, rate_func=smooth)
+        else:
+            gap.set_value(0.0)
+        return _elapsed(scene) - t0
 
     qed_block.anim = _close_gap
     return blocks
