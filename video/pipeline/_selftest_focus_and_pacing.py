@@ -172,6 +172,50 @@ def test_unknown_block_id_is_ignored_at_play_time():
     assert dimmed == {"a"}
 
 
+def test_apply_never_redims_a_block_that_is_already_dimmed():
+    """Regression for the ch03 06 `sector_inequality` restore-restore-fails-to-fully-
+    restore report (2026-09-13, `+41s`/`+55s` sampled darker than a single dim):
+    `apply({a})` then `apply({a, b})` then `apply({})` must leave BOTH `a` and `b` at
+    full opacity, and `a` must never be faded a SECOND time just because the wanted
+    set grew to include it again alongside `b` -- `fade` is multiplicative, so a
+    repeat application would compound (0.35 -> 0.1225), not hold steady."""
+    by_id = _by_id("a", "b")
+    scene = FakeScene(10.0)
+    dimmed = F.apply(scene, by_id, ["a"], set())
+    assert by_id["a"].mobject.opacity == F.DIM_OPACITY
+    dimmed = F.apply(scene, by_id, ["a", "b"], dimmed)
+    assert by_id["a"].mobject.opacity == F.DIM_OPACITY, "a must not be dimmed a second time"
+    assert by_id["b"].mobject.opacity == F.DIM_OPACITY
+    dimmed = F.apply(scene, by_id, [], dimmed)
+    assert dimmed == set()
+    assert by_id["a"].mobject.opacity == 1.0, "a must land on full opacity, not a doubled dim"
+    assert by_id["b"].mobject.opacity == 1.0
+
+
+def test_apply_only_saves_state_for_a_block_not_already_dimmed():
+    """`save_state()` must run exactly once per dim, before the fade that follows it --
+    if a block already in the dimmed set were saved again, it would be saved AT its
+    current (dimmed) opacity, and `restore()` would land back on that dimmed value
+    instead of the original full one."""
+    by_id = _by_id("a", "b")
+    scene = FakeScene(10.0)
+    save_calls = {"a": 0, "b": 0}
+    for name in ("a", "b"):
+        mob = by_id[name].mobject
+
+        def _wrapped(orig=mob.save_state, n=name):
+            save_calls[n] += 1
+            orig()
+        mob.save_state = _wrapped
+
+    dimmed = F.apply(scene, by_id, ["a"], set())
+    dimmed = F.apply(scene, by_id, ["a", "b"], dimmed)
+    assert save_calls == {"a": 1, "b": 1}, "each block saves its un-dimmed state exactly once"
+    F.apply(scene, by_id, [], dimmed)
+    assert by_id["a"].mobject.opacity == 1.0
+    assert by_id["b"].mobject.opacity == 1.0
+
+
 # -- focus[].indicate: the flash variant (SPEC-motion-language rule 3) -----------
 
 def test_scene_indicate_reads_only_entries_that_flash():
@@ -214,6 +258,65 @@ def test_indicate_is_free_when_nothing_matches():
     assert F.indicate(scene, _square_blocks("a"), ["nope"], "#ffffff") == 0.0
     assert F.indicate(scene, _square_blocks("a"), [], "#ffffff") == 0.0
     assert scene.plays == []
+
+
+# -- scene.py's focus call site: a `dim: []` entry runs BEFORE the beat's reveal -
+
+def test_restore_only_focus_entry_runs_before_the_beats_own_reveal():
+    """Root cause of the ch03 06 `sector_inequality` report: scene.py normally
+    reveals-then-focuses (the just-revealed block earns full attention before
+    anything dims). A `dim: []` entry dims nothing, so there is nothing left to
+    protect by waiting -- and its whole point is putting everything back for the
+    viewer to compare across THIS beat, not just whatever is left of it once the
+    beat's own reveal returns. `ineq`'s reveal walks three terms across a beat that
+    grew to ~22-27 s (motion primitive 7), so the old reveal-then-focus order left
+    the restore stranded in the final FADE_SECONDS: a mock render showed the dimmed
+    copies still dimmed at every sampled point inside the beat and only snapping
+    back right before the next one started. `LessonScene._play_content` now runs a
+    restore-only (`dim: []`) entry BEFORE `play_block`, not after."""
+    import pipeline.scene as scene_mod
+    from pipeline.blocks import Block
+
+    log = []
+    real_apply = F.apply
+
+    def logging_apply(scene, by_id, wanted, currently_dimmed):
+        if not wanted:
+            log.append("restore")
+        return real_apply(scene, by_id, wanted, currently_dimmed)
+
+    def reveal_setup(scene, mob, ground):
+        log.append("reveal-setup")
+        return 0.0
+
+    def reveal_ineq(scene, mob, ground):
+        log.append("reveal-ineq")
+        return 0.0
+
+    by_id = {"a": FakeBlock(),
+              "setup": Block(id="setup", mobject=FakeMob(), anim=reveal_setup),
+              "ineq": Block(id="ineq", mobject=FakeMob(), anim=reveal_ineq)}
+
+    class FakeLessonScene(FakeScene):
+        def wait(self, seconds):
+            pass
+
+    fake_scene = FakeLessonScene(10.0)
+    fake_scene.spec = {"say": "{show setup} one two three {show ineq} four five six",
+                        "focus": [{"at": "setup", "dim": ["a"]}, {"at": "ineq", "dim": []}]}
+    fake_scene.beat_durations = None
+
+    scene_mod.focus.apply = logging_apply
+    try:
+        scene_mod.LessonScene._play_content(fake_scene, [], by_id, "dark")
+    finally:
+        scene_mod.focus.apply = real_apply
+
+    # A trailing "restore" is scene.py's own end-of-scene sweep-up (`focus.apply(..., [],
+    # dimmed)`, always a no-op here since `dim: []` already restored everything); only the
+    # first three events are this fix's concern.
+    assert log[:3] == ["reveal-setup", "restore", "reveal-ineq"], log
+    assert by_id["a"].mobject.opacity == 1.0, "the restore must actually run, not just move"
 
 
 # -- schema validation -----------------------------------------------------------
@@ -287,9 +390,12 @@ if __name__ == "__main__":
     test_empty_dim_restores_everything()
     test_apply_is_a_no_op_when_nothing_changes()
     test_unknown_block_id_is_ignored_at_play_time()
+    test_apply_never_redims_a_block_that_is_already_dimmed()
+    test_apply_only_saves_state_for_a_block_not_already_dimmed()
     test_scene_indicate_reads_only_entries_that_flash()
     test_indicate_plays_one_flash_for_the_whole_list_and_charges_for_it()
     test_indicate_is_free_when_nothing_matches()
+    test_restore_only_focus_entry_runs_before_the_beats_own_reveal()
     test_schema_accepts_indicate_next_to_dim()
     test_schema_rejects_a_malformed_indicate()
     test_schema_rejects_indicating_a_block_the_same_entry_dims()

@@ -125,10 +125,29 @@ class LessonScene(Scene):
             else:
                 target_seconds = estimate_seconds(beat.text)
             self.beat_seconds = target_seconds
+            # A `dim: []` entry is a pure restore: nothing is being dimmed, so there is
+            # nothing left to protect by waiting for the reveal, and the whole point is
+            # putting everything back for the viewer to compare across THIS beat -- not
+            # just whatever is left of it once the beat's OWN reveal returns. When that
+            # reveal is paced across nearly the entire beat (motion primitive 7 -- e.g.
+            # ch03 06's `ineq`, which walks three terms across a 20+ s beat), the normal
+            # reveal-then-focus order strands the restore in the final FADE_SECONDS:
+            # measured on a mock render, the dimmed copies stayed dimmed through the
+            # whole beat and only snapped back right before the next one started
+            # (2026-09-13). That is the same architecture problem the `evenness` hook
+            # already documents and works around by folding its own fade into its
+            # reveal; a restore-only entry can dodge it here instead, by running before
+            # the reveal rather than after it.
+            restore_only = target in focus_plan and not focus_plan[target]
+            if restore_only:
+                before = dimmed
+                dimmed = focus.apply(self, by_id, focus_plan[target], dimmed)
+                if dimmed != before:
+                    consumed += focus.FADE_SECONDS
             if target and target in by_id and target not in revealed:
-                consumed = play_block(self, by_id[target], ground)
+                consumed += play_block(self, by_id[target], ground)
                 revealed.add(target)
-            if target in focus_plan:
+            if target in focus_plan and not restore_only:
                 before = dimmed
                 dimmed = focus.apply(self, by_id, focus_plan[target], dimmed)
                 if dimmed != before:
