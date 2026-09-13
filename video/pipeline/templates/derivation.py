@@ -50,6 +50,8 @@ from manim import (DOWN, LEFT, RIGHT, Create, FadeIn, FadeOut, MathTex, Surround
                    TransformMatchingShapes, TransformMatchingTex, VGroup)
 
 from .. import brand
+from .. import pacing
+from .. import timing as TM
 from ..blocks import Block, accent_role
 from ..timing import STOCK_ANIM_SECONDS
 from ..visuals import theme as T
@@ -188,7 +190,28 @@ def _matching(source, target):
     return TransformMatchingShapes(source, target)
 
 
-def _transform_anim(prev_eq, prev_row, this_eq, *, frame: bool = False):
+def _rail(mob, this_eq):
+    """The row's rail parts (leader, reason): everything in the row group but the equation. A
+    theorem_proof row IS its MathTex (rollout T1-3) -- its submobjects are glyphs, not a rail."""
+    if mob is this_eq:
+        return VGroup()
+    return VGroup(*[m for m in mob.submobjects if m is not this_eq])
+
+
+def _rail_walk_seconds(scene, rail, consumed: float, paced: bool) -> "float | None":
+    """A `paced` transform / cancel row (rollout T1-1): the seconds left in the beat after the
+    morph, for the rail to be walked across (pacing.walk) -- so a 1.2 s morph on a 12 s beat
+    reads "morph, read the leader, read the reason" instead of "morph, then 10 s of nothing".
+    None means the rail rides the morph play as before: not paced, no rail, or too little of
+    the beat left for one fade per part (off-beat too -- beat_run_time is 0 there)."""
+    n = len(rail.submobjects)
+    if not paced or not n:
+        return None
+    remaining = TM.beat_run_time(scene, 0.0) - consumed
+    return remaining if remaining >= pacing.FADE_SECONDS * n else None
+
+
+def _transform_anim(prev_eq, prev_row, this_eq, *, frame: bool = False, paced: bool = False):
     """An in-place rewrite: the previous row's equation morphs into this one, and the row it
     came from dims. Glyph matching unless both rows are segmented (see _matching); either way
     the row is built exactly as an un-transformed one, so the terminal frame is byte-identical
@@ -196,30 +219,40 @@ def _transform_anim(prev_eq, prev_row, this_eq, *, frame: bool = False):
 
     The WHOLE previous row dims -- equation, leader and reason together. Dimming only the
     equation inverted the hierarchy: a spent row's rail annotation stayed at full ink and so
-    read brighter than the equation it annotates (visual-frame audit, 2026-09-12)."""
+    read brighter than the equation it annotates (visual-frame audit, 2026-09-12).
+
+    `paced` (T1-1): the rail is left OUT of the morph play and walked across the rest of the
+    beat afterwards when there is room (_rail_walk_seconds). The closure's `fixed_seconds`
+    (T1-2) is the morph's own length -- what the stillness advisory charges it either way."""
     def anim(scene, mob, ground) -> float:
         rect = _frame(scene, prev_eq, ground) if frame else None
         ghost = prev_eq.copy()
         scene.add(ghost)
-        rail = VGroup(*[m for m in mob.submobjects if m is not this_eq])
+        rail = _rail(mob, this_eq)
+        consumed = TRANSFORM_SECONDS + (FRAME_SECONDS if rect is not None else 0.0)
+        walk = _rail_walk_seconds(scene, rail, consumed, paced)
         scene.play(
             _matching(ghost, this_eq),
             prev_row.animate.set_opacity(MUTED_OPACITY),
-            *([FadeIn(rail)] if rail.submobjects else []),
+            *([FadeIn(rail)] if rail.submobjects and walk is None else []),
             *([FadeOut(rect)] if rect is not None else []),
             run_time=TRANSFORM_SECONDS,
         )
-        return TRANSFORM_SECONDS + (FRAME_SECONDS if rect is not None else 0.0)
+        if walk is not None:
+            consumed += pacing.walk(scene, rail.submobjects, walk)
+        return consumed
+    anim.fixed_seconds = TRANSFORM_SECONDS + (FRAME_SECONDS if frame else 0.0)
     return anim
 
 
-def _cancel_anim(prev_eq, prev_row, this_eq, cancel: "list[int]", *, frame: bool = False):
+def _cancel_anim(prev_eq, prev_row, this_eq, cancel: "list[int]", *, frame: bool = False,
+                 paced: bool = False):
     """Two-stage elimination (SPEC rule 2, B1 419 s): the cancelled segments of the previous
     row go first, in place, so the reader confirms WHICH terms cancel; then the survivors morph
     into this row. Stage 1 fades a ghost's segments while the row underneath drops to muted, so
     the cancelled tokens read bright -> muted and the survivors stay bright until they move;
     the previous row keeps its full content as (muted) history and the terminal frame is the
-    same as a plain transform's."""
+    same as a plain transform's. `paced` / `fixed_seconds` as in _transform_anim."""
     def anim(scene, mob, ground) -> float:
         rect = _frame(scene, prev_eq, ground) if frame else None
         ghost = prev_eq.copy()
@@ -228,14 +261,19 @@ def _cancel_anim(prev_eq, prev_row, this_eq, cancel: "list[int]", *, frame: bool
         scene.play(FadeOut(VGroup(*gone)), prev_row.animate.set_opacity(MUTED_OPACITY),
                    run_time=CANCEL_FADE_SECONDS)
         ghost.remove(*gone)          # stage 2 morphs the survivors only
-        rail = VGroup(*[m for m in mob.submobjects if m is not this_eq])
+        rail = _rail(mob, this_eq)
+        consumed = CANCEL_SECONDS + (FRAME_SECONDS if rect is not None else 0.0)
+        walk = _rail_walk_seconds(scene, rail, consumed, paced)
         scene.play(
             TransformMatchingTex(ghost, this_eq, transform_mismatches=True),
-            *([FadeIn(rail)] if rail.submobjects else []),
+            *([FadeIn(rail)] if rail.submobjects and walk is None else []),
             *([FadeOut(rect)] if rect is not None else []),
             run_time=CANCEL_SECONDS - CANCEL_FADE_SECONDS,
         )
-        return CANCEL_SECONDS + (FRAME_SECONDS if rect is not None else 0.0)
+        if walk is not None:
+            consumed += pacing.walk(scene, rail.submobjects, walk)
+        return consumed
+    anim.fixed_seconds = CANCEL_SECONDS + (FRAME_SECONDS if frame else 0.0)
     return anim
 
 
@@ -401,6 +439,9 @@ def build(spec: dict[str, Any], ctx: dict[str, Any]) -> list[Block]:
             blocks.append(Block("statement", statement, anim="slide", static=False))
         else:
             blocks.append(Block("statement", statement, anim="fade", static=True))
+    # A transform / cancel row is a callable, which pacing.apply leaves alone -- so it reads
+    # `paced` here and walks its own rail across the rest of the beat (T1-1).
+    paced_ids = set(spec.get("paced") or [])
     for i, (r, group, eq) in enumerate(row_mobs):
         # `anim: transform` / `anim: cancel` morph the row ABOVE into this one. The first row
         # has nothing to morph from, so it keeps its stock reveal -- silently, since "transform
@@ -415,12 +456,14 @@ def build(spec: dict[str, Any], ctx: dict[str, Any]) -> list[Block]:
             anim = "transform"
         if anim in ("transform", "cancel") and prev_eq is not None and this_eq is not None:
             frame = bool(r.get("frame"))
+            paced = r["rid"] in paced_ids
             prev_row = row_mobs[i - 1][1]
             if anim == "cancel":
-                fn = _cancel_anim(prev_eq, prev_row, this_eq, list(r.get("cancel") or []), frame=frame)
+                fn = _cancel_anim(prev_eq, prev_row, this_eq, list(r.get("cancel") or []),
+                                  frame=frame, paced=paced)
                 seconds = CANCEL_SECONDS
             else:
-                fn = _transform_anim(prev_eq, prev_row, this_eq, frame=frame)
+                fn = _transform_anim(prev_eq, prev_row, this_eq, frame=frame, paced=paced)
                 seconds = TRANSFORM_SECONDS
             blocks.append(Block(r["rid"], group, anim=fn,
                                 anim_seconds=seconds + (FRAME_SECONDS if frame else 0.0),

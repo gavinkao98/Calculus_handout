@@ -152,7 +152,7 @@ scenes:
 | `title` | yes | 螢幕上的 scene title；可使用 `$...$` 表示數學 |
 | `say` | yes | 單一 narration 欄位（見下方） |
 | `statement`、`math`、`steps`、`plots`、… | per template | 螢幕上的 visual payload |
-| `paced` | no | reveal id 的 list：這些 block 的揭示**攤開在整拍**上（多段的逐段淡入、單行式子隨旁白書寫），而不是一次 0.45 s 的淡入。opt-in，其餘 block 照舊；anim 已是 callable 的（hook／`anim: transform`）一律跳過。見下方 motion primitive 節與 [`pipeline/pacing.py`](pipeline/pacing.py)。 |
+| `paced` | no | reveal id 的 list：這些 block 的揭示**攤開在整拍**上（多段的逐段淡入、單行式子隨旁白書寫），而不是一次 0.45 s 的淡入。opt-in，其餘 block 照舊；anim 已是 callable 的（hook）一律跳過；`anim: transform`／`cancel` 列自己讀 `paced`（morph 後 rail 逐段隨讀，見下方 motion primitive 節）。見 [`pipeline/pacing.py`](pipeline/pacing.py)。 |
 | `focus` | no | `[{at: <reveal id>, dim: [<block id>…]}]`：那一拍起把 `dim` 的 block 壓暗，`dim: []` 還原；場末一律全部還原。見下方 motion primitive 節與 [`pipeline/focus.py`](pipeline/focus.py)。 |
 | `hook` | no | `"<module>:<fn>"` custom-animation factory，可從 `video/` import（例如 `"animations.ch01_inverse_functions_hooks:can_we_go_backwards"`）。Factory 接收 `(spec, ctx, template_blocks)` 並回傳最終的 block list：替換 block 的 mobject **但保留其 reveal id**（使 `{show ...}` marker 和已核准的 narration 不受影響）、將 static element defer 到一個 beat、或附加一個 callable anim `(scene, mobject, ground) -> seconds spent`（`pipeline/blocks.py`）。Storyboard 中的 template payload 保留為 no-hook fallback——刪掉 `hook:` 行即恢復 stock scene。在 `pipeline/templates/__init__.py:_apply_hook` 中接線。 |
 
@@ -169,7 +169,7 @@ Demo storyboard 在 `storyboards/_demo_*.yml`。
 | template | 教學形狀 | payload 欄位 | reveal target |
 |---|---|---|---|
 | `definition_math` | definition / statement / note / motivation：statement + math lines（key line 用 `anim: highlight` → amber + glow） | `statement`、`math[]`、`kicker`、`math_align: center`(opt) | `math.N` |
-| `theorem_proof` | gold-bar 面板 statement + 藍點 proof steps + 綠 QED | `statement`、`proof[]`、`qed` | `proof.N`、`qed`、`statement`（寫了 `{show statement}` 才動態；`PROOF` 小標跟 `proof.0` 同進） |
+| `theorem_proof` | gold-bar 面板 statement + 藍點 proof steps + 綠 QED | `statement`、`proof[]`（字串，或 `{tex, anim: transform, frame}` dict 列）、`qed` | `proof.N`、`qed`、`statement`（寫了 `{show statement}` 才動態；`PROOF` 小標跟 `proof.0` 同進） |
 | `procedure_steps` | 01/02 藍數字步驟 + 底部圓角 worked strip | `steps[{text,math}]`、`worked[]` | `math.N`、`worked` |
 | `derivation` ★ | **統一數學系統**：式子左欄 + reason rail（dotted leader）+ amber ∴ result + 綠 ✓ check | `steps[{math, reason?, anim?}]`、`result:{math, reason?, anim?}`、`check:{math, reason?}`；**或** back-compat `lines[]`（`anim: highlight` → result）、`statement`。`anim: transform` ＝原地改寫（見下方 motion primitive 節） | `step.N`/`result`/`check`（或 `line.N`）、`statement`（寫了 `{show statement}` 才動態） |
 | `callout` ★ | Remark / Caution / Note：eyebrow `[ TYPE n.n ]`＋title masthead，body 文字置於標題下方（色隨 type：remark 藍／caution 紅／note 琥珀）；`body` 字串→散文、list→條列（同色圓點）。同 `definition_math` 走 `scene_head`＋`place_body`（2026-06-29 改版，見下） | `type: remark\|caution\|note`、`number`(opt)、`title`、`body`(字串或 list) | `body` |
@@ -762,8 +762,11 @@ reveal 既不在 `paced:`、也沒有 `pauses:` 條目、動畫也不是 callabl
 `[stillness] <scene>: beat NN holds X.Xs with nothing declared (reveal=...); add paced:/pauses:/sweep or split the beat`。
 純 advisory：不改 exit code、不擋 render，讓作者在花一次 render 前就看到六鏡抓到的「一次揭示＋18 秒不動」
 與「首拍無 reveal 37.6 s」。判定函式 `stillness.undeclared_still_beats` 是 manim-free 純函式，
-`_selftest_stillness.py` 釘住七個案例。**已知盲點：** callable 一律免檢，故 1.2 s 的 `transform` 接長 hold
-不會被抓——beat-paced sweep 的 `Block.anim_seconds` 是佈局 placeholder 3.0，不能拿來當真實動畫長度。
+`_selftest_stillness.py` 釘住七個案例。**callable 的誠實（rollout T1-2，2026-09-13）：** 固定長度的 callable
+（`anim: transform`／`cancel` 的 closure、`carry` 的飛行）在函式上掛 `fixed_seconds`（1.2／1.6（frame）／0.8），
+`timing.stock_animation_seconds` 對 callable 回 `getattr(anim, "fixed_seconds", None)`，所以「1.2 s 的 `transform`
+接 10 s hold」現在會被抓；真的在填拍的 callable（hook／sweep／`seconds: beat`／paced 走法）仍是 `None`＝免檢。
+beat-paced sweep 的 `Block.anim_seconds` 是佈局 placeholder 3.0，不能拿來當真實動畫長度。
 三個門檻的分工：**6 s＝這道 authoring advisory、12 s＝`rewatch_pack` 量測閘（品質補強輪 ⑧）、REWATCH R4
 模型判讀**（對齊見 [`KICKOFF-motion-language-gaps.md`](KICKOFF-motion-language-gaps.md) T5）。
 
@@ -774,6 +777,16 @@ muted（opacity 0.55）。用 `TransformMatchingShapes` 逐字形配對，**不�
 直接讓 LaTeX 編譯失敗，而且會擾動被切那幾列的間距。字形配對完全不改 mob 的建法，
 所以終態幾何與未變形版逐 token 相同（sizecheck 量到的是同一幀）。第一列沒有可變形
 的來源，會靜默沿用原本的 reveal。名義時長 1.2 s，見 `timing.STOCK_ANIM_SECONDS`。
+**paced 列的 rail 隨讀（rollout T1-1，2026-09-13）：** `paced:` 裡的 transform／cancel 列，morph 那個 play
+**不**帶 rail（leader／reason），morph 之後把 rail 的各段平均鋪在**拍子剩餘時間**上（`beat_run_time − 已耗秒數`；
+n 段切 n 個間隔，同 `paced_reveal`，兩者共用 `pacing.walk`）——1.2 s 變形接 10 s 靜止就變成「變形、讀 leader、讀理由」。
+剩餘時間不夠 n 個 fade、或該列沒有 rail（沒寫 reason；theorem_proof 列）→ 退回 rail 跟 morph 同一個 play。
+`derivation.build` 自己把 `paced` 傳進 closure；`pacing.apply` 仍跳過 callable。**`fixed_seconds`：** closure 掛
+`anim.fixed_seconds = 1.2`（frame 再 +0.4），`[stillness]` 據此判定（見上）。**theorem_proof 的 `proof[]` 也收 dict 列：**
+`{tex: "$…$", anim: transform, frame: true}`（字串列不變；`theorem_proof.proof_texts(spec)` 給所有讀 `proof[]` 的消費端），
+`i > 0` 且前後列都取得到 MathTex 才變形（proof.0 靜默沿用 stock）；不支援 `cancel`（schema error「derivation-only」）；
+`paced` 裡同時列了 transform 的 proof 列 → transform 贏（proof 列無 rail，沒有可隨讀的段）。`schema._derivation_issues`
+對 theorem_proof 的 dict 列查 `tex` 必填、`frame` 要配 `anim: transform`、`cancel` 拒收。
 
 **`kind: sweep`（graph 的 `plots[]`）——游標掃描。**
 
@@ -842,8 +855,8 @@ block 會在前半拍放完、後半拍整片靜止，等於把病灶搬家而�
 **沒有段可走的 block（單行式子）改為「隨旁白書寫」**：`Write` 跨整拍畫出來，速率有上限
 （`WRITE_SECONDS_PER_GLYPH`），短式子落在長拍上不會被拖成慢動作，剩下的時間照常是 hold。
 實作 [`pipeline/pacing.py`](pipeline/pacing.py)，接在 `build_blocks` 的 hook 之後（所以
-hook 換掉的 mobject 也吃得到）。**只升級 stock reveal**：anim 已經是 callable 的（hook、
-`anim: transform`）一律跳過，否則通用的走法會把那支編舞靜靜吃掉。
+hook 換掉的 mobject 也吃得到）。**只升級 stock reveal**：anim 已經是 callable 的（hook）一律跳過，否則通用的走法會把那支編舞靜靜吃掉；
+`anim: transform`／`cancel` 列則自己讀 `paced`（morph 後 rail 逐段隨讀，見首輪節）。
 `schema._paced_issues` 擋 `say` 沒揭示過的 id 與重複 id。
 
 > **量測注意：** `rewatch_pack` 把畫面縮成 192×108 灰階再比對，0.2% 門檻 ≈ 400 px。

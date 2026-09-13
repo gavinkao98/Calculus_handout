@@ -14,19 +14,23 @@ from pipeline import _bootstrap
 
 _bootstrap.bootstrap()   # derivation imports manim at module level -- bootstrap FIRST
 
-from manim import MathTex
+from manim import FadeIn, MathTex
 
+from pipeline import pacing as P
+from pipeline import timing as TM
 from pipeline.templates import build_blocks
 from pipeline.timing import STOCK_ANIM_SECONDS, stock_animation_seconds
 
 _META = {"id": "_t", "chapter": "Chapter 9", "section": "9.9", "title": "T", "theme": "midnight"}
 
 
-def _spec(*, transform: bool):
+def _spec(*, transform: bool, frame: bool = False, paced=None):
     def step(math, reason, i):
         st = {"math": math, "reason": reason}
         if transform and i > 0:
             st["anim"] = "transform"
+            if frame:
+                st["frame"] = True
         return st
     return {
         "id": "der", "kind": "content", "template": "derivation", "accent": "definition",
@@ -38,6 +42,7 @@ def _spec(*, transform: bool):
                        r"\cdot\frac{\sin(h/2)}{h/2}", "divide", 1)],
         "result": {"math": r"\cos\!\left(x+\frac h2\right)\to\cos x", "reason": "continuity",
                    **({"anim": "transform"} if transform else {})},
+        **({"paced": list(paced)} if paced else {}),
     }
 
 
@@ -73,8 +78,9 @@ def test_transform_row_advertises_its_nominal_seconds():
     want = STOCK_ANIM_SECONDS["transform"]
     assert _b(blocks, "step.1").anim_seconds == want
     assert _b(blocks, "result").anim_seconds == want
-    # a callable is opaque to the stock table -- anim_seconds is what make.py must read
-    assert stock_animation_seconds(_b(blocks, "step.1").anim) is None
+    # the callable also advertises its fixed length itself (T1-2 `fixed_seconds`), so the
+    # stillness advisory -- which reads the stock table, not anim_seconds -- sees it too
+    assert stock_animation_seconds(_b(blocks, "step.1").anim) == want
 
 
 def test_transform_does_not_move_the_row():
@@ -106,15 +112,20 @@ def test_back_compat_lines_accept_transform_too():
 # -- the animation itself plays and reports its cost -------------------------
 
 class _FakeScene:
-    """Records what a callable anim asks for, without running manim's renderer."""
-    def __init__(self):
-        self.added, self.played = [], []
+    """Records what a callable anim asks for, without running manim's renderer. `beat_seconds`
+    is what the real LessonScene sets before each beat (None = off-beat)."""
+    def __init__(self, beat_seconds=None):
+        self.beat_seconds = beat_seconds
+        self.added, self.played, self.waits = [], [], []
 
     def add(self, *mobs):
         self.added.extend(mobs)
 
     def play(self, *anims, **kw):
         self.played.append((anims, kw))
+
+    def wait(self, seconds):
+        self.waits.append(float(seconds))
 
 
 def test_transform_callable_plays_one_timed_animation_and_returns_its_seconds():
@@ -170,6 +181,96 @@ def test_row_color_role_overrides_the_scene_accent():
     dflt = _colors(_b(build_blocks(_spec(transform=False), {"ground": "dark", "meta": _META}),
                       "result").mobject)
     assert T.color("dark", "concept").lower() in dflt, dflt
+
+
+# -- T1-2: a fixed-length callable tells the stillness advisory its length ----
+
+def test_fixed_seconds_tell_the_stillness_advisory_the_morph_length():
+    """A transform / cancel callable is a FIXED 1.2 s (+0.4 s frame) morph, not a beat-filling
+    choreography, so stock_animation_seconds must report it -- None used to exempt every
+    transform from the [stillness] advisory, exactly where '1.2 s morph + 10 s hold' lived."""
+    assert stock_animation_seconds(_b(_blocks(transform=True), "step.1").anim) == 1.2
+    framed = build_blocks(_spec(transform=True, frame=True), {"ground": "dark", "meta": _META})
+    assert stock_animation_seconds(_b(framed, "step.1").anim) == 1.6
+    assert _b(framed, "step.1").anim_seconds == 1.6
+
+    def hook(scene, mob, ground):
+        return 1.0
+    assert stock_animation_seconds(hook) is None, "a hook still fills its beat: no fixed length"
+
+
+def test_carry_flight_advertises_its_fixed_seconds():
+    src = _spec(transform=False)
+    dst = {"id": "next", "kind": "content", "template": "derivation", "accent": "definition",
+           "title": "Next", "say": "A. {show carried.eq} B. {show step.0} C.",
+           "steps": [{"math": "a = b", "reason": "given"}],
+           "carry": [{"from": "der", "block": "step.0", "as": "carried.eq",
+                      "to": {"corner": "top_right", "scale": 0.5}}]}
+    ctx = {"ground": "dark", "meta": _META, "scenes_by_id": {"der": src, "next": dst}}
+    flight = _b(build_blocks(dst, ctx), "carried.eq").anim
+    assert callable(flight)
+    assert stock_animation_seconds(flight) == STOCK_ANIM_SECONDS["carry"] == 0.8
+
+
+# -- T1-1: a `paced` transform row walks its rail across the rest of the beat --
+
+def _paced_blocks(*, frame=False):
+    return build_blocks(_spec(transform=True, frame=frame, paced=["step.1"]),
+                        {"ground": "dark", "meta": _META})
+
+
+def test_paced_transform_walks_the_rail_after_the_morph():
+    """On a long beat the morph play carries NO rail; the leader and reason then fade in one
+    at a time across the rest of the beat, so it reads 'morph, leader, reason' instead of
+    'morph, then 10 s of nothing'. Total = the whole beat (minus the paced tail), never more."""
+    block = _b(_paced_blocks(), "step.1")
+    assert callable(block.anim), "pacing.apply must leave the transform in place"
+    rail_n = len(block.mobject.submobjects) - 1          # leader + reason
+    assert rail_n == 2
+    scene = _FakeScene(beat_seconds=12.3)
+    secs = block.anim(scene, block.mobject, "dark")
+    morph, *walk = scene.played
+    assert not [a for a in morph[0] if isinstance(a, FadeIn)], "the rail must not ride the morph"
+    assert morph[1]["run_time"] == STOCK_ANIM_SECONDS["transform"]
+    assert len(walk) == rail_n, walk
+    assert all(len(p[0]) == 1 and isinstance(p[0][0], FadeIn) for p in walk)
+    assert all(p[1]["run_time"] == P.FADE_SECONDS for p in walk)
+    assert len(scene.waits) == rail_n and max(scene.waits) < 12.3 / rail_n
+    assert abs(secs - TM.beat_run_time(scene, 0.0)) < 1e-6, secs
+    assert secs <= 12.3
+
+
+def test_paced_transform_with_frame_still_fills_exactly_the_beat():
+    block = _b(_paced_blocks(frame=True), "step.1")
+    scene = _FakeScene(beat_seconds=12.3)
+    secs = block.anim(scene, block.mobject, "dark")
+    assert len(scene.played) == 1 + 1 + 2          # frame, morph, then one play per rail part
+    assert abs(secs - TM.beat_run_time(scene, 0.0)) < 1e-6, secs
+    assert stock_animation_seconds(block.anim) == 1.6
+
+
+def test_paced_transform_falls_back_when_the_beat_is_too_short():
+    block = _b(_paced_blocks(), "step.1")
+    scene = _FakeScene(beat_seconds=2.0)      # 1.4 s usable, 1.2 s morph: no room for two fades
+    secs = block.anim(scene, block.mobject, "dark")
+    assert secs == STOCK_ANIM_SECONDS["transform"]
+    assert len(scene.played) == 1 and scene.waits == []
+    assert [a for a in scene.played[0][0] if isinstance(a, FadeIn)], "the rail rides the morph again"
+
+
+def test_unpaced_transform_is_unchanged_on_a_long_beat():
+    block = _b(_blocks(transform=True), "step.1")
+    scene = _FakeScene(beat_seconds=12.3)
+    assert block.anim(scene, block.mobject, "dark") == STOCK_ANIM_SECONDS["transform"]
+    assert len(scene.played) == 1 and scene.waits == []
+
+
+def test_paced_transform_off_beat_falls_back_too():
+    """No beat context (end-of-scene sweep-up, selftests): no invented hold."""
+    block = _b(_paced_blocks(), "step.1")
+    scene = _FakeScene()
+    assert block.anim(scene, block.mobject, "dark") == STOCK_ANIM_SECONDS["transform"]
+    assert len(scene.played) == 1 and scene.waits == []
 
 
 def _colors(mob) -> "set[str]":

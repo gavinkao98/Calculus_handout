@@ -165,6 +165,8 @@ def _apply_carry(spec: dict[str, Any], ctx: dict[str, Any], blocks: "list[Block]
         def flight(scene, m, _ground, *, s=scale, c=target, t=seconds) -> float:
             scene.play(m.animate.scale(s).move_to(c), run_time=t)
             return t
+        # a fixed-length callable: the stillness advisory charges it like a stock reveal (T1-2)
+        flight.fixed_seconds = seconds
 
         out.append(Block(as_id, mob, anim=flight, anim_seconds=seconds, static=False,
                          layer=source.layer, pre_play=lambda m: m.restore()))

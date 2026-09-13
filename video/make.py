@@ -375,8 +375,10 @@ def _warn_undeclared_stillness(meta: dict, scenes: list[dict], manifest: dict,
         if not beat_seconds:
             continue
         blocks = build_blocks(scene, {"ground": "dark", "meta": meta, "scenes_by_id": scenes_by_id})
-        # callable anim (hook / sweep / `seconds: beat` / `anim: transform`) -> None: the
-        # picture moves by itself. Static blocks stay out, so their reveal counts as no motion.
+        # a callable anim that fills its beat (hook / sweep / `seconds: beat` / paced walk) ->
+        # None: the picture moves by itself. A fixed-length callable (transform / cancel /
+        # carry) advertises `fixed_seconds` and is charged like a stock reveal (rollout T1-2).
+        # Static blocks stay out, so their reveal counts as no motion.
         anim_seconds = {b.id: stock_animation_seconds(b.anim) for b in blocks if not b.static}
         beats = [{"index": i, "reveal": beat.reveal, "seconds": float(beat_seconds[i - 1])}
                  for i, beat in enumerate(parse_say(scene.get("say", "")), start=1)

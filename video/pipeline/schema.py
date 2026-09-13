@@ -256,12 +256,36 @@ def _color_map_issues(meta: dict) -> "list[tuple[str, str]]":
     return issues
 
 
+def _proof_row_issues(sid: str, scene: dict) -> "list[tuple[str, str]]":
+    """theorem_proof `proof[]` dict rows (rollout T1-3): `{tex, anim: transform, frame}`. `tex`
+    is required; `frame` needs `anim: transform` as in derivation; `cancel` is derivation-only
+    (a proof row has no `{{...}}` segment contract to index into). String rows are untouched."""
+    issues: list[tuple[str, str]] = []
+    for j, row in enumerate(scene.get("proof") or []):
+        if not isinstance(row, dict):
+            continue
+        where = f"{sid}.proof[{j}]"
+        anim = row.get("anim")
+        if not isinstance(row.get("tex"), str) or not row["tex"].strip():
+            issues.append(("error", f"{where}.tex: required non-empty string"))
+        if anim == "cancel" or row.get("cancel") is not None:
+            issues.append(("error", f"{where}: anim: cancel is derivation-only "
+                                    f"(a proof row takes anim: transform)"))
+        elif row.get("frame") and anim != "transform":
+            issues.append(("error", f"{where}.frame: only applies with anim: transform "
+                                    f"(this row: {anim!r})"))
+    return issues
+
+
 def _derivation_issues(sid: str, scene: dict) -> "list[tuple[str, str]]":
     """derivation rows' `anim: cancel` + `cancel: [i, ...]` and `frame: true` (kickoff T3-3 /
     T2-2). A cancel index points into the PREVIOUS row's `{{...}}` segments, so it needs a
     previous row, that row needs segments, and every index must fall inside them -- an index
     that misses is an IndexError mid-render, a `cancel:` without `anim: cancel` (or a `frame`
-    on a plain reveal) is silently inert. Errors: each is always a mistake."""
+    on a plain reveal) is silently inert. Errors: each is always a mistake. theorem_proof's
+    `proof[]` dict rows get the same treatment via _proof_row_issues (rollout T1-3)."""
+    if scene.get("template") == "theorem_proof":
+        return _proof_row_issues(sid, scene)
     if scene.get("template") != "derivation":
         return []
     from pipeline import texparts

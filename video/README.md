@@ -144,6 +144,9 @@ kickoff [KICKOFF-motion-language-gaps.md](KICKOFF-motion-language-gaps.md)）：
 - **`focus[].indicate`**／**graph `inset:`**——強調閃爍；主圖不縮放的放大鏡，sweep 時鏡片內游標同步（規則 3）。
 - **`carry:`／`exit:`**（場級）——上一場的 block 這一場開場就在（keep 或飛去角落），場界改硬切；
   `exit` 在場尾把不帶走的東西淡出（規則 1）。
+- **transform 列的 rail 隨讀／`fixed_seconds`／`theorem_proof` 的 `anim: transform`**（rollout T1，2026-09-13）——
+  `paced:` 裡的 transform／cancel 列 morph 後把 leader／理由逐段鋪在拍子剩餘時間；固定長度的 callable 掛
+  `fixed_seconds` 讓 `[stillness]` 看得見；`proof[]` 收 `{tex, anim: transform, frame}` dict 列（規則 2、4）。
 
 目前生效的設計決策：
 
