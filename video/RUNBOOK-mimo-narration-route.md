@@ -97,18 +97,49 @@ DECK: <填，如 ch01_precise_limit>      SECTION: <填，如 §1.6>
   被退回重試，7 次 billed call 一場都沒 promote**（`--max-billed-calls` 擋住，什麼都沒污染）；
   六場全下 `--skip-qa` 後 **5 場 5 次呼叫、0 retry**。QA 改成事後看：`manifest.json` 的
   `gates.qa` 仍然誠實記錄 skipped，要真做 QA 就離線另跑探針、不要讓它決定要不要重花錢。
-- **〔2026-09-13〕beat 級 reuse 以「輸出檔路徑」為 key，所以場序一變就全部對不上。**
-  `build_reuse_index` 建的是 `{該 beat 的 audio_file 絕對路徑: {…, text_hash}}`，而路徑是
+- **〔2026-09-13，已修〕beat 級 reuse 的 key 已從「輸出檔路徑」改成「`scene_id` ＋ beat 文字 hash
+  ＋ backend/model/voice/style」；搬場與加／移 `{show}` marker 不再計費。**
+  舊行為（兩次各花掉計費呼叫的那個坑）：`build_reuse_index` 建的是
+  `{該 beat 的 audio_file 絕對路徑: {…, text_hash}}`，而路徑是
   `beats/<兩位數場號>_<scene_id>/<兩位數序>_<reveal>.wav`——**場號與 reveal 都進檔名**。於是
   (a) 任何場序調整（例：Task B-4 把 `companion_limit` 往前搬，`derivative_of_cosine` 由第 16 場
-  變第 17 場）會讓整場的 beat 路徑失配，(b) 在場中間插一個 `{show}` marker 會讓其後每一拍的序號
-  位移、同樣失配。兩種情況下工具都會**把整場每一拍重合成**，即使 `text_hash` 大多沒變。
-  實測代價：改 1 個 beat 的字，工具打算合成 6 個。**改字前先核 manifest 的 `scene_number` 與
-  `beats[].audio_file` 是否還對得上現在的場序**；對不上就把整個 beats 目錄複製到新場號、把
-  manifest 的 `audio_file`／`scene_number` 指過去（留一份 `.bak`），再跑——實測回到
-  `backend_calls: 1`，log 明寫 `not reusing 03_proof_0.wav: text_hash changed`。
+  變第 17 場）、(b) 在場中間加／移一個 `{show}` marker（檔名換、其後每一拍序號位移），都會讓整場
+  beat 路徑失配，工具**把整場每一拍重合成**，即使一個字都沒改。
+  **現行為：** 命中與路徑無關；命中後若新舊路徑不同就**把 WAV 搬到新路徑再登記**，log 印
+  `reused <新檔名> (moved from <舊路徑>)`（搬完舊目錄若空就刪掉，免得變成沒人認領的孤兒 WAV 去
+  絆 `overwrite_guard`）。同一場兩拍文字相同時依 index 配對，同一份 take 不會被登記兩次。
+  離線實測（`--no-billing`，真音檔）：把 `continuity_argument` 的場號改成 07、第一拍檔名改成別的
+  reveal 名（文字一字未改）→ `backend_calls: 0`，五拍全部 `reused (moved from …)` 搬回
+  `beats/09_continuity_argument/`。**不必再手動複製 beats 目錄＋改 manifest 了**（上一版教的
+  `.bak` 手術做法已作廢）。
   §3.1 目前走 beats 路線的三場是 `continuity_argument`(09)／`derivative_of_cosine`(17)／
-  `shm_stacked_graphs`(24)，後兩者的場號都在 B-4 之後變過。
+  `shm_stacked_graphs`(24)。
+- **〔2026-09-13，已修〕`--scene` 子集併回 prior manifest 時，`scene_number` 一律以當前 storyboard
+  的全 deck 序號重算**（intro／divider 也佔號，與 `rewatch_pack.py`／`critic.py` 同一套數法），
+  換號的場其 WAV／align sidecar／beat 目錄一併搬到新號。舊行為是沒被重跑的場沿用舊值，於是
+  §3.1 的 manifest 裡 `derivative_of_cosine` 與 `slope_equals_height` 同為 17（critic 抽幀撞號，
+  當時由 critic 改讀 storyboard 序繞過）。離線實測：一次 `--no-billing` 的子集跑就把 5 場
+  （`divider_derivatives` 14→15、`derivative_of_sine` 15→16、`slope_equals_height` 17→18、
+  `derivative_cycle` 18→19、`divider_apply` 19→20）修正並搬檔，27 場場號唯一且與 storyboard 對齊。
+- **`--dry-run` 現在會把 reuse 算進 `plan` 欄**（多一個 `reuse` 欄＝既有音檔已覆蓋的計費單位，
+  TOTAL 行另印 `(no-reuse: N)` 保留悲觀報價）。所以「加一個 marker 要不要錢」在 dry-run 就看得出來。
+  **但 `plan` 是「有下 `--reuse-existing` 才算數」的數字**——沒下旗標時它會多印一行 NOTE 告訴你
+  真正會 billed 幾次（就是 2026-09-12 那 13 次的成因）。`worst` 欄對 scene-level 仍是 reuse-blind
+  （reuse 的 WAV 仍可能重對齊失敗而掉 ladder）。
+- **⚠️ 殘留缺口：scene-level（`scene_aligned`）的場，其 WAV 路徑仍是 `scenes/<場號>_<scene_id>.wav`，
+  而 `_synthesize_scene_aligned` 用「今天的場號」去找它。** 本輪只把 **beat 級** reuse 改成內容定址
+  （契約指明 scene 級 index 以 `scene_id` 為 key「已正確、不動」），所以**搬場之後的第一次真跑**，
+  被搬動的 scene_aligned 場仍會因為「今天的號下沒有 WAV」而重合成一次。
+  **免費的解法（先做這一步再跑正事）：** 先跑一次
+  `tts.py … --reuse-existing --no-billing --scene <任一 reuse 會命中的場>`——例如沒被搬動的
+  scene_aligned 場，或走 beats 的場配 `--unit beat`。該次跑 0 次呼叫就會走到 manifest 合併，
+  `renumber_scenes` 便把**全 deck** 的場號重算、把換號的 scene WAV／align sidecar／beat 目錄
+  一併搬到新號；之後的 dry-run／真跑就都對得上了。實測：這一步把 §3.1 的
+  `--dry-run` planned 由 6 降到 3（剩下的 3 就是下一條講的 `--unit auto` 路由，不是路徑問題）。
+- **`--unit auto` 會把 beats 路線的三場路由去 scene-level（＝1 次計費），因為它只看 template。**
+  要對那三場享受 beat 級 reuse，指令要帶 `--unit beat`。實測：
+  `--reuse-existing --no-billing --scene shm_stacked_graphs,derivative_of_cosine`（不帶 `--unit beat`）
+  在第一次呼叫前就被 `--no-billing` 攔下；補上 `--unit beat` 後 `backend_calls: 0`。
 - `make.py --reuse-audio` 會先驗 manifest freshness（deck id、scene、beat count、`{show}`、
   `text_hash`、WAV 存在/時長；`scene_aligned` 另驗 scene WAV＋words/aligned 檔＋`validation.status`），再 render；
   若報 stale/incomplete，不要硬跳過，先重跑該 storyboard 的 `tts.py` 或確認是不是選錯 `<deck>_mimo.yml`。
