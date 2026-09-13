@@ -1099,9 +1099,9 @@ helper 播 0.55 s 卻回報 0.65 s（**多報**），它所在的場就比旁白
 3. 沒有 renderer 的場（selftest 的 `FakeScene`）三者都退回原本的算術，行為不變。
 
 **剩下的殘餘是「內容本來就比旁白長」**，非時序 bug：一拍用 `paced` 填滿（`beat − 0.6`）之後
-再接 `indicate`（0.8 s）就一定超過該拍，超出的部分只能由 `MIN_HOLD` 與場尾吸收；ch03 06
-（`ineq` 拍 + `evenness` hook + `exit` 淡出）超出量大於 tail 能吸收的 0.7 s，仍留一條 `[sync]`
-警告。要清掉它得改 run_time／編排，屬內容決定，不是這一層的事。
+再接 `indicate`（0.8 s）就一定超過該拍，超出的部分只能由 `MIN_HOLD` 與場尾吸收；全 deck `[sync]`
+已零警告（六場 sum|delta| 2.35→0.54 後，最後一條 06 由 indicate 預算扣除清掉，機制見 `focus[].indicate`
+段的 `beat_reserved_seconds`）。
 
 **寫法**（`animations/ch03_trig_derivatives_hooks.py` 是現行範例）：
 
