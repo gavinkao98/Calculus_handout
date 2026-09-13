@@ -51,6 +51,15 @@ class Block:
     # measure the frame the scene ends on, and pre_play restores it to where the previous
     # scene left it; the reveal then flies it to the corner. None for every other block.
     pre_play: Any = None
+    # A dynamic block with NO `{show ...}` marker of its own that must enter on the beat
+    # that reveals ANOTHER block: scene.py plays it immediately before that block's reveal.
+    # The one user is theorem_proof's PROOF eyebrow, which must stand over the first proof
+    # row rather than over an empty column. It stays a Block in its own right -- so the
+    # layout gates measure the bare kicker and the bare row, and a hook that REPLACES the
+    # row's anim cannot drop it -- instead of living inside that anim or that mobject.
+    # None for every other block; an id naming no block simply never fires early, and the
+    # end-of-scene sweep-up catches the rider as it does any unrevealed dynamic block.
+    reveal_with: str | None = None
 
 
 # Direction D: 4 semantic accents. The role names map (via theme aliases) to hues:

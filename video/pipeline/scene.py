@@ -23,7 +23,7 @@ from .blocks import accent_role, play_block
 from .narration import estimate_seconds, parse_say
 from .templates import build_blocks
 from .timing import (EXIT_FADE_SECONDS, MIN_BEAT_HOLD_SECONDS, SCENE_LEAD_SECONDS,
-                     SCENE_TAIL_SECONDS, elapsed)
+                     SCENE_TAIL_SECONDS, elapsed, stock_animation_seconds)
 from .visuals import theme as T
 
 LIGHT_KINDS = {"intro", "outro"}
@@ -62,10 +62,10 @@ class LessonScene(Scene):
     # it and keeps its fixed duration.
     beat_seconds: float | None = None
     # How much of the CURRENT beat is already spoken for by something fixed-length that
-    # plays before or after the reveal (a `focus[].indicate` flash AFTER it, a `dim` that
-    # actually changes the dimmed set BEFORE it) -- 0 outside a beat, or in a beat with
-    # neither. `timing.beat_run_time` subtracts this from a beat-filling reveal's budget
-    # so that both land inside the beat instead of past it.
+    # plays before or after the reveal (a `focus[].indicate` flash AFTER it; a `dim` that
+    # actually changes the dimmed set, or a `Block.reveal_with` rider, BEFORE it) -- 0
+    # outside a beat, or in a beat with none of them. `timing.beat_run_time` subtracts this
+    # from a beat-filling reveal's budget so that both land inside the beat, not past it.
     beat_reserved_seconds: float = 0.0
 
     def construct(self) -> None:
@@ -145,6 +145,13 @@ class LessonScene(Scene):
         revealed: set[str] = set()
         beats = parse_say(self.spec.get("say", ""))
         durations = self.beat_durations
+        # `Block.reveal_with`: a block with no marker of its own that enters on another
+        # block's beat (theorem_proof's PROOF eyebrow over proof.0). Grouped by target
+        # once, here, so the beat loop stays a dict lookup.
+        riders: dict[str, list] = {}
+        for block in blocks:
+            if block.reveal_with and not block.static:
+                riders.setdefault(block.reveal_with, []).append(block)
         focus_plan = focus.scene_focus(self.spec)
         indicate_plan = focus.scene_indicate(self.spec)
         # A scene that declares no `accent` (graph / hook scenes) resolves to `aside_ink`, and a
@@ -194,9 +201,18 @@ class LessonScene(Scene):
             if wanted is not None:
                 dim_target = {b for b in wanted if b in by_id}
                 dim_changes = bool(dim_target - dimmed) or bool(dimmed - dim_target)
+            # A `reveal_with` rider (below) plays BEFORE the beat's own reveal and is
+            # fixed-length, so it is reserved for the same reason `dim` is: without this a
+            # beat-filling reveal would ask for the whole beat and then overrun it by the
+            # rider's fade.
+            will_reveal = bool(target) and target in by_id and target not in revealed
+            riding = ([r for r in riders.get(target, ()) if r.id not in revealed]
+                      if will_reveal else [])
             self.beat_reserved_seconds = ((focus.INDICATE_SECONDS if indicate_plan.get(target)
                                           else 0.0)
-                                          + (focus.FADE_SECONDS if dim_changes else 0.0))
+                                          + (focus.FADE_SECONDS if dim_changes else 0.0)
+                                          + sum(stock_animation_seconds(r.anim) or 0.0
+                                                for r in riding))
             # The focus runs BEFORE the beat's own reveal. It used to run after, on the
             # reasoning that a just-revealed block earns full attention before anything
             # dims -- but what a `dim` dims is never the block being revealed, it is the
@@ -213,7 +229,12 @@ class LessonScene(Scene):
                 dimmed = focus.apply(self, by_id, wanted, dimmed)
                 if dimmed != before:
                     consumed += focus.FADE_SECONDS
-            if target and target in by_id and target not in revealed:
+            if will_reveal:
+                # the kicker first, then the block it labels: a "PROOF" eyebrow that
+                # arrived after its own first row would read as an afterthought.
+                for rider in riding:
+                    consumed += play_block(self, rider, ground)
+                    revealed.add(rider.id)
                 consumed += play_block(self, by_id[target], ground)
                 revealed.add(target)
             if target in indicate_plan:
