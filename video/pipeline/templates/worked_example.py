@@ -80,11 +80,12 @@ from ._common import (MASTHEAD_TOP, CONTENT_W, PRIMARY_W, RAIL_W, RAIL_X, SPINE_
 # "author claimed nothing" case blocks.DEFAULT_ROLE exists for.
 DEFAULT_ACCENT = "example"
 
-# Type sizes as RAW PX (D6): the 62 / 34 tiers are this template's own, not new global
-# scale steps -- theme._SCALE_PX stays untouched. 62 is MathRules rule 5's conclusion
-# tier (62 / 48 / 34); step rows keep the shared `math` (48) via derivation's _eq_mob.
-ANSWER_PX = 62         # the answer band's equation -- the frame's heaviest type
-RAIL_MATH_PX = 34      # a rail note's formula (rule 5's supporting tier)
+# Type sizes read off the shared scale (T2 2026-09-14 promoted D6's raw 62 / 34 into the
+# named `math_conclusion` / `math_rail` tokens): MathRules rule 5's three math tiers are
+# 62 / 48 / 34, and step rows keep the shared `math` (48) via derivation's _eq_mob. These
+# stay bound as px numbers because they are also the _clamp_shrink floors below.
+ANSWER_PX = T._SCALE_PX["math_conclusion"]   # the answer band's equation -- the frame's heaviest type
+RAIL_MATH_PX = T._SCALE_PX["math_rail"]      # a rail note's formula (rule 5's supporting tier)
 
 ANSWER_PAD_X = 0.34    # answer band inner padding, left/right of box edge
 ANSWER_PAD_Y = 0.22    # ... top/bottom (the mockup's 26/30 px)

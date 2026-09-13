@@ -1283,23 +1283,34 @@ standalone display line**——`heading`/`heading_rich` title——即使在那�
 
 ### 型階與量測表（2026-07-05 體檢存檔）
 
-**型階承載表**（`theme._SCALE_PX`，px＠1920×1080；由大到小）：
+**型階承載表**（**第一欄＝`theme._SCALE_PX` 的真實鍵**，px＠1920×1080；由大到小。2026-09-14 T2
+更正：舊表把「divider」「result」當成鍵列，前者是 alias、後者根本不是鍵而是 `derivation.py`
+的 raw px——兩者都已收成真鍵）：
 
-| 型階 | px | 用途 |
+| `_SCALE_PX` 鍵 | px | 用途 |
 |---|---|---|
-| hero | 112 | 無 call site 保留 |
-| divider | 92 | divider title（`heading_rich size="intro_headline"`；2026-07-05 由 raw 92 掛回 token。outro title 亦由 raw 72 → `outro_headline`=78） |
+| hero | 112 | 無 call site 保留（back-compat alias `display`） |
+| intro_headline | 92 | intro／divider title（`heading_rich size="intro_headline"`；**舊表列名「divider」不是鍵**。outro title 走 `outro_headline`=78） |
 | h1 | 78 | 一級標題 |
+| **math_conclusion** | **62** | **數學三階①結論**：derivation result line、`worked_example` 的 ANSWER 帶（2026-09-14 T2 由 `derivation.py` 的 raw `size=54` 升成具名 token 並改 62；**舊表列的「result 54」不是鍵、值也不是 54**） |
 | h2 | 58 | 二級標題 |
-| result | 54 | derivation result line |
-| math | 48 | display 數學 |
+| **math** | **48** | **數學三階②body**：display 數學（未變） |
 | h3 | 44 | 三級標題（example prompt） |
 | statement | 44 | **命題/定義/value_table/sign_chart 的 `statement`**（2026-07-05 統一 raw-px 落單；原散落 h3=44／prose=42／raw 40） |
-| prose / step | 42 | 內文、離散步驟文字、value_table 內文 cell |
-| math_sm | 40 | 刻度／軸名（graph carrier label 現已升為 math_sm） |
-| prose_sm | 35 | reason rail／aside／divider 副標／value_table 表頭（2026-07-05 收 raw 40／38 落單） |
-| tag | 30 | derivation result-reason、part pager |
+| prose | 42 | 內文、離散步驟文字、value_table 內文 cell（back-compat alias `body`／`step`） |
+| prose_sm | 38 | reason rail／aside／divider 副標／value_table 表頭（2026-07-05 收 raw 40／38 落單；**2026-09-14 T2 由 35 → 38**，A/B 開放值定案） |
+| **math_rail** | **34** | **數學三階③rail·inline**：graph 刻度／軸名／carrier label、QED 字形、sign_chart 點標、procedure 鏈（2026-09-14 T2 取代 `math_sm` 40） |
+| tag | 32 | derivation result-reason、part pager（**2026-09-14 T2 由 30 → 32**，A/B 開放值定案） |
 | eyebrow | 26 | floor（`MIN_FONT_FLOOR`） |
+
+**數學只有三階**（`MathRules.dc.html` 規則 5，2026-09-14 T2 落地）：結論 62 ／ body 48 ／
+rail·inline 34。`math_sm 40` **已刪除、不留 alias**——實測它與 48 在螢幕上分不出來，只製造不一致；
+刪鍵之後任何殘留 call site 會直接 `KeyError`，那就是編譯期的閘。守門＝`pipeline/_selftest_type_scale.py`
+（AST 掃 `templates/` 的 `brand.math_line`／`brand.glyph` 的 `size=`，斷言落在 62／48／34 或明列例外）。
+**三階的 34 與 `prose_sm` 38、`tag` 32 是三個不同 family／不同路徑的 token，不合併**：34 走 MathTex
+（Latin Modern，不吃 `TEXT_SCALE`），38 走文字（Instrument Sans，`×TEXT_SCALE`），32 走 mono eyebrow，
+三者同一個 px 數字在畫面上也不會一樣大。目前**明列的非三階例外**：`sign_chart` 的 ±／箭號 mark（raw 64）
+與 `procedure_steps` 的 step 算式（raw 44），兩者早於 T2、不在 T2 契約內（見 `KICKOFF-shared-layer-v1.md` §8）。
 
 **數學三路徑表**：
 

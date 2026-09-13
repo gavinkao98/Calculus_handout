@@ -72,11 +72,15 @@ HEADING_MATH_SCALE = 1.0
 _SCALE_PX = {
     # Direction-D scale
     "hero": 112, "h1": 78, "h2": 58, "h3": 44,  # h1 82->78: titles read as over-dominant on many scenes (Codex, both rounds)
-    "prose": 42, "prose_sm": 35,
+    "prose": 42, "prose_sm": 38,   # prose_sm 35->38: the A/B open value, settled UP (2026-09-14 T2)
     "statement": 44,  # canonical declarative statement line (theorem/definition/value_table/sign_chart) -- unify 2026-07-05; was scattered h3=44 / prose=42 / raw 40
-    "math": 48, "math_sm": 40,
+    # Math has exactly THREE tiers (MathRules rule 5, 2026-09-14 T2): conclusion / body /
+    # rail-inline. The old `math_sm` 40 is DELETED, not kept as an alias -- it was
+    # indistinguishable from 48 on screen and only produced inconsistency, and a KeyError at
+    # a stale call site is the intended compile-time gate. Guarded by _selftest_type_scale.py.
+    "math_conclusion": 62, "math": 48, "math_rail": 34,
     "caption": 30, "eyebrow": 26, "numeral": 104, "ghost_numeral": 520,
-    "tag": 30,   # mono nav/emphasis tag: derivation result-reason + part pager (was eyebrow=26 == floor; A/B may settle 32)
+    "tag": 32,   # mono nav/emphasis tag: derivation result-reason + part pager (was eyebrow=26 == floor; 30->32 settled 2026-09-14 T2)
     # back-compat aliases (old Direction-B names -> nearest Direction-D size)
     "display": 112, "body": 42, "step": 42, "label": 30,
     "intro_headline": 92, "intro_subtitle": 35, "outro_headline": 78,
