@@ -43,9 +43,11 @@ scenes:
     prompt: "Establish the companion limit $(1-\\cos\\theta)/\\theta \\to 0$ as $\\theta \\to 0$."
     # 一行的祈使句：rail 的策略欄放「怎麼下手」，推理（化成平方差）由旁白承載。
     # 實測：62 px 答案框（1.37u）＋題目 masthead（1.9u）之下，rail 只剩約 2.9u——
-    # 策略文字換到第二行就會頂到答案框。同理步驟鏈取 2 列（＝正典 ch03 companion_limit
-    # 的寫法）而不是 mockup 的 4 列：mockup 是靜態版面圖，不含影片的安全邊界與答案框。
-    strategy: "Multiply by the conjugate $1+\\cos\\theta$."
+    # T2 定案 prose_sm 38 之後，原長版策略句（帶 "$1+\cos\theta$"）在 T4-5 幀稽核量出會
+    # 折成兩行、頂到答案框（rail 容錯僅 ~33 px），故縮成單行版本（Authoring Playbook：
+    # rail 策略句限一行）。同理步驟鏈取 2 列（＝正典 ch03 companion_limit 的寫法）而不是
+    # mockup 的 4 列：mockup 是靜態版面圖，不含影片的安全邊界與答案框。
+    strategy: "Multiply by the conjugate."
     notes_label: "what each factor does"
     notes:
       - { math: "\\frac{\\sin\\theta}{\\theta}", text: "$\\to 1$", ref: "Prop 3.2" }

@@ -114,9 +114,11 @@ def test_the_first_row_keeps_its_stock_reveal():
     # no {show proof.0}: the label stays static and proof.0 is the plain stock fade
     blocks = _blocks(_spec(rows, say="One. {show proof.1} Two."))
     assert _b(blocks, "proof.0").anim == "fade" and _b(blocks, "proof.0").anim_seconds is None
-    # with the marker the PROOF eyebrow rides in on proof.0 as before, not a morph
-    blk = _b(_blocks(_spec(rows)), "proof.0")
-    assert callable(blk.anim) and blk.anim_seconds == TP._LABEL_FADE_SECONDS
+    # with the marker the PROOF eyebrow rides in on proof.0's BEAT -- as a Block of its
+    # own (Block.reveal_with), so proof.0 itself still keeps the stock fade, not a morph
+    blocks = _blocks(_spec(rows))
+    assert _b(blocks, "proof.0").anim == "fade" and _b(blocks, "proof.0").anim_seconds is None
+    assert _b(blocks, "proof_label").reveal_with == "proof.0"
 
 
 def test_a_paced_transform_row_keeps_the_transform():
