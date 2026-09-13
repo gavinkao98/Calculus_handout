@@ -27,6 +27,10 @@ YAML shape:
   statement: "If $f$ is strictly increasing ... then $f$ is one-to-one ..."
   proof: ["Take any $x_1 < x_2$ ...", "...", "..."]
   qed: "Therefore $f$ is one-to-one."     # optional closing line
+
+A proof row may also be a dict (rollout T1-3): `{tex: "$...$", anim: transform, frame: true}`
+morphs the PREVIOUS proof row's equation into this one (derivation's `anim: transform`, same
+callable); proof.0 keeps its stock reveal. `cancel` is derivation-only (schema).
 """
 from __future__ import annotations
 
@@ -38,6 +42,7 @@ from .. import brand
 from ..blocks import Block, accent_role
 from ..timing import STOCK_ANIM_SECONDS
 from ..visuals import theme as T
+from . import derivation
 from ._common import (scene_head, motif_corner, center_in_zone, build_aside, render_scaffold,
                       reveals, ColumnPlan, SPINE_X, CONTENT_W, PRIMARY_W, RAIL_X, RAIL_W)
 
@@ -47,6 +52,14 @@ _CARD_PAD_X = 0.5     # statement-card horizontal pad; rail interior == RAIL_W -
 RAIL_MAX_LINES = 1    # rail is single-line only (a formula / one-liner); any wrap -> full-width band
                       # (a wrapped card in the ~4-word rail is inherently ragged; the band wraps far
                       #  less at ~3x the measure, so "wrap -> band" reads cleaner -- 2026-07-05 user call)
+
+
+def proof_texts(spec: dict[str, Any]) -> list[str]:
+    """The `proof[]` rows as their on-screen strings: a row is a plain string or a
+    `{tex, anim: transform, frame}` dict (rollout T1-3). Every reader of proof[] goes
+    through this, so a dict row is transparent to it."""
+    return [str(p.get("tex", "")) if isinstance(p, dict) else str(p)
+            for p in spec.get("proof") or []]
 
 
 def capacity_meta(spec: dict[str, Any]) -> list[ColumnPlan]:
@@ -186,7 +199,8 @@ def build(spec: dict[str, Any], ctx: dict[str, Any]) -> list[Block]:
 
     left = SPINE_X
     content_w = CONTENT_W
-    steps = spec.get("proof", [])
+    steps = proof_texts(spec)
+    rows = spec.get("proof") or []       # the raw entries: a dict row carries anim / frame
     qed_text = spec.get("qed")
 
     # -- statement-only proposition (no proof) + enrichment aside: balanced two-column,
@@ -265,7 +279,22 @@ def build(spec: dict[str, Any], ctx: dict[str, Any]) -> list[Block]:
         if prev_half is not None:
             y -= prev_half + _ROW_GAP + half
         m.move_to([proof_left, y, 0], aligned_edge=LEFT)
-        if fold_label and i == 0:
+        # `anim: transform` on a dict row (rollout T1-3): the previous proof row morphs into this
+        # one, derivation's callable verbatim. proof.0 has nothing to morph from and keeps its
+        # stock reveal (silently, as in derivation), and so does a row whose neighbour is not a
+        # MathTex. A proof row has no rail, so `paced:` naming it changes nothing: transform wins.
+        row = rows[i] if isinstance(rows[i], dict) else {}
+        prev_eq = derivation._eq_core(step_mobs[i - 1]) if i and row.get("anim") == "transform" else None
+        this_eq = derivation._eq_core(m) if prev_eq is not None else None
+        if prev_eq is not None and this_eq is not None:
+            frame = bool(row.get("frame"))
+            blocks.append(Block(f"proof.{i}", m,
+                                anim=derivation._transform_anim(prev_eq, step_mobs[i - 1], this_eq,
+                                                                frame=frame),
+                                anim_seconds=derivation.TRANSFORM_SECONDS
+                                + (derivation.FRAME_SECONDS if frame else 0.0),
+                                static=False))
+        elif fold_label and i == 0:
             # The label rides in on proof.0's ANIMATION, not inside its mobject: a VGroup
             # spanning label-to-row would hand the layout gates a box with a hollow middle,
             # and _overlap_issues / _capacity_issues would read that empty span as content

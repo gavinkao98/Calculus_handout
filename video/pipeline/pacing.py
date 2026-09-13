@@ -78,27 +78,38 @@ def paced_reveal(scene, mob, _ground) -> float:
     n = len(parts)
     if n == 1:
         return _paced_write(scene, mob)
-    total = TM.beat_run_time(scene, FADE_SECONDS * n)
+    spent = walk(scene, parts, TM.beat_run_time(scene, FADE_SECONDS * n))
+    scene.add(mob)
+    return spent
+
+
+def walk(scene, parts, total: float) -> float:
+    """Fade *parts* in one at a time, evenly spread over *total* seconds: each part's
+    FADE_SECONDS entrance, then its share of whatever hold is left (n gaps, see
+    paced_reveal). Shared with the transform / cancel rows, which walk their rail across
+    the REST of the beat after the morph (rollout T1-1). Returns the seconds spent."""
+    n = len(parts)
     gap = max((total - FADE_SECONDS * n) / n, 0.0)
     for part in parts:
         scene.play(FadeIn(part, shift=0.1 * UP), run_time=FADE_SECONDS)
         if gap:
             scene.wait(gap)
-    scene.add(mob)
     return FADE_SECONDS * n + gap * n
 
 
 def apply(spec: dict[str, Any], blocks: "list") -> "list":
     """Swap the stock reveal of every block named in ``spec['paced']`` for the paced one.
     Unknown ids are left to the schema/sizecheck reveal-target checks, which already
-    report a `{show ...}` that names nothing."""
+    report a `{show ...}` that names nothing. A derivation `anim: transform` / `cancel`
+    row is a callable and so is skipped here -- it reads `paced` itself in
+    derivation.build and walks its rail across the rest of the beat after the morph."""
     want = set(spec.get("paced") or [])
     if not want:
         return blocks
     for b in blocks:
-        # A CALLABLE anim is already a choreography (a hook, or `anim: transform`);
-        # replacing it with the generic walk would silently delete that, so pacing only
-        # ever upgrades a STOCK reveal.
+        # A CALLABLE anim is already a choreography (a hook, or `anim: transform`, which
+        # handles its own pacing); replacing it with the generic walk would silently delete
+        # that, so pacing only ever upgrades a STOCK reveal.
         if b.id in want and not b.static and not callable(b.anim):
             n = len(block_parts(b.mobject))
             b.anim = paced_reveal

@@ -66,9 +66,11 @@ def text_hash(text: str) -> str:
 
 
 def stock_animation_seconds(anim: Any) -> float | None:
-    """Return known stock animation time, or None for custom hook callables."""
+    """Return known stock animation time. A callable reports the fixed length it advertises
+    as `fixed_seconds` (derivation transform / cancel, the carry flight -- rollout T1-2), else
+    None: a hook, sweep, `seconds: beat` or paced walk really does fill its beat."""
     if callable(anim):
-        return None
+        return getattr(anim, "fixed_seconds", None)
     return STOCK_ANIM_SECONDS.get(str(anim), STOCK_ANIM_SECONDS["write"])
 
 

@@ -93,6 +93,8 @@ def _prose_strings(data: dict) -> "list[tuple[str, str]]":
                 out.append((f"{sid}.{key}", v))
         for key in _PROSE_LISTS:
             for i, v in enumerate(scene.get(key, []) or []):
+                if isinstance(v, dict):      # theorem_proof proof[] dict row {tex, anim, frame}
+                    v = v.get("tex")
                 if isinstance(v, str):
                     out.append((f"{sid}.{key}[{i}]", v))
         for i, st in enumerate(scene.get("steps", []) or []):
