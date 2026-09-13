@@ -842,6 +842,14 @@ focus:                       # content 場專用，opt-in
 
 每一筆**取代**（不是累加）該拍起的壓暗集合；場末一律全部還原，所以視覺閘讀到的最終幀
 就是沒有任何壓暗的那一幀。實作 [`pipeline/focus.py`](pipeline/focus.py)。
+**`dim` 一律在該拍的 reveal 之前套用**（2026-09-13；原本只有 `dim: []` 純還原提前）：壓暗的
+永遠是「旁白剛要你別看的另一半」，而那句話就是這拍的**第一句**，等 reveal 回來才暗，遇上
+填滿整拍的 reveal（`paced` 走格、hook）就會把壓暗擠到拍尾——24 `mirror` 拍（`dim: [g_v]`，
+hook 佔 11.5 秒拍的前 ~5 秒）實測速度列到拍中才暗。`indicate` 維持在 reveal **之後**（它是
+指著某物閃一下，不是把注意力從某物移開）。連帶規則：**`dim` 不可含該筆自己的 `at`**——
+提前後 `focus.apply` 會在該 block 還沒上畫面時 `save_state()`，之後的 `dim: []` 會把它靜靜
+還原成看不見；`schema._focus_issues` 直接報 error，`scene.py` 另有跳過＋`[focus]` warn 當
+第二道防線。
 **還原一定用 `save_state()`/`restore()`，絕不可用 `set_opacity(1.0)`**——manim 的
 `set_opacity` 會把整個 family 的 fill 與 stroke 一律設成該值，於是「刻意透明」的部分
 （`fill_opacity=0` 的空心編號環）會被填成實心色塊。`schema._focus_issues` 擋 `at` 指到
@@ -1057,11 +1065,34 @@ make.py／sizecheck／scratch_frames／critic 都已佈線），缺了而場有 
 ### Reveal 的耗時回報契約（`_elapsed`／`_spent`；前提＝`disable_caching`）
 
 `blocks.play_block()` 的契約寫在它自己的 docstring：**回傳「實際消耗的 wall-clock 秒數」**，
-`scene.py` 靠它算 `wait(max(target_seconds - consumed, MIN_HOLD))`，讓每一拍的影像長度等於它的
-旁白。**回傳標稱值（各 `run_time` 相加、或寫死的常數）會壞掉**——manim 把每個 `play` 的 run_time
-向上取到整數影格，一拍播三、四個 `play` 就少報好幾個影格，後面的 `wait` 就多等，整場比旁白長，
-`[sync] render/audio length` 出警告。反向也會發生：曾有 helper 播 0.55 s 卻回報 0.65 s（**多報**），
-它所在的場就比旁白短。兩種錯誤同時存在時還會互相抵銷，讓數字「看起來還好」而掩蓋真正的低報。
+讓每一拍的影像長度等於它的旁白。**回傳標稱值（各 `run_time` 相加、或寫死的常數）會壞掉**——
+manim 把每個 `play` 的 run_time 向上取到整數影格，一拍播三、四個 `play` 就少報好幾個影格，
+後面的 `wait` 就多等，整場比旁白長，`[sync] render/audio length` 出警告。反向也會發生：曾有
+helper 播 0.55 s 卻回報 0.65 s（**多報**），它所在的場就比旁白短。兩種錯誤同時存在時還會互相
+抵銷，讓數字「看起來還好」而掩蓋真正的低報。
+
+**量測做在 `play_block` 這一層（2026-09-13）。** `blocks._reveal()` 回傳各路徑的**標稱**秒數
+（stock 表的常數／callable 自報的值），`play_block` 用 `timing.elapsed()`／`timing.spent()` 把它
+換成實測值，於是 **stock 字串／`paced` 走格／hook callable 三條路一次誠實**，不必各自處理。
+§3.1 的 hook 自己也量（`_spent`），那是無害的重複——外層量的是同一段區間、得到同一個數字。
+
+**三個對時點（都在 `scene.py`，都讀 `timing.elapsed()`）：**
+
+1. **每拍的 hold 對齊「累積目標」**，不是各拍自己算 `target − consumed`：`wait` 會
+   **向下**取整（`freeze_current_frame` 用 `int(duration/dt)`）、`play` 會**向上**取整，逐拍
+   各自結算就讓誤差一拍拍累積。改成 `wait(max(start + Σtarget − renderer.time, MIN_HOLD))`，
+   某一拍超時由下一拍吸收，誤差不累積。
+2. **場尾 hold 對齊「旁白結束 + `SCENE_TAIL_SECONDS`」**（`_play_content` 回傳旁白結束時的
+   clock，`_tail` 收）。最後一拍與 `_tail` 之間還夾著兩段**不是旁白時間**的東西：
+   `_play_content` 收尾的還原（`focus.apply(..., [], dimmed)`，凡壓暗過的場都有，0.4 s）與
+   「最後一拍超時只好吃 `MIN_HOLD`」。它們本來直接把整片撐長，現在被場尾 hold 吸收——與
+   `exit:` 的淡出被 tail 吸收是同一個作法。
+3. 沒有 renderer 的場（selftest 的 `FakeScene`）三者都退回原本的算術，行為不變。
+
+**剩下的殘餘是「內容本來就比旁白長」**，非時序 bug：一拍用 `paced` 填滿（`beat − 0.6`）之後
+再接 `indicate`（0.8 s）就一定超過該拍，超出的部分只能由 `MIN_HOLD` 與場尾吸收；ch03 06
+（`ineq` 拍 + `evenness` hook + `exit` 淡出）超出量大於 tail 能吸收的 0.7 s，仍留一條 `[sync]`
+警告。要清掉它得改 run_time／編排，屬內容決定，不是這一層的事。
 
 **寫法**（`animations/ch03_trig_derivatives_hooks.py` 是現行範例）：
 
@@ -1084,9 +1115,9 @@ assert 回傳的秒數，沒有這層 fallback 會拿到 0.0。所以 hook 一�
 > 在開快取時會間歇性地空白。）
 
 歷史：2026-09-13 一輪把 §3.1 hooks 的 12 處 callable 從標稱值遷成實測值，`[sync]` 警告 8 → 6 條、
-`sum|delta|` 2.981 → 2.713（`git log --grep="_spent"`）。殘餘的 6 條落在 `video/pipeline/` 自己——
-`pacing.walk`／`paced_write`／`paced_reveal` 仍回傳標稱值、`play_block` 的 stock 字串分支回傳常數、
-`scene.py` 每拍的 `wait` 各自進位一影格——那些場多半連 `hook:` 都沒有，屬另一輪。
+`sum|delta|` 2.981 → 2.713（`git log --grep="_spent"`）。同日次輪把量測收斂到 `play_block`、加上上述
+兩個對時點，六場對照（`--reuse-audio --quality high`）警告 6 → 1 條、`sum|delta|` 2.347 → 0.541，
+六場末幀逐像素相同（`git log --grep="timing-honest"`）。
 
 ### Text rendering：prose vs math（no garble）
 

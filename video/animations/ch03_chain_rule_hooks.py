@@ -55,9 +55,14 @@ def _centre_in_zone(title_mob, group, *, bottom_pad: float = 0.45) -> None:
 
 
 def _fade(scene, mob, g):
+    # Report the run_time actually played, not 0.65 -- the extra 0.10 s was pure
+    # over-report (`scene.add` costs no wall clock), so every beat using this reveal held
+    # a tenth of a second short and the scene ended before its narration. `play_block`
+    # converts this nominal figure into the measured one on a real render; it stays the
+    # answer on a render-free scene, so it has to be the truth there too.
     scene.play(FadeIn(mob), run_time=0.55)
     scene.add(mob)
-    return 0.65
+    return 0.55
 
 
 # ================================================================ hook 1

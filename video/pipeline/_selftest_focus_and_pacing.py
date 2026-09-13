@@ -12,6 +12,7 @@ sys.path.insert(0, str(Path(__file__).resolve().parent.parent))
 from pipeline import focus as F        # noqa: E402
 from pipeline import timing as TM      # noqa: E402
 from pipeline import schema as S       # noqa: E402
+from pipeline.blocks import Block      # noqa: E402
 
 
 class FakeMob:
@@ -260,50 +261,27 @@ def test_indicate_is_free_when_nothing_matches():
     assert scene.plays == []
 
 
-# -- scene.py's focus call site: a `dim: []` entry runs BEFORE the beat's reveal -
+# -- scene.py's focus call site: EVERY `dim` entry runs BEFORE the beat's reveal -
 
-def test_restore_only_focus_entry_runs_before_the_beats_own_reveal():
-    """Root cause of the ch03 06 `sector_inequality` report: scene.py normally
-    reveals-then-focuses (the just-revealed block earns full attention before
-    anything dims). A `dim: []` entry dims nothing, so there is nothing left to
-    protect by waiting -- and its whole point is putting everything back for the
-    viewer to compare across THIS beat, not just whatever is left of it once the
-    beat's own reveal returns. `ineq`'s reveal walks three terms across a beat that
-    grew to ~22-27 s (motion primitive 7), so the old reveal-then-focus order left
-    the restore stranded in the final FADE_SECONDS: a mock render showed the dimmed
-    copies still dimmed at every sampled point inside the beat and only snapping
-    back right before the next one started. `LessonScene._play_content` now runs a
-    restore-only (`dim: []`) entry BEFORE `play_block`, not after."""
+class FakeLessonScene(FakeScene):
+    """A FakeScene that `LessonScene._play_content` can be driven against unbound."""
+    def wait(self, seconds):
+        pass
+
+
+def _run_play_content(spec, by_id, log):
+    """Drive `_play_content` over *spec* with `focus.apply` logging what it was asked
+    to do, so the ORDER of dim / restore / reveal is observable."""
     import pipeline.scene as scene_mod
-    from pipeline.blocks import Block
 
-    log = []
     real_apply = F.apply
 
-    def logging_apply(scene, by_id, wanted, currently_dimmed):
-        if not wanted:
-            log.append("restore")
-        return real_apply(scene, by_id, wanted, currently_dimmed)
-
-    def reveal_setup(scene, mob, ground):
-        log.append("reveal-setup")
-        return 0.0
-
-    def reveal_ineq(scene, mob, ground):
-        log.append("reveal-ineq")
-        return 0.0
-
-    by_id = {"a": FakeBlock(),
-              "setup": Block(id="setup", mobject=FakeMob(), anim=reveal_setup),
-              "ineq": Block(id="ineq", mobject=FakeMob(), anim=reveal_ineq)}
-
-    class FakeLessonScene(FakeScene):
-        def wait(self, seconds):
-            pass
+    def logging_apply(scene, by_id_, wanted, currently_dimmed):
+        log.append("restore" if not wanted else "dim:" + ",".join(sorted(wanted)))
+        return real_apply(scene, by_id_, wanted, currently_dimmed)
 
     fake_scene = FakeLessonScene(10.0)
-    fake_scene.spec = {"say": "{show setup} one two three {show ineq} four five six",
-                        "focus": [{"at": "setup", "dim": ["a"]}, {"at": "ineq", "dim": []}]}
+    fake_scene.spec = spec
     fake_scene.beat_durations = None
 
     scene_mod.focus.apply = logging_apply
@@ -311,12 +289,77 @@ def test_restore_only_focus_entry_runs_before_the_beats_own_reveal():
         scene_mod.LessonScene._play_content(fake_scene, [], by_id, "dark")
     finally:
         scene_mod.focus.apply = real_apply
+    return fake_scene
+
+
+def _reveal_logger(log, name):
+    def reveal(scene, mob, ground):
+        log.append("reveal-" + name)
+        return 0.0
+    return reveal
+
+
+def test_every_focus_entry_runs_before_the_beats_own_reveal():
+    """Root cause of the ch03 06 `sector_inequality` report, then of the ch03 24
+    `mirror` one: scene.py used to reveal-then-focus (the just-revealed block earns
+    full attention before anything dims).
+
+    A `dim: []` entry dims nothing, so there was nothing left to protect by waiting --
+    and its whole point is putting everything back for the viewer to compare across
+    THIS beat. `ineq`'s reveal walks three terms across a beat that grew to ~22-27 s
+    (motion primitive 7), so the old order left the restore stranded in the final
+    FADE_SECONDS: a mock render showed the dimmed copies still dimmed at every sampled
+    point inside the beat and only snapping back right before the next one started.
+
+    A NON-EMPTY `dim` has exactly the same defect and it is worse, because what is
+    dimmed is never the block being revealed -- it is the OTHER half of the screen,
+    which the narration is steering attention away from in its FIRST sentence. Scene
+    24's `mirror` beat (`dim: [g_v]`, an 11.5 s beat whose hook reveal fills ~5 s)
+    rendered with the velocity row still lit until mid-beat, while "hold the bottom
+    graph against the top" is the beat's opening line. So `_play_content` now applies
+    the WHOLE focus entry before `play_block`; only `indicate` still fires after the
+    reveal (it flashes blocks, it does not steer away from one)."""
+    log = []
+    by_id = {"a": FakeBlock(),
+             "setup": Block(id="setup", mobject=FakeMob(), anim=_reveal_logger(log, "setup")),
+             "ineq": Block(id="ineq", mobject=FakeMob(), anim=_reveal_logger(log, "ineq"))}
+    _run_play_content(
+        {"say": "{show setup} one two three {show ineq} four five six",
+         "focus": [{"at": "setup", "dim": ["a"]}, {"at": "ineq", "dim": []}]},
+        by_id, log)
 
     # A trailing "restore" is scene.py's own end-of-scene sweep-up (`focus.apply(..., [],
     # dimmed)`, always a no-op here since `dim: []` already restored everything); only the
-    # first three events are this fix's concern.
-    assert log[:3] == ["reveal-setup", "restore", "reveal-ineq"], log
+    # first four events are this fix's concern.
+    assert log[:4] == ["dim:a", "reveal-setup", "restore", "reveal-ineq"], log
     assert by_id["a"].mobject.opacity == 1.0, "the restore must actually run, not just move"
+
+
+def test_a_dim_that_names_its_own_beats_reveal_is_skipped_and_warned():
+    """Second line of defence behind the schema error. Now that a `dim` runs BEFORE the
+    reveal, dimming the block the SAME beat reveals would have `focus.apply` call
+    `save_state()` on a mobject that is not on screen yet -- and a later `dim: []` would
+    then `restore()` it back to invisible, silently. No storyboard does this today; the
+    order change is what would make it a trap, so the player skips the id and says so."""
+    import contextlib
+    import io
+
+    log = []
+    by_id = {"a": FakeBlock(),
+             "row": Block(id="row", mobject=FakeMob(), anim=_reveal_logger(log, "row"))}
+    buf = io.StringIO()
+    with contextlib.redirect_stdout(buf):
+        _run_play_content({"id": "s24", "say": "{show row} one two three",
+                           "focus": [{"at": "row", "dim": ["a", "row"]}]}, by_id, log)
+
+    assert log[:2] == ["dim:a", "reveal-row"], log
+    # `_play_content` restores everything on its way out, so the tell is the SNAPSHOT:
+    # `a` was dimmed (state saved), `row` was never touched (nothing to restore from).
+    assert by_id["a"].mobject._saved is not None, "`a` should have been dimmed"
+    assert by_id["row"].mobject._saved is None, "the beat's own reveal must not be dimmed"
+    assert by_id["row"].mobject.opacity == 1.0
+    out = buf.getvalue()
+    assert "row" in out and "s24" in out, out
 
 
 # -- schema validation -----------------------------------------------------------
@@ -367,6 +410,17 @@ def test_schema_rejects_a_duplicate_at():
     assert any("already focused" in e for e in errs), errs
 
 
+def test_schema_rejects_a_dim_that_names_its_own_entrys_at():
+    """Always a typo, and since the dim now runs BEFORE the beat's reveal it is a trap:
+    `focus.apply` would snapshot the block before it is on screen and a later `dim: []`
+    would restore it to invisible. scene.py skips + warns at play time; this is the gate."""
+    say = "One {show result} two {show check} three"
+    errs = _focus_errs({"focus": [{"at": "result", "dim": ["step.0", "result"]}]}, say)
+    assert len(errs) == 1 and "result" in errs[0], errs
+    # a dim naming ANOTHER beat's reveal target is fine -- that is the normal case
+    assert _focus_errs({"focus": [{"at": "check", "dim": ["result"]}]}, say) == []
+
+
 def test_schema_rejects_a_missing_or_non_list_dim():
     say = "One {show result} two"
     assert any("required list" in e for e in _focus_errs({"focus": [{"at": "result"}]}, say))
@@ -395,13 +449,15 @@ if __name__ == "__main__":
     test_scene_indicate_reads_only_entries_that_flash()
     test_indicate_plays_one_flash_for_the_whole_list_and_charges_for_it()
     test_indicate_is_free_when_nothing_matches()
-    test_restore_only_focus_entry_runs_before_the_beats_own_reveal()
+    test_every_focus_entry_runs_before_the_beats_own_reveal()
+    test_a_dim_that_names_its_own_beats_reveal_is_skipped_and_warned()
     test_schema_accepts_indicate_next_to_dim()
     test_schema_rejects_a_malformed_indicate()
     test_schema_rejects_indicating_a_block_the_same_entry_dims()
     test_schema_accepts_a_well_formed_focus()
     test_schema_rejects_an_at_that_is_never_revealed()
     test_schema_rejects_a_duplicate_at()
+    test_schema_rejects_a_dim_that_names_its_own_entrys_at()
     test_schema_rejects_a_missing_or_non_list_dim()
     test_schema_is_silent_without_the_field()
     print("OK focus_and_pacing self-test")
