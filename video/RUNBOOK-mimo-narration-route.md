@@ -126,20 +126,27 @@ DECK: <填，如 ch01_precise_limit>      SECTION: <填，如 §1.6>
   **但 `plan` 是「有下 `--reuse-existing` 才算數」的數字**——沒下旗標時它會多印一行 NOTE 告訴你
   真正會 billed 幾次（就是 2026-09-12 那 13 次的成因）。`worst` 欄對 scene-level 仍是 reuse-blind
   （reuse 的 WAV 仍可能重對齊失敗而掉 ladder）。
-- **⚠️ 殘留缺口：scene-level（`scene_aligned`）的場，其 WAV 路徑仍是 `scenes/<場號>_<scene_id>.wav`，
-  而 `_synthesize_scene_aligned` 用「今天的場號」去找它。** 本輪只把 **beat 級** reuse 改成內容定址
-  （契約指明 scene 級 index 以 `scene_id` 為 key「已正確、不動」），所以**搬場之後的第一次真跑**，
-  被搬動的 scene_aligned 場仍會因為「今天的號下沒有 WAV」而重合成一次。
-  **免費的解法（先做這一步再跑正事）：** 先跑一次
-  `tts.py … --reuse-existing --no-billing --scene <任一 reuse 會命中的場>`——例如沒被搬動的
-  scene_aligned 場，或走 beats 的場配 `--unit beat`。該次跑 0 次呼叫就會走到 manifest 合併，
-  `renumber_scenes` 便把**全 deck** 的場號重算、把換號的 scene WAV／align sidecar／beat 目錄
-  一併搬到新號；之後的 dry-run／真跑就都對得上了。實測：這一步把 §3.1 的
-  `--dry-run` planned 由 6 降到 3（剩下的 3 就是下一條講的 `--unit auto` 路由，不是路徑問題）。
-- **`--unit auto` 會把 beats 路線的三場路由去 scene-level（＝1 次計費），因為它只看 template。**
-  要對那三場享受 beat 級 reuse，指令要帶 `--unit beat`。實測：
+- **〔2026-09-13，已修〕scene-level（`scene_aligned`）的場同樣處理：兩種模式都會自動搬，搬場後的
+  第一次真跑就是 0 次。** scene WAV 是 `scenes/<場號>_<scene_id>.wav`、對齊檔是
+  `align/<場號>_<scene_id>.{words,aligned}.json`，一樣把場序嵌進檔名；`build_scene_reuse_index`
+  以 `scene_id` 為 key 本來就找得到「哪一份音檔屬於這一場」，出問題的是 `scene_reuse_ok` 被餵
+  「今天的場號」去找它，搬場後那裡是空的 → 重合成。現在 `adopt_prior_scene_artifacts` 會在
+  freshness 檢查**之前**先把舊 WAV＋兩個 sidecar 搬到今天的號（同一套 copy→驗大小→刪舊→空目錄
+  rmdir 規則），命中就印 `reused <新檔名> (moved from <舊路徑>)`。
+  **搬檔是無條件的**（即使文字改了也搬）：re-synth 走 temp＋gates 過才 promote，所以搬過去的檔在
+  有好的替代品之前不會消失；而不搬就會在舊場號下留孤兒 WAV。
+  離線實測（`--no-billing`，真音檔）：把 `companion_limit`（B-4 被搬過的 scene_aligned 場）的場號
+  與三個檔名改回 20（文字一字未改）→ `--reuse-existing --no-billing --skip-qa --scene companion_limit`
+  得 `backend_calls: 0`、log 印 `reused 14_companion_limit.wav (moved from …20_companion_limit.wav)`、
+  WAV 與兩個 sidecar 都搬回 `14_`、20_ 的舊檔全部清掉、`validation: pass_with_warnings`。
+  （scene-level 重對齊一律記得帶 `--skip-qa`，理由見上面 2026-09-13 那條；不帶的話 ASR 探針誤判
+  會判 fail 而去重合成。）
+- **beats 模式的場跑 `tts.py` 一律帶 `--unit beat`。** `--unit auto` 只看 template，會把它們路由去
+  scene-level ＝ 1 次計費（然後才可能一路掉回 beats 終端，那還更貴）。§3.1 目前走 beats 的三場是
+  `continuity_argument`／`derivative_of_cosine`／`shm_stacked_graphs`。實測：
   `--reuse-existing --no-billing --scene shm_stacked_graphs,derivative_of_cosine`（不帶 `--unit beat`）
   在第一次呼叫前就被 `--no-billing` 攔下；補上 `--unit beat` 後 `backend_calls: 0`。
+  scene_aligned 的場則用預設 `--unit auto` 即可。
 - `make.py --reuse-audio` 會先驗 manifest freshness（deck id、scene、beat count、`{show}`、
   `text_hash`、WAV 存在/時長；`scene_aligned` 另驗 scene WAV＋words/aligned 檔＋`validation.status`），再 render；
   若報 stale/incomplete，不要硬跳過，先重跑該 storyboard 的 `tts.py` 或確認是不是選錯 `<deck>_mimo.yml`。

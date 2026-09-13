@@ -189,6 +189,158 @@ def test_two_beats_with_identical_text_pair_off_by_index():
         assert index == {}, "each prior take is consumed exactly once"
 
 
+# ---- tts-reuse-key: the SCENE path gets the same treatment (scene WAV + align sidecars) ----
+#
+# Keying build_scene_reuse_index by scene_id was always right about WHICH audio belongs to a
+# scene; what re-billed was that scene_reuse_ok was handed TODAY's path, while the WAV sits at
+# `scenes/<old scene_number>_<scene_id>.wav`. A reordered deck therefore found nothing and
+# re-synthesized a scene whose words never changed -- the beat bug, one level up.
+
+_MOVED_SCENE = {"id": "sceneA", "kind": "content", "template": "derivation",
+                "say": "a b {show m.0} c d"}
+
+
+def _prior_scene_aligned(out: Path, number: int):
+    """Lay down one scene_aligned scene's artifacts at `number` and return
+    (prior manifest, plan, {audio_file/words_file/aligned_file: Path})."""
+    from pipeline.audio import silence_pcm, wav_duration, write_pcm_wav
+    from pipeline import scene_align as SA
+    (out / "scenes").mkdir(parents=True, exist_ok=True)
+    (out / "align").mkdir(parents=True, exist_ok=True)
+    paths = {"audio_file": out / "scenes" / f"{number:02d}_sceneA.wav",
+             "words_file": out / "align" / f"{number:02d}_sceneA.words.json",
+             "aligned_file": out / "align" / f"{number:02d}_sceneA.aligned.json"}
+    write_pcm_wav(paths["audio_file"], silence_pcm(4.0))
+    paths["words_file"].write_text("{}", encoding="utf-8")
+    paths["aligned_file"].write_text("{}", encoding="utf-8")
+    plan = SA.build_scene_plan(_MOVED_SCENE)
+    prior = {"backend": "mock", "model": "m", "voice": "Dean", "style": "", "scenes": [{
+        "scene_id": "sceneA", "scene_number": number, "narration_mode": "scene_aligned",
+        "scene_text_hash": plan["scene_text_hash"],
+        "audio_file": str(paths["audio_file"]),
+        "audio_seconds": round(wav_duration(paths["audio_file"]), 3),
+        "alignment": {"words_file": str(paths["words_file"]),
+                      "aligned_file": str(paths["aligned_file"])}}]}
+    return prior, plan, paths
+
+
+def _scene_args(**over):
+    return argparse.Namespace(**{"model": "m", "style": "", "voice": "Dean",
+                                 "aligner_model": "base.en", "aligner_device": "cpu",
+                                 "skip_qa": True, "unit": "auto", "fallback_budget": 2,
+                                 "empty_beat_seconds": 0.4, "reuse_existing": True, **over})
+
+
+def test_scene_aligned_reuse_relocates_a_moved_scene_then_hits():
+    """The deck moved sceneA 20 -> 14. Nothing was said differently, so the prior WAV and
+    both align sidecars must be MOVED onto 14 and the freshness check must then pass."""
+    with tempfile.TemporaryDirectory() as d:
+        out = Path(d)
+        prior, plan, old = _prior_scene_aligned(out, 20)
+        index = tts.build_scene_reuse_index(prior)
+        assert index["sceneA"]["words_file"] == str(old["words_file"]), "sidecars are indexed"
+        args = _scene_args()
+        new = {"audio_file": out / "scenes" / "14_sceneA.wav",
+               "words_file": out / "align" / "14_sceneA.words.json",
+               "aligned_file": out / "align" / "14_sceneA.aligned.json"}
+        # the miss this commit removes: the WAV is at 20_, the check is asked about 14_
+        assert tts.scene_reuse_ok(index["sceneA"], plan, new["audio_file"],
+                                  backend_name="mock", voice="Dean", args=args) is False
+        adopted, moved_from = tts.adopt_prior_scene_artifacts(
+            index["sceneA"], scene_wav=new["audio_file"], words_file=new["words_file"],
+            aligned_file=new["aligned_file"])
+        assert moved_from == str(old["audio_file"])
+        for key in new:
+            assert new[key].exists(), key
+            assert not old[key].exists(), f"{key} must be moved, not copied"
+            assert adopted[key] == str(new[key])
+        assert tts.scene_reuse_ok(adopted, plan, new["audio_file"],
+                                  backend_name="mock", voice="Dean", args=args) is True
+        # already in place -> nothing to move, and the verdict is unchanged
+        again, moved_again = tts.adopt_prior_scene_artifacts(
+            adopted, scene_wav=new["audio_file"], words_file=new["words_file"],
+            aligned_file=new["aligned_file"])
+        assert moved_again is None and again == adopted
+
+
+def test_synthesize_scene_aligned_reuses_a_moved_scene_with_zero_backend_calls():
+    """The seam above, wired into the scene path: a reordered deck must cost NOTHING.
+    _align_and_gate is stubbed (it needs a whisper model); what is under test is that TTS
+    is skipped and that the re-align is pointed at the relocated WAV."""
+    with tempfile.TemporaryDirectory() as d:
+        out = Path(d)
+        prior, _, old = _prior_scene_aligned(out, 20)
+        index = tts.build_scene_reuse_index(prior)
+        backend = tts.MockTTSBackend(0.4)
+        seen = {}
+
+        def fake_align_and_gate(plan_, wav, scene_number, words_file, aligned_file, args_,
+                                *, audio_file, promote_from, aligner_model=None):
+            seen.update(wav=Path(wav), promote_from=promote_from, number=scene_number)
+            return {"scene_id": plan_["scene_id"], "narration_mode": "scene_aligned",
+                    "audio_file": str(audio_file), "scene_number": scene_number,
+                    "validation": {"status": "pass", "warnings": [], "metrics": {}},
+                    "fallback_history": []}
+
+        saved, buf = tts._align_and_gate, io.StringIO()
+        tts._align_and_gate = fake_align_and_gate
+        try:
+            with redirect_stdout(buf):
+                entry = tts._synthesize_scene_aligned(
+                    backend=backend, meta={}, scene=_MOVED_SCENE, scene_number=14,
+                    output_dir=out, args=_scene_args(), reuse_index={},
+                    scene_reuse_index=index)
+        finally:
+            tts._align_and_gate = saved
+        assert backend.stats["calls"] == 0, "a reordered scene must not be re-synthesized"
+        assert entry["validation"]["status"] == "pass"
+        assert seen["wav"] == out / "scenes" / "14_sceneA.wav", seen["wav"]
+        assert seen["promote_from"] is None, "reuse re-aligns in place; nothing to promote"
+        assert not old["audio_file"].exists(), "the stale-numbered WAV must not linger"
+        log = buf.getvalue()
+        assert "reused 14_sceneA.wav" in log and "moved from" in log, log
+
+
+def test_scene_aligned_relocates_even_when_the_text_changed():
+    """Relocation is unconditional: the moved WAV is what a failed re-synth falls back on
+    (promotion only happens after gates pass), and leaving it under the old number would
+    strand an orphan WAV. The verdict must still be "not reusable"."""
+    with tempfile.TemporaryDirectory() as d:
+        out = Path(d)
+        prior, plan, old = _prior_scene_aligned(out, 20)
+        index = tts.build_scene_reuse_index(prior)
+        index["sceneA"]["scene_text_hash"] = "SOMETHING-ELSE"      # the words changed
+        new_wav = out / "scenes" / "14_sceneA.wav"
+        adopted, moved_from = tts.adopt_prior_scene_artifacts(
+            index["sceneA"], scene_wav=new_wav,
+            words_file=out / "align" / "14_sceneA.words.json",
+            aligned_file=out / "align" / "14_sceneA.aligned.json")
+        assert moved_from == str(old["audio_file"]) and new_wav.exists()
+        assert tts.scene_reuse_ok(adopted, plan, new_wav, backend_name="mock",
+                                  voice="Dean", args=_scene_args()) is False
+
+
+def test_adopt_prior_scene_artifacts_tolerates_a_missing_alignment_block():
+    """A scene_aligned entry with no alignment block (or null paths) must not crash:
+    read_manifest_status type-checks the fields its consumers dereference, and the
+    alignment block is not among them."""
+    with tempfile.TemporaryDirectory() as d:
+        out = Path(d)
+        assert tts.adopt_prior_scene_artifacts(None, scene_wav=out / "a.wav",
+                                               words_file=out / "w", aligned_file=out / "a") \
+            == (None, None)
+        prior, _, old = _prior_scene_aligned(out, 20)
+        prior["scenes"][0].pop("alignment")
+        index = tts.build_scene_reuse_index(prior)
+        assert index["sceneA"]["words_file"] is None
+        adopted, moved_from = tts.adopt_prior_scene_artifacts(
+            index["sceneA"], scene_wav=out / "scenes" / "14_sceneA.wav",
+            words_file=out / "align" / "14_sceneA.words.json",
+            aligned_file=out / "align" / "14_sceneA.aligned.json")
+        assert moved_from == str(old["audio_file"])
+        assert adopted["words_file"] is None and adopted["aligned_file"] is None
+
+
 # ---- tts-reuse-key: a subset merge re-stamps scene_number from the current storyboard ----
 
 def test_renumber_scenes_restamps_from_the_current_storyboard_order():
@@ -524,6 +676,10 @@ if __name__ == "__main__":
     test_beat_reuse_refuses_when_the_text_changed()
     test_beat_reuse_refuses_on_identity_and_missing_audio()
     test_two_beats_with_identical_text_pair_off_by_index()
+    test_scene_aligned_reuse_relocates_a_moved_scene_then_hits()
+    test_synthesize_scene_aligned_reuses_a_moved_scene_with_zero_backend_calls()
+    test_scene_aligned_relocates_even_when_the_text_changed()
+    test_adopt_prior_scene_artifacts_tolerates_a_missing_alignment_block()
     test_renumber_scenes_restamps_from_the_current_storyboard_order()
     test_dry_run_prices_a_marker_only_edit_at_zero_calls()
     test_read_manifest_status_shape_contract()
