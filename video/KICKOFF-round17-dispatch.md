@@ -30,4 +30,4 @@ A–D 各自 commit 合進 main、`run_selftests` 全綠、`doctor --smoke` 與 
 
 ## 4. 結果
 
-（執行後填）
+（執行中，2026-09-13）A 色軸 ✅ `c5dd432`→再裁 θ 紫 ✅ `5fd41c8`；B prose θ ✅ `24536f9`；C seg_roles proof ✅ `44ed099`；D 23 彈簧 ✅ `ff8c3d1`（＋拿掉 23 的 indicate，`54e2008`）；另一 session：09 ✅ `3621597`、pack fine 定位 ✅ `e2a29de`；**04 覆蓋層（Opus）進行中**。main 閘：selftest 40/40、schema OK、sizecheck 0 error。合併版 render 待 04 合併後由另一 session 跑。
