@@ -194,6 +194,15 @@
 - 好：「水平線從畫面上方緩緩下移、掃過 parabola；落到 $y=\tfrac14$ 時停住，同時閃示兩個交點 $x=\pm\tfrac12$，凸顯『一個輸出對應兩個輸入』。」
 - 不好：寫座標數值、寫 manim 物件名、寫 `run_time`。
 
+### hook 內的文字一律走 `brand.*`（2026-09-13 鋪滿輪；[`SPEC-motion-language.md`](SPEC-motion-language.md) 規則 5）
+
+生成的 hook code **MUST NOT** 直接建 `MathTex`／`Tex`／`Text` 來放教學文字（標籤、式子、註記），一律經
+`brand.math_line`／`brand.prose`／`brand.eyebrow`。原因是產線的語意色（`meta.color_map` 的變數色、`{{…}}`
+分段與 `seg_roles`）與字級表都在 `brand` 這一層落地：試點（品質補強輪 ⑮）06 場的 hook 自建 `MathTex(r"\theta")`
+讓圖上的 θ 是白色、每條式子的 θ 是赭色，被視覺閘 V10 判 blocking；04 場的 `h` 因同一原因至今進不了色表。
+幾何物件（`Line`／`Arc`／`Dot`／`Polygon`）照舊直接用 manim，只有**文字**受此規則約束。`hook-engineering-audit`
+的 E2 慣例項含此條。
+
 ### 生成 code 的修補紀律（render 失敗時）
 
 Claude 依 `animation_cue` 生成的客製動畫 code 偶爾 render 失敗。此時 **SHOULD 由小到大逐層修補**，**MUST NOT** 一失敗就整支重生——重生會丟掉已被使用者認可的部分，還得從頭重審。修補階梯：

@@ -85,6 +85,10 @@ scenes:
     ref: md:why_trig_is_different
     scaffold: { flag: radians }     # PD4: first use of the radian assumption
     paced: [math.0, math.1, statement]   # 12-19 s beats: one line each, written as read
+    # 規則 3（閃爍）：statement 那拍旁白說「takes a genuinely new tool」——它指的是上一列那個
+    # 單一極限，閃一下把「這一句」和「那一列」對上（2026-09-13 鋪滿輪）。
+    focus:
+      - { at: statement, dim: [], indicate: [math.1] }
     source: "chapter3-print-standalone.html SS3.1 . opening prose (funnels to sin/theta over theta)"
     title: "A Limit No Algebra Can Crack"
     say: |
@@ -118,6 +122,9 @@ scenes:
     hook: animations.ch03_trig_derivatives_hooks:difference_quotient_for_sine
     ref: md:difference_quotient_for_sine
     covers: [identity, substitute, divide, factors]     # step.0/1/2 + result (all shown; root reduction)
+    # 規則 4：step.0 一次寫完後靜止 9 s（R2 ML4）→ 隨旁白書寫；step.1 是 transform，paced 讓它 morph 之後
+    # 把 leader／reason 鋪在拍子剩餘時間（T1-1）。step.2／result 是 hook 編舞，不列。
+    paced: [step.0, step.1]
     scaffold: { motive: "Sum-to-product turns the difference of sines into a product." }
     source: "chapter3-print-standalone.html SS3.1 . The difference quotient for sine (sum-to-product)"
     title: "The Difference Quotient for Sine"
@@ -175,6 +182,8 @@ scenes:
       - { at: tri_outer, dim: [tri_inner, sector] }
       # 規則 3 的閃爍變體：ineq 那拍三塊全部還原後，依序閃一下讓觀眾把三塊面積和不等式的三項對上。
       - { at: ineq, dim: [], indicate: [tri_inner, sector, tri_outer] }
+    # 規則 1：07 只帶走 [circle, frame, apex]；其餘在場尾先淡出（exit），不靠硬切消失。
+    exit: [evenness, tri_inner, sector, tri_outer, ineq]
     source: "chapter3-print-standalone.html SS3.1 . Figure 3.1 (sector-inequality) + area prose"
     title: "A Squeeze on the Unit Circle"
     say: |
@@ -214,7 +223,12 @@ scenes:
     # 跨場攜帶（原語 5 物件面；SPEC-motion-language 規則 1）：06 的單位圓不重生——開場就在
     # 上一場末幀的位置，第一拍飛去右上角縮成 inset，當這一列列不等式的「那張圖」常駐提醒。
     carry:
-      - { from: sector_inequality, block: [circle, frame, apex], as: carried.circle, to: { corner: top_right, scale: 0.35 } }
+      - { from: sector_inequality, block: [circle, frame, apex], as: carried.circle, to: { corner: top_right, scale: 0.5 } }
+    # scale 0.35→0.5（2026-09-13）：試點縮圖的 sinθ／tanθ 標籤 7–9 px 讀不到（R2 A6）；0.5 落在標題右側的空檔，
+    # 不碰 motive（x 到 1020 px）也不碰第一列 rail。
+    # 規則 3：check 那拍旁白「from sinθ ≤ θ we also get…」指回 step.0，閃一下。
+    focus:
+      - { at: check, dim: [], indicate: [step.0] }
     scaffold: { motive: "Turn the chain of areas into bounds on $\\sin\\theta/\\theta$." }
     source: "chapter3-print-standalone.html SS3.1 . algebra after Figure 3.1 (inequality 1)"
     title: "Trapping the Ratio"
@@ -233,14 +247,17 @@ scenes:
       {show check} And pocket one more consequence: from $\sin\theta\le\theta$ we
       also get zero at most $|\sin\theta|$ at most $|\theta|$ near zero -- a
       bound we lean on twice in a moment.
-    # 規則 2 試點：{{…}} 分段＋對位變形。result 從 step.1 變形——`1` 這一段從左端跑到右端，
-    # 「取倒數把鏈翻過來」就是看得見的動作，marker 挪到旁白說 the chain turns around 的位置；
-    # `frame: true` 讓變動前先框住上一列（規則 3 的預備動作）。step.1 維持 paced（它的拍 12 s，
-    # transform 1.2 s 填不滿；試點首跑 result 拍 16 s 最長靜止 15 s 就是這樣來的）。
+    # 規則 2：{{…}} 分段＋對位變形。step.1 從 step.0 變形（÷ sinθ），result 從 step.1 變形——`1` 這一段
+    # 從左端跑到右端，「取倒數把鏈翻過來」就是看得見的動作；`frame: true` 讓變動前先框住上一列。
+    # 兩列都留在 paced 裡：morph 1.6 s 之後 leader／reason 鋪在拍子剩餘時間（T1-1），拍子不再空等。
+    # 規則 5：三項各自繼承 06 三塊區域的色（藍＝內三角／琥珀＝扇形／綠＝外三角），取倒數後顏色左右對調。
     steps:
-      - { math: "{{\\sin\\theta}} \\;\\le\\; {{\\theta}} \\;\\le\\; {{\\tan\\theta}}", reason: "multiply areas by $2$" }
-      - { math: "{{1}} \\;\\le\\; {{\\frac{\\theta}{\\sin\\theta}}} \\;\\le\\; {{\\frac{1}{\\cos\\theta}}}", reason: "$\\div\\sin\\theta$, $\\tan=\\tfrac{\\sin}{\\cos}$" }
-    result: { math: "{{\\cos\\theta}} \\;\\le\\; {{\\frac{\\sin\\theta}{\\theta}}} \\;\\le\\; {{1}} \\qquad (0<\\theta<\\frac{\\pi}{2})", reason: "reciprocate -- reverses", anim: transform, frame: true }
+      - { math: "{{\\sin\\theta}} \\;\\le\\; {{\\theta}} \\;\\le\\; {{\\tan\\theta}}", reason: "multiply areas by $2$",
+          seg_roles: { "\\sin\\theta": secondary, "\\theta": accent, "\\tan\\theta": success } }
+      - { math: "{{1}} \\;\\le\\; {{\\frac{\\theta}{\\sin\\theta}}} \\;\\le\\; {{\\frac{1}{\\cos\\theta}}}", reason: "$\\div\\sin\\theta$, $\\tan=\\tfrac{\\sin}{\\cos}$", anim: transform, frame: true,
+          seg_roles: { "1": secondary, "\\frac{\\theta}{\\sin\\theta}": accent, "\\frac{1}{\\cos\\theta}": success } }
+    result: { math: "{{\\cos\\theta}} \\;\\le\\; {{\\frac{\\sin\\theta}{\\theta}}} \\;\\le\\; {{1}} \\qquad (0<\\theta<\\frac{\\pi}{2})", reason: "reciprocate -- reverses", anim: transform, frame: true,
+              seg_roles: { "\\cos\\theta": success, "\\frac{\\sin\\theta}{\\theta}": accent, "1": secondary } }
     check:  { math: "0 \\;\\le\\; \\lvert\\sin\\theta\\rvert \\;\\le\\; \\lvert\\theta\\rvert", reason: "kept for later" }
 
   # 7 ------------------- Proposition 3.1 (part 1/2): statement + lim sin theta = 0
@@ -253,6 +270,11 @@ scenes:
     ref: md:continuity_statement_sin_limit
     covers: [bound, squeeze, qed]     # proof.0/1 + qed; bound recaps squeeze_to_the_bound.abs_bound
     hook: animations.ch03_trig_derivatives_hooks:chord_vs_arc
+    # 規則 4：proof.0 拍 11.1 s 一次淡入 → 隨旁白書寫。規則 3：proof.0 旁白「Since 0 ≤ |sin θ| ≤ |θ|」
+    # 指的是右側那兩條擺平的長度條（straighten），閃一下把式子和圖對上。
+    paced: [proof.0]
+    focus:
+      - { at: proof.0, dim: [], indicate: [straighten] }
     scaffold: { motive: "The bound is the key to continuity — first prove $\\sin\\theta\\to 0$." }
     source: "chapter3-print-standalone.html SS3.1 . Proposition 3.1 (statement) + Proof (sin theta -> 0)"
     title: "Sine and Cosine Are Continuous"
@@ -289,6 +311,9 @@ scenes:
     ref: md:continuity_argument
     covers: [cos_identity, sin_identity, bound, qed]     # proof.0/1/2 + qed (all shown)
     paced: [proof.0, proof.1, qed]   # 15-17 s beats: each row written as it is read
+    # 規則 3：proof.2「Drop it to its largest size, one」講的是上面兩列的半和因子，閃兩列。
+    focus:
+      - { at: proof.2, dim: [], indicate: [proof.0, proof.1] }
     scaffold: { motive: "Turn $\\sin\\theta\\to 0$ into full continuity, everywhere." }
     source: "chapter3-print-standalone.html SS3.1 . Proposition 3.1 . Proof (sum-to-product bound + squeeze)"
     title: "Sine and Cosine Are Continuous"
@@ -321,6 +346,11 @@ scenes:
     label: "[ proposition ]"
     ref: md:fundamental_limit
     covers: [bound, squeeze, qed]     # proof.0/1 + qed; bound recaps squeeze_to_the_bound.bound (ineq (1))
+    # 規則 4：proof.0（12 s）隨旁白書寫、qed（8 s）兩件逐段；規則 2：proof.1 從 proof.0 變形——
+    # 夾住的三項各自走到極限（theorem_proof 的 transform，T1-3）；規則 3：qed「That is the keystone」閃 statement。
+    paced: [proof.0, qed]
+    focus:
+      - { at: qed, dim: [], indicate: [statement] }
     scaffold: { motive: "Close the limit $\\sin\\theta/\\theta\\to 1$ the whole section is built on." }
     source: "chapter3-print-standalone.html SS3.1 . Proposition 3.2 + Proof"
     title: "The Fundamental Limit"
@@ -338,8 +368,8 @@ scenes:
       so the two-sided limit is one as well. That is the keystone.
     statement: "$\\lim_{\\theta\\to 0}\\frac{\\sin\\theta}{\\theta}=1$"
     proof:
-      - "$\\cos\\theta\\le\\frac{\\sin\\theta}{\\theta}\\le 1\\quad(0<\\theta<\\frac{\\pi}{2})$"
-      - "$\\cos\\theta\\to 1\\ \\Rightarrow\\ \\frac{\\sin\\theta}{\\theta}\\to 1$"
+      - "$ {{\\cos\\theta}} \\le {{\\frac{\\sin\\theta}{\\theta}}} \\le {{1}} \\quad (0<\\theta<\\frac{\\pi}{2}) $"
+      - { tex: "$ {{\\cos\\theta}} \\to {{1}} \\ \\Rightarrow\\ {{\\frac{\\sin\\theta}{\\theta}}} \\to {{1}} $", anim: transform, frame: true }
     qed: "even $\\Rightarrow$ two-sided limit $=1$"
 
   # 10 ------------------------------------- Figure 3.2: the squeeze as a graph (stock)
@@ -377,7 +407,7 @@ scenes:
       # label_point 補上：原本無指定＝貼在曲線端點上，標籤被自己的曲線穿過（量測 716 點落在框內）。
       - { kind: function, expression: "cos(x)", x_range: [-1.5708, 1.5708], color_role: secondary, dashed: true, label: "$\\cos\\theta$", label_point: [-0.98, 0.40], reveal: true }
       - { kind: line, start: [-1.72, 1], end: [1.72, 1], color_role: muted, label: "$1$", label_point: [1.15, 1.08], reveal: true }
-      # 1.06 → 0.865：原位置的標籤下緣壓在 y=1 那條常數線上（它橫跨整個 x 範圍，只能往下閃）。
+      # 1.06 → 0.82：原位置的標籤下緣壓在 y=1 那條常數線上（它橫跨整個 x 範圍，只能往下閃）。
       - { kind: function, expression: "sin(x)/x", x_range: [-1.72, 1.72], color_role: accent, label: "$\\tfrac{\\sin\\theta}{\\theta}$", label_point: [-1.52, 0.865], reveal: true }
       - { kind: point, point: [0, 1], hollow: true, hollow_reason: "ratio undefined at theta=0 (0/0)", color_role: accent, reveal: true }
       # the cursor the narration describes: it walks theta in toward zero, dragging a dot
@@ -396,8 +426,14 @@ scenes:
       y: [0.9, 1.04]
       corner: top_right
       follow: true
+    # 規則 3：annotation 那拍「not a value it ever takes」閃空心圈。規則 1：12 帶走主圖
+    # （axes＋三條曲線＋空心圈＋標籤＋刻度），游標／鏡片／註解在場尾先淡出。
+    focus:
+      - { at: annotation.0, dim: [], indicate: [plot.3] }
+    exit: [plot.4, inset, annotation.0]
     annotations:
-      - "Trapped between $\\cos\\theta$ and $1$, the ratio is forced to $1$ -- undefined at $\\theta=0$."
+      # 尾句縮短（2026-09-13）：原句折行後只剩「θ = 0.」孤行（R2 A6）。
+      - "Trapped between $\\cos\\theta$ and $1$: forced to $1$, undefined at $\\theta=0$."
 
   # 11 --------------------------------------- Caution: a limit, not an identity
   - id: limit_not_identity
@@ -407,10 +443,13 @@ scenes:
     sparse_ok: true                  # pull-quote caution: the calm whitespace is the emphasis (G3 ack, Task 14 #7)
     ref: md:limit_not_identity
     paced: [body]                    # 17.9 s beat: the caution reads line by line
+    # 規則 1：上一場的圖不重生——「at θ=π/2 it is 2/π」時那條曲線就在右上角（曲線在 π/2 明顯低於 1）。
+    carry:
+      - { from: squeeze_graph, block: [axes, ticks, plot.0, plot.1, plot.2, plot.3], as: carried.graph, to: { corner: top_right, scale: 0.4 } }
     source: "chapter3-print-standalone.html SS3.1 . Caution (limit not identity)"
     title: "A Limit, Not an Identity"
     say: |
-      One caution, because this result is easy to over-read.
+      {show carried.graph} One caution, because this result is easy to over-read.
       {show body} The statement is about the limit as $\theta\to 0$ -- not an
       identity. At a fixed angle the ratio is generally not one: at
       $\theta=\tfrac\pi2$ it is two over $\pi$, about $0.64$, and at $\theta=\pi$
@@ -443,6 +482,9 @@ scenes:
     accent: example
     ref: md:companion_limit
     covers: [conjugate, split, evaluate]     # step.0/1 + result (all shown)
+    # 規則 2＋4：step.1 從 step.0 變形（1−cos² → sin²，先框住上一列）、result 從 step.1 變形（各因子走到極限）；
+    # 三列都 paced——step.0 隨旁白書寫，兩個 transform 列 morph 後 leader／reason 鋪滿剩餘拍子。
+    paced: [step.0, step.1, result]
     scaffold: { motive: "Bank a companion limit: $(1-\\cos\\theta)/\\theta\\to 0$." }
     source: "chapter3-print-standalone.html SS3.1 . Example 3.1 (companion limit)"
     title: "A Companion Limit"
@@ -458,9 +500,9 @@ scenes:
       {show result} Let $\theta\to 0$: the first factor goes to one, the second
       to zero over two. One times zero is zero.
     steps:
-      - { math: "\\frac{1-\\cos\\theta}{\\theta} = \\frac{(1-\\cos\\theta)(1+\\cos\\theta)}{\\theta\\,(1+\\cos\\theta)} = \\frac{1-\\cos^{2}\\theta}{\\theta\\,(1+\\cos\\theta)}", reason: "multiply by $1+\\cos\\theta$" }
-      - { math: "= \\frac{\\sin^{2}\\theta}{\\theta\\,(1+\\cos\\theta)} = \\frac{\\sin\\theta}{\\theta}\\cdot\\frac{\\sin\\theta}{1+\\cos\\theta}", reason: "$1-\\cos^{2}\\theta=\\sin^{2}\\theta$" }
-    result: { math: "\\longrightarrow\\ 1\\cdot\\frac{0}{1+1} = 0", reason: "the limit, then continuity" }
+      - { math: "{{\\frac{1-\\cos\\theta}{\\theta}}} = {{\\frac{(1-\\cos\\theta)(1+\\cos\\theta)}{\\theta\\,(1+\\cos\\theta)}}} = {{\\frac{1-\\cos^{2}\\theta}{\\theta\\,(1+\\cos\\theta)}}}", reason: "multiply by $1+\\cos\\theta$" }
+      - { math: "= {{\\frac{\\sin^{2}\\theta}{\\theta\\,(1+\\cos\\theta)}}} = {{\\frac{\\sin\\theta}{\\theta}}} \\cdot {{\\frac{\\sin\\theta}{1+\\cos\\theta}}}", reason: "$1-\\cos^{2}\\theta=\\sin^{2}\\theta$", anim: transform, frame: true }
+    result: { math: "{{\\longrightarrow\\ 1}} \\cdot {{\\frac{0}{1+1}}} = {{0}}", reason: "the limit, then continuity", anim: transform }
 
   # 14 ----------------------------------------- divider: Stage 3 opener
   - id: divider_derivatives
@@ -486,6 +528,10 @@ scenes:
     accent: theorem
     ref: md:derivative_of_sine
     covers: [def, reduced, limits, qed]
+    # 規則 2：proof.1 從 proof.0 變形（差商改寫成乘積，先框住定義列）、proof.2 從 proof.1 變形——
+    # 兩個因子原位各自走到自己的極限（{{}} 同名段對位）。規則 3：qed「just cos x」閃 statement。
+    focus:
+      - { at: qed, dim: [], indicate: [statement] }
     scaffold: { motive: "Cash in continuity and the limit — sine's derivative falls out." }
     source: "chapter3-print-standalone.html SS3.1 . Theorem 3.1 + Proof"
     title: "The Derivative of Sine"
@@ -503,9 +549,9 @@ scenes:
       times one, just $\cos x$.
     statement: "$\\frac{d}{dx}\\sin x = \\cos x$"
     proof:
-      - "$\\frac{d}{dx}\\sin x=\\lim_{h\\to 0}\\frac{\\sin(x+h)-\\sin x}{h}$"
-      - "$=\\lim_{h\\to 0}\\cos\\!\\left(x+\\frac h2\\right)\\frac{\\sin(h/2)}{h/2}$"
-      - "$\\cos\\!\\left(x+\\frac h2\\right)\\to\\cos x,\\quad \\frac{\\sin(h/2)}{h/2}\\to 1$"
+      - "$ {{\\frac{d}{dx}\\sin x}} = {{\\lim_{h\\to 0}\\frac{\\sin(x+h)-\\sin x}{h}}} $"
+      - { tex: "$ = {{\\lim_{h\\to 0}}} {{\\cos\\!\\left(x+\\frac h2\\right)}} {{\\frac{\\sin(h/2)}{h/2}}} $", anim: transform, frame: true }
+      - { tex: "$ {{\\cos\\!\\left(x+\\frac h2\\right)}} \\to {{\\cos x}} ,\\quad {{\\frac{\\sin(h/2)}{h/2}}} \\to {{1}} $", anim: transform }
     qed: "$\\Rightarrow\\ \\cos x\\cdot 1=\\cos x$"
 
   # 16 ------------- Theorem 3.2 + Proof: companion identity -> divided -> limit -> -sin x
@@ -516,6 +562,9 @@ scenes:
     accent: theorem
     ref: md:derivative_of_cosine
     covers: [companion_identity, divide, limits, qed]
+    # 同 16：proof.1 從 proof.0 變形（套 A=x+h, B=x 再除以 h）、proof.2 從 proof.1 變形；qed 閃 statement。
+    focus:
+      - { at: qed, dim: [], indicate: [statement] }
     scaffold: { motive: "Same machinery, companion identity — now cosine." }
     source: "chapter3-print-standalone.html SS3.1 . Theorem 3.2 + Proof"
     title: "The Derivative of Cosine"
@@ -532,9 +581,9 @@ scenes:
       two tools, one extra minus sign.
     statement: "$\\frac{d}{dx}\\cos x = -\\sin x$"
     proof:
-      - "$\\cos A-\\cos B=-2\\sin\\frac{A+B}{2}\\,\\sin\\frac{A-B}{2}$"
-      - "$\\frac{\\cos(x+h)-\\cos x}{h}=-\\sin\\!\\left(x+\\frac h2\\right)\\frac{\\sin(h/2)}{h/2}$"
-      - "$-\\sin\\!\\left(x+\\frac h2\\right)\\to-\\sin x,\\quad \\frac{\\sin(h/2)}{h/2}\\to 1$"
+      - "$ {{\\cos A-\\cos B}} = {{-2\\sin\\frac{A+B}{2}\\,\\sin\\frac{A-B}{2}}} $"
+      - { tex: "$ {{\\frac{\\cos(x+h)-\\cos x}{h}}} = {{-\\sin\\!\\left(x+\\frac h2\\right)}} {{\\frac{\\sin(h/2)}{h/2}}} $", anim: transform, frame: true }
+      - { tex: "$ {{-\\sin\\!\\left(x+\\frac h2\\right)}} \\to {{-\\sin x}} ,\\quad {{\\frac{\\sin(h/2)}{h/2}}} \\to {{1}} $", anim: transform }
     qed: "$\\Rightarrow\\ -\\sin x\\cdot 1=-\\sin x$"
 
   # 17 ----------------------------- Figure 3.3: slope of sine = height of cosine (HOOK)
@@ -543,6 +592,10 @@ scenes:
     template: graph
     mode: single
     hook: "animations.ch03_trig_derivatives_hooks:slope_equals_height"
+    # 規則 3：cos_dots 那拍「read its heights at those same points… They match exactly」——
+    # 閃三條切線，讓觀眾把三個高度和三條切線的斜率對上。
+    focus:
+      - { at: cos_dots, dim: [], indicate: [tan_0, tan_halfpi, tan_pi] }
     source: "chapter3-print-standalone.html SS3.1 . Figure 3.3 (sin-cos-slope)"
     title: "Slope Equals Height"
     say: |
@@ -563,7 +616,7 @@ scenes:
       x_length: 7.2
       y_length: 4.0
     plots:
-      # 色軸（規則 5）：amber＝sine、blue＝cosine（與場 24 的 s'=\\cos t 同色）、green＝斜率。
+      # 色軸（規則 5）：amber＝sine、blue＝cosine（與場 24 的 s'=\cos t 同色）、green＝斜率。
       # cos 原為 muted 灰虛線，但讀數點與讀數標籤卻是 amber——同一個橘同時代表 sin 曲線與 cos 的值
       # （2026-09-13 視覺稽核）。cos 升為 secondary 後，hook 的讀數點／標籤跟著同色。
       # label_point 1.4→0.95：原位置壓在自己的曲線頂與 m=0 切線上（量測：曲線 3105 點落在標籤框內）。
@@ -578,6 +631,9 @@ scenes:
     hook: "animations.ch03_trig_derivatives_hooks:derivative_cycle"   # Task 14 #3: linear chain -> 4-node ring diagram (replaces math.0)
     scene_role: remark              # Remark 3.1 -> [ remark ] (was mislabelled [ proposition ])
     paced: [math.1]                  # 14.0 s beat, one line: written as it is read
+    # 規則 3：math.1「Four derivatives and you are home」閃那個四節點的環。
+    focus:
+      - { at: math.1, dim: [], indicate: [math.0] }
     ref: md:derivative_cycle
     scaffold: { motive: "Step back: what pattern do these two derivatives make together?" }
     source: "chapter3-print-standalone.html SS3.1 . Remark 3.1 (derivative cycle)"
@@ -618,6 +674,9 @@ scenes:
     part: { current: 1, total: 2 }
     ref: md:all_six_trig_derivatives
     covers: [tan_quotient, tan_result, sec_setup, sec_result]     # step.0/1/2 + result
+    # 規則 2：step.1 從 step.0 變形（分子化簡，先框住）、result 從 step.2 變形；step.2 是新的商（新寫）。
+    # 規則 4：step.1（9.6 s）paced → morph 後 reason 鋪滿。
+    paced: [step.1]
     scaffold: { motive: "From $\\sin,\\cos$, the quotient rule gives the other four." }
     source: "chapter3-print-standalone.html SS3.1 . Example 3.2 (tan', sec')"
     title: "All Six Derivatives"
@@ -633,10 +692,10 @@ scenes:
       rule, with a constant on top, gives this.
       {show result} Clean it up, and secant's derivative is $\sec x\tan x$.
     steps:
-      - { math: "\\frac{d}{dx}\\tan x = \\frac{(\\cos x)(\\cos x)-(\\sin x)(-\\sin x)}{\\cos^{2} x}", reason: "quotient rule on $\\tfrac{\\sin x}{\\cos x}$ ($\\cos x\\neq 0$)" }
-      - { math: "= \\frac{\\cos^{2} x+\\sin^{2} x}{\\cos^{2} x} = \\frac{1}{\\cos^{2} x} = \\sec^{2} x", reason: "Pythagorean identity" }
-      - { math: "\\frac{d}{dx}\\sec x = \\frac{0\\cdot\\cos x-1\\cdot(-\\sin x)}{\\cos^{2} x}", reason: "quotient rule on $\\tfrac{1}{\\cos x}$" }
-    result: { math: "= \\frac{\\sin x}{\\cos^{2} x} = \\sec x\\tan x" }
+      - { math: "{{\\frac{d}{dx}\\tan x}} = {{\\frac{(\\cos x)(\\cos x)-(\\sin x)(-\\sin x)}{\\cos^{2} x}}}", reason: "quotient rule on $\\tfrac{\\sin x}{\\cos x}$ ($\\cos x\\neq 0$)" }
+      - { math: "= {{\\frac{\\cos^{2} x+\\sin^{2} x}{\\cos^{2} x}}} = {{\\frac{1}{\\cos^{2} x}}} = {{\\sec^{2} x}}", reason: "Pythagorean identity", anim: transform, frame: true }
+      - { math: "{{\\frac{d}{dx}\\sec x}} = {{\\frac{0\\cdot\\cos x-1\\cdot(-\\sin x)}{\\cos^{2} x}}}", reason: "quotient rule on $\\tfrac{1}{\\cos x}$" }
+    result: { math: "= {{\\frac{\\sin x}{\\cos^{2} x}}} = {{\\sec x\\tan x}}", anim: transform }
 
   # 20b ------------------- Example 3.2 (part 2/2): cot' and csc' -- the same move
   - id: all_six_cot_csc
@@ -646,6 +705,8 @@ scenes:
     part: { current: 2, total: 2 }
     ref: md:all_six_trig_derivatives
     covers: [cot_setup, cot_result, csc_setup, csc_result]     # step.0/1/2 + result
+    # 同 21。result（11.9 s）沒有 reason rail，paced 後仍會靜 ~10 s（< 12 s 閘；advisory 會報，接受）。
+    paced: [step.1, result]
     scaffold: { motive: "The same quotient rule finishes $\\cot x$ and $\\csc x$." }
     source: "chapter3-print-standalone.html SS3.1 . Example 3.2 (cot', csc')"
     title: "All Six Derivatives"
@@ -660,10 +721,10 @@ scenes:
       {show result} Cleaned up, that is $-\csc x\cot x$ -- and all six are done,
       every one built on $\sin'=\cos$ and $\cos'=-\sin$.
     steps:
-      - { math: "\\frac{d}{dx}\\cot x = \\frac{(-\\sin x)(\\sin x)-(\\cos x)(\\cos x)}{\\sin^{2} x}", reason: "quotient rule on $\\tfrac{\\cos x}{\\sin x}$ ($\\sin x\\neq 0$)" }
-      - { math: "= \\frac{-(\\sin^{2} x+\\cos^{2} x)}{\\sin^{2} x} = -\\frac{1}{\\sin^{2} x} = -\\csc^{2} x", reason: "Pythagorean identity" }
-      - { math: "\\frac{d}{dx}\\csc x = \\frac{0\\cdot\\sin x-1\\cdot\\cos x}{\\sin^{2} x}", reason: "quotient rule on $\\tfrac{1}{\\sin x}$" }
-    result: { math: "= -\\frac{\\cos x}{\\sin^{2} x} = -\\csc x\\cot x" }
+      - { math: "{{\\frac{d}{dx}\\cot x}} = {{\\frac{(-\\sin x)(\\sin x)-(\\cos x)(\\cos x)}{\\sin^{2} x}}}", reason: "quotient rule on $\\tfrac{\\cos x}{\\sin x}$ ($\\sin x\\neq 0$)" }
+      - { math: "= {{\\frac{-(\\sin^{2} x+\\cos^{2} x)}{\\sin^{2} x}}} = {{-\\frac{1}{\\sin^{2} x}}} = {{-\\csc^{2} x}}", reason: "Pythagorean identity", anim: transform, frame: true }
+      - { math: "{{\\frac{d}{dx}\\csc x}} = {{\\frac{0\\cdot\\sin x-1\\cdot\\cos x}{\\sin^{2} x}}}", reason: "quotient rule on $\\tfrac{1}{\\sin x}$" }
+    result: { math: "= {{-\\frac{\\cos x}{\\sin^{2} x}}} = {{-\\csc x\\cot x}}", anim: transform }
 
   # 21 ------------------------------- Example 3.3: simple harmonic motion (s'' = -s)
   - id: shm_compute
@@ -673,6 +734,11 @@ scenes:
     ref: md:shm_compute
     covers: [height, velocity, acceleration, shm]     # step.0/1/2 + result (all shown)
     paced: [result]                  # 15.5 s beat: s'' = -s, then its SHM annotation
+    # 規則 2：result 從 step.2 變形（−sin t 就地接上 = −s(t)，先框住）；規則 3：result 旁白「is just −s(t)」
+    # 閃 step.0；規則 1：24 帶走 result，三個 step 在場尾先淡出。
+    focus:
+      - { at: result, dim: [], indicate: [step.0] }
+    exit: [step.0, step.1, step.2]
     scaffold: { motive: "Put the new derivatives to work: a weight on a spring." }
     source: "chapter3-print-standalone.html SS3.1 . Example 3.3 (simple harmonic motion)"
     title: "A Weight on a Spring"
@@ -689,8 +755,8 @@ scenes:
     steps:
       - { math: "s(t) = \\sin t", reason: "height" }
       - { math: "s'(t) = \\cos t", reason: "velocity" }
-      - { math: "s''(t) = -\\sin t", reason: "acceleration" }
-    result: { math: "s''(t) = -\\sin t = -\\,s(t)", reason: "simple harmonic motion" }
+      - { math: "{{s''(t)}} = {{-\\sin t}}", reason: "acceleration" }
+    result: { math: "{{s''(t)}} = {{-\\sin t}} = {{-\\,s(t)}}", reason: "simple harmonic motion", anim: transform, frame: true }
 
   # 22 ------------------------- Figure 3.4: s/s'/s'' stacked over one time axis (HOOK)
   - id: shm_stacked_graphs
@@ -698,10 +764,16 @@ scenes:
     template: graph
     mode: single
     hook: "animations.ch03_trig_derivatives_hooks:shm_stacked_graphs"
+    # 規則 1：23 推出的 s''=−s 不重生，開場就在、第一句飛到右下角（右上角是標題「Height, Velocity,
+    # Acceleration」的地盤）；規則 3：mirror 那拍「hold the bottom graph against the top」把中間那條壓暗。
+    carry:
+      - { from: shm_compute, block: result, as: carried.shm, to: { corner: bottom_right, scale: 0.45 } }
+    focus:
+      - { at: mirror, dim: [g_v] }
     source: "chapter3-print-standalone.html SS3.1 . Figure 3.4 (shm-triple)"
     title: "Height, Velocity, Acceleration"
     say: |
-      Stack the three graphs over one time axis and the relationship jumps out.
+      {show carried.shm} Stack the three graphs over one time axis and the relationship jumps out.
       {show g_s} On top, the height $s=\sin t$.
       {show g_v} In the middle, the velocity $s'=\cos t$.
       {show g_a} On the bottom, the acceleration $s''=-\sin t$. Watch where the
