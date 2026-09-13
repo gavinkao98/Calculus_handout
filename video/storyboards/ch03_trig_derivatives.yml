@@ -294,8 +294,10 @@ scenes:
       straight out of it, which is what we do next.
     statement: "At every point $x_0$, both $\\sin x$ and $\\cos x$ are continuous."
     proof:
-      - "$0\\le|\\sin\\theta|\\le|\\theta|$ (chord $\\le$ arc)"
-      - "$|\\theta|\\to 0$, squeeze $\\Rightarrow\\ \\sin\\theta\\to 0$"
+      # 純 math 列（\text{} 放說明字）：混排 prose 路徑不吃 meta.color_map，θ 在同一幀裡白（列）赭（圖／qed）
+      # 被視覺閘判 V10 blocking（2026-09-13 鋪滿輪）。\text{} 走同一個 Plex Sans 文字字型，語域不變。
+      - "$0\\le|\\sin\\theta|\\le|\\theta| \\quad (\\text{chord} \\le \\text{arc})$"
+      - "$|\\theta|\\to 0,\\ \\text{squeeze}\\ \\Rightarrow\\ \\sin\\theta\\to 0$"
     qed: "$\\lim_{\\theta\\to 0}\\sin\\theta = 0$"
     # let the squeeze step sit before the payoff line arrives.
     pauses:
@@ -767,7 +769,7 @@ scenes:
     # 規則 1：23 推出的 s''=−s 不重生，開場就在、第一句飛到右下角（右上角是標題「Height, Velocity,
     # Acceleration」的地盤）；規則 3：mirror 那拍「hold the bottom graph against the top」把中間那條壓暗。
     carry:
-      - { from: shm_compute, block: result, as: carried.shm, to: { corner: bottom_right, scale: 0.45 } }
+      - { from: shm_compute, block: result, as: carried.shm, to: { corner: bottom_left, scale: 0.45 } }
     focus:
       - { at: mirror, dim: [g_v] }
     source: "chapter3-print-standalone.html SS3.1 . Figure 3.4 (shm-triple)"
