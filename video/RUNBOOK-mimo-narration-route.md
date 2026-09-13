@@ -152,8 +152,14 @@ DECK: <填，如 ch01_precise_limit>      SECTION: <填，如 §1.6>
   若報 stale/incomplete，不要硬跳過，先重跑該 storyboard 的 `tts.py` 或確認是不是選錯 `<deck>_mimo.yml`。
 - 若出現 `[sync] short/reveal-only beat warning`，通常是連續 `{show a} {show b}` 或短空 beat；
   優先把其中一個 reveal 合併到有旁白的 beat，或接受它作為 deliberate visual pause。
-- render 後 `[sync] render/audio lengths clean` 最好要出現；fatal mismatch 代表 narration 可能超過
-  video，先不要 compose/交片。
+- render 後 `[sync] render/audio lengths clean` **必須**出現——2026-09-13 起是硬閘：影片短於旁白、或
+  |video − expected| 超過 `SYNC_HARD_GATE_FRAMES`＝2 影格（fps 由 ffprobe 對成品實測），`make.py` 自己就
+  ERROR、compose 前 abort，不會有 warn 可以帶過（閘定義見 [`REVIEW_GATES.md`](REVIEW_GATES.md) §一 層 6）。
+- render 後跑 `python video/pipeline/rewatch_pack.py --deck <deck>`（要留底就加 `--out <dir>`；要跟
+  上一輪比就加 `--baseline <上一輪 pack dir>`）：`[still-gate] PASS` 才算該輪完成，exit 1＝有 content 場
+  0.05% 細門檻最長靜止超過 12 s（FAIL 行帶所在拍）、exit 2＝基線 fps／尺寸不同、拒絕 A/B。verdict 在
+  pack 的 `PRODUCTION.md`。**注意 `--scene` 子集打進既有 pack 目錄會整個覆寫 `INDEX.md`／`pack.json`，
+  子集一律另給 `--out`。**（[`REVIEW_GATES.md`](REVIEW_GATES.md) §六 6.3／6.4）
 - 驗收：在幾個 reveal beat 的時間點抽幀，確認 reveal 準時出現＋LaTeX 無亂碼（光看 exit code 不夠）。
 
 規則：
