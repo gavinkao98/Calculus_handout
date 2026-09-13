@@ -232,6 +232,9 @@ definition＝赭、theorem＝藍，影片卻是 definition＝藍、theorem＝琥
 `concept`，改用與其他五軸色相都拉開一截、且 §3.1 沒有 procedure／strategy 場而完全空著的
 `strategy` 紫。
 
+推導的結論列與 theorem 的 proof 列若寫的是函數（cos θ、sin θ/θ、1），用函數色與 graph 對位；
+步驟列可保留來源色（07 的三塊面積）。
+
 ### Eyebrow 字卡 resolver（`scene_role`；2026-07-01）
 
 **兩條正交的軸。** eyebrow 字卡（`[ DEFINITION ]` 等）與顏色是**兩件事**：`accent` 決定**顏色**（`blocks.ACCENT_ROLE`），`scene_role` 決定**字卡**。字卡標的是「這格是什麼**教學 beat**」，不是「什麼數學物件」——對定理格兩者重合，但對開場／動機／直覺這類 exposition beat 兩者分岔，字卡不該硬套形式標籤。
