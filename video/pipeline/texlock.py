@@ -50,6 +50,12 @@ render holds the lock for 15-25 min, and a gate started in the same cwd DURING s
 render should wait it out rather than raise -- the every-10-s progress line is what keeps
 that wait from looking like a hang. It stays finite so a wedged holder that is somehow
 alive but stuck cannot block a cwd forever; pass `timeout=` to tighten it for a gate.
+
+**`TEXLOCK_TIMEOUT` (seconds) overrides that default for a whole process**, which is how
+you tighten the wait for something you cannot pass an argument to -- a child process. The
+selftest sets it on the subprocesses it spawns so one slow build cannot push the test past
+`run_selftests`'s 900 s per-test cap; it is equally the knob for "I know a render is going,
+do not make me wait half an hour for it to fail". An explicit `timeout=` still wins.
 """
 from __future__ import annotations
 
@@ -126,13 +132,31 @@ def _is_stale(path: Path, pid: int) -> bool:
     return age > STALE_SECONDS and not _pid_alive(pid)
 
 
+def default_timeout() -> float:
+    """`DEFAULT_TIMEOUT`, or `TEXLOCK_TIMEOUT` (seconds) when it is set to a positive number.
+
+    Read per call, not at import, so a caller can set it for a child process it is about
+    to spawn. A junk value is ignored rather than raised on -- a mistyped env var must not
+    take down a build."""
+    raw = os.environ.get("TEXLOCK_TIMEOUT")
+    if raw:
+        try:
+            seconds = float(raw)
+        except ValueError:
+            seconds = 0.0
+        if seconds > 0:
+            return seconds
+    return DEFAULT_TIMEOUT
+
+
 @contextlib.contextmanager
-def tex_lock(*, reason: str, timeout: float = DEFAULT_TIMEOUT):
+def tex_lock(*, reason: str, timeout: "float | None" = None):
     """Hold the per-cwd TeX build lock for the duration of the block.
 
     `reason` names the segment ("sizecheck", "make preflight", ...) and is what a
     waiting process prints, so whoever is watching knows what they are queued behind.
-    Raises `TimeoutError` after `timeout` seconds rather than waiting forever."""
+    Raises `TimeoutError` after `timeout` seconds rather than waiting forever;
+    `timeout=None` takes `default_timeout()` (which honours `TEXLOCK_TIMEOUT`)."""
     global _depth
     if _depth:
         _depth += 1
@@ -142,6 +166,8 @@ def tex_lock(*, reason: str, timeout: float = DEFAULT_TIMEOUT):
             _depth -= 1
         return
 
+    if timeout is None:
+        timeout = default_timeout()
     path = lock_path()
     path.parent.mkdir(parents=True, exist_ok=True)
     payload = f"{os.getpid()}\n{reason}\n{time.time()}\n".encode("utf-8")

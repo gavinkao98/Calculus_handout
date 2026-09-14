@@ -168,3 +168,20 @@ mock render 場 04、14、21、22 改前後幀（scratchpad/taskG），`visual-f
   r3 候選：① `make.py` render 的 Tex 實際落在 `<REPO>/video/output/_media/Tex`（per-worktree）而鎖是 per-cwd——同 worktree 不同 cwd 的兩支 render 仍共用目錄不互斥（實務未見）；
   ② 本機 venv launcher 的 `Popen.pid` ≠ 子行程 `os.getpid()`，任何拿 `Popen.pid` 比對的診斷都會被誤導（texlock 寫的是 `os.getpid()`，正確）；
   ③ MiKTeX 全域 fndb 競爭是 §8 ⑧ 未被 texlock 接管的那半（量測期間把 12 s 的 sizecheck 拉到 600 s），整合測試的 assert 訊息會分辨「鎖沒守住」與「機器層 flake」。
+- **§3.2 對 Task J 的校準回報（2026-09-14）：** `ch03_chain_rule` sizecheck 在 r1／r2 前後皆 0 error／32 warning 逐條相同，sibling 閘活過來後 **0 條**；該 deck 模板覆蓋面＝7 `definition_math`／5 `theorem_proof`／5 `derivation`／2 `graph`／1 `procedure_steps`／1 `callout`／1 `recap_cards`。連同 J 自己的 24 deck 零違規，sibling 閘的修復判定為零假陽性。§3.2 亦將 r1 的兩條派工紀律（scratchpad 子目錄、Python 驅動器）收進 `REVIEW_GATES.md` §六 6.8，並加一條：子代理卡住先看其 worktree 有無已完成未 commit 的成果。
+
+---
+
+## 7. 收案（2026-09-14）
+
+| Task | 子代理 commit | merge | 新測試 | 報表差異（finding 級，對 r1 收案） |
+|---|---|---|---|---|
+| I `[gate-coverage]` | `7c0533c` | `219184f` | +4（兩支既有檔） | schema：`procedure_steps` fixture 的 provenance warn（`_demo_capacity` 9／`_demo_tall_rows` 3／`ch01` 3）；`ch03_chain_rule` 4 ERROR 由 `310a273` 補 `ref:` 歸零 |
+| J `[sizecheck-siblings]` | `7764451` | `7627402` | +2 | sizecheck：`_demo_worked_example` 拆分（error 2→0，`_over` 新檔承接）；sibling 閘零新 finding |
+| G `[hung-clamp]` | `37bb709` | `a2a31a5` | +4（新檔） | sizecheck：`ch03_trig_derivatives{,_mimo}` 各少一條 `result spills` warn |
+| H `[tex-lock]` | `af0c85e`＋`2d2f907` | `89f68e9`＋`294a9b1` | +8＋1（新檔） | 無（鎖不改輸出） |
+
+- 回歸：main `16bed9a` 對 r1 收案 `1dd7008`，`run_selftests` 56→58 全綠（`_selftest_texlock` 64 s）；lint 24/24 逐字相同；正典 deck error 0；`doctor --smoke` 影片線 ✅。
+- 主對話裁決（不再重議）：`_SCOPED_TEMPLATES` 本輪不加 `definition_math`；texlock 鎖檔放 `<media_dir>/Tex.lock`、`DEFAULT_TIMEOUT` 1800 s＋`TEXLOCK_TIMEOUT` 覆寫；floorprobe marker 集合不改。
+- **更正**：Task H 首次回報「fndb 競爭把一輪拉到 608 s」為誤判，主因是 selftest 逐一 `communicate()` 的 pipe 互卡（`2d2f907` 修）；MiKTeX fndb 競爭仍存在但不是那兩輪的原因。
+- r3 從 §6 挑：`critic.py` 子集路徑、repo 內同型 `communicate()` 風險掃描、`parse_block` 非 dict 分流、`TEACHING_TEXT_FIELDS` 同步。
