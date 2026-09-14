@@ -561,8 +561,11 @@ rail 欄（`min_pitch=RAIL_GAP`，`x_bucket=round(RAIL_X)`），兩條獨立流�
 `schema._worked_example_issues`（上表的 error）＋`_seg_roles_issues`＋與 derivation 共用的 `_row_anim_issues`、
 `step_coverage._SCOPED_TEMPLATES`、`provenance._present_text_fields`（`strategy` 與 `notes.i.text` 是上畫面教學文字，
 走 `ref:`／`refs:`）。`pedagogy._MOTIVE_TEMPLATES` **不加**（`prompt` 就是 motive）。
-demo／回歸稿＝[`storyboards/_demo_worked_example.yml`](storyboards/_demo_worked_example.yml)（四場：完整形狀／無 rail／
-容量超量／分頁續頁），selftest＝`pipeline/_selftest_worked_example.py`。
+demo／回歸稿＝[`storyboards/_demo_worked_example.yml`](storyboards/_demo_worked_example.yml)（三場：完整形狀／無 rail／
+分頁續頁，乾淨、`make.py` 跑得完）＋[`storyboards/_demo_worked_example_over.yml`](storyboards/_demo_worked_example_over.yml)
+（容量超量壓測 fixture，刻意 error，要 `--skip-sizecheck`；2026-09-14 r2 Task J 拆自前者，
+理由見 [`KICKOFF-toolline-backlog-r2.md`](KICKOFF-toolline-backlog-r2.md) §2.J），
+selftest＝`pipeline/_selftest_worked_example.py`。
 
 ## 內容分量自適應 ＋ 多頁拆分（2026-06-21）
 

@@ -38,7 +38,12 @@ from pipeline.timing import STOCK_ANIM_SECONDS, stock_animation_seconds  # noqa:
 from pipeline.visuals import theme as T  # noqa: E402
 
 _META = {"id": "_we", "chapter": "Demo", "section": "0.0", "title": "T", "theme": "midnight"}
-_FIXTURE = Path(__file__).resolve().parent.parent / "storyboards" / "_demo_worked_example.yml"
+_STORYBOARDS = Path(__file__).resolve().parent.parent / "storyboards"
+_FIXTURE = _STORYBOARDS / "_demo_worked_example.yml"
+# capacity_over (the deliberately over-capacity fixture scene) lives in its own deck
+# since r2 Task J (2026-09-14): mixed into _demo_worked_example.yml it carried 2 SIZE
+# errors that forced every `make.py` run of that deck through --skip-sizecheck.
+_FIXTURE_OVER = _STORYBOARDS / "_demo_worked_example_over.yml"
 _EPS = 0.02
 
 
@@ -329,13 +334,16 @@ def _split_warn(sid: str, data) -> bool:
 def test_capacity_contract_on_the_demo_deck():
     """The two columns are audited independently and the answer band's room is counted
     ONCE (as the reserved bottom band, not also as a step row) -- the false positive that
-    would otherwise fire on every scene that has an answer."""
+    would otherwise fire on every scene that has an answer. `capacity_over` lives in its
+    own fixture deck (_FIXTURE_OVER, r2 Task J) so the clean demo deck has no reason to
+    ever need --skip-sizecheck."""
     import yaml
 
     data = yaml.safe_load(_FIXTURE.read_text(encoding="utf-8"))
     assert not _split_warn("companion_limit_example", data)
     assert not _split_warn("no_rail", data)
-    assert _split_warn("capacity_over", data)
+    data_over = yaml.safe_load(_FIXTURE_OVER.read_text(encoding="utf-8"))
+    assert _split_warn("capacity_over", data_over)
 
 
 def test_capacity_meta_declares_both_columns():

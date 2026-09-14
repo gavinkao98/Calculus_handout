@@ -76,8 +76,16 @@ def _block_prose_size(block_mob, text_scale: float):
     # shrunk line shrinks these too). A pure inline-math prose line (only MathTex,
     # e.g. a reason rail "$h(0)=h(2)=0$") has no comparable carrier -- skip it rather
     # than mismeasure it against text siblings.
-    carriers = [n for n in nodes
-                if isinstance(n, Text) or (isinstance(n, Tex) and not isinstance(n, MathTex))]
+    # `isinstance(n, Tex) and not isinstance(n, MathTex)` looks like "prose Tex,
+    # excluding pure math" but is dead code in this manim version: `Tex` SUBCLASSES
+    # `MathTex` (tex_mobject.py:607 -- the same order trap floorprobe._effective_px's
+    # docstring calls out), so every Tex instance also passes `isinstance(n, MathTex)`
+    # and the second clause is always False. Route A also ended manim `Text` output
+    # entirely (brand.py has no Text import), so `carriers` was permanently [] and this
+    # whole sibling gate a silent no-op. `isinstance(n, Tex)` alone is correct: a bare
+    # `MathTex(...)` (brand.math_line) is never also a `Tex` instance, so it is excluded
+    # without the redundant (and broken) second check.
+    carriers = [n for n in nodes if isinstance(n, Text) or isinstance(n, Tex)]
     if not carriers:
         return None
     # all prose lines in a block share a size; max is robust to a stray tag
