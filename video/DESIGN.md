@@ -397,6 +397,31 @@ gutter、`derivation` 的式子右緣、`callout` 的置中…），任何「第
   `difference_quotient_for_sine`（最短 leader 17.9→74.3 px、右緣餘裕 0→333 px，`result` 併行）、
   `companion_limit`（57.6→271.3 px、0→96 px，`step.0` 併行）、`example_chain_times_quotient`
   （右緣餘裕 0→253 px，無列併行——只是那條無 reason 的 10.39u 結論列不再頂住 rail）。
+  **2026-09-14（backlog ⑫，工具線 r2 Task G）：hung 列的底邊夾制＝`_clamp_hang()`。**
+  併回下一行的 reason 是**純粹多出來的高度**，而 `_common._biased_y` 對放不下的內容刻意
+  top-anchor（讓它溢出**下緣**、好讓容量閘看得見），兩者相乘的結果＝`difference_quotient_for_sine`
+  的 tag 落到下緣安全線以下 0.231u（≈31 px）、貼著右下角落 motif（sizecheck 的
+  `block 'result' spills past the safe margin`）。**但這不是容量問題**：該場的**等式全部放得下**
+  （不 hang 的話 4.668u < zone 4.830u），放不下的只有那一行小字，拆頁對它毫無意義。
+  所以 `build` 在 `place_body` 之後把鏈**往上推到底緣坐在安全線上**，推的量以
+  **`hang_extra`（hang 多吃掉的高度）為上限**——本來就太高的鏈只會被退還 hang 的那一份、
+  其餘溢出照舊，`sizecheck._capacity_issues` 的拆頁判定（predictive，看 `Σ列高+(n−1)·MIN_PITCH`）
+  因此完全不受影響。房間出自**標題間距**（`place_body` 在 masthead 下留的 `T.TITLE_GAP`；
+  有 `scaffold.motive` 的場就是 motive 那一行底下），且**保留 `HANG_GAP`**——模板自己最小的
+  可辨間隔——當地板，讓區塊邊界永遠不會被壓成 0（本場地板不咬：gap 0.415u、要 0.231u、
+  留 0.180u；它擋的是未來某條更高的 hung reason 拿「撞到上一行」換「不越下緣」，
+  那種鏈會保留（縮小後的）溢出，那正是它該被拆頁的誠實訊號）。
+  **選它而不選另外三個候選的理由：**
+  ① `HANG_GAP → 0` 最多只還 0.18u（不足 0.231u），且 reason 會貼死等式；
+  ② 「reason 回到等式同一行、不畫 leader」還得回全部高度，但那正是 2026-09-13 視覺稽核
+  在這一場開的原案（30 px 淨空「黏在算式尾巴」），且會破掉 Task E 剛立的
+  「留在 rail 上的列 leader ≥ `MIN_LEADER`」；
+  ③ 「塞進該列與下一列之間的既有 gap」對**最後一列**（正是本場的 `result`）無效，
+  而縮列間 gap 會低於 `MIN_PITCH`、破容量契約。
+  **不加字級、不動 `_SCALE_PX`／`_ROW_GAP`／`MIN_PITCH`／`HANG_GAP`／`RIGHT_SLACK`。**
+  代價寫明：本場 title gap 56 px → 25 px（0.4148u → 0.184u），換掉 31 px 的下緣越界。
+  實測影響面：33 個 derivation 場只有 `difference_quotient_for_sine`（在兩個 deck 各一份）
+  會 hang，其餘 31 場逐 mobject 座標零位移。守門＝`pipeline/_selftest_derivation_hung.py`。
 - `procedure_steps`：result 欄左對齊 `RAIL_X`（原右對齊 far gutter、Codex 兩輪嫌 detached）。
 - `recap_cards`：**不用 rail**——改為單一全幅編號點欄（`points[]` 以 `01/02/03` ＋ 全寬 prose
   左堆疊、`center_in_zone` 上偏置中）；舊「公式卡 snap `RAIL_X`」雙欄版已退場。
