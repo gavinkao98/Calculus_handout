@@ -183,6 +183,60 @@ def test_sparse_ok_still_acks():
     assert S._sparse_issues(scene, blocks) == []
 
 
+def test_sibling_prose_size_mismatch_is_caught():
+    """r2 Task J: `carriers`'s `isinstance(n, Tex) and not isinstance(n, MathTex)` clause
+    is dead in this manim version -- `Tex` SUBCLASSES `MathTex` (tex_mobject.py:607, the
+    same order trap floorprobe._effective_px's docstring documents), so that clause is
+    always False; Route A also ended manim `Text` output entirely (brand.py never imports
+    it), so `carriers` was permanently [] and the sibling gate a silent no-op since Route A
+    landed. Proves it fires again: two point.* siblings, one a Route-A body_text Tex
+    scaled down well past TOLERANCE (the 'shrunk not wrapped' anti-pattern this gate
+    exists to catch), must trip the 'different sizes' error."""
+    from pipeline.blocks import Block
+    import pipeline.templates as templates_mod
+
+    from manim import DOWN
+
+    def carrier(px, shift=0.0):
+        node = Tex("hello")
+        node.font_size = px * T.PX_TO_FS * T.TEXT_SCALE
+        node._brand_prose = True
+        if shift:
+            node.shift(shift * DOWN)
+        return node
+
+    blocks = [Block(id="point.0", mobject=carrier(38.0)),
+              Block(id="point.1", mobject=carrier(20.0, shift=1.0))]   # ratio 1.9x >> TOLERANCE 1.06x
+
+    orig = templates_mod.build_blocks
+    templates_mod.build_blocks = lambda scene, ctx: blocks
+    try:
+        meta = {"id": "demo", "chapter": "0", "section": "0.0", "title": "T", "sections": []}
+        issues = S.check_scenes(meta, [{"id": "sib", "kind": "content"}])
+    finally:
+        templates_mod.build_blocks = orig
+
+    errs = [m for sev, m in issues if sev == "error" and "different sizes" in m]
+    assert len(errs) == 1 and "'point' siblings" in errs[0], issues
+
+
+def test_pure_mathtex_sibling_is_not_a_carrier():
+    """A prose line that is nothing but inline math (brand.math_line, e.g. a reason rail
+    "$h(0)=h(2)=0$") is tagged _brand_prose like every other prose output but renders as
+    a bare MathTex, not a Tex -- _norm_size's TEX_TEXT_SCALE relation does not apply to it
+    (brand._compose x-height-matches it separately, per _block_prose_size's own docstring),
+    so it must stay excluded from `carriers` even after the isinstance fix: two such nodes
+    at wildly different font_size must not manufacture a sibling finding."""
+    node_a = MathTex("x")
+    node_a.font_size = 40.0 * T.PX_TO_FS
+    node_a._brand_prose = True
+    node_b = MathTex("y")
+    node_b.font_size = 20.0 * T.PX_TO_FS
+    node_b._brand_prose = True
+    assert S._block_prose_size(node_a, T.TEXT_SCALE) is None
+    assert S._block_prose_size(node_b, T.TEXT_SCALE) is None
+
+
 if __name__ == "__main__":
     test_effective_px_recovers_authored_size()
     test_floor_findings_flags_below()
@@ -202,4 +256,6 @@ if __name__ == "__main__":
     test_sparse_single_block_warns()
     test_sparse_silent_when_graph_block_fills_zone()
     test_sparse_ok_still_acks()
+    test_sibling_prose_size_mismatch_is_caught()
+    test_pure_mathtex_sibling_is_not_a_carrier()
     print("OK sizecheck self-test")
