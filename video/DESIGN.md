@@ -383,6 +383,20 @@ gutter、`derivation` 的式子右緣、`callout` 的置中…），任何「第
   （視覺稽核在 `difference_quotient_for_sine` 與 `companion_limit` 各開一條）。現在 rail 會
   **場級右移**到最寬那列還放得下 `MIN_LEADER = 0.55u` 為止，上限是「最寬 reason 自己的寬度」
   ——欄位永遠不會被擠到要縮字（tag 已是畫面最小字級）。其餘場位移 0.000u，逐列輸出不變。
+  **2026-09-14（backlog ④⑬，工具線 Task E）：`MIN_LEADER` 咬住時的 fallback＝「reason 併回
+  等式下一行」。** 原因是兩股壓力方向相反、不可互相交換：rail **右移**才能加長 leader（④），
+  rail **左移**才能還給 reason 右緣容錯（⑬）。所以另外兩個候選都無解——「rail 整體右移」正是被
+  右緣上限擋住的那件事；「點改線」只換樣式、一寸空間也生不出來，對⑬毫無作用。唯一能同時解掉
+  兩者的做法是**把某一列從這場競爭裡移出去**：`_rail_plan()` 讓「等式＋reason 自身寬度」最大的
+  那一列把 reason 放到**自己等式的下一行**（無 leader、左緣仍對齊 rail，寬到放不下才往左讓），
+  該列**同時不再參與 rail 的 x 計算**——後者才是這個 fallback 有效的關鍵（否則那列的等式照樣
+  把 rail 往右頂）。**沒有 reason 的列同理不再頂住 rail**（它本來就不需要 leader）。
+  rail 因此恆滿足：留在 rail 上的每一列 leader ≥ `MIN_LEADER`，且最寬 reason 距 `SPINE_X +
+  CONTENT_W` ≥ `RIGHT_SLACK = 0.15u`（≈20 px）。**不新增第四階字級、不動 `_SCALE_PX`。**
+  實測影響面（30 個 derivation 場中的 5 個 instance，其餘 25 個 rail x 位移 0.000u）：
+  `difference_quotient_for_sine`（最短 leader 17.9→74.3 px、右緣餘裕 0→333 px，`result` 併行）、
+  `companion_limit`（57.6→271.3 px、0→96 px，`step.0` 併行）、`example_chain_times_quotient`
+  （右緣餘裕 0→253 px，無列併行——只是那條無 reason 的 10.39u 結論列不再頂住 rail）。
 - `procedure_steps`：result 欄左對齊 `RAIL_X`（原右對齊 far gutter、Codex 兩輪嫌 detached）。
 - `recap_cards`：**不用 rail**——改為單一全幅編號點欄（`points[]` 以 `01/02/03` ＋ 全寬 prose
   左堆疊、`center_in_zone` 上偏置中）；舊「公式卡 snap `RAIL_X`」雙欄版已退場。
@@ -1335,10 +1349,21 @@ attribute 把 `spec`／`meta`／`beat_durations` 交進去，`LessonScene.floorp
 
 | 角色 | 函式 | 字體 | LaTeX |
 |---|---|---|---|
-| 標題 | `brand.heading` / `brand.heading_rich` | Instrument Sans Bold | `\textbf{…}` |
+| 標題 | `brand.heading` / `brand.heading_rich` | Instrument Sans Bold | `\textbf{…}`（詞間距見下註） |
 | 內文 prose | `brand.body_text` / `brand.prose` | Instrument Sans | text-mode（含 `$math$`） |
 | eyebrow / label | `brand.eyebrow` | Plex Mono | `\texttt{…}` |
 | 數學 | `brand.math_line` / `MathTex` | Latin Modern | math-mode |
+
+> **Bold 詞間距（2026-09-14，backlog ③）：** vendored 的 Instrument Sans **Bold 自帶的
+> interword space 比 Regular 還窄**（`\fontdimen2` 1.90 pt vs 1.99998 pt @10 pt），而它的
+> 字身反而**寬 5.04 %**（小寫字母表 142.740 pt vs 135.890 pt），於是 bold 標題比周圍的
+> regular 文字緊約 9.6 %，詞與詞黏在一起（T1 換字後唯一新增的可見缺點，三場幀稽核點名）。
+> preamble 用 `\AtBeginDocument{…\bfseries\fontdimen2\font=0.2101em…}` 把它按字身成長的
+> 同一比例放大回去（1.99998 × 142.740/135.890 = 2.1008 pt）；`\fontdimen` 在 TeX 是**全域
+> 指派**，所以設一次就涵蓋整份文件的 `\textbf`。`\fontdimen3/4`（伸縮）刻意不動——manim 的
+> `standalone`／`preview` 盒子每行都以自然寬排版，詞間膠水永遠不伸縮。守門＝
+> `_selftest_derivation_rail.test_bold_interword_space_matches_regular_density`（兩字重的
+> 「詞距 ÷ 自身字母表寬」須一致）與 `_selftest_text_metrics` 的 bold 估寬帶。
 
 `Tex` 在 text mode 原生排「文字＋內聯 `$math$` 同行」、baseline 正確、kerned，所以**舊的 Pango↔Tex 拼接機制已全部移除**：`theme.TEX_TEXT_SCALE`（Pango↔Tex 尺寸對齊，今 = 1.0 no-op）、`brand._pango_dashes`、`brand._compose`／`_prose_mixed`（手動 baseline 拼接）。換行寬度估計 `_WIDTH_K`／`estimate_text_width` 與 kerning 無關，保留並在每次換字時重校（2026-09-13：Instrument Sans）。
 

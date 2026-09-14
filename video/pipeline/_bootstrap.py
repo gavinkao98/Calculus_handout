@@ -87,6 +87,18 @@ def apply_tex_template() -> None:
         # these three are not, so on-screen math using them failed to compile.
         r"\DeclareMathOperator{\arccsc}{arccsc}" "\n"
         r"\DeclareMathOperator{\arcsec}{arcsec}" "\n"
-        r"\DeclareMathOperator{\arccot}{arccot}"
+        r"\DeclareMathOperator{\arccot}{arccot}" "\n"
+        # Bold word spacing (shared-layer backlog 3 -- the one visible defect the 2026-09-13
+        # font swap left, named by three frame audits). The vendored Instrument Sans ships
+        # a NARROWER interword space in Bold than in Regular (\fontdimen2 = 1.90 pt vs
+        # 1.99998 pt at 10 pt) while its glyphs are WIDER (lowercase alphabet 142.740 pt vs
+        # 135.890 pt, +5.04 %), so bold titles set ~9.6 % tighter than the regular text
+        # around them and the words read as clumped. Restore parity by growing the space by
+        # exactly the amount the letters grew: 1.99998 * (142.740 / 135.890) = 2.1008 pt,
+        # i.e. 0.2101 em. \fontdimen assignments are GLOBAL in TeX, so one pass over the
+        # bold font at \begin{document} covers every \textbf in the run. Stretch/shrink
+        # (\fontdimen 3/4) are deliberately left alone: manim sets each line at its natural
+        # width inside a standalone/preview box, so interword glue never stretches.
+        r"\AtBeginDocument{\begingroup\bfseries\fontdimen2\font=0.2101em\relax\endgroup}"
     )
     config.tex_template = tpl

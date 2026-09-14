@@ -45,6 +45,15 @@ _PROSE_CASES = (
 )
 WIDTH_FLOOR = 0.94             # estimate >= 94% of measured on every prose case
 
+# Bold is the OTHER series this preamble renders (\textbf -- headings), and 2026-09-14
+# widened its interword space to match regular's visual density (shared-layer backlog 3,
+# see _bootstrap.apply_tex_template). Bold advances run ~5% above regular, and _WIDTH_K is
+# calibrated on regular -- nothing in the pipeline wraps bold (heading/heading_rich clamp on
+# the MEASURED width), so the guard here is the representative-case band, not the strict
+# calibration-sentence bound. It exists so a later change to the bold face cannot quietly
+# push the estimate further below the advance than the estimator's own spread.
+_BOLD_CASE = r"\textbf{" + _CALIBRATION.replace(" ", r"\ ") + "}"
+
 
 def test_cap_height_anchor():
     """_text_fs(px) must render cap height at the Times anchor (-> fixes TEXT_SCALE)."""
@@ -85,6 +94,17 @@ def test_estimate_width_not_systematically_short():
         f"brand._WIDTH_K under-estimates by more than {(1 - WIDTH_FLOOR) * 100:.0f}% -- "
         "wrapped lines will overflow:\n  " + "\n  ".join(bad)
     )
+
+
+def test_estimate_width_not_systematically_short_on_bold():
+    """The bold series stays inside the same band (-> the \\fontdimen2 retune did not push
+    bold out of the width the estimator assumes)."""
+    measured = Tex(_BOLD_CASE, font_size=FS).width
+    ratio = brand.estimate_text_width(_CALIBRATION, FS) / measured
+    assert ratio >= WIDTH_FLOOR, (
+        f"estimate is {(1 - ratio) * 100:.1f}% below the BOLD advance of the calibration "
+        f"sentence (floor {WIDTH_FLOOR}); bold got wider -- re-check "
+        "_bootstrap.apply_tex_template's \\fontdimen2 setting")
 
 
 def test_preamble_names_the_text_family():
