@@ -283,6 +283,9 @@ mock render `ch03_trig_derivatives` 場 04、21、22 與一場 bold 標題長的
 16. **`_selftest_text_metrics` 對短、大寫多的字串（"The squeeze theorem"）est/真寬只有 0.9145**，regular 亦然，是估寬器的統計性質、不是字體問題；記一筆免重查。
 17. **`_WIDTH_K` 對 bold 未重校**（bold per-char 0.005312 vs regular 0.005109，差 4%）：`estimate_text_width` 全部 call site 都是 regular，bold 只走 `heading*` 且用實量寬 clamp；改由 selftest 的 bold fixture 守 ≥94% 帶（實測最差 0.9744）。若日後 bold 走估寬器，再回來校。
 
+**§3.2 session 的 r1 下游回歸（2026-09-14，merge 後）：** `ch03_chain_rule` schema／lint 相同、sizecheck 0 error／32 warn 逐條相同、三場定點 render（`proof_delicate_choices`／`two_forms_equivalent`／`example_chain_times_quotient`）`[sync]` clean；`[floorprobe]` 無輸出、`nothing to walk` 未觸發（§3.2 的 `paced:` 要等 B1 才鋪）。整片 `[sync]` 等真音檔。它也提出：上游 merge 時附「影響清單」讓下游只重驗會作廢的閘，比整片重跑省——由 §3.2 session 回寫 `REVIEW_GATES.md` §六當範例。
+18. **⭐ `sizecheck` 的 TeX 建置段加 per-cwd 檔案鎖**（§3.2 session 實測）：`make.py` 內含自己的 sizecheck preflight，背景跑 `sizecheck.py` 同時跑 `make.py` 照樣撞出假的 `SIZE: could not build scene`（.dvi 讀不到）；「別同時跑兩支」的文件叮嚀擋不住看不見的那一支。解＝`media/Tex/.lock` 之類的 per-cwd 鎖讓第二支等待而非吐假 error。r2 候選，優先度高（多 session 並行階段每天會撞）。
+
 **兩條共識更正（已採信，寫進對應文件）：**
 - `sizecheck`／`schema` 的 TeX cache 競態是 **per-cwd**（`config.media_dir = ./media`，各 worktree 各有 `media/Tex`），跨 worktree
   並行零撞車；MiKTeX fndb 鎖才是全域偶發。→ [`KICKOFF-shared-layer-v1.md`](KICKOFF-shared-layer-v1.md) §8 ⑧ 已補註；
