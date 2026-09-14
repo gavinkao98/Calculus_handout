@@ -296,3 +296,22 @@ mock render `ch03_trig_derivatives` 場 04、21、22 與一場 bold 標題長的
 **依賴（merge 時要做）：** §3.2 已跑過一次 1080p mock 音檔 render 當 `[sync]` 基線（909.9 s，舊 timing 常數）。r1 的 Task F
 （`STOCK_ANIM_SECONDS` 對齊實際 run_time）與 Task A（paced 無 rail）merge 後該基線作廢——**merge 完通知 §3.2 session 重跑**
 （只重 render、不重合成）。§3.2 基準線（2026-09-14）：28 場（content 23）、mock 音檔 828 s、成片 909.9 s、28 場全 narration under video；STOCK 對齊若讓畫面變短，最先撐不住的是最長三場 `proof_delicate_choices` 50.0 s／`two_forms_equivalent` 49.2 s／`proof_setup_substitution` 47.6 s。§3.2 會等真合成完再重跑 `[sync]`，不只對 mock 驗。
+
+---
+
+## 7. 收案（2026-09-14）
+
+| Task | 子代理 commit | merge | 新測試 | 報表差異（finding 級） |
+|---|---|---|---|---|
+| D `[rewatch-subset]` | `104616a` | `bef07a8` | +4（15→19） | 無 |
+| B `[floorprobe]` | `aa010bb` | `efead05` | +8（新檔） | 無 |
+| C `[critic-fullest]` | `53a0a72` | `a717275` | +3（新檔） | 無 |
+| F `[hygiene]` | `cbcb953` | `cc3d7fc` | +2（新檔）＋1 改 | sizecheck 8 deck 加 `(band promotion)` 尾碼 |
+| A `[paced-norail]` | `50ef15f` | `f1412d1` | +10（新檔） | schema `ch03_trig_derivatives{,_mimo}` 各 +1 warn |
+| E `[sans-width]` | `bb2f1e5` | `d437d97` | +9（新檔）＋1 | sizecheck `_demo_capacity` 67→68%、`ch03_trig_derivatives{,_mimo}` 各 +1 warn |
+
+- 回歸：main `1dd7008` 對起點 `266d0ee`，`run_selftests` 51→56 全綠；lint 23/23 逐字相同；sizecheck error 30→30；上表差異與六份回報逐條對上。
+- `doctor --smoke` 影片線 ✅（pdftotext 非 poppler 版的 FAIL 為既存）。
+- §3.2 下游回歸零影響（§6）。
+- 主對話裁決（不再重議）：`[stillness]` 對 `paced:` 的免檢不改；`_WIDTH_K` 不為 bold 重校；`floorprobe` 無 enforce 旗標。
+- r2 從 §6 的 ⭐ 兩項起：hung 列底邊夾制（§3.1 4K final 前）、sizecheck per-cwd TeX 鎖。
