@@ -86,7 +86,7 @@
   **語意色用「來源軸」而非函數軸：** 列 1–2（`sin'=cos`／`cos'=-sin`）用 `result`（藍，＝場 16／17 兩個定理本身的 accent），列 3–6 用 `practice`（綠，＝場 22 自己的 accent）。理由：旁白畫的線是**來源**（`every one built on sin'=cos and cos'=-sin`）不是 sin-vs-cos，且列 1、2 各自同時含 sin 與 cos，函數軸配色會有歧義。兩色都是講義 `calcbook` 的 `aResult`／`aPractice` 色相，未發明新色。26 的 banner 另把警示框畫在那兩條藍列上——旁白的 fine print 正是「這兩條只在弧度制下成立」，忠實。
   **驗收：** `schema` OK、`lint` 0 error、`sizecheck` **0 error**／20 warn、`run_selftests` **51 綠**、`derive --check` parity OK、`make.py --reuse-audio` 兩道 `[sync]` clean＋`[stillness] no undeclared still > 6s`。**零 TTS**（`--reuse-audio` 能過本身即 `text_hash` 未變的證明）。新增的 2 條 sizecheck warn（`step.1`／`step.2` vs `all_six` overlap 26%／25%）是**build 佈局**的量測，執行期推導鏈會縮小、rail 會退場——我抽終幀確認無碰撞，與 `exit:` 既有的「閘讀 pre-exit 幀」caveat 同類。
   **P4（各 point 配里程碑縮圖）未做**：要跨 20 個場重建圖形、無 `carry:` 可用，成本不成比例；bottom band 已由 banner 填滿，評審「查 sec′ 要倒回 14:03」的訴求已由本輪滿足。
-  **⚠ 尚未進成片：** 本輪的修正**還沒有 render**，現行 §3.1 成片（共用層 v1 版）不含它們。下一次 §3.1 render（4K final 或任何 1080p 重跑）才會帶進去。
+  **⚠ 尚未進成片，且刻意不為它單獨 render（2026-09-14 使用者裁決）：** 本輪的修正**還沒有 render**，現行 §3.1 成片（共用層 v1 版）不含它們——場 22 仍是 11.0 s 靜止、場 26 仍是 10.5 s。**裁決＝併進 4K final 那一次 render**（§6.1「一輪一 render」；4K final 本來就是下一次 §3.1 render，兩者都是 `--reuse-audio`、零計費）。**做 4K final 的 session 請注意：** 那一次 render 之後要重量這兩場的 fine 最長靜止（目標 22 ≤ 5 s、26 ≤ 5 s；本輪在 worktree 內量到 4.75／4.00 s），並確認新增的 2 條 sizecheck warn 在終幀仍無碰撞。
   **轉給工具線的共用層發現（本輪查到的根因）：** 場 22 那 11.0 s 靜止的本體是——`result` 在該場 `paced:` 清單內，`derivation._transform_anim` 因此走「morph 後把剩下整拍用掉」的 rail 路徑，但 `result` 沒有 reason rail，`_rail()` 回傳的是 equation 的 glow wrapper，於是它 morph 完再淡入一次等式、然後把整整 11.26 s 走完。**這是 `pipeline/templates/derivation.py` 的共用層行為，可能在別的 deck 也有**；本輪只在 hook 內借一段縮短的 `beat_seconds` 繞開，stock 一行未改。
 
 ## 每節成本量測（2026-07-07 起；量三節後檢視模板紅利，再定 per-scene 客製 hook 上限）
