@@ -289,7 +289,11 @@ gate-2 判它是 blocking，且給的修法（修根因、把指數搬進 LaTeX�
 > 兩支照舊互撞）。同 cwd 的第二支現在會每 10 s 印一次
 > `[texlock] waiting for pid N (<reason>) ... Ns` **等待**，不再吐假的 `SIZE … could not build scene`（`.dvi` 讀不到）。
 > ⇒ **看到那行是正常等待、不是 hang**；等待上限 **30 分鐘**（足以等完一次全片 render），
-> 要縮短用環境變數 `TEXLOCK_TIMEOUT`（秒；工具線 r2 追加，預設值不動）。
+> 要縮短用環境變數 `TEXLOCK_TIMEOUT`（秒）。
+> ⚠️ **`TEXLOCK_TIMEOUT` 是工具線 r2 的追加修正，2026-09-14 回寫本節時尚未落地**
+> （`grep -rn TEXLOCK_TIMEOUT video/` 零命中）；預設 1800 s 不會變。**落地前只有等待、沒有覆寫出口**，
+> 且 `_selftest_texlock` 在機器上有別的 worktree 在編 Tex 時可能撞到 `run_selftests` 的 900 s 上限
+> ——**只有那一支紅、其餘全綠時不是本節的問題**。
 > 依據：**文件叮嚀擋不住看不見的那一支**——主對話親自撞出三個假 error，因為使用者看不到 `make.py` 裡面也有一支 preflight。
 
 > **`| tail -N` 為什麼寫成硬規則（2026-09-14 一天內兩次誤讀）：** `sizecheck.py` 先印

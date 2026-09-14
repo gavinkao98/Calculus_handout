@@ -166,7 +166,7 @@
 | 1b | ↳ 該保留的 | `remainder_form_definition`＝真的 `def:3.1`，赭色正確 | `chapter3.tex:246` |
 | 1c | ↳ ⚠️ **缺的：`caution_inner_derivative` 目前 `accent` 未設**（落中性 slate），但它對位 `envcaution` | 應為 `accent: caution`（紅） | `chapter3.tex:342`；`accent`→role 對照見 `KICKOFF-s31-amplify.md` §2 |
 | 1d | ↳ ⚠️ **3 個 divider 仍帶 `accent: definition`** | §3.1 已在 ⑰ 拿掉四個 divider 的 `accent: definition`（幕級家具無可對位的講義環境） | `REBUILD_STATUS.md` ⑰ |
-| 2 | `scaffold.*` 揭示時序 | 13 筆 `scaffold`，**全部是 `motive`**（11 個 content 場）；⑬ 已讓 `scaffold.*` 吃 `{show}` 時序，零成本生效 | `REBUILD_STATUS.md` ⑬ |
+| 2 | `scaffold.*` 揭示時序 | 13 筆 `scaffold`；⑬ 已讓 `scaffold.*` 吃 `{show}` 時序，零成本生效。⚠️ **勘誤（2026-09-14 重量）：組成是 10 個 content 場 `motive` ＋ 3 個 divider `problem`**，不是「全部是 `motive`（11 個 content 場）」——原文與下方 2a 列自相矛盾（11+3=14 兜不攏總數 13） | `REBUILD_STATUS.md` ⑬ |
 | 2a | ↳ ⚠️ **divider `scaffold.problem` 已經有了**（三個 divider 全有） | `divider_rule`／`divider_why`／`divider_use` 各帶一條 problem 式 | 與開工指示不同：這項**不用做** |
 | 3 | `carry:`／`exit:` 跨場延續 | 0 次 | ⑮ T4 落地；`DESIGN.md`「motion primitive」節 |
 | 4 | `focus:` 聚焦 | 0 次 | 原語 4；`pipeline/focus.py` |
@@ -185,6 +185,9 @@ python video/pipeline/lint.py      video/storyboards/ch03_chain_rule.yml
   → 5 WARN：3 條 display-style math 在 INLINE register（example_chain_times_quotient.prompt／
      example_leibniz_rates.prompt／recap.points[1]）＋2 條 widow line
      （two_forms_equivalent.statement／proof_easy_piece.statement）
+  ⚠️ 勘誤（2026-09-14 重跑）：實為 **6 WARN**——立檔時漏記 `caution_inner_derivative.body` 的
+     display-style（`$\dfrac{d}{dx}\sin(g(x))=\cos(g(x))$`）。該欄自始就有 `\dfrac`，不是後來漂移；
+     lint 的 G1 規則本來就掃 `body`。A2 已把 6 條全清（改 `\tfrac`／重寫句尾），現為 `clean`。
 python video/pipeline/sizecheck.py video/storyboards/ch03_chain_rule.yml
   → 0 error, 5 warning：qed 越安全邊界 ×2（proof_setup_substitution／proof_delicate_choices）、
      statement 換行變全寬帶 ×2（two_forms_equivalent／proof_delicate_bound）、
@@ -664,8 +667,19 @@ python video/pipeline/rewatch_pack.py --deck ch03_chain_rule --out <milestone pa
 - ⚠️ `animations/ch03_chain_rule_hooks.py:57` 的 `_fade` 仍回傳寫死秒數（§2.4 第 4 點）——
   **B1 順手遷**，但 `pipeline/` 裡的同款殘餘（`pacing.walk`／`play_block` 標稱值、每拍 wait 整幀進位）
   屬工具線。
-- ⚠️ 量測閘的 TeX cache race（§2.3）——`sizecheck.py` 同時跑兩支會吐假 error，
+- ✅ 量測閘的 TeX cache race（§2.3）——`sizecheck.py` 同時跑兩支會吐假 error，
   要不要加檔案鎖或在 `REVIEW_GATES.md` §六 6.4 加一條紀律。
+  **已交付並落地（2026-09-14）：** 工具線 r2 Task H 加了 per-cwd 檔案鎖 `<media_dir>/Tex.lock`
+  （不放 `Tex/` 內，manim 會清掉），`sizecheck.check_scenes`／`make.py` preflight／render／
+  `critic --per scene`／`scratch_frames.py` 都持鎖，同 cwd 第二支改為等待。§六 6.4 已回寫。
+  **本節另補一條範圍更正：race 是 per-cwd，不是全域**（`media_dir` 相對 cwd），且**不只 `sizecheck` 之間**
+  ——`make.py` 內含自己的 preflight，主對話因此親自撞出三個假 error。
+- ✅ **`source_rev` 的整章粒度不需要改 code。** §2.1 曾把「stamp 換到 `chapter3.tex` 後雜湊涵蓋整章、
+  §3.1／§3.3 一動就讓 §3.2 跳 WARN」當成待解副作用；**實測是既有先例**——§3.1 的 deck
+  （`ch03_trig_derivatives.md`）早就 stamp 同一個 `chapter3.tex`、同一個 hash `acc1feed…`。
+  所以 A1 照著蓋是與既有做法一致，**不是新引入的問題**。
+  **節切片（讓 `source_rev.py` 支援行範圍／`\sechead` 區間）留作可選增強**，非 blocker：
+  誤報的代價是重跑一次 §8 對齊的 diff，而那次 diff 本來就該做。
 - `rewatch_pack` 的 `_beat_at` 對跨拍靜止段回空字串、FAIL 行尾無所在拍（流程改革輪已記）。
 
 ---
