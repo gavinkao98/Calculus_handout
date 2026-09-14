@@ -289,11 +289,12 @@ gate-2 判它是 blocking，且給的修法（修根因、把指數搬進 LaTeX�
 > 兩支照舊互撞）。同 cwd 的第二支現在會每 10 s 印一次
 > `[texlock] waiting for pid N (<reason>) ... Ns` **等待**，不再吐假的 `SIZE … could not build scene`（`.dvi` 讀不到）。
 > ⇒ **看到那行是正常等待、不是 hang**；等待上限 **30 分鐘**（足以等完一次全片 render），
-> 要縮短用環境變數 `TEXLOCK_TIMEOUT`（秒）。
-> ⚠️ **`TEXLOCK_TIMEOUT` 是工具線 r2 的追加修正，2026-09-14 回寫本節時尚未落地**
-> （`grep -rn TEXLOCK_TIMEOUT video/` 零命中）；預設 1800 s 不會變。**落地前只有等待、沒有覆寫出口**，
-> 且 `_selftest_texlock` 在機器上有別的 worktree 在編 Tex 時可能撞到 `run_selftests` 的 900 s 上限
-> ——**只有那一支紅、其餘全綠時不是本節的問題**。
+> 要縮短用環境變數 `TEXLOCK_TIMEOUT`（秒）——已落地（`texlock.py:136–149`，`DEFAULT_TIMEOUT = 1800.0`
+> 不變，`TEXLOCK_TIMEOUT` 設正數才覆寫）。
+>
+> **這一條本身就是「快照會作廢」的實例（值得留著當教材）：** 回寫本節時 `TEXLOCK_TIMEOUT` 還不存在
+> （`grep` 零命中），於是先寫成「尚未落地」；同一天工具線併入 `294a9b1` 之後，那句註記**自己過期了**。
+> ⇒ **§六 描述別條線的工具行為時，要附「當日 main tip」與可自驗的 grep**，不要只寫結論。
 > 依據：**文件叮嚀擋不住看不見的那一支**——主對話親自撞出三個假 error，因為使用者看不到 `make.py` 裡面也有一支 preflight。
 
 > **`| tail -N` 為什麼寫成硬規則（2026-09-14 一天內兩次誤讀）：** `sizecheck.py` 先印
