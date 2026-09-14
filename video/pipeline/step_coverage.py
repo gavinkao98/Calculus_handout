@@ -14,7 +14,16 @@ from __future__ import annotations
 from pipeline import _screen_contract as _sc
 from pipeline.provenance import parse_ref
 
-_SCOPED_TEMPLATES = frozenset({"theorem_proof", "derivation", "worked_example"})
+# Templates whose unit MUST carry a screen_contract under meta.coverage_enforce: the
+# ones that teach a step SEQUENCE, where dropping a step is the failure mode SC exists
+# for. `procedure_steps` added r2 Task I -- a Strategy's numbered recipe is exactly such
+# a sequence (§3.2's Strategy 3.1 had a step that never reached the screen and only the
+# human PD1 gate caught it). `definition_math` is deliberately NOT here: it is a single
+# statement frame (definition / theorem statement / remark / forward-ref), no deck's
+# definition unit declares required_steps, and its prose is already covered by the
+# `statement` provenance field (REVIEW_GATES.md section 1, schema.py row).
+_SCOPED_TEMPLATES = frozenset({"theorem_proof", "derivation", "worked_example",
+                               "procedure_steps"})
 
 
 def covers_by_unit(storyboard: dict) -> "dict[str, set[str]]":
@@ -46,6 +55,15 @@ def coverage_issues(storyboard: dict, contracts: "dict[str, dict]", enforce: boo
     cov = covers_by_unit(storyboard)
     issues: list[tuple[str, str]] = []
     for unit_id, contract in contracts.items():
+        if isinstance(contract, _sc.ParseError):
+            # present but unreadable: say so, and say it apart from "not written".
+            # Own severity (always error, like the orphan finding's always-warn): a
+            # contract that does not parse is an authoring bug, not a coverage policy
+            # the deck can opt out of -- and staying quiet is what let §3.2's broken
+            # block read as "no screen_contract".
+            issues.append(("error", f"[SC] {unit_id}: screen_contract failed to parse "
+                                    f"-- {contract.message}"))
+            continue
         if _sc.is_exempt(contract):
             continue
         req_ids = {s["id"] for s in _sc.required_steps(contract)}
@@ -74,6 +92,8 @@ def coverage_issues(storyboard: dict, contracts: "dict[str, dict]", enforce: boo
                 continue
             unit = parsed[1]
             c = contracts.get(unit)
+            if isinstance(c, _sc.ParseError):
+                continue          # already reported above as a parse failure -- not "unwritten"
             if c is None or (not _sc.required_steps(c) and not _sc.is_exempt(c)):
                 flagged.add(unit)
                 issues.append(("error", f"[SC] {unit}: proof/derivation unit under "
