@@ -270,6 +270,11 @@ mock render `ch03_trig_derivatives` 場 04、21、22 與一場 bold 標題長的
 
 9. **§3.1 場 23 `shm_compute` 的 reason tag `SIMPLE HARMONIC MOTION` 撞進右側彈簧裝置**（主對話抽查 Task C 的最滿幀時看到；舊的末幀抽法因 `exit:` 清空看不到）。**不是工具線項目**，歸 §3.1 backlog、搭 4K final 一起修；收尾時抄進 `REBUILD_STATUS.md`。
 
+**Task A 收尾的裁決與後續（2026-09-14 主對話）：**
+- **裁決：不改 `[stillness]` 對 `paced:` 的無條件免檢。** 有 rail 的 paced 列由 `pacing.walk` 鋪滿整拍是構造保證；無 rail 的由 schema `nothing to walk` warn 提早擋。要改免檢得同時動 `_transform_anim`／`_cancel_anim` 的 `fixed_seconds`、`worked_example._row_block`、SPEC-motion-language 規則 4 與 `_selftest_stillness` (b)，而對現有 23 deck 是 no-op（唯二命中列都由 hook 接管）。不列 backlog，免得重議。
+10. **§3.1 場 22 `all_six_cot_csc` 的 `paced: [step.1, result]` 應把 `result` 拿掉**（hook `all_six_summary` 已接管該列），否則每次 build 都多一條 schema warn；同場 hook 註解 `ch03_trig_derivatives_hooks.py:3201–3207` 描述的是舊行為（walk 整個 11.26 s），一併更新。**§3.1 側、非工具線**，搭 4K final。
+11. **`_demo_worked_example` 預設跑不完 `make.py`**（Task A）：`capacity_over` 是刻意的壓測場（2 條 SIZE error），要 `--skip-sizecheck` 才 render 得動；若要當常態 smoke，把壓測場拆到另一個 deck 或給 `meta` 豁免。
+
 **兩條共識更正（已採信，寫進對應文件）：**
 - `sizecheck`／`schema` 的 TeX cache 競態是 **per-cwd**（`config.media_dir = ./media`，各 worktree 各有 `media/Tex`），跨 worktree
   並行零撞車；MiKTeX fndb 鎖才是全域偶發。→ [`KICKOFF-shared-layer-v1.md`](KICKOFF-shared-layer-v1.md) §8 ⑧ 已補註；
