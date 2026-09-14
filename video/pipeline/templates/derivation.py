@@ -199,11 +199,32 @@ def _matching(source, target):
 
 
 def _rail(mob, this_eq):
-    """The row's rail parts (leader, reason): everything in the row group but the equation. A
-    theorem_proof row IS its MathTex (rollout T1-3) -- its submobjects are glyphs, not a rail."""
+    """The row's rail parts (leader, reason, a verdict glyph): everything in the row group but
+    the equation. A theorem_proof row IS its MathTex (rollout T1-3) -- its submobjects are
+    glyphs, not a rail.
+
+    The equation is often WRAPPED -- `_eq_mob` puts a result inside a glow group and pairs a
+    marked row with its verdict glyph -- so the wrapper is opened and only its non-equation
+    members count as rail; the wrapper ITSELF is never a rail part. Counting it as one (before
+    2026-09-14) gave a row with no reason a rail of length 1 -- the equation's own wrapper --
+    with two consequences (§8 backlog ⑯): a `paced` row then looked walkable, so
+    `_rail_walk_seconds` handed it the rest of the beat and `pacing.walk` spent that beat
+    re-fading the equation the morph had just finished drawing and then holding (`paced:`
+    exempts the row from the [stillness] advisory, so a beat that was still end to end was
+    also invisible -- ch03 22 `all_six_cot_csc.result`, 11.26 s); and an UNPACED such row put
+    `FadeIn(wrapper)` into the morph play, animating the morph's own target a second time
+    (ch03 20 `all_six_tan_sec.result`)."""
     if mob is this_eq:
         return VGroup()
-    return VGroup(*[m for m in mob.submobjects if m is not this_eq])
+    parts = []
+    for m in mob.submobjects:
+        if m is this_eq:
+            continue
+        if any(s is this_eq for s in m.get_family()):   # the wrapper: keep its siblings only
+            parts += [s for s in m.submobjects if s is not this_eq]
+        else:
+            parts.append(m)
+    return VGroup(*parts)
 
 
 def _rail_walk_seconds(scene, rail, consumed: float, paced: bool) -> "float | None":
@@ -211,7 +232,11 @@ def _rail_walk_seconds(scene, rail, consumed: float, paced: bool) -> "float | No
     morph, for the rail to be walked across (pacing.walk) -- so a 1.2 s morph on a 12 s beat
     reads "morph, read the leader, read the reason" instead of "morph, then 10 s of nothing".
     None means the rail rides the morph play as before: not paced, no rail, or too little of
-    the beat left for one fade per part (off-beat too -- beat_run_time is 0 there)."""
+    the beat left for one fade per part (off-beat too -- beat_run_time is 0 there). A row with
+    no `reason` has no rail at all (see _rail), so `paced:` on it walks NOTHING: the morph
+    plays, the rest of the beat holds, and the honest report of that hold is schema's
+    `nothing to walk` warning (a `paced:` id still exempts the beat from the [stillness]
+    advisory, which is why the warning has to be the one that speaks)."""
     n = len(rail.submobjects)
     if not paced or not n:
         return None
