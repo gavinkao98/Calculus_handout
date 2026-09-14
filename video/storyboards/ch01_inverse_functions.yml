@@ -427,14 +427,15 @@ scenes:
     result: { math: "\\therefore\\; f^{-1}(x) = \\sqrt[3]{x - 2}", reason: "swap names" }
     check:  { math: "f\\bigl(f^{-1}(x)\\bigr) = \\bigl(\\sqrt[3]{x-2}\\bigr)^3 + 2 = x", reason: "verified" }
 
-  # 17 -------------------- Example 1.7: a rational inverse, verified both ways + domains
+  # 17a ------------------- Example 1.7 (1/2): a rational inverse -- solve for the formula
   - id: invert_a_rational
     kind: content
     template: derivation
     accent: example
+    part: { current: 1, total: 2 }
     source: "chapter1-print-standalone.html SS1.1 . Example 1.7"
     title: "A Rational Inverse"
-    prompt: "Find the inverse of $f(x)=\\dfrac{3}{x-5}$."
+    prompt: "Find the inverse of $f(x)=\\dfrac{3}{x-5}$, and verify both directions."
     say: |
       Same recipe, now on a rational function: $f(x)=\dfrac{3}{x-5}$.
       {show step.0} Set $y$ equal to it.
@@ -442,15 +443,34 @@ scenes:
       over $y$.
       {show step.2} Add five, and the input is five plus three over $y$.
       {show result} Swap the names, over a common denominator, for the inverse.
-      {show check} Here is the payoff: composing both ways returns the input,
-      exactly as the proposition promised. The domains pair up too -- $f$
-      skips $x=5$ and never outputs zero, while its inverse skips $x=0$ and
-      never outputs five.
+      That leaves one thing: making the formula prove itself.
     steps:
       - { math: "y = \\dfrac{3}{x-5}", reason: "write $y=f(x)$" }
       - { math: "x - 5 = \\dfrac{3}{y}", reason: "flip and isolate" }
       - { math: "x = 5 + \\dfrac{3}{y}", reason: "add 5" }
     result: { math: "\\therefore\\; f^{-1}(x) = 5 + \\dfrac{3}{x} = \\dfrac{5x+3}{x}", reason: "swap names" }
+
+  # 17b ------------------- Example 1.7 (2/2): verify both ways, then the paired domains
+  - id: invert_a_rational_verify
+    kind: content
+    template: derivation
+    accent: example
+    part: { current: 2, total: 2 }
+    source: "chapter1-print-standalone.html SS1.1 . Example 1.7"
+    title: "A Rational Inverse, Verified"
+    prompt: "Find the inverse of $f(x)=\\dfrac{3}{x-5}$, and verify both directions."
+    say: |
+      Both directions, as the problem asked.
+      {show step.0} Feed the inverse into $f$: the fives cancel, and three
+      divided by three over $x$ leaves $x$.
+      {show step.1} The other way round, the same cancellation gives $x$ back.
+      {show check} Here is the payoff: composing both ways returns the input,
+      exactly as the proposition promised. The domains pair up too -- $f$
+      skips $x=5$ and never outputs zero, while its inverse skips $x=0$ and
+      never outputs five.
+    steps:
+      - { math: "f\\bigl(f^{-1}(x)\\bigr) = \\dfrac{3}{\\bigl(5+\\tfrac{3}{x}\\bigr)-5} = x", reason: "forward" }
+      - { math: "f^{-1}\\bigl(f(x)\\bigr) = 5 + \\dfrac{3}{3/(x-5)} = x", reason: "backward" }
     check:  { math: "f\\bigl(f^{-1}(x)\\bigr) = x = f^{-1}\\bigl(f(x)\\bigr)", reason: "both ways" }
 
   # 18 ----------------------------------- Example 1.8: an everyday (applied) inverse

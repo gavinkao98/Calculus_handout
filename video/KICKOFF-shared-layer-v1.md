@@ -437,6 +437,7 @@ severity ∈ {`error`, `warn`}；`make.py` 有 error 即 abort（`--skip-sizeche
 > 其 `check` 行因結論階 62 出框＝1 error。** 變因隔離證實**純由 62 造成**（不是 T1 的字體、不是 T3 的新規則）。
 > **主對話裁決＝62 不退、修在 deck 側**——已用 `spawn_task` 另開 chip
 > 「修 ch01 deck `invert_a_rational` 結論階 62 出框」，不在本輪處理（§8 backlog ⑤）。
+> **✅ 2026-09-14 已收（§8 backlog ⑤）：** deck 側把該場 `part:` 分成 `invert_a_rational`（1/2，三步＋62 結論行）＋`invert_a_rational_verify`（2/2，雙向驗證兩列＋`check` 判定列）兩場，不動 `pipeline/`；該 deck `schema`／`lint`／`sizecheck` **0 error**，唯一新增 1 條 L2「下三分之一 11% 填充」advisory warn（與本 deck 既有 8 條同類同級）。
 
 **規則來源**（`_audit/design-template-system/MathRules.dc.html` 規則 5 逐字）：
 > 數學字級只有三階：**conclusion 62 px／body 48 px／rail·inline 34 px**。
@@ -757,6 +758,7 @@ severity ∈ {`error`, `warn`}；`make.py` 有 error 即 abort（`--skip-sizeche
    修法屬共用層：下限咬住時換一種連接樣式（點改線、或 reason 併回同列），或允許 rail 整體再右移。
 5. **`ch01_inverse_functions` 的 `invert_a_rational` 結論階 62 出框（1 error）。**
    變因隔離證實純由 62 造成；主對話裁決 62 不退、修在 deck 側，**已用 `spawn_task` 開成獨立 chip**。
+   **✅ 2026-09-14 已收：** deck 側把該場 `part:` 分成 `invert_a_rational`（1/2，三步＋62 結論行）＋`invert_a_rational_verify`（2/2，雙向驗證兩列＋`check` 判定列）兩場，不動 `pipeline/`；該 deck `schema`／`lint`／`sizecheck` **0 error**，唯一新增 1 條 L2「下三分之一 11% 填充」advisory warn（與本 deck 既有 8 條同類同級）。
 6. **L4 `layout:` 佔比宣告欄位、M4 ∎ 字形化。** T3 判「只能人審」的兩條（§7「明確不做」也列了）。
    L4 可自動的只有「宣告了就要跟宣告一致」，但 storyboard 目前沒有這個欄位；
    M4 是 `brand.glyph("qed")` 的視覺做法問題（現在渲成綠色圓角方框），不是可量的幾何。
@@ -817,14 +819,15 @@ severity ∈ {`error`, `warn`}；`make.py` 有 error 即 abort（`--skip-sizeche
    `doctor --smoke` 9/9、**23 deck `sizecheck`：正典 deck 0 error；`_demo_*` 壓測 fixture
    （含 `_demo_worked_example` 的 `capacity_over`）的刻意 error 與 Phase 0 基線逐字相同**、
    `[sync]` 0、`[still-gate]` PASS、`visual-frame-audit` 21 場 0 blocking、人閘通過。
-   **實績（2026-09-14，§6 驗收逐項數字見該節）：`run_selftests` 46/46**（預期的 45 ＋ T5 的
-   `_selftest_theorem_proof_label`）、回歸 deck **23 個**、`doctor --smoke` **9/9**、
+   **實績（2026-09-14，§6 驗收逐項數字見該節）：`run_selftests` 50/50**（**原記 46/46 係沿用凍結收尾當下的支數、未重數**——`_selftest_side_branch`／`_selftest_continuity_argument`／`_selftest_sector_inequality`／`_selftest_pairing_and_opening` 四支
+   在 §3.1 那條線併進來時就已在樹上；2026-09-14 實測 all 50 green）、回歸 deck **23 個**、`doctor --smoke` **9/9**、
    `sizecheck` 正典 deck 0 error 且 fixture 的刻意 error 與 Phase 0 逐條可解釋
    （兩筆 error→warn 降級＋兩筆座標位移，成因都是新字行框較淺）、
    `[sync]` **0**、`[still-gate]` **PASS**（最長 11.0 s ≤ 12 s）、
    `visual-frame-audit` **21 場 0 blocking**（13 advisory）、
    **人閘 Go（使用者 2026-09-14 裁決，凍結成立；該次 render 即 §3.1 的 v1 版成片）**。
-   **已知未收乾淨的一項＝`ch01_inverse_functions` 的 `invert_a_rational` 1 error**（§8 backlog ⑤，已開 chip）。
+   ~~**已知未收乾淨的一項＝`ch01_inverse_functions` 的 `invert_a_rational` 1 error**（§8 backlog ⑤，已開 chip）。~~
+   **✅ 2026-09-14 已收**（§8 backlog ⑤）——deck 側 `part:` 分頁為兩場，23 deck 現在 `sizecheck` 全數 0 error。
 
 ### 預估（工時／render 次數）
 
