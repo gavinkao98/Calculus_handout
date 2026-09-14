@@ -625,15 +625,26 @@ python video/pipeline/rewatch_pack.py --deck ch03_chain_rule --out <milestone pa
 **本節是 §六的第一次實測。** 任何一條 G0–G7 在實際執行時「做不到」「意思不清楚」「與別的條款打架」，
 **當場記下來，收工時回寫 §六**——§六是驗收定義的 SSOT，kickoff 只是當時的檢討紀錄。
 
-**已知的三個觀察點（本檔立檔時就看得到，收工時回答）：**
+**已知的三個觀察點（本檔立檔時就看得到，收工時回答）：** **三個都已回答並回寫**（2026-09-14；連同 §3.2 實跑
+另外記下的 22 條觀察，一併併入 [`REVIEW_GATES.md`](REVIEW_GATES.md) §六，並新增 6.8／6.9 兩個小節）。
 
 - **6.4 開工清單第 1 項**（`run_selftests` 全綠）在本節開工時就綠（42），
   **但 §2.3 發現的 TeX cache race 不在清單上**——要不要加一條「量測閘一次只跑一支」？
+  - **答：要加，但範圍不是「量測閘」也不是全域——是「同一個工作目錄裡，會建 TeX 的工具一次只跑一支」。**
+    `config.media_dir = ./media` 相對 cwd，每個 worktree 各有自己的 `media/Tex` ⇒ **跨 worktree 不需排隊**；
+    而互斥對象不只 `sizecheck.py` 之間，`make.py` 的內建 preflight／`critic.py`／`scratch_frames.py` 都算。
+    工具線 r2 Task H 已用 per-cwd 檔案鎖（`<media_dir>/Tex.lock`）把它接管掉。
+    **回寫位置＝§六 6.4**（三條新 checkbox ＋ texlock 說明框）。
 - **6.2 的「輪內新 must 上限 3」在 Phase A 沒有對應物**——內容階段的 must 怎麼算？
   （A1 的跟改單元數？NFA 的 blocking 數？）§六沒寫。
+  - **答：Phase A 的 must ＝ 該輪 gate-1 的 blocking 數；advisory 由指揮者逐條裁決、不計入上限。**
+    依據＝本節 pedagogy gate 四輪 blocking 3 → 1 → 1 → 0、advisory 5 → 5 → 1 → 2（advisory 每輪重新生成）。
+    **回寫位置＝§六 6.2。**
 - **6.3 停止條件第 2 條依賴「上一次里程碑審」**，但**第一節沒有上一次**——
   §3.2 的第一輪要怎麼判？（本檔的答案：第一輪只看第 1、3、4 條，第 2 條從第二輪起生效；
   若 §六同意，回寫進去。）
+  - **答：照本檔的提案定案——一節的第一輪只看第 1、3、4 條，第 2 條從第二輪起生效。**
+    **回寫位置＝§六 6.3**（接在「§3.1 在第 ㉑ 輪就該停」那個引言框之後）。
 
 ---
 
