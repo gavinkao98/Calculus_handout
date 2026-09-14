@@ -761,7 +761,7 @@ severity ∈ {`error`, `warn`}；`make.py` 有 error 即 abort（`--skip-sizeche
    `doctor --smoke` 9/9、**23 deck `sizecheck`：正典 deck 0 error；`_demo_*` 壓測 fixture
    （含 `_demo_worked_example` 的 `capacity_over`）的刻意 error 與 Phase 0 基線逐字相同**、
    `[sync]` 0、`[still-gate]` PASS、`visual-frame-audit` 21 場 0 blocking、人閘通過。
-   **現況：`run_selftests` 實際 46 支**（預期的 45 ＋ T5 的 `_selftest_theorem_proof_label`）、回歸 deck 23 個；
+   **現況：`run_selftests` 實際 50 支**（本輪收尾時 46 支＝預期的 45 ＋ T5 的 `_selftest_theorem_proof_label`；其後 §3.1 里程碑審那條線又併進 4 支場級回歸——`_selftest_side_branch`／`_selftest_continuity_argument`／`_selftest_sector_inequality`／`_selftest_pairing_and_opening`，2026-09-14 實測 all 50 green）、回歸 deck 23 個；
    **§6 的驗收迴圈尚未跑**——`[sync]`／`[still-gate]`／21 場幀稽核／人閘四項，
    **待 §3.1 里程碑審 session 把 must 修正併進 main 後執行，結果另補一段**。
    ~~**已知未收乾淨的一項＝`ch01_inverse_functions` 的 `invert_a_rational` 1 error**（§8 backlog ⑤，已開 chip）。~~
