@@ -257,6 +257,12 @@ RADIUS_MD = 12 / PX_PER_UNIT_Y
 RADIUS_LG = 18 / PX_PER_UNIT_Y
 BAR_W = 5 / PX_PER_UNIT_X             # accent-bar left-edge width
 
+# graph axis arrowheads (manim units, not px-derived -- current values copied verbatim
+# from the two call sites that used to hardcode them, zero behaviour change). AXIS_TIP:
+# the single/full-frame graph. AXIS_TIP_INSET: the smaller 2-up compare panel.
+AXIS_TIP = 0.16
+AXIS_TIP_INSET = 0.14
+
 # Settled: no coordinate grid is rendered on any template — the deep-ink ground
 # carries the aesthetic. grid_line colours stay as a latent motif.
 SHOW_GRID = False

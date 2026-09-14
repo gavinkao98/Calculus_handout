@@ -823,8 +823,8 @@ def _build_single(spec: dict[str, Any], ctx: dict[str, Any]) -> list[Block]:
         },
     )
     if bool(ac.get("tips", True)):
-        axes.x_axis.add_tip(tip_length=0.16, tip_width=0.16)
-        axes.y_axis.add_tip(tip_length=0.16, tip_width=0.16)
+        axes.x_axis.add_tip(tip_length=T.AXIS_TIP, tip_width=T.AXIS_TIP)
+        axes.y_axis.add_tip(tip_length=T.AXIS_TIP, tip_width=T.AXIS_TIP)
     axes.move_to([0, -0.2, 0])
     _add_axis_labels(axes, ground, ac)
     blocks.append(Block("axes", axes, anim="create", static=True, layer="graph"))
@@ -911,8 +911,8 @@ def _panel(side_spec: dict[str, Any], ground: str, prefix: str) -> tuple[list[Bl
         },
     )
     if bool(ac.get("tips", True)):
-        axes.x_axis.add_tip(tip_length=0.14, tip_width=0.14)
-        axes.y_axis.add_tip(tip_length=0.14, tip_width=0.14)
+        axes.x_axis.add_tip(tip_length=T.AXIS_TIP_INSET, tip_width=T.AXIS_TIP_INSET)
+        axes.y_axis.add_tip(tip_length=T.AXIS_TIP_INSET, tip_width=T.AXIS_TIP_INSET)
     _add_axis_labels(axes, ground, ac)
 
     panel_blocks: list[Block] = [Block("axes", axes, anim="create", static=True)]

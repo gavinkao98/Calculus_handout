@@ -22,10 +22,14 @@ STOCK_ANIM_SECONDS = {
     "create": 0.8,
     "grow": 0.45,
     "slide": 0.5,
-    "highlight": 1.2,
-    "flash_in": 1.1,
-    "write_glow": 1.4,
-    "slide_pop": 0.85,
+    # highlight/flash_in/write_glow/slide_pop: corrected to the seconds `blocks._reveal`
+    # actually plays (0.7/0.5/0.8/0.45) -- this table used to disagree with the real
+    # `scene.play(..., run_time=...)` calls (1.2/1.1/1.4/0.85), a duplicated-constant drift
+    # `_reveal` now reads this table instead of hardcoding, so it cannot recur.
+    "highlight": 0.7,
+    "flash_in": 0.5,
+    "write_glow": 0.8,
+    "slide_pop": 0.45,
     "write": 0.7,
     # in-place rewrite (derivation `anim: transform`): morphs the previous row into this
     # one. Played by a Block CALLABLE, so this entry is the single source of its nominal

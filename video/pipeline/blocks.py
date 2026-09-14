@@ -18,7 +18,6 @@ from typing import Any
 from manim import Create, FadeIn, RIGHT, UP, Write
 
 from . import timing as TM
-from .visuals import theme as T
 
 
 @dataclass
@@ -125,50 +124,62 @@ def play_block(scene, block: Block, ground: str) -> float:
 
 
 def _reveal(scene, block: Block, ground: str) -> float:
-    """Play one block's reveal; returns its NOMINAL seconds (see `play_block`)."""
+    """Play one block's reveal; returns its NOMINAL seconds (see `play_block`).
+
+    Every stock name's run_time is read from TM.STOCK_ANIM_SECONDS -- the single source of
+    truth (was hardcoded per-branch here, which had drifted out of sync with the table for
+    four names; see the table's own comment)."""
     mob = block.mobject
     anim = block.anim
-    accent = T.color(ground, "accent")
 
     if callable(anim):
         return float(anim(scene, mob, ground) or 0.0)
 
     if anim == "fade":
-        scene.play(FadeIn(mob, shift=0.1 * UP), run_time=0.5)
-        return 0.5
+        secs = TM.STOCK_ANIM_SECONDS["fade"]
+        scene.play(FadeIn(mob, shift=0.1 * UP), run_time=secs)
+        return secs
     elif anim == "create":
-        scene.play(Create(mob), run_time=0.8)
-        return 0.8
+        secs = TM.STOCK_ANIM_SECONDS["create"]
+        scene.play(Create(mob), run_time=secs)
+        return secs
     elif anim == "grow":
         # Direction D: entrances are fades/writes, never bounces. (Was GrowFromCenter.)
-        scene.play(FadeIn(mob, shift=0.1 * UP), run_time=0.45)
-        return 0.45
+        secs = TM.STOCK_ANIM_SECONDS["grow"]
+        scene.play(FadeIn(mob, shift=0.1 * UP), run_time=secs)
+        return secs
     elif anim == "slide":
-        scene.play(FadeIn(mob, shift=0.35 * RIGHT), run_time=0.5)
-        return 0.5
+        secs = TM.STOCK_ANIM_SECONDS["slide"]
+        scene.play(FadeIn(mob, shift=0.35 * RIGHT), run_time=secs)
+        return secs
     elif anim == "highlight":
-        scene.play(Write(mob), run_time=0.7)
-        return 0.7
+        secs = TM.STOCK_ANIM_SECONDS["highlight"]
+        scene.play(Write(mob), run_time=secs)
+        return secs
     elif anim == "flash_in":
         # was FadeIn + a glow Flash burst; the burst removed project-wide per user
         # request (2026-06-29 -- "no explosion effect"). Kept as a distinct name so
         # callers (theorem_proof qed) need not change; now a plain fade reveal.
-        scene.play(FadeIn(mob), run_time=0.5)
-        return 0.5
+        secs = TM.STOCK_ANIM_SECONDS["flash_in"]
+        scene.play(FadeIn(mob), run_time=secs)
+        return secs
     elif anim == "write_glow":
         # was Write + a glow Flash burst; the burst removed project-wide per user
         # request (2026-06-29). The key/result line keeps its colour + persistent
         # text_glow halo (set in the templates); only the reveal burst is gone.
-        scene.play(Write(mob), run_time=0.8)
-        return 0.8
+        secs = TM.STOCK_ANIM_SECONDS["write_glow"]
+        scene.play(Write(mob), run_time=secs)
+        return secs
     elif anim == "slide_pop":
         # was slide in + a glow Flash burst; the burst removed project-wide per user
         # request (2026-06-29). Now a plain slide-in (no bounce, no flash).
-        scene.play(FadeIn(mob, shift=0.4 * RIGHT), run_time=0.45)
-        return 0.45
+        secs = TM.STOCK_ANIM_SECONDS["slide_pop"]
+        scene.play(FadeIn(mob, shift=0.4 * RIGHT), run_time=secs)
+        return secs
     else:  # "write"
         if getattr(mob, "width", 0) > 9.0:
             scene.play(FadeIn(mob, shift=0.1 * UP), run_time=0.6)
             return 0.6
-        scene.play(Write(mob), run_time=0.7)
-        return 0.7
+        secs = TM.STOCK_ANIM_SECONDS["write"]
+        scene.play(Write(mob), run_time=secs)
+        return secs
