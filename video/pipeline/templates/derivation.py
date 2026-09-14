@@ -116,6 +116,41 @@ def _rail_plan(eq_widths: list[float],
     return max(RAIL_X, min(need, cap)), off_rail
 
 
+def _clamp_hang(content, body_ref, hang_extra: float) -> float:
+    """Give a hung chain back the room the hang took, out of the TITLE GAP above it.
+
+    `_common._biased_y` deliberately top-anchors content too tall for its body zone, so it
+    overflows the BOTTOM (where sizecheck's capacity trigger can see it) rather than the
+    title. A hang is a different kind of tall: the chain's EQUATIONS fit -- only the reason
+    dropped under one of them does not -- so the overflow is not a capacity problem to be
+    split, it is one line of small type landing 31 px into the bottom safe margin next to the
+    corner motif (``difference_quotient_for_sine``, measured 2026-09-14).
+
+    So: shift the chain up until its bottom sits on the safe line, but never by more than
+    *hang_extra* -- the height the hang ADDED. A chain that was already too tall before it
+    hung anything therefore still overflows by exactly as much as it did, and sizecheck still
+    reports it for splitting; the clamp only ever refunds the hang. Returns the shift, for the
+    caller's own bookkeeping. See DESIGN.md, the `derivation` rail entry.
+
+    The room comes from the TITLE GAP (`T.TITLE_GAP` of clear space `place_body` leaves under
+    the masthead -- under the `scaffold.motive` line, when a scene has one), and the clamp
+    keeps `HANG_GAP` of it: the template's own smallest legible separation, so the block
+    boundary above the chain never closes to nothing. On the one scene that hangs today the
+    floor is not binding (0.415 u of gap, 0.231 u wanted, 0.180 u kept); it is what stops a
+    taller hung reason on some future chain from trading a bottom-margin spill for a
+    collision with the line above -- such a chain keeps its (reduced) spill, which is the
+    honest signal that it needs splitting.
+    """
+    deficit = (-T.FRAME_H / 2 + T.SAFE_MARGIN) - float(content.get_bottom()[1])
+    if deficit <= 0.0:
+        return 0.0
+    room = float(body_ref.get_bottom()[1]) - float(content.get_top()[1]) - HANG_GAP
+    shift = min(deficit, hang_extra, max(room, 0.0))
+    if shift > 0.0:
+        content.shift([0.0, shift, 0.0])
+    return shift
+
+
 def capacity_meta(spec: dict[str, Any]) -> list[ColumnPlan]:
     """Capacity contract (L1): the chain is one column at MIN_PITCH. Equivalent to the
     scalar MIN_PITCH sizecheck already reads -- declared so the audit reads the same
@@ -450,6 +485,7 @@ def build(spec: dict[str, Any], ctx: dict[str, Any]) -> list[Block]:
     hung: set[int] = set()
     own_x: dict[int, float] = {}
     heights: list[float] = []
+    hang_extra = 0.0      # height the hang ADDED -- the budget _clamp_hang may refund
     for i, (r, eq, reason) in enumerate(zip(rows, eqs, reasons)):
         limit = off_rail_max_w if i in off_rail else reason_max_w
         if reason is not None and reason.width > limit > 0:
@@ -465,6 +501,7 @@ def build(spec: dict[str, Any], ctx: dict[str, Any]) -> list[Block]:
                 hung.add(i)
         if i in hung:
             heights.append(eq.height + HANG_GAP + reason.height)
+            hang_extra += heights[-1] - max(eq.height, reason.height)
         else:
             heights.append(max(eq.height, reason.height if reason is not None else 0.0))
 
@@ -524,6 +561,8 @@ def build(spec: dict[str, Any], ctx: dict[str, Any]) -> list[Block]:
     if parts:
         content = VGroup(*parts).arrange(DOWN, buff=0.55, aligned_edge=LEFT)
         place_body(content, body_ref, left_x)
+        if hang_extra:
+            _clamp_hang(content, body_ref, hang_extra)
         # A pure equation chain (no reason rail, no statement, no prompt header)
         # left-flush would hug the left third and strand the right ~60% empty (Codex
         # flagged cubic/rational/app as "left-heavy, large dead field"). Centre it
