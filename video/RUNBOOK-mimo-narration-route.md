@@ -71,7 +71,7 @@ DECK: <填，如 ch01_precise_limit>      SECTION: <填，如 §1.6>
   selftest 守 registry 一致）走 scene-level（一場一次合成、`stable-ts` 回推 beat 時序、
   per-scene validation，過不了自動回退 beat）。要全走舊路用 `--unit beat`；單一場強制 scene 用 `--unit scene`。
   **紀律：scene-level 真合成只在 narration lock＋NFA 之後**（「改一個字→整場重合成」的 blast radius 由 lock 吃掉）；
-  lock 前一律 `make.py --backend mock`（beats、零計費、離線）迭代。**§7 fallback ladder＝arbiter(免費)→resynth(1 call)
+  lock 前一律 `make.py --backend mock`（beats、零計費、離線）迭代。**注意（2026-09-14 §3.2 實測）：`tts.py --backend mock --storyboard <deck>_mimo.yml` 會把靜音 WAV 與 mock manifest 寫進 `audio_mimo/`——與真 MiMo 音檔同一目錄；真合成前先清掉或帶 `--force-backend-switch`。****§7 fallback ladder＝arbiter(免費)→resynth(1 call)
   →chunk(sentence-chunk，N 個 billed sub-synth)→beats(budget-exempt 終點——不佔 rungs 2–3 budget，但 MiMo 下每非空
   beat 仍一次 call、非免費)**；scene-level 合成報價時要把 fallback 預算一併列入：
   預設 `--fallback-budget 2` 只夠 resynth，**要啟用 chunk 救援得把 budget 調到覆蓋 fan-out（1＋該場句數），句數即 billed
