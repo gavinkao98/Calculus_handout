@@ -1679,7 +1679,9 @@ synthesize audio 但不重新 render Manim）仍為 (TODO)。
 - **鎖的粒度是「整段」不是「每個 Tex」**：逐個 snippet 上鎖只會讓兩支交錯、Tex cache 照樣互寫；
   要的是一支程式從第一次 build 到最後一次都獨佔那個目錄。
 - **等待而非報錯**：每 0.5 s 重試，每 10 s 印一行 `[texlock] waiting for pid N (sizecheck) … 20s`
-  （等待永遠不該看起來像掛住），逾時預設 10 分鐘後丟 `TimeoutError` 並指名持有者。
+  （等待永遠不該看起來像掛住），逾時預設 10 分鐘後丟 `TimeoutError` 並指名持有者。 預設值由環境變數
+  **`TEXLOCK_TIMEOUT`（秒）**覆寫——要縮短某個 process（尤其是自己 spawn 的子行程，沒有參數可傳）的等待時用它；
+  明確傳 `timeout=` 仍優先。`_selftest_texlock` 就是靠它把子行程壓在 90 s，免得撞上 `run_selftests` 的 900 s 單測上限。
 - **同一個 process 內可重入**：`make.py` 在 preflight 外層持鎖、`check_scenes` 內層再持一次，
   深度計數讓內層變成 no-op 而不是自我死鎖。
 - **stale 回收需同時成立兩個條件**：鎖檔 mtime 超過 15 分鐘**且**寫在裡面的 pid 已不存在，才覆蓋並印
