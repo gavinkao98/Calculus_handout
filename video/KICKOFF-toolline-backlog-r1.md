@@ -275,6 +275,14 @@ mock render `ch03_trig_derivatives` 場 04、21、22 與一場 bold 標題長的
 10. **§3.1 場 22 `all_six_cot_csc` 的 `paced: [step.1, result]` 應把 `result` 拿掉**（hook `all_six_summary` 已接管該列），否則每次 build 都多一條 schema warn；同場 hook 註解 `ch03_trig_derivatives_hooks.py:3201–3207` 描述的是舊行為（walk 整個 11.26 s），一併更新。**§3.1 側、非工具線**，搭 4K final。
 11. **`_demo_worked_example` 預設跑不完 `make.py`**（Task A）：`capacity_over` 是刻意的壓測場（2 條 SIZE error），要 `--skip-sizecheck` 才 render 得動；若要當常態 smoke，把壓測場拆到另一個 deck 或給 `meta` 豁免。
 
+**Task E 回報的後續（2026-09-14）：**
+12. **⭐ r2 首項：`_common.place_body` 不保證含降行（hung）列的 chain 留在下緣安全線內。** §3.1 場 04 `difference_quotient_for_sine` 的結論列 reason 改掛在等式下一行後越下緣安全線 0.23u（≈28 px），貼近品牌波形（gate 1 advisory A1 78）。修法＝對含 hung 列的 chain 加底邊夾制或縮 `HANG_GAP` 0.18；**§3.1 4K final 前要修**（否則場 04 帶著這條進成片）。
+13. **off-rail 列與共用欄左緣分裂 22 px**（場 14 `companion_limit`）。稽核建議「全場 rail 改用 `min(reason_x, own_x)`」實測不可行（會把 step.0 的 leader 壓回 36.5 px、破掉 `MIN_LEADER` 保證）；兩者兼得需要別的設計，先留。
+14. **證據條款措辭**：「sizecheck error 仍 0」只對正典 deck 成立；`_demo_*` fixture 既有 30 條刻意 error（改前改後相同）。下輪 kickoff 的證據條款照共用層 v1 §6 的寫法明寫「fixture 的刻意 error 與基線逐字相同」。
+15. **reason 內嵌行內分數低於 floor**（場 21 `	frac{\sin x}{\cos x}` ≈17–20 px）：與 ① 同源，Task B 的 floorprobe 應看得到，全 deck 首跑時拿它驗。
+16. **`_selftest_text_metrics` 對短、大寫多的字串（"The squeeze theorem"）est/真寬只有 0.9145**，regular 亦然，是估寬器的統計性質、不是字體問題；記一筆免重查。
+17. **`_WIDTH_K` 對 bold 未重校**（bold per-char 0.005312 vs regular 0.005109，差 4%）：`estimate_text_width` 全部 call site 都是 regular，bold 只走 `heading*` 且用實量寬 clamp；改由 selftest 的 bold fixture 守 ≥94% 帶（實測最差 0.9744）。若日後 bold 走估寬器，再回來校。
+
 **兩條共識更正（已採信，寫進對應文件）：**
 - `sizecheck`／`schema` 的 TeX cache 競態是 **per-cwd**（`config.media_dir = ./media`，各 worktree 各有 `media/Tex`），跨 worktree
   並行零撞車；MiKTeX fndb 鎖才是全域偶發。→ [`KICKOFF-shared-layer-v1.md`](KICKOFF-shared-layer-v1.md) §8 ⑧ 已補註；
