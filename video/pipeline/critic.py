@@ -62,6 +62,7 @@ from pipeline import _bootstrap  # noqa: E402
 
 _bootstrap.bootstrap()
 
+import numpy as np  # noqa: E402
 import yaml  # noqa: E402
 
 from pipeline.timing import SCENE_LEAD_SECONDS  # noqa: E402
@@ -70,6 +71,14 @@ from pipeline.sizecheck import graph_label_geometry  # noqa: E402
 LEAD_SECONDS = SCENE_LEAD_SECONDS
 BEAT_BACKOFF = 0.20     # grab this far before a beat boundary: reveal has settled,
                         # next beat not yet started (fullest frame for THIS beat)
+
+# per == "scene" fullest-frame pick (backlog #10): decode the whole scene video at
+# this fps in 192x108 gray, same recipe as rewatch_pack.motion_stats, to find which
+# frame has the most "ink" -- for a scene with `exit:` that is NOT the last frame
+# (the picture has been cleared by then), so grabbing the end (the old behaviour)
+# extracted a blank frame and gate 1 audited nothing (scenes 06, 23, 2026-09-14).
+INK_FPS = 4
+INK_DIFF_THRESHOLD = 12   # same |pixel diff| > 12/255 convention as rewatch_pack.CHANGE_FRAC
 
 # Cost estimate. MiMo-V2.5 (omnimodal) is Xiaomi's FREE public beta as of 2026-06
 # (the same key/endpoint the project already uses for TTS), so the USD figure is
@@ -146,6 +155,46 @@ def _ffprobe_duration(video: Path) -> float | None:
         return None
 
 
+def _fullest_frame_ts(video: Path) -> "tuple[float, float | None] | None":
+    """(ts_seconds, ink_ratio_vs_last) of the frame with the most "ink" in the whole
+    scene video, or None if it can't be decoded (caller falls back to the old
+    end-of-scene pick). Ties go to the LATEST frame; and if the last frame's ink is
+    within 1% of the true peak, the last frame wins anyway regardless of the tie
+    scan -- so a purely-additive scene (nothing ever leaves the screen) still picks
+    the same frame this always picked, and only a scene that clears itself (an
+    `exit:`) moves off the end.
+
+    ink = fraction of pixels that differ from the scene's background gray level by
+    more than INK_DIFF_THRESHOLD. The background level is not hard-coded (the deck
+    can be light- or dark-ground): it is the single most common gray value across
+    the whole decoded clip, since the background fills most of every frame even at
+    the fullest reveal.
+    """
+    try:
+        raw = subprocess.run(
+            ["ffmpeg", "-v", "error", "-i", str(video), "-an", "-vf",
+             f"fps={INK_FPS},scale=192:108,format=gray", "-f", "rawvideo", "-"],
+            capture_output=True, check=True,
+        ).stdout
+    except Exception:  # noqa: BLE001
+        return None
+    n = len(raw) // (192 * 108)
+    if n < 1:
+        return None
+    frames = np.frombuffer(raw[: n * 192 * 108], dtype=np.uint8).reshape(n, 108, 192)
+    bg = int(np.bincount(frames.reshape(-1)).argmax())
+    ink = (np.abs(frames.astype(np.int16) - bg) > INK_DIFF_THRESHOLD).mean(axis=(1, 2))
+    best_idx, best_val = 0, -1.0
+    for i, v in enumerate(ink):          # tie -> latest: >= keeps overwriting on ties
+        if v >= best_val:
+            best_idx, best_val = i, float(v)
+    last_val = float(ink[-1])
+    if last_val >= 0.99 * best_val:      # purely additive: keep the end-of-scene pick
+        best_idx = n - 1
+    ratio = round(best_val / last_val, 2) if last_val > 0 else None
+    return best_idx / INK_FPS, ratio
+
+
 # ---- frame plan ---------------------------------------------------------
 
 def cumulative_reveals(beats: list[dict], upto: int) -> list[str]:
@@ -197,7 +246,11 @@ def plan_frames(storyboard: dict, manifest: dict, selector: str, per: str = "sce
                   "title": titles.get(sid, "")}
         if per == "scene":
             item = {**common, "beat_index": 0, "final": True,
-                    "ts": 1e9,  # extract clamps to (duration - 0.05): the last held frame
+                    # sentinel: extract_frames() resolves this to the fullest-ink ts
+                    # (or, under --dry-run / a missing mp4, clamps it to duration -
+                    # 0.05 -- the last held frame, the old behaviour).
+                    "ts": 1e9,
+                    "fullest_ts": None, "ink_ratio_vs_last": None,
                     "narration": entry.get("script", ""), "reveal": None,
                     "revealed_so_far": cumulative_reveals(beats, len(beats) - 1)}
             # B.1b: attach deterministic graph-label geometry so build_prompt can
@@ -231,9 +284,17 @@ def reset_frames_dir(out_dir: Path) -> None:
         shutil.rmtree(frames_dir)
 
 
-def extract_frames(deck_id: str, plan: list[dict], out_dir: Path) -> list[dict]:
+def extract_frames(deck_id: str, plan: list[dict], out_dir: Path, *,
+                   compute_fullest: bool = True) -> list[dict]:
     """ffmpeg-grab one PNG per planned frame. Offline, free. Returns the plan
-    with `frame_path` filled (or None on miss)."""
+    with `frame_path` filled (or None on miss).
+
+    compute_fullest: for a `final` (per=="scene") item, decode the whole scene
+    video once to find the fullest-ink frame (see `_fullest_frame_ts`) before
+    grabbing it -- this is the one part of extraction that is NOT cheap (it reads
+    every frame, not just one), so --dry-run passes False to stay free and to keep
+    working with no mp4 rendered yet; the item's `ts` sentinel then falls through
+    to the existing duration-0.05 clamp below (the old end-of-scene behaviour)."""
     durations: dict[str, float | None] = {}
     for item in plan:
         sid = item["scene_id"]
@@ -245,6 +306,11 @@ def extract_frames(deck_id: str, plan: list[dict], out_dir: Path) -> list[dict]:
         if sid not in durations:
             durations[sid] = _ffprobe_duration(video)
         dur = durations[sid]
+        if item.get("final") and compute_fullest:
+            found = _fullest_frame_ts(video)
+            if found is not None:
+                item["ts"], item["ink_ratio_vs_last"] = found
+                item["fullest_ts"] = item["ts"]
         ts = item["ts"] if dur is None else min(item["ts"], dur - 0.05)
         frame_dir = out_dir / "frames" / f"{item['scene_number']:02d}_{sid}"
         frame_dir.mkdir(parents=True, exist_ok=True)
@@ -611,7 +677,7 @@ def main() -> int:
     print(f"[critic] output dir: {out_dir}", flush=True)
     rubric = load_rubric()
     reset_frames_dir(out_dir)
-    plan = extract_frames(deck_id, plan, out_dir)
+    plan = extract_frames(deck_id, plan, out_dir, compute_fullest=not args.dry_run)
     (out_dir / "frame_plan.json").write_text(
         json.dumps(plan, indent=2, ensure_ascii=False) + "\n", encoding="utf-8")
 
