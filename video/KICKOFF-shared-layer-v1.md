@@ -718,17 +718,19 @@ severity ∈ {`error`, `warn`}；`make.py` 有 error 即 abort（`--skip-sizeche
 
 ## 8. Backlog（本檔查證時發現，不在本輪修）
 
-- **`_SCALE_PX` 沒有 `result` token**，`derivation.py:136` 用 raw `size=54`；
+> **2026-09-14 認領狀態**：本節條目的逐條分類與第 1 輪認領（Task A–F）見 [`KICKOFF-toolline-backlog-r1.md`](KICKOFF-toolline-backlog-r1.md)；下方 ✅ 為已收。
+
+- ✅（T2 收：result 列走 `math_conclusion` 62，raw `size=54` 已無）**`_SCALE_PX` 沒有 `result` token**，`derivation.py:136` 用 raw `size=54`；
   `DESIGN.md:1211` 的型階表卻把它列成一階。T2 會順手修掉（升成具名 token），
   但表裡的 `divider 92` 同樣是 alias（`intro_headline`）——表與 code 的對應關係值得整節重寫一次。
 - **`sizecheck` 只看 `brand.prose`** 的盲點（`REVIEW_GATES.md` 層 6 已記）。T3 的 L1 會被它咬到；
   若 T3 為了 L1 做了「全樹 `_effective_font_px`」，**那是一個共用層改動**，
   應該考慮讓既有的 muted／floor 檢查也吃這條路（但不要在 T3 裡順手改，那違反外科手術原則）。
-- **Instrument Sans 沒有 CTAN pdflatex 套件**（§2.1）。若 T1-5 是 no-go，
+- ✅（T1 為 go，字型 vendored＋`ENVIRONMENT.md`／doctor 已記）**Instrument Sans 沒有 CTAN pdflatex 套件**（§2.1）。若 T1-5 是 no-go，
   這個事實要寫進 `ENVIRONMENT.md`，免得下一個人再查一次。
-- **mockup 的數學字體是 Source Serif 4**（`DirectionB.dc.html:14`），與落地的 Latin Modern 不同。
+- ✅（已記進 `_audit/design-template-system/README.md` 已知限制）**mockup 的數學字體是 Source Serif 4**（`DirectionB.dc.html:14`），與落地的 Latin Modern 不同。
   設計畫布與 code 之間的這個落差應該回寫進 `_audit/design-template-system/README.md` 的「已知限制」。
-- **`RUNBOOK-mimo-narration-route.md:67` 寫死「9 個」**（2026-09-13 T4 併入時已改 10）——這種硬寫數字的地方值得全面掃一次
+- ✅（9→10 已改；全面掃＝第 1 輪 Task F 第 4 件）**`RUNBOOK-mimo-narration-route.md:67` 寫死「9 個」**（2026-09-13 T4 併入時已改 10）——這種硬寫數字的地方值得全面掃一次
   （`REVIEW_GATES.md`／`README.md`／`REBUILD_STATUS.md` 裡的 deck 數、selftest 數同理；
   本檔 §2.4 已記錄「18 → 22」這個漂移）。
 - **`meta.example_coverage_enforce` 未開**（§7.2 open item）。§3.2 開工時是自然的時機。
@@ -770,7 +772,7 @@ severity ∈ {`error`, `warn`}；`make.py` 有 error 即 abort（`--skip-sizeche
    答案框高度貼合內容）。其中 `caption 30/ink_2` 那條是**共用層 token 的性質**，不是這個模板的私事。
 8. **環境 flake：`latex.exe`／`dvisvgm.exe` 偶發掛死。** 成因＝MiKTeX 的 fndb 被別的 process 鎖住；
    症狀＝`media/Tex` 不再增長、selftest runner 0 輸出（不是報錯，是靜靜卡住）。
-   **紀律：同一個工作樹絕不並行跑兩個 deck 的報表或 build pass**——`media/Tex` 的競態會偽裝成 `sizecheck` error。
+   **紀律：同一個工作樹絕不並行跑兩個 deck 的報表或 build pass**——`media/Tex` 的競態會偽裝成 `sizecheck` error。 **（2026-09-14 §3.2 session 實測補充：`media/Tex` 競態是 per-cwd——`config.media_dir = ./media`，各 worktree 各有一份——跨 worktree 並行零撞車；fndb 鎖才是全域偶發，症狀是靜靜掛住而非報錯。）**
 9. **`_selftest_theorem_regime` 用 `"band" in msg` 撈 finding。** 於是 `sizecheck` 的新訊息**不得含 band 這個字**
    （T3 已避開），這是一條隱形的耦合。值得改成結構化比對（比對 finding 的 code／severity，而不是訊息字串）。
 10. **`critic.py --per scene` 對有 `exit:` 的場取到末幀、不是最滿幀。** gate 1 的長期覆蓋缺口：
@@ -787,7 +789,7 @@ severity ∈ {`error`, `warn`}；`make.py` 有 error 即 abort（`--skip-sizeche
     （2026-09-14 幀稽核 advisory）；目前仍在框內但已無容錯，與 ④ 的 rail 寬度議題同源，宜一起看。
 14. **場 12 的 `Axes(tips=True)` 用 manim 預設箭頭 0.35，deck 其他圖是 0.16。** 同一節兩種箭頭大小；
     修法是讓 `graph` 模板把箭頭尺寸納入 theme，而不是逐場覆寫。
-15. **`rewatch_pack --baseline` 拒絕舊版包。** 舊版 `rewatch_pack` 寫的包沒記 fps／畫面尺寸，
+15. ✅（已收：協定回寫、基線以備份成片重生）**`rewatch_pack --baseline` 拒絕舊版包。** 舊版 `rewatch_pack` 寫的包沒記 fps／畫面尺寸，
     新版比對讀不到就 **exit 2 什麼都不寫**——2026-09-14 §6 的 `rewatch_pack_after21` 即因此被拒，
     改以兩包 `INDEX.md` 逐場比對代替。協定已由 §3.1 里程碑審 session 回寫、並用備份成片重生基線；
     此處記一筆，免得下一個人再撞一次。

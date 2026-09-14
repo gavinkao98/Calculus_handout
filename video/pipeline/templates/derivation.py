@@ -65,7 +65,55 @@ MIN_PITCH = _ROW_GAP  # tightest inter-row gap -- sizecheck's split-capacity tri
 LEAD_PAD_L = 0.22     # clear space between an equation's right edge and its leader
 LEAD_PAD_R = 0.18     # ... and between the leader and the reason column
 MIN_LEADER = 0.55     # shortest leader that still reads as a connector (~74 px at 1080p)
+RIGHT_SLACK = 0.15    # clear space the reason column keeps at the content edge (~20 px)
+HANG_GAP = 0.18       # equation -> its hung reason, when the reason drops to the next line
 _REASON_PX = T._SCALE_PX["prose_sm"]   # 一般 reason 的 authored px（A/B 開放值 2026-09-14 定案 38）
+
+
+def _rail_fits(eq_w: float, reason_w: float) -> bool:
+    """Can a row this wide keep a FULL leader and still leave the reason column its
+    right-edge tolerance? (SPINE_X cancels out -- this is purely a width budget.)"""
+    return eq_w + LEAD_PAD_L + MIN_LEADER + LEAD_PAD_R + reason_w + RIGHT_SLACK <= CONTENT_W
+
+
+def _rail_plan(eq_widths: list[float],
+               reason_widths: "list[float | None]") -> "tuple[float, set[int]]":
+    """Which rows share the reason rail, and where the rail's left edge lands.
+
+    Returns ``(reason_x, off_rail)``. MIN_LEADER is a FLOOR, and until 2026-09-14 nothing
+    happened when it could not be met: the rail was capped at the frame edge and the widest
+    row took whatever leader was left over -- 17.9 px, about two dots, on
+    ``difference_quotient_for_sine``'s result row, with the reason column landing flush on
+    the content edge (0.0 px of slack). The two pressures pull opposite ways (moving the
+    rail RIGHT lengthens the leader but pushes the reason off-frame), so neither can be
+    traded for the other; the fallback has to remove a row from the contest instead.
+
+    *off_rail* is the set of row indexes that give up the SHARED column x (shared-layer
+    backlog 4's "reason 併回等式下一行"; ``build`` then decides whether such a row still fits
+    on its equation's own line or has to drop under it). The one that leaves is the WIDEST
+    REASON: it is the row pinned against the content edge, so it is the one backlog 13 is
+    about, and it is the term the column cannot accommodate -- the equations stay where they
+    are either way. (Dropping the widest equation+reason FOOTPRINT instead also balances the
+    budget, but on ``companion_limit`` that is a middle row, and moving its reason cost the
+    rows below it a line each.) An off-rail row stops driving the rail, which is what makes
+    this worth anything: otherwise its equation would keep pushing the rail right. Rows with
+    NO reason never drive it either, for the same reason (they need no leader); that alone
+    gives ``example_chain_times_quotient`` back its right-edge tolerance (backlog 13).
+    """
+    live = [i for i, w in enumerate(reason_widths) if w is not None]
+    off_rail: set[int] = set()
+    while live:
+        if _rail_fits(max(eq_widths[i] for i in live),
+                      max(reason_widths[i] for i in live)):
+            break
+        worst = max(live, key=lambda i: (reason_widths[i], eq_widths[i]))
+        off_rail.add(worst)
+        live.remove(worst)
+    if not live:
+        return RAIL_X, off_rail
+    need = SPINE_X + max(eq_widths[i] for i in live) + LEAD_PAD_L + MIN_LEADER + LEAD_PAD_R
+    cap = (SPINE_X + CONTENT_W) - max(reason_widths[i] for i in live) - RIGHT_SLACK
+    return max(RAIL_X, min(need, cap)), off_rail
 
 
 def capacity_meta(spec: dict[str, Any]) -> list[ColumnPlan]:
@@ -199,11 +247,32 @@ def _matching(source, target):
 
 
 def _rail(mob, this_eq):
-    """The row's rail parts (leader, reason): everything in the row group but the equation. A
-    theorem_proof row IS its MathTex (rollout T1-3) -- its submobjects are glyphs, not a rail."""
+    """The row's rail parts (leader, reason, a verdict glyph): everything in the row group but
+    the equation. A theorem_proof row IS its MathTex (rollout T1-3) -- its submobjects are
+    glyphs, not a rail.
+
+    The equation is often WRAPPED -- `_eq_mob` puts a result inside a glow group and pairs a
+    marked row with its verdict glyph -- so the wrapper is opened and only its non-equation
+    members count as rail; the wrapper ITSELF is never a rail part. Counting it as one (before
+    2026-09-14) gave a row with no reason a rail of length 1 -- the equation's own wrapper --
+    with two consequences (§8 backlog ⑯): a `paced` row then looked walkable, so
+    `_rail_walk_seconds` handed it the rest of the beat and `pacing.walk` spent that beat
+    re-fading the equation the morph had just finished drawing and then holding (`paced:`
+    exempts the row from the [stillness] advisory, so a beat that was still end to end was
+    also invisible -- ch03 22 `all_six_cot_csc.result`, 11.26 s); and an UNPACED such row put
+    `FadeIn(wrapper)` into the morph play, animating the morph's own target a second time
+    (ch03 20 `all_six_tan_sec.result`)."""
     if mob is this_eq:
         return VGroup()
-    return VGroup(*[m for m in mob.submobjects if m is not this_eq])
+    parts = []
+    for m in mob.submobjects:
+        if m is this_eq:
+            continue
+        if any(s is this_eq for s in m.get_family()):   # the wrapper: keep its siblings only
+            parts += [s for s in m.submobjects if s is not this_eq]
+        else:
+            parts.append(m)
+    return VGroup(*parts)
 
 
 def _rail_walk_seconds(scene, rail, consumed: float, paced: bool) -> "float | None":
@@ -211,7 +280,11 @@ def _rail_walk_seconds(scene, rail, consumed: float, paced: bool) -> "float | No
     morph, for the rail to be walked across (pacing.walk) -- so a 1.2 s morph on a 12 s beat
     reads "morph, read the leader, read the reason" instead of "morph, then 10 s of nothing".
     None means the rail rides the morph play as before: not paced, no rail, or too little of
-    the beat left for one fade per part (off-beat too -- beat_run_time is 0 there)."""
+    the beat left for one fade per part (off-beat too -- beat_run_time is 0 there). A row with
+    no `reason` has no rail at all (see _rail), so `paced:` on it walks NOTHING: the morph
+    plays, the rest of the beat holds, and the honest report of that hold is schema's
+    `nothing to walk` warning (a `paced:` id still exempts the beat from the [stillness]
+    advisory, which is why the warning has to be the one that speaks)."""
     n = len(rail.submobjects)
     if not paced or not n:
         return None
@@ -351,37 +424,49 @@ def build(spec: dict[str, Any], ctx: dict[str, Any]) -> list[Block]:
     # with the other templates' right column). The dotted leader becomes a
     # TOC-style connector spanning each equation's right edge to the reason column
     # (set per row in the layout loop), so a short equation gets a long leader and
-    # the link always reads. eq_col_w now only guards the rare chain wide enough to
-    # reach the rail -- then that row's leader is skipped.
-    eq_col_w = max((e.width for e in eqs), default=0.0)
-    # A chain that reaches the rail used to lose its leader (the `> 0.12` skip below) and
-    # the tag then read as glued to the equation's tail -- 30 px of clear space on
-    # difference_quotient_for_sine's result row, 16 px on companion_limit's first step
-    # (2026-09-13 visual audit). So the rail SHIFTS RIGHT, scene-wide, by just enough to
-    # keep a readable leader on the widest row; a column that stayed straight while its
-    # connector vanished was the actual defect, not the column's x. Capped at
-    # the widest reason's own width so the column can never be starved into shrinking its
-    # text (the tags are already the smallest type in the frame); rows narrower than the
-    # widest just get a longer leader, as before.
-    reason_x = RAIL_X
-    widest_reason = max((r.width for r in reasons if r is not None), default=0.0)
-    if widest_reason > 0:
-        need = left_x + eq_col_w + LEAD_PAD_L + MIN_LEADER + LEAD_PAD_R
-        reason_x = max(RAIL_X, min(need, (SPINE_X + CONTENT_W) - widest_reason))
-    reason_max_w = (SPINE_X + CONTENT_W) - reason_x
+    # the link always reads. The rail SHIFTS RIGHT, scene-wide, by just enough to keep a
+    # readable leader on the widest row that carries one: a chain reaching the rail used to
+    # lose its leader (the `> 0.12` skip below) and the tag then read as glued to the
+    # equation's tail -- 30 px of clear space on difference_quotient_for_sine's result row,
+    # 16 px on companion_limit's first step (2026-09-13 visual audit); a column that stayed
+    # straight while its connector vanished was the actual defect, not the column's x.
+    # _rail_plan owns that x AND the fallback for the rows it cannot serve.
+    right_edge = SPINE_X + CONTENT_W
+    reason_x, off_rail = _rail_plan([e.width for e in eqs],
+                                    [r.width if r is not None else None for r in reasons])
+    reason_max_w = right_edge - reason_x - RIGHT_SLACK
+    off_rail_max_w = CONTENT_W - RIGHT_SLACK   # an off-rail reason answers only to the frame
 
-    # pre-pass: clamp reason widths, collect row heights (needed to size the chain to
-    # the body zone before placing).
+    # pre-pass: clamp reason widths, place the off-rail rows' reasons, collect row heights
+    # (needed to size the chain to the body zone before placing).
+    #
+    # An off-rail reason takes the rightmost x that still leaves RIGHT_SLACK, never past the
+    # rail's own x (so the column still reads as one). It KEEPS ITS EQUATION'S LINE whenever a
+    # full leader still fits there -- on companion_limit the result's 4.60u tag is what the
+    # shared column could not host, but its own 3.36u equation leaves plenty of room on its
+    # own line, and dropping it a line for nothing pushed the chain past the bottom safe
+    # margin. Only a row too wide for that (difference_quotient_for_sine's 8.34u result)
+    # HANGS: its reason goes on the line under the equation, no leader.
+    hung: set[int] = set()
+    own_x: dict[int, float] = {}
     heights: list[float] = []
-    for r, eq, reason in zip(rows, eqs, reasons):
-        if reason is not None and reason.width > reason_max_w > 0:
+    for i, (r, eq, reason) in enumerate(zip(rows, eqs, reasons)):
+        limit = off_rail_max_w if i in off_rail else reason_max_w
+        if reason is not None and reason.width > limit > 0:
             # px dispatched by row kind, SAME SOURCE as the authored sizes above: a result
             # reason is an eyebrow at "tag", everything else at _REASON_PX -- keeps the clamp
             # floor equal to the authored px (closes the SP2 note; and an A/B re-tune of
             # _REASON_PX can never drift away from this guard).
             floor_px = T._SCALE_PX["tag"] if r["kind"] == "result" else _REASON_PX
-            brand._clamp_shrink(reason, reason_max_w, floor_px)
-        heights.append(max(eq.height, reason.height if reason is not None else 0.0))
+            brand._clamp_shrink(reason, limit, floor_px)
+        if reason is not None and i in off_rail:
+            own_x[i] = max(SPINE_X, min(reason_x, right_edge - RIGHT_SLACK - reason.width))
+            if SPINE_X + eq.width + LEAD_PAD_L + MIN_LEADER + LEAD_PAD_R > own_x[i]:
+                hung.add(i)
+        if i in hung:
+            heights.append(eq.height + HANG_GAP + reason.height)
+        else:
+            heights.append(max(eq.height, reason.height if reason is not None else 0.0))
 
     # spread rows so a short chain fills the body zone rather than stranding a dead band
     # under the title + an empty lower third (Codex 2026-06-21). A statement, if present,
@@ -394,22 +479,33 @@ def build(spec: dict[str, Any], ctx: dict[str, Any]) -> list[Block]:
     row_mobs: list[Any] = []
     y = 0.0
     prev_half = None
-    for r, eq, reason, h in zip(rows, eqs, reasons, heights):
+    for i, (r, eq, reason, h) in enumerate(zip(rows, eqs, reasons, heights)):
         half = h / 2
         if prev_half is not None:
             extra = row_gap + (0.12 if r["kind"] == "check" else 0.0)
             y -= prev_half + extra + half
+        if i in hung:
+            # the fallback's last resort: this row's reason sits on the line UNDER its own
+            # equation, with no leader -- the row is already as wide as the frame, so a
+            # connector would be a stub and the reason would be pinned against the content
+            # edge (difference_quotient_for_sine's result: 17.9 px of leader, 0.0 px of slack).
+            eq.move_to([left_x, y + half - eq.height / 2, 0], aligned_edge=LEFT)
+            reason.move_to([own_x[i], y - half + reason.height / 2, 0], aligned_edge=LEFT)
+            row_mobs.append((r, VGroup(eq, reason), eq))
+            prev_half = half
+            continue
+        rx = own_x.get(i, reason_x)
         eq.move_to([left_x, y, 0], aligned_edge=LEFT)
         group = [eq]
         if reason is not None:
-            reason.move_to([reason_x, y, 0], aligned_edge=LEFT)
+            reason.move_to([rx, y, 0], aligned_edge=LEFT)
             # TOC-style leader: spans the gap from this equation's right edge to the
             # reason column, so the connection holds whatever the equation's width
             # (was a fixed 0.67u stub anchored to the floating rail). A chain wide
             # enough to reach the rail leaves no room -> skip the leader, keep the link
             # implicit by row alignment. opacity 0.6/0.7 (Codex read 0.5/0.55 too faint).
             lead_start = eq.get_right()[0] + LEAD_PAD_L
-            lead_end = reason_x - LEAD_PAD_R
+            lead_end = rx - LEAD_PAD_R
             if lead_end - lead_start > 0.12:
                 leader = brand.dotted_leader(
                     lead_end - lead_start, ground,

@@ -383,6 +383,20 @@ gutter、`derivation` 的式子右緣、`callout` 的置中…），任何「第
   （視覺稽核在 `difference_quotient_for_sine` 與 `companion_limit` 各開一條）。現在 rail 會
   **場級右移**到最寬那列還放得下 `MIN_LEADER = 0.55u` 為止，上限是「最寬 reason 自己的寬度」
   ——欄位永遠不會被擠到要縮字（tag 已是畫面最小字級）。其餘場位移 0.000u，逐列輸出不變。
+  **2026-09-14（backlog ④⑬，工具線 Task E）：`MIN_LEADER` 咬住時的 fallback＝「reason 併回
+  等式下一行」。** 原因是兩股壓力方向相反、不可互相交換：rail **右移**才能加長 leader（④），
+  rail **左移**才能還給 reason 右緣容錯（⑬）。所以另外兩個候選都無解——「rail 整體右移」正是被
+  右緣上限擋住的那件事；「點改線」只換樣式、一寸空間也生不出來，對⑬毫無作用。唯一能同時解掉
+  兩者的做法是**把某一列從這場競爭裡移出去**：`_rail_plan()` 讓「等式＋reason 自身寬度」最大的
+  那一列把 reason 放到**自己等式的下一行**（無 leader、左緣仍對齊 rail，寬到放不下才往左讓），
+  該列**同時不再參與 rail 的 x 計算**——後者才是這個 fallback 有效的關鍵（否則那列的等式照樣
+  把 rail 往右頂）。**沒有 reason 的列同理不再頂住 rail**（它本來就不需要 leader）。
+  rail 因此恆滿足：留在 rail 上的每一列 leader ≥ `MIN_LEADER`，且最寬 reason 距 `SPINE_X +
+  CONTENT_W` ≥ `RIGHT_SLACK = 0.15u`（≈20 px）。**不新增第四階字級、不動 `_SCALE_PX`。**
+  實測影響面（30 個 derivation 場中的 5 個 instance，其餘 25 個 rail x 位移 0.000u）：
+  `difference_quotient_for_sine`（最短 leader 17.9→74.3 px、右緣餘裕 0→333 px，`result` 併行）、
+  `companion_limit`（57.6→271.3 px、0→96 px，`step.0` 併行）、`example_chain_times_quotient`
+  （右緣餘裕 0→253 px，無列併行——只是那條無 reason 的 10.39u 結論列不再頂住 rail）。
 - `procedure_steps`：result 欄左對齊 `RAIL_X`（原右對齊 far gutter、Codex 兩輪嫌 detached）。
 - `recap_cards`：**不用 rail**——改為單一全幅編號點欄（`points[]` 以 `01/02/03` ＋ 全寬 prose
   左堆疊、`center_in_zone` 上偏置中）；舊「公式卡 snap `RAIL_X`」雙欄版已退場。
@@ -948,6 +962,15 @@ muted（opacity 0.55）。用 `TransformMatchingShapes` 逐字形配對，**不�
 **不**帶 rail（leader／reason），morph 之後把 rail 的各段平均鋪在**拍子剩餘時間**上（`beat_run_time − 已耗秒數`；
 n 段切 n 個間隔，同 `paced_reveal`，兩者共用 `pacing.walk`）——1.2 s 變形接 10 s 靜止就變成「變形、讀 leader、讀理由」。
 剩餘時間不夠 n 個 fade、或該列沒有 rail（沒寫 reason；theorem_proof 列）→ 退回 rail 跟 morph 同一個 play。
+**無 rail 就不走，改由 schema 報（2026-09-14，§8 backlog ⑯）：** `_rail` 認的是「row group 裡不是等式的那些
+部件」，而等式常被**包一層**（result 在 glow group 裡、帶判定符號的列是 `VGroup(等式, 符號)`），所以包裝層本身
+永遠不算一段（只取它裡面非等式的成員）。此前包裝層算一段，於是沒寫 reason 的列也回報「有 rail」：paced 列
+把整拍交給 `pacing.walk`，走的是剛 morph 完的等式自己（再淡入一次然後 hold），而 `paced:` 又讓 `[stillness]`
+免檢——宣告 paced、實際整拍靜止且無人報（ch03 22 `all_six_cot_csc.result` 11.26 s）；未 paced 的同型列則是
+`FadeIn(包裝層)` 與 morph 同一個 play，對 morph 自己的終點再放一次動畫（ch03 20 `all_six_tan_sec.result`）。
+改後兩者都只剩 morph 本身，拍子剩下的是誠實的 hold；**author 端的閘＝`schema._paced_no_rail_issues`**
+（`paced` 列出的 `anim: transform`／`cancel` 列沒有 `reason` → warn `paced row '<rid>' has nothing to walk
+(no reason rail)`）——`[stillness]` 對列在 `paced:` 的 reveal 一律免檢，看不到這種拍，所以要由 schema 出聲。
 `derivation.build` 自己把 `paced` 傳進 closure；`pacing.apply` 仍跳過 callable。**`fixed_seconds`：** closure 掛
 `anim.fixed_seconds = 1.2`（frame 再 +0.4），`[stillness]` 據此判定（見上）。**theorem_proof 的 `proof[]` 也收 dict 列：**
 `{tex: "$…$", anim: transform, frame: true}`（字串列不變；`theorem_proof.proof_texts(spec)` 給所有讀 `proof[]` 的消費端），
@@ -1294,6 +1317,28 @@ assert 回傳的秒數，沒有這層 fallback 會拿到 0.0。所以 hook 一�
 兩個對時點，六場對照（`--reuse-audio --quality high`）警告 6 → 1 條、`sum|delta|` 2.347 → 0.541，
 六場末幀逐像素相同（`git log --grep="timing-honest"`）。
 
+#### 同一條通道上的執行期字級探針（`[floorprobe]`）
+
+`sizecheck` 的 `MIN_FONT_FLOOR` 閘量的是 **build 佈局的 authored px**；`carry: to.scale` 的縮放、
+hook 自建的 `MathTex`、`\tfrac` 的 scriptstyle 內縮、執行期 `.scale()`／退場，它**一概看不到**
+（`KICKOFF-shared-layer-v1.md` §8 ①②⑪⑫⑰ 是同一個盲點的五張臉）。`pipeline/floorprobe.py` 從另一側補：
+`probe()` 走 **scene 的 mobject 樹**，讀 manim 的 `font_size`（＝`height / initial_height`，**跟隨
+`.scale()`**）換回有效 px，低於 floor 就回一條 finding；tex 含 `\tfrac`／`\frac`／`^`／`_`／`\sqrt[`
+者另報 scriptstyle 內縮估計（`SCRIPT_RATIO = 0.7`，是**估計**不是量測，所以自成一種 finding）。
+
+**只量不動**——不 `wait`、不 `play`、不碰任何 mobject，所以本節那三個對時點與 `[sync]` 量的每拍時鐘
+一律不受影響（`_selftest_floorprobe.test_probe_does_not_touch_the_mobjects` 守這一條）。掛在
+`scene.py::_play_content` 每拍 `wait` 之後與 `_tail` 開頭各一次。
+
+**回報走的就是上面那條通道**：render 在 `make.py` 行程內跑，`make.py` 用 `LessonScene` 的 class
+attribute 把 `spec`／`meta`／`beat_durations` 交進去，`LessonScene.floorprobe_findings` 就是同一條線
+的回程（**沒有第二條 sidecar**；`timeline.json`／`.vtt` 是 compose 時由 manifest 寫的，與此無關）。
+`make.py::render()` 每場 render 完把它排乾，交給 `_print_floorprobe`（定義在 `_warn_undeclared_stillness`
+旁邊）印 `[floorprobe] …`，同一個節點只印它第一次掉到 floor 以下的那一拍。
+
+**永遠 warn-only，也刻意不做 `meta.floorprobe_enforce`**：它在幀都畫完之後才知道結果，升成 error
+也擋不住任何還來得及擋的事——能擋的那一半是 `meta.fontfloor_enforce`（render 前）的職責。
+
 ### Text rendering：prose vs math（no garble）
 
 **Route A（2026-06-24 落地）：所有螢幕文字都走 LaTeX/pdflatex** 以拿到正確 kerning——內文/標題 **Instrument Sans**（2026-09-13 由 IBM Plex Sans 換過來；沒有 CTAN 套件，OTF＋autoinst 生成物 vendored 在 `pipeline/fonts/instrument-sans/`，換機設定見 [`../ENVIRONMENT.md`](../ENVIRONMENT.md) ①b）、eyebrow **IBM Plex Mono**、數學 **Latin Modern**。根因：實測 manim `Text`/`MarkupText`（Pango）完全不套 kerning（`W("AVAVAV")`≈各字寬相加），sans 尤其鬆；LaTeX 會 kerning。字體在 TeX preamble 設定（`_bootstrap.apply_tex_template`：`InstrumentSans`＋`plex-mono`＋`lmodern`＋`microtype`，`familydefault=\sfdefault`，`\everymath{\displaystyle}`），所以本模組不再出現任何 Pango family 名。硬約束：只能 pdflatex（lualatex/xelatex 會破壞 manim 的 `\special{dvisvgm:raw}` 數學子部件定址）。計畫見 [`content_scripts/_audit/PLAN-routeA-plex-latex.md`](content_scripts/_audit/PLAN-routeA-plex-latex.md)。
@@ -1304,10 +1349,21 @@ assert 回傳的秒數，沒有這層 fallback 會拿到 0.0。所以 hook 一�
 
 | 角色 | 函式 | 字體 | LaTeX |
 |---|---|---|---|
-| 標題 | `brand.heading` / `brand.heading_rich` | Instrument Sans Bold | `\textbf{…}` |
+| 標題 | `brand.heading` / `brand.heading_rich` | Instrument Sans Bold | `\textbf{…}`（詞間距見下註） |
 | 內文 prose | `brand.body_text` / `brand.prose` | Instrument Sans | text-mode（含 `$math$`） |
 | eyebrow / label | `brand.eyebrow` | Plex Mono | `\texttt{…}` |
 | 數學 | `brand.math_line` / `MathTex` | Latin Modern | math-mode |
+
+> **Bold 詞間距（2026-09-14，backlog ③）：** vendored 的 Instrument Sans **Bold 自帶的
+> interword space 比 Regular 還窄**（`\fontdimen2` 1.90 pt vs 1.99998 pt @10 pt），而它的
+> 字身反而**寬 5.04 %**（小寫字母表 142.740 pt vs 135.890 pt），於是 bold 標題比周圍的
+> regular 文字緊約 9.6 %，詞與詞黏在一起（T1 換字後唯一新增的可見缺點，三場幀稽核點名）。
+> preamble 用 `\AtBeginDocument{…\bfseries\fontdimen2\font=0.2101em…}` 把它按字身成長的
+> 同一比例放大回去（1.99998 × 142.740/135.890 = 2.1008 pt）；`\fontdimen` 在 TeX 是**全域
+> 指派**，所以設一次就涵蓋整份文件的 `\textbf`。`\fontdimen3/4`（伸縮）刻意不動——manim 的
+> `standalone`／`preview` 盒子每行都以自然寬排版，詞間膠水永遠不伸縮。守門＝
+> `_selftest_derivation_rail.test_bold_interword_space_matches_regular_density`（兩字重的
+> 「詞距 ÷ 自身字母表寬」須一致）與 `_selftest_text_metrics` 的 bold 估寬帶。
 
 `Tex` 在 text mode 原生排「文字＋內聯 `$math$` 同行」、baseline 正確、kerned，所以**舊的 Pango↔Tex 拼接機制已全部移除**：`theme.TEX_TEXT_SCALE`（Pango↔Tex 尺寸對齊，今 = 1.0 no-op）、`brand._pango_dashes`、`brand._compose`／`_prose_mixed`（手動 baseline 拼接）。換行寬度估計 `_WIDTH_K`／`estimate_text_width` 與 kerning 無關，保留並在每次換字時重校（2026-09-13：Instrument Sans）。
 

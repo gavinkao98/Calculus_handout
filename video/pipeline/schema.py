@@ -115,6 +115,44 @@ def _paced_issues(sid: str, scene: dict, say) -> "list[tuple[str, str]]":
                                     f"(revealed here: {sorted(revealed)})"))
     if len(set(entries)) != len(entries):
         issues.append(("error", f"{sid}.paced: duplicate id"))
+    issues += _paced_no_rail_issues(sid, scene, entries)
+    return issues
+
+
+def _paced_no_rail_issues(sid: str, scene: dict, entries: "list[str]") -> "list[tuple[str, str]]":
+    """A `paced:` id naming a derivation MORPH row (`anim: transform` / `cancel`) with no
+    `reason` has nothing to walk (§8 backlog ⑯).
+
+    Those rows are the one paced shape `pacing.apply` never touches -- a morph row is already
+    a callable, so it reads `paced:` itself and walks its own reason rail across what is left
+    of the beat (templates/derivation._rail_walk_seconds). Without a `reason` there is no
+    rail, so the declaration buys nothing: the morph plays for its 1.2 s and the rest of the
+    beat holds. Warn, not error -- the frame is correct, the pacing is not -- and warn HERE
+    because the [stillness] advisory cannot: it exempts every beat whose reveal is named in
+    `paced:`, so this is the one shape that can declare itself paced and be still for the
+    whole beat with no gate saying so."""
+    # derivation only: worked_example rows carry no `reason` by design (D2) and its answer
+    # band walks its own box + tag, so "no reason" says nothing about walkability there.
+    if scene.get("template") != "derivation":
+        return []
+    rows: dict[str, dict] = {}
+    for j, st in enumerate(scene.get("steps") or []):
+        rows[f"step.{j}"] = st if isinstance(st, dict) else {"math": st}
+    if scene.get("result") is not None:
+        r = scene["result"]
+        rows["result"] = r if isinstance(r, dict) else {"math": r}
+    for j, ln in enumerate(scene.get("lines") or []):
+        rows[f"line.{j}"] = ln if isinstance(ln, dict) else {"tex": ln}
+    issues: list[tuple[str, str]] = []
+    for bid in entries:
+        row = rows.get(bid)
+        if not isinstance(row, dict) or row.get("anim") not in ("transform", "cancel"):
+            continue
+        if not row.get("reason"):
+            issues.append(("warn", f"{sid}: paced row {bid!r} has nothing to walk (no reason "
+                                   f"rail) -- an `anim: {row['anim']}` row paces by walking "
+                                   f"its reason rail, so this beat holds after the morph; "
+                                   f"give the row a `reason:` or drop it from `paced:`"))
     return issues
 
 

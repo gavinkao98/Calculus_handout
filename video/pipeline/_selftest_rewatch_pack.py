@@ -20,6 +20,14 @@ how eight `[sync]` warnings survived from round 13 to round 20, so a gate that c
 anything is not a gate. `baseline_verdict` refuses an A/B whose baseline was rendered at a
 different fps or frame size, because comparing 480p15 against 1080p30 measures `--quality`
 and not the change. Both are pure functions so the judging is tested without ffmpeg.
+
+Also pinned (2026-09-14, KICKOFF-toolline-backlog-r1.md §2.D): `_beat_at` used to pick a beat
+by whether a still span's MIDPOINT fell inside its range, so a span that genuinely straddled
+a beat boundary (or ran into the tail) could name no beat at all -- a FAIL line then had
+nowhere to point. It now uses overlap, which cannot miss a beat the span touches, and names
+the dominant one plus the range it spans. `scene_subset_verdict` is `main()`'s own --scene
+subset / --out validation extracted into a pure function: a subset always needs an --out of
+its own, and refuses one that already holds a full (non-subset) pack.
 """
 from pipeline import _bootstrap
 
@@ -96,14 +104,33 @@ def test_beat_attribution_names_the_beat_the_span_sits_in():
     lead = RP.SCENE_LEAD_SECONDS
     # scene 09's real numbers: the FINE span is the proof.1 beat ...
     assert RP._beat_at([lead + 26.5, lead + 41.8], beats) == " (beat 2, proof.1)"
-    # ... while the COARSE span, which merges the writing beat with its neighbour, is not
-    assert RP._beat_at([lead + 7.0, lead + 26.8], beats) == " (beat 1, proof.0)"
+    # ... while the COARSE span, which merges the writing beat with its neighbour, overlaps
+    # all three (2.9 s of statement, 15.2 s of proof.0, 1.7 s of proof.1) -- proof.0 dominates
+    # by overlap, and the span-of-several is now named rather than silently dropped
+    assert RP._beat_at([lead + 7.0, lead + 26.8], beats) == " (beat 1, proof.0; spans beats 0–2)"
 
 
 def test_beat_attribution_is_silent_without_beats_or_outside_them():
     assert RP._beat_at([1.0, 5.0], []) == ""
     one = [{"index": 0, "reveal": "x", "start_seconds": 0.0, "end_seconds": 2.0}]
     assert RP._beat_at([900.0, 901.0], one) == ""
+
+
+def test_beat_attribution_names_the_dominant_beat_and_flags_the_span():
+    """2026-09-14 bug: `_beat_at` picked a beat by whether the span's MIDPOINT fell inside
+    its range, so a span whose midpoint landed past the end of the beat it mostly overlaps
+    (e.g. into a neighbour, or the tail) could name no beat at all -- a FAIL line then had
+    nowhere to point. Overlap only needs the span to touch a beat, so it cannot miss one, and
+    when it touches more than one it must say so rather than silently pick just one."""
+    beats = [{"index": 3, "reveal": "step.3", "start_seconds": 20.0, "end_seconds": 22.0},
+             {"index": 4, "reveal": "step.4", "start_seconds": 22.0, "end_seconds": 30.0}]
+    lead = RP.SCENE_LEAD_SECONDS
+    # overlaps beat 3 by 1 s (21-22) and beat 4 by 6 s (22-28) -- beat 4 dominates by overlap,
+    # and the midpoint (24.5) already sits inside beat 4, so the OLD code also named beat 4 --
+    # what it never did is flag that the span reaches into beat 3 as well
+    assert RP._beat_at([lead + 21.0, lead + 28.0], beats) == " (beat 4, step.4; spans beats 3–4)"
+    # a span entirely inside one beat is unaffected: no "spans" suffix
+    assert RP._beat_at([lead + 23.0, lead + 24.0], beats) == " (beat 4, step.4)"
 
 
 # ---- the 12 s still gate (G1) ---------------------------------------------------------
@@ -187,12 +214,43 @@ def test_this_render_mixing_fps_across_its_own_scenes_is_refused():
     assert "fps=15/1 size=854x480" in msg and "fps=30/1 size=1920x1080" in msg, msg
 
 
+# ---- a --scene subset's --out (kickoff §2.D points 1-2) -------------------------------
+# `main()`'s own logic, extracted into `scene_subset_verdict` so it is testable without
+# touching argparse, ffmpeg or the filesystem.
+
+def test_a_full_deck_run_needs_no_out_and_is_never_refused():
+    ok, msg = RP.scene_subset_verdict(False, None, None)
+    assert ok and msg == "", msg
+    ok, msg = RP.scene_subset_verdict(False, Path("anywhere"), {"subset": False})
+    assert ok and msg == "", msg               # a full run may even sit on top of a full pack
+
+
+def test_a_scene_subset_without_its_own_out_is_refused():
+    """This used to `raise SystemExit` for the FULL deck's missing _av files even when only
+    two scenes were asked for (backlog item 18); requiring --out is the other half of the
+    fix -- a subset must never land in, and silently overwrite, the full pack's default dir."""
+    ok, msg = RP.scene_subset_verdict(True, None, None)
+    assert not ok and "requires --out" in msg, msg
+    ok, msg = RP.scene_subset_verdict(True, Path("some/dir"), None)
+    assert ok and msg == "", msg               # --out given, and nothing there yet: fine
+
+
+def test_a_scene_subset_refuses_to_land_on_an_existing_full_pack():
+    full_pack = {"deck": "d", "subset": False, "scenes": {}}
+    ok, msg = RP.scene_subset_verdict(True, Path("out"), full_pack)
+    assert not ok and "already holds a full pack" in msg, msg
+    subset_pack = {"deck": "d", "subset": True, "scenes": {}}
+    ok, msg = RP.scene_subset_verdict(True, Path("out"), subset_pack)
+    assert ok and msg == "", msg               # overwriting an existing SUBSET pack is fine
+
+
 if __name__ == "__main__":
     test_the_span_points_at_the_longest_run_not_the_first()
     test_both_thresholds_report_a_span()
     test_a_clip_too_short_to_difference_still_carries_the_new_keys()
     test_beat_attribution_names_the_beat_the_span_sits_in()
     test_beat_attribution_is_silent_without_beats_or_outside_them()
+    test_beat_attribution_names_the_dominant_beat_and_flags_the_span()
     test_still_gate_passes_when_every_content_scene_is_under_the_line()
     test_still_gate_fails_and_names_the_beat_of_the_scene_over_the_line()
     test_still_gate_ignores_scenes_that_are_not_content()
@@ -203,4 +261,7 @@ if __name__ == "__main__":
     test_baseline_at_a_different_frame_size_is_refused()
     test_a_baseline_pack_that_records_no_source_is_refused()
     test_this_render_mixing_fps_across_its_own_scenes_is_refused()
+    test_a_full_deck_run_needs_no_out_and_is_never_refused()
+    test_a_scene_subset_without_its_own_out_is_refused()
+    test_a_scene_subset_refuses_to_land_on_an_existing_full_pack()
     print("OK rewatch_pack self-test")

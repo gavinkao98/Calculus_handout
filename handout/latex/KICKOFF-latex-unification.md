@@ -97,9 +97,9 @@ video/                      # 流程不動；講義輸入錨改 latex/src（U5�
 |---|---|---|---|
 | **P0 pilot** | ch03 源升格（`dist/ch03/chapter3.tex` → `src/ch03/`）＋編譯三閘＋`check_prose` 對現行 fragment 跑 PASS（證升格無損）；圖 harness 自 standalone 抽出→`export_figs` 重匯→與 `chapters/ch03/figs/` 現品比對一致 | 三閘綠＋子序列 PASS＋圖匯出一致 | ✅ 2026-08-09（commit `ceb92f9`；捎帶修 export_figs ERR_UNSAFE_PORT 隨機炸彈＋ch03 圖 Times 殘渣債） |
 | **P1 源接管** | ch08＋appA/C/D 首轉（最後一批走 convert.py：方言盤點→mapping→四閘）；其餘 7 單元 tex 升格 `src/`；12 單元 figs harness 全建；`html/` 凍結、`make_dist.py` 退役、新 `build.py`＝日常編譯入口 | 12 單元 src 編譯全綠；fragment 凍結；convert.py／check_prose／make_dist.py 退役留檔 | ✅ 2026-08-09（方言差集：ch08/appA/appC/appD 皆 **0**，免補 mapping；ch05 圖 0 著陸債由 harness 重匯修；首轉 4 單元自動閘全綠、**人眼閘待使用者過目**；overfull 待裁決 6 條＝appA×3〔2.3pt 同型〕/appD×1〔14pt〕/ch04×1〔12.1pt〕/ch06×1〔4.2pt〕；`_audit`/`_dev-archive` 當日決定留在 html/ 原地——**2026-08-09 稍晚使用者要求佈局重構後推翻**：升層至 `handout/_audit`／`handout/_dev-archive`，html 凍結件與轉換工具移入 `legacy/html_handout/`＋`legacy/html2latex/`，`shot.mjs`→`figkit/`、`quote_lint.py`→`tools/`；引用以批量腳本＋doc_lint 迭代修至 clean） |
-| **P2 編號語意化**（U3） | 轉換腳本＋模板 counter 層；逐單元轉＋驗證 | 12 單元輸出編號與 as-built ledger 逐一相同 | ⬜ |
-| **P3 閘鏈＋契約＋CI＋文檔** | CONTRACT-latex-writing.md 立檔；6 個 handout subagent rubric 改輸入；quote_lint 改掃 .tex；CI 改（lint＋src 存在性；編譯閘維持本地）；README／PIPELINE／CONTENT_SPEC／WORKFLOW／CLAUDE.md 全面改寫 | doc_lint 綠；新 rubric 對任一章實跑一輪 | ⬜ |
-| **P4 影片線**（U5） | video/README golden path＋CONTENT_METHODOLOGY `source:` 錨格式改 latex/src；各文檔權威輸入指向更新 | video 文檔 doc_lint 綠、引用格式範例更新 | ⬜ |
+| **P2 編號語意化**（U3） | 轉換腳本＋模板 counter 層；逐單元轉＋驗證 | 12 單元輸出編號與 as-built ledger 逐一相同 | ✅ 2026-08-09（commit `3ebbcc8`；本表當時未回填，2026-09-14 依 git 補勾） |
+| **P3 閘鏈＋契約＋CI＋文檔** | CONTRACT-latex-writing.md 立檔；6 個 handout subagent rubric 改輸入；quote_lint 改掃 .tex；CI 改（lint＋src 存在性；編譯閘維持本地）；README／PIPELINE／CONTENT_SPEC／WORKFLOW／CLAUDE.md 全面改寫 | doc_lint 綠；新 rubric 對任一章實跑一輪 | ✅ 2026-08-09（commit `827a508`；本表當時未回填，2026-09-14 依 git 補勾） |
+| **P4 影片線**（U5） | video/README golden path＋CONTENT_METHODOLOGY `source:` 錨格式改 latex/src；各文檔權威輸入指向更新 | video 文檔 doc_lint 綠、引用格式範例更新 | ✅ 2026-08-09（commit `f6882de`；本表當時未回填，2026-09-14 依 git 補勾） |
 | **P5 Ch8 gate-2**（U4） | 三閘 gate-2（數學／散文 S·A·V／圖視覺）在 LaTeX 源上跑到 0 blocking → Ch8 定版 | Ch8 定版；新閘鏈首戰紀錄回填本表 | ✅ 2026-08-09（新閘鏈首戰通過：`.tex` inline＋harness PNG 餵 Codex 全程順跑；數學 1B+1A／散文 0／圖 13 clean，9 處措辭修補〔含 ch06 EF1〕，回歸全綠，Ch8 定版。紀錄＝`html/_dev-archive/ch08/ch08_gate2-audit.md`） |
 
 > P2 與 P3 可部分並行；P5 需 P1（ch08 有 src）＋P3（rubric 改完）。每 Phase 完成即回填
