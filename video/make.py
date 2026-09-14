@@ -395,6 +395,35 @@ def _warn_undeclared_stillness(meta: dict, scenes: list[dict], manifest: dict,
         print(f"[stillness] no undeclared still > {UNDECLARED_STILL_SECONDS:g}s", flush=True)
 
 
+def _print_floorprobe(findings: "list[tuple]") -> None:
+    """The RUN-TIME font-floor advisory, the twin of the `[stillness]` one above.
+
+    `sizecheck`'s floor check runs BEFORE the render and reads the BUILD layout;
+    `pipeline/floorprobe` (wired into scene.py) reads the scene's mobject tree while it
+    plays, so a `carry: to.scale`, a hook's own MathTex and a `\\tfrac`'s scriptstyle
+    inner size -- all invisible to the static gate -- surface here. Warn-only: it is
+    printed after the frames are drawn, so there is nothing left for it to block.
+
+    A node under the floor is still under it on every later beat, so each
+    (scene, origin, kind, tex, px) prints ONCE, at the first beat it appeared under."""
+    seen: set = set()
+    lines: list[str] = []
+    for sid, beat, finding in findings:
+        key = (sid, finding.origin, finding.kind, finding.tex, round(finding.px, 1))
+        if key in seen:
+            continue
+        seen.add(key)
+        lines.append(f"[floorprobe] {finding.message(sid, beat)}")
+    if not lines:
+        print("[floorprobe] no on-screen text below the font floor", flush=True)
+        return
+    print(f"[floorprobe] {len(lines)} node(s) below the font floor at render time:", flush=True)
+    for line in lines[:20]:
+        print(f"  {line}", flush=True)
+    if len(lines) > 20:
+        print(f"  [floorprobe] ... and {len(lines) - 20} more", flush=True)
+
+
 def render(meta: dict, scenes: list[dict], manifest: dict, out_dir: Path, quality: str,
            deck: "list[dict] | None" = None):
     """Manim renders each scene silent; reuses scene.LessonScene align core. `deck` is the
@@ -407,6 +436,10 @@ def render(meta: dict, scenes: list[dict], manifest: dict, out_dir: Path, qualit
     media_dir = out_dir / "_media"
     rendered: dict[str, Path | None] = {}
     failures = 0
+    # scene.py's run-time font-floor probe reports back on the same class attribute
+    # channel this loop uses to hand each scene in; construct() resets it per scene, so
+    # drain it after every render (see _print_floorprobe).
+    floorprobe_hits: list = []
     LessonScene.scenes_by_id = _scenes_by_id(scenes, deck)
     for scene in scenes:
         sid = scene["id"]
@@ -461,6 +494,8 @@ def render(meta: dict, scenes: list[dict], manifest: dict, out_dir: Path, qualit
             failures += 1
             print(f"[render] FAIL {sid}: {exc!r}", flush=True)
             traceback.print_exc()
+        floorprobe_hits += LessonScene.floorprobe_findings
+    _print_floorprobe(floorprobe_hits)
     return rendered, failures
 
 

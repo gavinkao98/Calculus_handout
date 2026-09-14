@@ -18,6 +18,7 @@ from typing import Any
 from manim import DOWN, UP, FadeIn, FadeOut, Rectangle, Scene
 
 from . import _bootstrap
+from . import floorprobe
 from . import focus
 from .blocks import accent_role, play_block
 from .narration import estimate_seconds, parse_say
@@ -49,6 +50,36 @@ def dim_ids(spec: dict[str, Any], target: str, wanted: "list[str]") -> "list[str
     return out
 
 
+def run_floorprobe(scene, by_id, beat: str) -> None:
+    """Run-time font floor (`pipeline/floorprobe`): measure what is ON SCREEN right now
+    and record anything under `MIN_FONT_FLOOR`. The static twin -- sizecheck's floor check
+    -- only ever sees the BUILD layout, so a `carry: to.scale`, a hook's own MathTex or a
+    `\\tfrac`'s scriptstyle inner size is invisible to it (KICKOFF-shared-layer-v1 §8
+    (1)(2)(11)(12)(17)).
+
+    MEASURE ONLY -- no `wait`, no `play`, no mobject touched -- so the beat clock the
+    `[sync]` audit measures cannot move because of this call. Warn-only: findings are
+    collected on `LessonScene.floorprobe_findings` and printed by make.py after the
+    render; nothing here blocks anything.
+
+    Module-level, and a no-op on a scene with no mobject tree, because `_tail` and
+    `_play_content` are also driven UNBOUND against the selftests' FakeScene
+    (_selftest_carry, _selftest_focus_and_pacing): those have no screen to read."""
+    mobjects = getattr(scene, "mobjects", None)
+    if not mobjects:
+        return
+    owners: dict[int, str] = {}
+    for block_id, block in by_id.items():
+        mobject = getattr(block, "mobject", None)
+        if mobject is None:
+            continue
+        for part in mobject.get_family():
+            owners.setdefault(id(part), block_id)
+    scene_id = (getattr(scene, "spec", None) or {}).get("id", "?")
+    for finding in floorprobe.probe(mobjects, owners=owners):
+        LessonScene.floorprobe_findings.append((scene_id, beat, finding))
+
+
 class LessonScene(Scene):
     spec: dict[str, Any] | None = None
     meta: dict[str, Any] | None = None
@@ -67,10 +98,19 @@ class LessonScene(Scene):
     # outside a beat, or in a beat with none of them. `timing.beat_run_time` subtracts this
     # from a beat-filling reveal's budget so that both land inside the beat, not past it.
     beat_reserved_seconds: float = 0.0
+    # The run-time font-floor probe's findings for the scene being rendered, as
+    # (scene id, beat label, floorprobe.Finding). CLASS-level and reset by construct(),
+    # because make.py renders through a throwaway `LessonScene()` instance and reads the
+    # result off the class -- the same in-process channel it already uses in the other
+    # direction to hand `spec` / `meta` / `beat_durations` in. (There is no per-beat
+    # sidecar on disk; the only sidecars, timeline.json / .vtt, are written at compose
+    # time from the manifest.)
+    floorprobe_findings: list = []
 
     def construct(self) -> None:
         if self.spec is None:
             raise RuntimeError("LessonScene was not configured (spec missing).")
+        LessonScene.floorprobe_findings = []
 
         # Re-apply the Plex/lmodern TeX template every scene: manim's tempconfig (this
         # scene runs inside `with tempconfig(cfg):`) drops config.tex_template back to
@@ -129,6 +169,7 @@ class LessonScene(Scene):
         (FADE_SECONDS, on any scene that dimmed something) and a final beat that overran
         and fell back on MIN_HOLD. Both used to push the whole clip long; they are absorbed
         by the hold now, the same way the `exit` fade already is."""
+        run_floorprobe(self, by_id, "tail")   # the finished frame, before anything exits
         exits = (self.spec.get("exit") or []) if kind == "content" else []
         mobs = [by_id[i].mobject for i in exits if i in by_id]
         if mobs:
@@ -247,6 +288,7 @@ class LessonScene(Scene):
                 self.wait(max(target_seconds - consumed, MIN_HOLD))
             else:
                 self.wait(max(start + elapsed_target - now, MIN_HOLD))
+            run_floorprobe(self, by_id, f"{index + 1:02d}")
         self.beat_seconds = None
         self.beat_reserved_seconds = 0.0
         # Leave the scene un-focused: the final frame (what the visual gates read, and

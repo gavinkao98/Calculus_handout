@@ -1294,6 +1294,28 @@ assert 回傳的秒數，沒有這層 fallback 會拿到 0.0。所以 hook 一�
 兩個對時點，六場對照（`--reuse-audio --quality high`）警告 6 → 1 條、`sum|delta|` 2.347 → 0.541，
 六場末幀逐像素相同（`git log --grep="timing-honest"`）。
 
+#### 同一條通道上的執行期字級探針（`[floorprobe]`）
+
+`sizecheck` 的 `MIN_FONT_FLOOR` 閘量的是 **build 佈局的 authored px**；`carry: to.scale` 的縮放、
+hook 自建的 `MathTex`、`\tfrac` 的 scriptstyle 內縮、執行期 `.scale()`／退場，它**一概看不到**
+（`KICKOFF-shared-layer-v1.md` §8 ①②⑪⑫⑰ 是同一個盲點的五張臉）。`pipeline/floorprobe.py` 從另一側補：
+`probe()` 走 **scene 的 mobject 樹**，讀 manim 的 `font_size`（＝`height / initial_height`，**跟隨
+`.scale()`**）換回有效 px，低於 floor 就回一條 finding；tex 含 `\tfrac`／`\frac`／`^`／`_`／`\sqrt[`
+者另報 scriptstyle 內縮估計（`SCRIPT_RATIO = 0.7`，是**估計**不是量測，所以自成一種 finding）。
+
+**只量不動**——不 `wait`、不 `play`、不碰任何 mobject，所以本節那三個對時點與 `[sync]` 量的每拍時鐘
+一律不受影響（`_selftest_floorprobe.test_probe_does_not_touch_the_mobjects` 守這一條）。掛在
+`scene.py::_play_content` 每拍 `wait` 之後與 `_tail` 開頭各一次。
+
+**回報走的就是上面那條通道**：render 在 `make.py` 行程內跑，`make.py` 用 `LessonScene` 的 class
+attribute 把 `spec`／`meta`／`beat_durations` 交進去，`LessonScene.floorprobe_findings` 就是同一條線
+的回程（**沒有第二條 sidecar**；`timeline.json`／`.vtt` 是 compose 時由 manifest 寫的，與此無關）。
+`make.py::render()` 每場 render 完把它排乾，交給 `_print_floorprobe`（定義在 `_warn_undeclared_stillness`
+旁邊）印 `[floorprobe] …`，同一個節點只印它第一次掉到 floor 以下的那一拍。
+
+**永遠 warn-only，也刻意不做 `meta.floorprobe_enforce`**：它在幀都畫完之後才知道結果，升成 error
+也擋不住任何還來得及擋的事——能擋的那一半是 `meta.fontfloor_enforce`（render 前）的職責。
+
 ### Text rendering：prose vs math（no garble）
 
 **Route A（2026-06-24 落地）：所有螢幕文字都走 LaTeX/pdflatex** 以拿到正確 kerning——內文/標題 **Instrument Sans**（2026-09-13 由 IBM Plex Sans 換過來；沒有 CTAN 套件，OTF＋autoinst 生成物 vendored 在 `pipeline/fonts/instrument-sans/`，換機設定見 [`../ENVIRONMENT.md`](../ENVIRONMENT.md) ①b）、eyebrow **IBM Plex Mono**、數學 **Latin Modern**。根因：實測 manim `Text`/`MarkupText`（Pango）完全不套 kerning（`W("AVAVAV")`≈各字寬相加），sans 尤其鬆；LaTeX 會 kerning。字體在 TeX preamble 設定（`_bootstrap.apply_tex_template`：`InstrumentSans`＋`plex-mono`＋`lmodern`＋`microtype`，`familydefault=\sfdefault`，`\everymath{\displaystyle}`），所以本模組不再出現任何 Pango family 名。硬約束：只能 pdflatex（lualatex/xelatex 會破壞 manim 的 `\special{dvisvgm:raw}` 數學子部件定址）。計畫見 [`content_scripts/_audit/PLAN-routeA-plex-latex.md`](content_scripts/_audit/PLAN-routeA-plex-latex.md)。
