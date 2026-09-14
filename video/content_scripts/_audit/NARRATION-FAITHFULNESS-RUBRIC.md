@@ -48,6 +48,7 @@ NFA 在**鎖稿後**跑（旁白 source 已認可、已 derive）。從同一份
 - `x+\tfrac h2` → “x plus one half h”——**不可** “x plus h over two”（會被聽成 `(x+h)/2`；§3.1 gate-2 實證的 D3 blocking）
 - **分子整個是和／差的分數** `\tfrac{A+B}{2}` → “the quantity A plus B, **all over** two”——**不可** “A plus B over two”（會被聽成 `A + B/2`）。上一條處理的是「加法在分數**外**」，這一條是「和在分子**內**」，兩者相反、都必須明講群組。（2026-09-13 §3.1 Task D 實證的 D3 blocking）
 - **函數的和／差引數** `\sin(u+v)`、`\cos(u-v)` → “sine of **the quantity** u plus v”——**不可** “sine of u plus v”（會被聽成 `(\sin u)+v`，在正要講「有東西相消」的句子裡會直接毀掉語意）。`\sin\frac h2` → “sine of h over two” 在**本片**可省群組詞，但理由不是「of 就夠了」（嚴格說 “sine of h | over two” 仍可解成 `(\sin h)/2`）——是**同一拍的旁白已指明 `h over two` 在 sine 之內、且畫面同時顯示 $\frac{\sin(h/2)}{h/2}$**。沒有這個支撐時改念 “sine of one half h”。（2026-09-13 §3.1 Task D 實證的 D3 blocking；本片 `why_trig_is_different` 早有 “sine of the quantity x plus h” 的先例，是新寫的句子漏套）
+- **分母整體被平方的分數** `\tfrac{A}{(X+Y)^2}` → “A over **the square of the quantity** X plus Y”——**不可** “A over the quantity X plus Y, squared”（`the quantity` 開群、逗號收群，但 “squared” 掛在哪一層沒有標記，會被聽成 $\bigl(\tfrac{A}{X+Y}\bigr)^2$）；**也不可** “…, all squared”——house 慣例裡 “all squared” 蓋住**前面整串**（見上方「群組次方」列），用在這裡會把 “A over …” 一起吃進去。**適用範圍限「分母整個被平方」**；獨立群組的次方（`(\sqrt[3]{x-2})^3`、`(f^{-1}(x))^2`、§3.1 [`../ch03_trig_derivatives.spoken.yml`](../ch03_trig_derivatives.spoken.yml):17 的 “expanded the quantity x plus h, to the n”）仍照「群組次方」那一列，本列**不推翻**既有先例。（2026-09-14 §3.2 gate-1 NFA N1-03 的 D3 advisory 裁定；首例 `ch03_chain_rule` 的 `example_chain_times_quotient`，$\tfrac{3}{(x+2)^2}$）
 
 ## 收斂線（blocking vs advisory）
 
