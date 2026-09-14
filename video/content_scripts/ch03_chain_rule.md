@@ -1,10 +1,11 @@
 # §3.2 The Chain Rule — 影片內容稿（content script）
 
 > **產線：** 講義 → 影片，gen-2。Chapter 3 第二節，從 HTML 講義逐節重跑。
-> **權威來源：** [`../../legacy/html_handout/fragments/ch03/sec-3-2.html`](../../legacy/html_handout/fragments/ch03/sec-3-2.html)（建置版 `legacy/html_handout/standalone/chapter3-print-standalone.html` §3.2）。
-> **source_rev：** `legacy/html_handout/fragments/ch03/sec-3-2.html` `sha256:a1cd58673847ef4b2d245ff61f21f3e9e4201c03c05d77af1cf050517837c889` — lock 時（2026-06-29，commit `b3860bc`）該 fragment 的 LF 正規化 sha256（2026-09-12 依產線評估 F2 補蓋；產生器 `python video/pipeline/source_rev.py <源檔>`）。schema／make／derive preflight 比對現檔，不符即 `[source_rev]` WARN＝「講義已變」→ 走 [`../CONTENT_METHODOLOGY.md`](../CONTENT_METHODOLOGY.md) §8（diff→外科修改→scoped NFA）後重蓋。**現況：lock 後講義已改三輪（2026-07-03／07-06／07-26），且 2026-08-09 起唯一源＝`handout/latex/src/ch03/chapter3.tex`——§8 對齊在解凍（品質補強試點 ④ 裁決後）進 Stage 2 前做；對齊後改 stamp 該 `.tex`。**
+> **權威來源：** [`../../handout/latex/src/ch03/chapter3.tex`](../../handout/latex/src/ch03/chapter3.tex) §3.2（`:208–416`）——2026-08-09 起講義唯一源。原 HTML fragment [`../../legacy/html_handout/fragments/ch03/sec-3-2.html`](../../legacy/html_handout/fragments/ch03/sec-3-2.html)（建置版 `legacy/html_handout/standalone/chapter3-print-standalone.html` §3.2）已封存於 `legacy/html_handout/`，可回溯。
+> **source_rev：** `handout/latex/src/ch03/chapter3.tex` `sha256:acc1feed6c089bbe5745848af4a8483bb76392c55a474c25836e92c32f59cc0a` — 2026-09-14 依 [`../CONTENT_METHODOLOGY.md`](../CONTENT_METHODOLOGY.md) §8 完成對齊後重蓋（產生器 `python video/pipeline/source_rev.py <源檔>`）。schema／make／derive preflight 比對現檔，不符即 `[source_rev]` WARN＝「講義已變」→ 走 §8（diff→外科修改→scoped NFA）後重蓋。**對齊結論：lock（2026-06-29，commit `b3860bc`）至今 §3.2 的講義改動全屬標點平實化／同義詞替換／圖說精簡／紙本動線，本文（Thm 3.3／Def 3.1／Prop 3.3／Strategy 3.1／Caution／ex:3.4–3.8／full ε-δ 證明）數學零改動，24 個單元全部「不跟改」（跟改 0 筆）；證據見 [`_audit/REVIEW-ch03_chain_rule-s32-a1-alignment.html`](_audit/REVIEW-ch03_chain_rule-s32-a1-alignment.html)。**
 > **這是什麼：** 純內容中間產物（source of truth）。格式見 [`../CONTENT_METHODOLOGY.md`](../CONTENT_METHODOLOGY.md) §6——只含 `id`／`source`／`learning_goal`／`kind`／`narration`／`visual_need`／`animation_cue`，**不含**任何工程欄位（template／`{show}`／accent／payload／divider）。工程是第二階段的事。
 > **階段：** **LOCKED（`CONTENT_APPROVED=yes`；2026-06-29 使用者 sign-off）**——本輪只做 Stage 1 內容稿（使用者裁決 2026-06-29：先做內容稿到 sign-off 暫停）。Thm 3.3 證明走 **full ε-δ 全展開**（使用者裁決），切 4 個 proof 單元。計畫見 [`_audit/PLAN-ch03-s32-video.md`](_audit/PLAN-ch03-s32-video.md)。本輪六鏡 blocking==0（Workflow `wf_d53afe59-4f2`、L5 盲算全 match）＋ copyedit（6 tighten＋9 optional 全採納）＋ 使用者 sign-off 已完成 → LOCKED；後續忠實性由 NFA 把關，post-lock 改稿須對動到單元跑 scoped NFA 回歸（§8）。Stage 2（storyboard／hooks／render／視覺閘）達範圍同意後續做。narration 認可在編譯出的 `_narration.html` 上進行；本 `.md` 為權威，兩者 MUST 一致。
+> **出片旁白的權威（doc-sync）：** 本檔的 `narration:` 是**鎖稿當時的內容稿旁白**（版本 A [`ch03_chain_rule_narration.html`](ch03_chain_rule_narration.html) 由它編出）；**實際出片的旁白以 [`../storyboards/ch03_chain_rule.yml`](../storyboards/ch03_chain_rule.yml) 的 `say:` 為準**——Stage 2 依鎖定內容稿為口說**再撰寫、收緊**（該檔檔頭自書 “authored from the LOCKED content script”）。兩者措辭有差是**已知且非 blocking 的 doc-sync 落差**（§3.1 同案已裁定，見 [`_audit/PROMPT-ch03_trig_derivatives-narration-faithfulness.md`](_audit/PROMPT-ch03_trig_derivatives-narration-faithfulness.md):17）；旁白忠實度由 NFA **對 `say:`** 判，不對本檔的 `narration:` 判。`narration:` 已 LOCKED，一個字都不改。
 
 ---
 
@@ -200,6 +201,29 @@ animation_cue: |
   （選用）建議動畫：拿一個合成式（如 $\sqrt{1+x^2}$），由最外層往內逐層用框
   把「外函數」與「內部整塊」框起來、依序點亮步驟①–④，最後在內部再框一次示意
   「裡頭還是複合就重複」。
+screen_contract: |
+  required_steps:
+    - id: outermost
+      tex: 'f(\,\cdot\,)'
+      reason: 'name the outer function'
+    - id: name_inside
+      tex: 'u=g(x)'
+      reason: 'name the inner function'
+    - id: outer_at_inner
+      tex: 'f''(g(x))'
+      reason: 'differentiate the outside, inside kept whole'
+    - id: times_inner
+      tex: 'f''(g(x))\cdot g''(x)'
+      reason: 'multiply by the inner derivative'
+    - id: repeat_per_layer
+      tex: '\text{repeat steps 1--4 per layer; the slope factors multiply}'
+      reason: 'iteration rule (chapter3.tex:239) -- prerequisite for the three-layer example'
+    - id: decompose_sqrt
+      tex: '\sqrt{1+x^{2}}:\ f(u)=\sqrt{u},\ g(x)=1+x^{2}'
+      reason: 'worked decomposition (chapter3.tex:241)'
+    - id: decompose_sin
+      tex: '\sin(x^{2}):\ f(u)=\sin u,\ g(x)=x^{2}'
+      reason: 'worked decomposition (chapter3.tex:241)'
 ```
 
 ---
@@ -309,6 +333,17 @@ visual_need: |
    2. (⇐) $f(x_0+h)=f(x_0)+m\,h+R(h)$ ÷$h$ ⇒ $\dfrac{f(x_0+h)-f(x_0)}{h}=m+\dfrac{R(h)}{h}\to m$。
    3. ∴ 同性質、同導數（QED）。
 animation_cue: （無——靜態陳述＋證明鏈即可）
+screen_contract: |
+  required_steps:
+    - id: define_R
+      tex: 'R(h):=f(x_0+h)-f(x_0)-m\,h'
+      reason: 'construct the remainder from the limit form (tex:267)'
+    - id: forward
+      tex: '\frac{R(h)}{h}=\frac{f(x_0+h)-f(x_0)}{h}-m\longrightarrow 0'
+      reason: 'limit form => remainder form'
+    - id: backward
+      tex: '\frac{f(x_0+h)-f(x_0)}{h}=m+\frac{R(h)}{h}\longrightarrow m'
+      reason: 'remainder form => limit form, same m'
 ```
 
 ---
@@ -341,6 +376,17 @@ visual_need: |
    3. 收線性項、其餘併 $R_3$：$P(x_0+h)=P(x_0)+(g'(x_0)f'(g(x_0)))h+R_3(h)$，$R_3=m_2 R_1(h)+R_2(m_1 h+R_1(h))$。
    4. 對照餘項形式 ⇒ $P'(x_0)=f'(g(x_0))g'(x_0)$，**只剩證** $\dfrac{R_3(h)}{h}\to0$（標為下一步目標）。
 animation_cue: （無——靜態證明鏈即可；步驟 3「收線性項／掃進 R₃」可用顏色分群強調）
+screen_contract: |
+  required_steps:
+    - id: g_remainder
+      tex: 'g(x_0+h)=g(x_0)+m_1 h+R_1(h),\quad m_1=g''(x_0)'
+      reason: 'g differentiable: its remainder form, and what m_1 is'
+    - id: f_remainder
+      tex: 'P(x_0+h)=f(g(x_0))+m_2[m_1 h+R_1(h)]+R_2(m_1 h+R_1(h)),\quad m_2=f''(g(x_0))'
+      reason: 'f''s remainder form at the inner increment; m_2 is used as a constant next scene'
+    - id: collect_R3
+      tex: '=P(x_0)+(g''(x_0)f''(g(x_0)))h+R_3(h),\quad R_3(h)=m_2R_1(h)+R_2(m_1 h+R_1(h))'
+      reason: 'collect the linear part and DEFINE R_3 -- the next scene splits exactly this'
 ```
 
 ---
@@ -368,6 +414,17 @@ visual_need: |
    3. 附記（標「keep for later」）：$m_1 h+R_1(h)\to0$（$m_1 h\to0$；$R_1(h)\to0$，因 $R_1(h)/h\to0$）。
    4. 第二塊 $\dfrac{R_2(m_1 h+R_1(h))}{h}$ 標「delicate → next」。
 animation_cue: （無——靜態推導即可）
+screen_contract: |
+  required_steps:
+    - id: split_R3
+      tex: '\frac{R_3(h)}{h}=m_2\frac{R_1(h)}{h}+\frac{R_2(m_1 h+R_1(h))}{h}'
+      reason: 'the two-piece split the whole endgame rests on'
+    - id: easy_zero
+      tex: 'm_2\frac{R_1(h)}{h}\to 0'
+      reason: 'the easy piece dies'
+    - id: inner_to_zero
+      tex: 'm_1 h+R_1(h)\to 0'
+      reason: 'noted for later -- choose_alpha in the next scene needs it'
 ```
 
 ---
@@ -399,6 +456,17 @@ visual_need: |
    4. 取 $0<|h|<\alpha$；零情形 $m_1 h+R_1(h)=0$ ⇒ $R_2(0)=0$ ⇒ 商 $=0$。
    5. 標「剩非零情形 → next」。
 animation_cue: （無——靜態 ε-δ 設定即可；δ→α 的「先選誤差容忍、再回推 h 範圍」可用箭頭示意因果）
+screen_contract: |
+  required_steps:
+    - id: choose_delta
+      tex: '\frac{R_2(y)}{y}\to 0\Rightarrow\exists\,\delta:\ |R_2(y)/y|<\varepsilon\ (0<|y|<\delta)'
+      reason: 'the delta that makes the relative remainder of f small'
+    - id: choose_alpha
+      tex: '\exists\,\alpha:\ |m_1 h+R_1(h)|<\delta\ (0<|h|<\alpha)'
+      reason: 'pull delta back to a window in h'
+    - id: zero_case
+      tex: 'm_1 h+R_1(h)=0\Rightarrow R_2(0)=0\Rightarrow\text{piece}=0'
+      reason: 'the degenerate case must be dispatched or the division below is illegal'
 ```
 
 ---
@@ -431,6 +499,14 @@ visual_need: |
    4. ⇒ $\le\left(|m_1|+\dfrac{|R_1(h)|}{|h|}\right)\varepsilon$；取 $\alpha_1$ 使 $\dfrac{|R_1(h)|}{|h|}<1$ ⇒ $<(|m_1|+1)\varepsilon$。
    5. $\varepsilon$ 任意 ⇒ 第二塊 $\to0$；合併 ⇒ $\dfrac{R_3(h)}{h}\to0$（QED：連鎖律成立）。
 animation_cue: （無——靜態證明鏈即可；步驟 2 的「乘一除一」可短暫高亮分子分母同插入 $|m_1 h+R_1(h)|$）
+screen_contract: |
+  required_steps:
+    - id: factor_split
+      tex: '\frac{|R_2(m_1 h+R_1(h))|}{|h|}=\frac{|m_1 h+R_1(h)|}{|h|}\cdot\frac{|R_2(m_1 h+R_1(h))|}{|m_1 h+R_1(h)|}'
+      reason: 'multiply and divide by the inner increment'
+    - id: triangle_bound
+      tex: '|m_1+R_1(h)/h|\le|m_1|+|R_1(h)|/|h|\Rightarrow\text{piece}<(|m_1|+1)\varepsilon'
+      reason: 'triangle inequality, then the fixed-constant bound'
 ```
 
 ---
@@ -459,6 +535,14 @@ visual_need: |
    (b) $\sin(x^2)$：外 $\sin$、內 $x^2$ → $\cos(x^2)\cdot 2x=2x\cos(x^2)$。
   兩式各把內導數因子 $2x$ 高亮（標「inner derivative」）。
 animation_cue: （無——靜態推導即可；兩式的 $2x$ 同色高亮，串到下一個 caution 單元）
+screen_contract: |
+  required_steps:
+    - id: sqrt_chain
+      tex: '\frac{d}{dx}\sqrt{1+x^{2}}=\frac{1}{2\sqrt{1+x^{2}}}\cdot 2x=\frac{x}{\sqrt{1+x^{2}}}'
+      reason: 'outer root, inner 1+x^2 -- the 2x is the inner derivative'
+    - id: sin_chain
+      tex: '\frac{d}{dx}\sin(x^{2})=\cos(x^{2})\cdot 2x=2x\cos(x^{2})'
+      reason: 'outer sine, inner x^2 -- same 2x'
 ```
 
 ---
@@ -512,6 +596,17 @@ visual_need: |
    3. $=\dfrac{\sin x\cos x}{\sqrt{1+\sin^2 x}}$。
   收尾標三因子 $\tfrac12 u^{-1/2}$、$2\sin x$、$\cos x$（每層一因子、相乘）。
 animation_cue: （無——靜態推導鏈即可；三個因子可由外而內依層點亮）
+screen_contract: |
+  required_steps:
+    - id: outer_root
+      tex: '\frac{d}{dx}\sqrt{1+\sin^{2}x}=\frac{1}{2\sqrt{1+\sin^{2}x}}\cdot\frac{d}{dx}(1+\sin^{2}x)'
+      reason: 'peel the outermost layer, keep the inside whole'
+    - id: inner_again
+      tex: '\frac{d}{dx}(1+\sin^{2}x)=2\sin x\cos x'
+      reason: 'the inside is itself a composition -- chain rule a second time'
+    - id: answer
+      tex: '\frac{d}{dx}\sqrt{1+\sin^{2}x}=\frac{\sin x\cos x}{\sqrt{1+\sin^{2}x}}'
+      reason: 'three layers, three factors'
 ```
 
 ---
@@ -542,6 +637,20 @@ visual_need: |
    4. $=\dfrac{3}{2\sqrt{x-1}\,(x+2)^{3/2}}$（$x>1$）。
   標：內導本身是個小問題（商法則）。
 animation_cue: （無——靜態推導鏈即可；內導數那一塊可框起標「a quotient rule of its own」）
+screen_contract: |
+  required_steps:
+    - id: outer_root
+      tex: '\frac{d}{dx}\sqrt{\frac{x-1}{x+2}}=\frac{1}{2\sqrt{(x-1)/(x+2)}}\cdot\frac{d}{dx}\left(\frac{x-1}{x+2}\right)'
+      reason: 'chain rule first; the inner derivative is left as its own problem'
+    - id: quotient_inner
+      tex: '\frac{d}{dx}\left(\frac{x-1}{x+2}\right)=\frac{(x+2)\cdot 1-(x-1)\cdot 1}{(x+2)^{2}}=\frac{3}{(x+2)^{2}}'
+      reason: 'quotient rule, with the u''v-uv'' skeleton visible (tex:373)'
+    - id: tidy_front
+      tex: '\frac{1}{2\sqrt{(x-1)/(x+2)}}=\frac{\sqrt{x+2}}{2\sqrt{x-1}}'
+      reason: 'the front factor must be tidied before the answer is recognisable (tex:375)'
+    - id: answer
+      tex: '\frac{3}{2\sqrt{x-1}\,(x+2)^{3/2}}\quad(x>1)'
+      reason: 'final answer with its domain'
 ```
 
 ---
@@ -570,6 +679,17 @@ visual_need: |
    3. $y'=2x\cos^2 x-2(1+x^2)\sin x\cos x$。
   標：積法則 + 連鎖律協作（缺一不可）。
 animation_cue: （無——靜態推導鏈即可）
+screen_contract: |
+  required_steps:
+    - id: product_rule
+      tex: 'y''=(2x)\cos^{2}x+(1+x^{2})\frac{d}{dx}(\cos^{2}x)'
+      reason: 'the outermost operation is a product, so start there'
+    - id: chain_on_cos2
+      tex: '\frac{d}{dx}(\cos^{2}x)=2\cos x(-\sin x)=-2\sin x\cos x'
+      reason: 'chain rule supplies the leftover derivative'
+    - id: answer
+      tex: 'y''=2x\cos^{2}x-2(1+x^{2})\sin x\cos x'
+      reason: 'both rules combined'
 ```
 
 ---
@@ -602,6 +722,17 @@ visual_need: |
 animation_cue: |
   （選用）建議動畫：畫 $O\to U\to K$ 三節點兩箭頭，各箭頭打上「−」號；
   沿鏈把兩個「−」相乘浮出「＋」於 $O\to K$，凸顯「符號沿鏈相乘」。
+screen_contract: |
+  required_steps:
+    - id: link_signs
+      tex: '\frac{dK}{dU}<0,\qquad \frac{dU}{dO}<0'
+      reason: 'read each link''s sign before chaining'
+    - id: leibniz_chain
+      tex: '\frac{dK}{dO}=\frac{dK}{dU}\cdot\frac{dU}{dO}'
+      reason: 'the Leibniz form is the rule being applied'
+    - id: answer
+      tex: '\frac{dK}{dO}=(-)\cdot(-)>0'
+      reason: 'product of two negatives -- more otters, more kelp'
 ```
 
 ---

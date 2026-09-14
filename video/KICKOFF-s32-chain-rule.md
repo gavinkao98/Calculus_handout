@@ -192,9 +192,16 @@ python video/pipeline/sizecheck.py video/storyboards/ch03_chain_rule.yml
 python video/pipeline/run_selftests.py  → all 42 green
 ```
 
-> **`sizecheck` 的 TeX cache race 陷阱（本檔立檔時親踩）：** 同一個 worktree 同時跑兩支
+> **`sizecheck` 的 TeX cache race 陷阱（本檔立檔時親踩）：** **同一個工作目錄**同時跑兩支
 > `sizecheck.py` 會得到 8 個假的 `SIZE: could not build scene (PermissionError/FileNotFoundError)`。
-> **量測閘一次只能跑一支**；數字對不上先確認沒有別人在跑（G7 的時間窗紀律）。
+> **同一個工作目錄內，量測閘一次只能跑一支**；數字對不上先確認同目錄沒有別人在跑。
+>
+> ⚠️ **範圍更正（2026-09-14 實測）：這個 race 是 per-cwd 的，不是全域的。** `manim` 的
+> `config.media_dir = ./media` 是**相對 cwd**，所以每個 worktree 各有自己的 `media/Tex`——
+> 不同 worktree 的子代理可以**同時**跑 `sizecheck`／`schema`，互不干擾（本節全程多 worktree 並行
+> 實跑，零撞車）。**原本寫成無限定的「量測閘一次只能跑一支」會在並行階段把所有子代理白白序列化**，
+> 這正是裁決 5「每節一個 session＋自己的 worktree」要避免的成本。§3.6 的同一句已一併更正。
+> （已同步工具線：`KICKOFF-shared-layer-v1.md` §8 ⑧。）
 
 ### 2.4 已驗證的 code 事實（沿用 §3.1，不重新發明）
 
@@ -269,7 +276,8 @@ python video/pipeline/run_selftests.py  → all 42 green
   **子集一律另給 `--out`**。
 - 開工先 `git status`；別人 dirty 的 hunk 不碰、只 commit 自己的路徑。
 - **render／tts 的時間窗用 `ListAgents`＋`SendMessage` 互相通知**（並行的另兩條線在跑）。
-- ⚠️ **量測閘（`sizecheck`／`schema`）一次只能跑一支**，理由見 §2.3 的 TeX cache race。
+- ⚠️ **量測閘（`sizecheck`／`schema`）在同一個工作目錄內一次只能跑一支**，理由見 §2.3 的 TeX cache race。
+  **跨 worktree 不受限**——`media_dir` 相對 cwd，各自一份 TeX cache（2026-09-14 實測更正，原文寫成全域限制）。
 
 ### 3.7 共用層不在這裡改
 
