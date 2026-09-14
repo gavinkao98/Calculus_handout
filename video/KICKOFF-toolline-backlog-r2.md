@@ -163,3 +163,8 @@ mock render 場 04、14、21、22 改前後幀（scratchpad/taskG），`visual-f
   ② **§3.1 側**：場 04 hook 的 draft band 用絕對 y（`ch03_trig_derivatives_hooks.py:1613–1620`，`_DRAFT_TAG_Y=0.10` 註解仍寫「step.0 bottom 0.47」，r1 E 後 0.6557、G 後 0.8864）——不相撞但該改成相對 step.0 量，
   歸 §3.1 chip；③ **`critic.py` 找不到 `--scene` 子集 render 的 mp4**（`make.py --scene a,b,c` 寫到 `output/_av/<deck>_<a>_<b>_<c>/`，critic 只找 `output/_av/<deck>/`）——工具缺口，r3；
   ④ `_selftest_*` 裡 `isinstance(m, MathTex)` 分不出 reason（`Tex ⊂ MathTex`），值得全掃一次；⑤ `--quality low` 的 480p 幀對 gate 1 偏弱，契約要明寫「幀用 `scratch_frames.py` 1080p、render 只證端到端」。
+- **Task H 的裁決與後續（2026-09-14）：** 鎖檔位置偏離契約（`<media_dir>/Tex.lock` 而非 `Tex/.lock`）——manim 每次 Tex→SVG 後 `delete_nonsvg_files()` 掃掉 `media/Tex` 內非 svg/tex 檔，
+  放裡面會被清；主對話認可。**裁決：`DEFAULT_TIMEOUT` 600→1800 s**（等待者能等完整 deck render；每 10 s 有進度行），merge 後一行 commit。
+  r3 候選：① `make.py` render 的 Tex 實際落在 `<REPO>/video/output/_media/Tex`（per-worktree）而鎖是 per-cwd——同 worktree 不同 cwd 的兩支 render 仍共用目錄不互斥（實務未見）；
+  ② 本機 venv launcher 的 `Popen.pid` ≠ 子行程 `os.getpid()`，任何拿 `Popen.pid` 比對的診斷都會被誤導（texlock 寫的是 `os.getpid()`，正確）；
+  ③ MiKTeX 全域 fndb 競爭是 §8 ⑧ 未被 texlock 接管的那半（量測期間把 12 s 的 sizecheck 拉到 600 s），整合測試的 assert 訊息會分辨「鎖沒守住」與「機器層 flake」。
