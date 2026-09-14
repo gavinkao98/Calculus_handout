@@ -59,7 +59,8 @@ mock render 場 04、14、21、22 改前後幀（scratchpad/taskG），`visual-f
 **目標**：在 Tex 建置段加 **per-cwd 互斥鎖**，讓第二支**等待**而不是吐假 error：
 1. 鎖檔＝`<media_dir>/Tex/.lock`（跟著 `config.media_dir`，所以跨 worktree 天然不互斥）；用 `os.open(O_CREAT|O_EXCL)` 原子建檔＋內寫 pid／時間；
    拿不到就每 0.5 s 重試；**逾時（預設 10 分鐘）或鎖檔過舊（mtime > 15 分鐘且 pid 不存在）視為 stale，覆蓋並印 `[texlock] stale lock from pid N removed`**。
-2. 鎖的範圍＝一整支程式的「會編 Tex 的段落」（`check_scenes` 全程；`make.py` 的 preflight 與 render 各自持鎖），不是每個 Tex 一次（那會讓兩支交錯、Tex cache 仍會互寫）。
+2. **命中面補充（§3.2 session）：`critic.py`（`graph_label_geometry` 走 templates build）、`rewatch_pack.py`、`derived_check.py` 等獨立入口凡會建 TeX 都要包鎖；selftest 不包（runner 已序列化）。**
+   鎖的範圍＝一整支程式的「會編 Tex 的段落」（`check_scenes` 全程；`make.py` 的 preflight 與 render 各自持鎖），不是每個 Tex 一次（那會讓兩支交錯、Tex cache 仍會互寫）。
    放在共用 helper `pipeline/texlock.py`：`with tex_lock(reason="sizecheck"):`。
 3. 等待時每 10 s 印一行 `[texlock] waiting for pid N (sizecheck) … 20s`，讓使用者知道不是掛住。
 4. 不依賴新套件（不裝 `filelock`）；Windows 與 POSIX 都要能跑（pid 存活檢查兩平台各一行）。
@@ -83,7 +84,7 @@ mock render 場 04、14、21、22 改前後幀（scratchpad/taskG），`visual-f
 
 **目標**：
 1. `_present_text_fields` 加 `procedure_steps` 的 `steps.i`（字串或 dict 的 `text`／`prose` 欄——先看模板實際讀哪個 key，照模板）；`worked[]` 是數學不算。
-2. `_SCOPED_TEMPLATES` 加 `procedure_steps`。**`definition_math` 要不要加由你判斷**：讀 `_screen_contract.required_steps` 對 `definition_math` 單元會產出什麼；
+2. `_SCOPED_TEMPLATES` 加 `procedure_steps`。**〔2026-09-14 主對話裁決，取代下文「由你判斷」：本輪不加 `definition_math`〕**——§3.2 session 實測納入會讓 `ch03_chain_rule`（已開 `meta.coverage_enforce`）多命中 7 個單元（`why_composition_is_missing`／`rates_multiply_intuition`／`leibniz_form`／`proof_strategy_bridge`／`remainder_form_definition`／`toward_section_3_3`／`decomposition_strategy_repeat`），需另一輪補契約；`procedure_steps` 只命中 `decomposition_strategy`，§3.2 會自補 `screen_contract`（Strategy 3.1 第 5 步曾因 SC 看不到 `procedure_steps` 而漏上畫面、吃過 PD1 blocking——此即 I 的驗收案例）。分析留當 r3 候選。原文：`definition_math` 要不要加由你判斷：讀 `_screen_contract.required_steps` 對 `definition_math` 單元會產出什麼；
    若 definition 單元根本沒有 required steps 就不加、寫明理由；若有且合理才加。
 3. **對現有正典 deck 跑 `schema.py`（含 SC）看新增了什麼**：新 finding 逐條列出、判「真缺口」或「規則過寬」。**真缺口不准改 deck**（`ch03_chain_rule*` 是 §3.2 session 的檔；
    `ch03_trig_derivatives*` 是 §3.1 的）——記進回報給主對話轉交；規則過寬就縮規則。SC 的嚴重度維持現行 `enforce` 旗標邏輯，不升級。
