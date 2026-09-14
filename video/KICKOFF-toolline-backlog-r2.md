@@ -168,3 +168,4 @@ mock render 場 04、14、21、22 改前後幀（scratchpad/taskG），`visual-f
   r3 候選：① `make.py` render 的 Tex 實際落在 `<REPO>/video/output/_media/Tex`（per-worktree）而鎖是 per-cwd——同 worktree 不同 cwd 的兩支 render 仍共用目錄不互斥（實務未見）；
   ② 本機 venv launcher 的 `Popen.pid` ≠ 子行程 `os.getpid()`，任何拿 `Popen.pid` 比對的診斷都會被誤導（texlock 寫的是 `os.getpid()`，正確）；
   ③ MiKTeX 全域 fndb 競爭是 §8 ⑧ 未被 texlock 接管的那半（量測期間把 12 s 的 sizecheck 拉到 600 s），整合測試的 assert 訊息會分辨「鎖沒守住」與「機器層 flake」。
+- **§3.2 對 Task J 的校準回報（2026-09-14）：** `ch03_chain_rule` sizecheck 在 r1／r2 前後皆 0 error／32 warning 逐條相同，sibling 閘活過來後 **0 條**；該 deck 模板覆蓋面＝7 `definition_math`／5 `theorem_proof`／5 `derivation`／2 `graph`／1 `procedure_steps`／1 `callout`／1 `recap_cards`。連同 J 自己的 24 deck 零違規，sibling 閘的修復判定為零假陽性。§3.2 亦將 r1 的兩條派工紀律（scratchpad 子目錄、Python 驅動器）收進 `REVIEW_GATES.md` §六 6.8，並加一條：子代理卡住先看其 worktree 有無已完成未 commit 的成果。
