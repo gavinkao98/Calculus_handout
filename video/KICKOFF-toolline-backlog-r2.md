@@ -156,3 +156,6 @@ mock render 場 04、14、21、22 改前後幀（scratchpad/taskG），`visual-f
   ③ `parse_block` 對「非 dict」（純 scalar）仍回 `None` 與「沒寫」混在一起，可用同一個 `ParseError` 分流。
   **`definition_math` 納入 SC 的分析（r3 依據）**：全 repo 12 份契約無一掛在 definition 單元；該模板是單一陳述框、散文只有 `statement` 且已由 provenance 覆蓋；
   若現在加入，`ch03_trig_derivatives{,_mimo}` 立刻各 +3 `[SC]` error、`ch03_chain_rule` 開 enforce 後再 +7——要加就連同那些單元的 `coverage_exempt: true` 一起做。
+- **Task J 的裁決與後續（2026-09-14）：** r1 §6 ⑥ **裁決不改**——floorprobe 對 §3.1 27 場首跑 44 條（DIRECT 21／INNER 23），INNER 裡 `	frac`／`rac`／`\sqrt[` 觸發 20、
+  只由 `^`／`_` 觸發 3，聲量主力是分數不是上下標；hook 來源 5 條（`squeeze_to_the_bound` 的 carried circle 標籤 8 條 DIRECT 全來自 `carry: to.scale`，即 r1 §6 ⑪ 的實證）。
+  數據在 `scratchpad/taskJ/floorprobe_s31{,_stats}.txt`。r3 候選：④ `video/_audit/_gen/worked_example_template.gen.py` 仍寫死舊的四場 `_demo_worked_example.yml`（歷史一次性報告產生器，無 selftest 呼叫；重跑該報告時要同步）。
