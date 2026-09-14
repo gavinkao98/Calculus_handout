@@ -141,3 +141,18 @@ mock render 場 04、14、21、22 改前後幀（scratchpad/taskG），`visual-f
 - ⑮ reason 內嵌 `\tfrac` 低於 floor：J 的數據會涵蓋。
 - ⑯⑰ text_metrics 短字串比例、`_WIDTH_K` bold：記錄性質，不做。
 - motion-language-gaps §8 其餘（`{{}}` 段級 role、palette 撞色、graph sweep leave、scene_head 清點）：等有場需要或使用者看幀裁決。
+
+---
+
+## 6. 本輪進行中收到（r3 候選與驗收數據）
+
+- **⭐ `_screen_contract.parse_block` fail-closed 靜默失效**（§3.2 session 2026-09-14 實踩）：`yaml.YAMLError`／非 dict／空一律回 `None`，一個 YAML 語法錯（雙引號 `tex:` 裡的 `\c`）
+  就讓整份 `screen_contract` 從閘視野消失，enforce 下吐 `has no screen_contract` 把人導向「去寫一份」。解＝解析失敗印成獨立 `[SC] <unit>: screen_contract failed to parse -- <err>`
+  ＋負向 selftest（含非法轉義的契約不得被當成「沒有契約」）。**已追加給 Task I**（若 I 已 commit 則為 r3 首項）。
+- **Task I 的驗收數據（§3.2 session 提供）**：其分支 `30c5358` 補了 `decomposition_strategy` 的 `screen_contract`（7 條 required_steps，兩個 `part:` 場 covers 4＋3；契約 10→11、required 29→36）；
+  模擬 `_SCOPED_TEMPLATES` 加 `procedure_steps` 後 `ch03_chain_rule{,_mimo}` 1 error → 0；全 repo 24 份 storyboard 零新增 error。
+- **Task I 回報的 r3 候選（2026-09-14）：** ① `step_coverage.py:97` missing-contract 訊息字面仍寫 `proof/derivation unit`，`procedure_steps` 納入後不準（現役 deck 0 條印到）；
+  ② `provenance.py:26` 的 `TEACHING_TEXT_FIELDS` 常數早已落後 `_present_text_fields`（`strategy`／`notes.*.text`／`steps.*.text` 都沒進去），只被 selftest 讀——補齊或刪掉；
+  ③ `parse_block` 對「非 dict」（純 scalar）仍回 `None` 與「沒寫」混在一起，可用同一個 `ParseError` 分流。
+  **`definition_math` 納入 SC 的分析（r3 依據）**：全 repo 12 份契約無一掛在 definition 單元；該模板是單一陳述框、散文只有 `statement` 且已由 provenance 覆蓋；
+  若現在加入，`ch03_trig_derivatives{,_mimo}` 立刻各 +3 `[SC]` error、`ch03_chain_rule` 開 enforce 後再 +7——要加就連同那些單元的 `coverage_exempt: true` 一起做。

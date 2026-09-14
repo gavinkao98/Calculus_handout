@@ -88,6 +88,28 @@ def test_scene_text_refs():
               "refs": {"steps.0.reason": "md:x"}}
     got7 = dict(P.scene_text_refs(scene7))
     assert got7["steps.0.reason"] == "md:x"         # override beats inherited scene ref
+    # procedure_steps puts each step's `text` on screen via brand.prose
+    # (templates/procedure_steps.py:68); `math` and the `worked[]` chain are maths.
+    scene8 = {"kind": "content", "template": "procedure_steps", "ref": "md:proc",
+              "steps": [{"text": "Write $y=f(x)$.", "math": "y=f(x)"},
+                        {"math": "x=\\cdots"},                    # no text -> skipped
+                        {"text": "   "},                          # blank text -> skipped
+                        "scalar entry"],                          # scalar -> skipped
+              "worked": ["y=x^2", "x=\\pm\\sqrt{y}"]}             # maths, never a text field
+    got8 = dict(P.scene_text_refs(scene8))
+    assert got8["steps.0.text"] == "md:proc"        # inherited scene ref
+    assert "steps.1.text" not in got8
+    assert "steps.2.text" not in got8
+    assert "steps.3.text" not in got8
+    assert not any(p.startswith("worked") for p in got8)
+    # per-field override works on the new path too
+    scene9 = dict(scene8, refs={"steps.0.text": "doc:frag-sec-1-1"})
+    assert dict(P.scene_text_refs(scene9))["steps.0.text"] == "doc:frag-sec-1-1"
+    # template gate: `steps[]` is shared with derivation/worked_example, where a
+    # `text` key would not be procedure prose -- only procedure_steps is scanned.
+    scene10 = {"kind": "content", "template": "derivation", "ref": "md:d",
+               "steps": [{"math": "a=b", "text": "not on screen here"}]}
+    assert "steps.0.text" not in dict(P.scene_text_refs(scene10))
 
 
 def test_provenance_issues():
@@ -129,6 +151,17 @@ def test_provenance_issues():
     assert "miss_step.steps.0.reason" in nmsgs
     assert "ok_step" not in nmsgs
     assert len(nwarns) == 1
+    # procedure_steps step text (r2 Task I): the on-screen recipe lines carry
+    # provenance like any other teaching text -- one finding per step, not one
+    # per scene, so a partially-reffed procedure still reports the gap.
+    proc = {"scenes": [
+        {"id": "recipe", "kind": "content", "template": "procedure_steps",
+         "steps": [{"text": "Write $y=f(x)$.", "math": "y=f(x)"},
+                   {"text": "Solve for $x$.", "math": "x=\\cdots"}],
+         "refs": {"steps.1.text": "md:unit_a"}},                 # 0 missing, 1 resolves
+    ]}
+    pwarns = P.provenance_issues(proc, loci, enforce=False)
+    assert len(pwarns) == 1 and "recipe.steps.0.text" in pwarns[0][1]
 
 
 def test_tex_anchors():

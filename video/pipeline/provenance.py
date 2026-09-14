@@ -171,6 +171,20 @@ def _present_text_fields(scene: dict) -> "list[str]":
         for i, v in enumerate(notes):
             if isinstance(v, dict) and isinstance(v.get("text"), str) and v["text"].strip():
                 paths.append(f"notes.{i}.text")
+    # procedure_steps renders each step's `text` as on-screen prose via brand.prose
+    # (templates/procedure_steps.py:68, `st.get("text")`) -- the recipe lines a learner
+    # reads, so they carry provenance. The step's `math` and the `worked[]` chain are
+    # maths, not text. TEMPLATE-GATED because `steps[]` is shared with derivation
+    # (math/reason) and worked_example (math/anim/frame), where a `text` key would not
+    # be this. Appended LAST so no existing scene's field order moves. (Until r2 Task I
+    # this template had NO scanned text field at all: `decomposition_strategy` carried
+    # four on-screen steps with no `ref:` and the OF2 layer said nothing.)
+    if scene.get("template") == "procedure_steps":
+        steps = scene.get("steps")
+        if isinstance(steps, list):
+            for i, v in enumerate(steps):
+                if isinstance(v, dict) and isinstance(v.get("text"), str) and v["text"].strip():
+                    paths.append(f"steps.{i}.text")
     return paths
 
 
