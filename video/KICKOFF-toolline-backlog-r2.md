@@ -185,3 +185,4 @@ mock render 場 04、14、21、22 改前後幀（scratchpad/taskG），`visual-f
 - 主對話裁決（不再重議）：`_SCOPED_TEMPLATES` 本輪不加 `definition_math`；texlock 鎖檔放 `<media_dir>/Tex.lock`、`DEFAULT_TIMEOUT` 1800 s＋`TEXLOCK_TIMEOUT` 覆寫；floorprobe marker 集合不改。
 - **更正**：Task H 首次回報「fndb 競爭把一輪拉到 608 s」為誤判，主因是 selftest 逐一 `communicate()` 的 pipe 互卡（`2d2f907` 修）；MiKTeX fndb 競爭仍存在但不是那兩輪的原因。
 - r3 從 §6 挑：`critic.py` 子集路徑、repo 內同型 `communicate()` 風險掃描、`parse_block` 非 dict 分流、`TEACHING_TEXT_FIELDS` 同步。
+- **§3.2 Phase A 收案回報（2026-09-14，工具線相關數字）：** 真 TTS 30 次呼叫（上限 35）、22 場 scene_aligned／1 場降級 beats（`composed_mapping_figure`，chunk 因 `--fallback-budget 2` 被拒）；**真音檔 704.5 s 對 mock 估的 828 s 短約 15%（逐場 −14%～−19%），mock 估時器系統性高估**——r3 候選：校正 `narration.estimate_seconds` 的語速常數（報價與 `[stillness]`／short-beat 規劃值都吃它），用 §3.1＋§3.2 兩節真音檔回歸。真音檔 1080p render 的 `[sync]` 是 r1／r2 timing 改動在 §3.2 的最終回歸，結果另報。§六已回寫成 6.1–6.9。
