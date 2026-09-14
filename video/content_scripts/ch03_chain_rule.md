@@ -201,6 +201,29 @@ animation_cue: |
   （選用）建議動畫：拿一個合成式（如 $\sqrt{1+x^2}$），由最外層往內逐層用框
   把「外函數」與「內部整塊」框起來、依序點亮步驟①–④，最後在內部再框一次示意
   「裡頭還是複合就重複」。
+screen_contract: |
+  required_steps:
+    - id: outermost
+      tex: 'f(\,\cdot\,)'
+      reason: 'name the outer function'
+    - id: name_inside
+      tex: 'u=g(x)'
+      reason: 'name the inner function'
+    - id: outer_at_inner
+      tex: 'f''(g(x))'
+      reason: 'differentiate the outside, inside kept whole'
+    - id: times_inner
+      tex: 'f''(g(x))\cdot g''(x)'
+      reason: 'multiply by the inner derivative'
+    - id: repeat_per_layer
+      tex: '\text{repeat steps 1--4 per layer; the slope factors multiply}'
+      reason: 'iteration rule (chapter3.tex:239) -- prerequisite for the three-layer example'
+    - id: decompose_sqrt
+      tex: '\sqrt{1+x^{2}}:\ f(u)=\sqrt{u},\ g(x)=1+x^{2}'
+      reason: 'worked decomposition (chapter3.tex:241)'
+    - id: decompose_sin
+      tex: '\sin(x^{2}):\ f(u)=\sin u,\ g(x)=x^{2}'
+      reason: 'worked decomposition (chapter3.tex:241)'
 ```
 
 ---
