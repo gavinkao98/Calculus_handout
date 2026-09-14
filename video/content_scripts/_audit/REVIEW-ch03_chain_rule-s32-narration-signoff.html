@@ -1,0 +1,440 @@
+<!DOCTYPE html>
+<html lang="zh-Hant">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>§3.2 The Chain Rule — 旁白簽核稿（合成前人閘）</title>
+<script>
+  window.MathJax = {
+    tex: { inlineMath: [['$','$']], displayMath: [['$$','$$']] },
+    svg: { fontCache: 'global' },
+    options: { skipHtmlTags: ['script','noscript','style','textarea','pre','code'] }
+  };
+</script>
+<script src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-svg.js" id="MathJax-script" async></script>
+<style>
+:root{
+  --bg:#f6f7f9; --paper:#ffffff; --ink:#191f28; --soft:#5d6876; --faint:#8a94a3;
+  --line:#e2e6ec; --line2:#eef1f5;
+  --accent:#2f5fe0; --accentsoft:#eaf0ff; --accentline:#c3d4fb;
+  --hot:#b4341f; --hotsoft:#fdf0ec; --hotline:#f0c3b8;
+  --act:#0f766e; --actsoft:#e7f5f2; --actline:#a9dcd4;
+  --codebg:#f0f2f6;
+}
+@media (prefers-color-scheme: dark){
+  :root{
+    --bg:#14171c; --paper:#1b1f26; --ink:#e6e9ee; --soft:#a3adbb; --faint:#7c8695;
+    --line:#2b3139; --line2:#232830;
+    --accent:#7ba2ff; --accentsoft:#1d2739; --accentline:#31456b;
+    --hot:#ff9d85; --hotsoft:#2c1f1b; --hotline:#5c382e;
+    --act:#5fd3c2; --actsoft:#14262a; --actline:#27524d;
+    --codebg:#242a33;
+  }
+}
+*{box-sizing:border-box}
+html{-webkit-text-size-adjust:100%}
+body{
+  margin:0; background:var(--bg); color:var(--ink);
+  font:16.5px/1.75 -apple-system,"Segoe UI",Roboto,"Noto Sans TC","Microsoft JhengHei",sans-serif;
+}
+.wrap{max-width:840px;margin:0 auto;padding:44px 20px 100px}
+code{font-family:"Cascadia Code",Consolas,"SF Mono",monospace;font-size:.88em;
+  background:var(--codebg);padding:1px 5px;border-radius:4px;word-break:break-word}
+
+.top{border-bottom:2px solid var(--line);padding-bottom:18px;margin-bottom:26px}
+.eyebrow{margin:0 0 8px;font-size:12.5px;font-weight:700;letter-spacing:.08em;
+  text-transform:uppercase;color:var(--accent)}
+h1{font-size:28px;line-height:1.3;margin:0 0 8px;letter-spacing:.01em}
+.deck{margin:0;color:var(--soft);font-size:13.5px}
+
+.lede{background:var(--paper);border:1px solid var(--line);border-left:4px solid var(--accent);
+  border-radius:10px;padding:18px 22px;margin:0 0 26px}
+.lede p{margin:0 0 11px}
+.lede p:last-child{margin-bottom:0}
+.hot{color:var(--hot);font-weight:700}
+
+.stats{display:grid;grid-template-columns:repeat(auto-fit,minmax(158px,1fr));gap:11px;margin:0 0 14px}
+.stat{background:var(--paper);border:1px solid var(--line);border-radius:10px;padding:13px 15px}
+.sv{font-size:23px;font-weight:700;letter-spacing:-.01em;font-variant-numeric:tabular-nums;line-height:1.2}
+.sl{font-size:13px;color:var(--ink);margin-top:2px;font-weight:600}
+.sn{font-size:11.5px;color:var(--faint);margin-top:4px;line-height:1.5}
+.caliper{background:var(--accentsoft);border:1px solid var(--accentline);border-radius:9px;
+  padding:12px 16px;font-size:13.5px;color:var(--soft);margin:0 0 34px}
+.caliper b{color:var(--ink)}
+
+.h2{font-size:20px;margin:44px 0 6px;padding-top:14px;border-top:2px solid var(--line)}
+.h2sub{margin:0 0 22px;color:var(--soft);font-size:14px}
+.h2sub b{color:var(--ink)}
+
+.act{background:var(--actsoft);border:1px solid var(--actline);border-radius:11px;
+  padding:16px 20px;margin:30px 0 18px;text-align:center}
+.act-eyebrow{font-size:11.5px;font-weight:700;letter-spacing:.1em;text-transform:uppercase;color:var(--act)}
+.act-title{font-size:20px;font-weight:700;margin:5px 0 3px}
+.act-sub{font-size:14px;color:var(--soft)}
+.act-note{font-size:12px;color:var(--faint);margin-top:7px}
+
+.scene{background:var(--paper);border:1px solid var(--line);border-radius:11px;
+  padding:17px 21px 13px;margin:14px 0}
+.shead{display:flex;align-items:center;gap:9px;flex-wrap:wrap;margin-bottom:4px}
+.snum{font-variant-numeric:tabular-nums;font-weight:700;font-size:12.5px;color:var(--soft);
+  border:1px solid var(--line);border-radius:6px;padding:1px 7px;background:var(--bg)}
+.sid{font-family:"Cascadia Code",Consolas,monospace;font-size:12.5px;color:var(--accent);word-break:break-all}
+.tmpl{font-size:11px;color:var(--faint);border:1px solid var(--line);border-radius:5px;padding:0 6px}
+.metrics{margin-left:auto;font-size:12px;color:var(--faint);font-variant-numeric:tabular-nums;white-space:nowrap}
+.stitle{font-size:13.5px;color:var(--soft);margin-bottom:9px}
+.say{font-size:17.5px;line-height:1.82;margin:0 0 10px}
+
+details.spoken{border-top:1px dashed var(--line);padding-top:8px;margin-top:4px}
+details.spoken summary{cursor:pointer;color:var(--accent);font-size:12.5px;font-weight:600;
+  list-style:none;user-select:none}
+details.spoken summary::-webkit-details-marker{display:none}
+details.spoken summary::before{content:"\25B8 "}
+details.spoken[open] summary::before{content:"\25BE "}
+.spk{background:var(--codebg);border-radius:8px;padding:12px 15px;margin:9px 0 4px;
+  font-size:14.5px;line-height:1.75;color:var(--soft)}
+
+.gap{background:var(--paper);border:1px solid var(--line);border-left:4px solid var(--hot);
+  border-radius:10px;padding:16px 20px;margin:14px 0}
+.gap-head{font-size:13px;margin-bottom:9px}
+.gap-what{margin:0 0 11px;font-size:15.5px}
+.tagx{display:inline-block;background:var(--hotsoft);border:1px solid var(--hotline);color:var(--hot);
+  font-size:11px;font-weight:700;padding:1px 7px;border-radius:5px;margin-right:7px;vertical-align:2px}
+.gap-row{margin:0 0 9px;font-size:14.5px;color:var(--soft)}
+.gap-row:last-child{margin-bottom:0}
+.gap-row b{color:var(--ink)}
+.gap-row .k{display:block;font-size:11.5px;font-weight:700;letter-spacing:.05em;
+  text-transform:uppercase;color:var(--faint);margin-bottom:2px}
+
+.chg-list{display:flex;flex-direction:column;gap:11px}
+.chg{background:var(--paper);border:1px solid var(--line);border-radius:10px;padding:14px 19px}
+.chg-head{display:flex;align-items:center;gap:9px;flex-wrap:wrap;margin-bottom:6px;font-size:13px}
+.chg-tag{background:var(--accentsoft);border:1px solid var(--accentline);color:var(--accent);
+  font-size:11.5px;font-weight:700;padding:1px 8px;border-radius:5px}
+.chg p{margin:0;font-size:14.5px;color:var(--soft)}
+.chg p b{color:var(--ink)}
+
+.ask{background:var(--hotsoft);border:2px solid var(--hotline);border-radius:12px;
+  padding:20px 24px;margin:46px 0 0}
+.ask h2{margin:0 0 10px;font-size:19px;color:var(--hot)}
+.ask ol{margin:0;padding-left:22px;font-size:16.5px}
+.ask li{margin:7px 0}
+.ask-note{margin:12px 0 0;font-size:13.5px;color:var(--soft)}
+
+.foot{margin-top:40px;padding-top:14px;border-top:1px solid var(--line);
+  color:var(--faint);font-size:12.5px;line-height:1.7}
+mjx-container[jax="SVG"]{color:inherit}
+</style>
+</head>
+<body>
+<div class="wrap">
+<header class="top">
+  <p class="eyebrow">合成前人閘 · NFA gate-2 框架層裁決（選 B）的落地</p>
+  <h1>§3.2 The Chain Rule — 旁白簽核稿</h1>
+  <p class="deck">deck <code>ch03_chain_rule</code> · 資料源 <code>video/storyboards/ch03_chain_rule.yml</code> 的 23 個 content 場 <code>say:</code></p>
+</header>
+<section class="lede">
+  <p><b>這一頁是什麼。</b>這是 §3.2 影片<b>真正會被唸出來的那 23 段旁白</b>的全文，按出片順序排好，數學已渲染成看得懂的樣子。</p>
+  <p><b>為什麼現在要簽。</b>您在 2026-06-29 簽核的是<b>內容稿</b>；而 Stage 2 為了「說出來順」把它重寫過，實際送去合成的是 storyboard 的 <code>say:</code>——這份文字<b>從未以「旁白」的身分送到您面前</b>。NFA gate-2 指出了這個落差，您的裁決是：<b>合成之前補簽一次</b>。這一頁就是那一次。</p>
+  <p><b>簽完會發生什麼。</b>這 23 段文字會被送去 MiMo 合成語音，<b>花 23 次計費呼叫</b>。此後任何一個字的改動，都要把那一場<b>重新合成、重新計費</b>。<span class="hot">現在改是零成本。</span></p>
+</section>
+<section class="stats">
+  <div class="stat"><div class="sv">23</div><div class="sl">content 場數</div><div class="sn">另有 intro 1／divider 3／outro 1，皆無旁白</div></div>
+  <div class="stat"><div class="sv">1,675</div><div class="sl">canonical 字數</div><div class="sn">storyboard <code>say:</code>，剝掉 <code>{show}</code> marker</div></div>
+  <div class="stat"><div class="sv">2,070</div><div class="sl">口語版字數</div><div class="sn">同一批話攤成口語後的字數（送 TTS 的那串）</div></div>
+  <div class="stat"><div class="sv">724 s</div><div class="sl">旁白秒數（估）</div><div class="sn">canonical 字數 ÷ 138.8 wpm（§3.1 實測語速）</div></div>
+  <div class="stat"><div class="sv">13.8 分</div><div class="sl">成片長度（估）</div><div class="sn">口語版字數 ÷ 150.0 wpm（mock 口徑）</div></div>
+  <div class="stat"><div class="sv">909.9 s</div><div class="sl">mock render 實測</div><div class="sn">離線靜音 mock 的成片長度，含 intro／divider／outro 家具</div></div>
+</section>
+<p class="caliper"><b>秒數口徑（請注意不要混用）。</b>下面<b>每一場</b>標的秒數，一律是 <b>canonical 字數 ÷ 138.8 wpm × 60</b>——§3.1 實測語速換算，逐場可加總。總覽裡的「成片長度（估）」走的是另一個口徑（口語版字數 ÷ 150.0 wpm，<code>pipeline/narration.py</code> 的 <code>estimate_seconds</code> 預設），因為那是 mock render 用的模型；兩個數字不同是口徑不同，不是矛盾。</p>
+<h2 class="h2">逐場旁白（出片順序）</h2>
+<p class="h2sub">這是本頁的主體。請當成老師會<b>唸出來</b>的話來讀——順不順、清不清楚、有沒有哪一句您想改。灰底的可摺疊區塊是<b>MiMo 實際要唸的那一串</b>（數學已攤成英文字），想確認某個式子會被唸成什麼時再展開。</p>
+<div class="act">
+  <div class="act-eyebrow">Stage 1 · 幕界</div>
+  <div class="act-title">The Rule You Can Use</div>
+  <div class="act-sub">State it first, then put it to work.</div>
+  <div class="act-note">此為分幕卡，<b>無旁白</b>（4.0 秒靜場）</div>
+</div>
+<section class="scene">
+  <div class="shead"><span class="snum">01</span><span class="sid">why_composition_is_missing</span><span class="tmpl">definition_math</span><span class="metrics">80 字 · 約 35 秒</span></div>
+  <div class="stitle">The Missing Rule</div>
+  <p class="say">We can differentiate sine and cosine now -- but only in their bare form. We can handle $\sin x$, yet nothing so far reaches $\sin(x^2)$ or $\sqrt $, where one function is fed into another. We built rules for sums, products, and quotients -- but never for composition, the operation of dropping one function inside another. That is the one gap left, and the chain rule fills it exactly -- and with it, the toolkit for differentiation is finally complete.</p>
+  <details class="spoken">
+    <summary>口語版（MiMo 實際要唸的那一串）</summary>
+    <p class="spk">We can differentiate sine and cosine now -- but only in their bare form. We can handle sine x, yet nothing so far reaches sine of x squared or the square root of the quantity one plus x squared, where one function is fed into another. We built rules for sums, products, and quotients -- but never for composition, the operation of dropping one function inside another. That is the one gap left, and the chain rule fills it exactly -- and with it, the toolkit for differentiation is finally complete.</p>
+  </details>
+</section>
+<section class="scene">
+  <div class="shead"><span class="snum">02</span><span class="sid">rates_multiply_intuition</span><span class="tmpl">definition_math</span><span class="metrics">91 字 · 約 39 秒</span></div>
+  <div class="stitle">The Whole Idea, in One Picture</div>
+  <p class="say">Here's the whole idea in one picture. Near a point, a differentiable function behaves like its tangent line -- it scales a small change in its input by its slope, with an error that shrinks faster than the change does. Now chain two together: $g$ scales a small increment $h$ by $g'(x)$, and then $f$ scales that by $f'(g(x))$. The two magnifications stack -- so the composite scales $h$ by the product $f'(g(x))\,g'(x)$. That's the chain rule; the proof, later, is just checking the two small errors stay negligible once chained.</p>
+  <details class="spoken">
+    <summary>口語版（MiMo 實際要唸的那一串）</summary>
+    <p class="spk">Here's the whole idea in one picture. Near a point, a differentiable function behaves like its tangent line -- it scales a small change in its input by its slope, with an error that shrinks faster than the change does. Now chain two together: g scales a small increment h by g prime of x, and then f scales that by f prime at g of x. The two magnifications stack -- so the composite scales h by the product f prime at g of x, times g prime of x. That's the chain rule; the proof, later, is just checking the two small errors stay negligible once chained.</p>
+  </details>
+</section>
+<section class="scene">
+  <div class="shead"><span class="snum">03</span><span class="sid">chain_rule_statement</span><span class="tmpl">definition_math</span><span class="metrics">63 字 · 約 27 秒</span></div>
+  <div class="stitle">The Chain Rule</div>
+  <p class="say">Let's state it precisely. If $g$ is differentiable at $x_0$, and $f$ is differentiable at $g(x_0)$, then the composition $P(x)=f(g(x))$ is differentiable at $x_0$ too. And its derivative is the outer derivative at the inner function, times the inner derivative. Read it from the inside out. We'll earn this with a proof a little later -- for now, let's learn to use it.</p>
+  <details class="spoken">
+    <summary>口語版（MiMo 實際要唸的那一串）</summary>
+    <p class="spk">Let's state it precisely. If g is differentiable at x sub zero, and f is differentiable at g of x sub zero, then the composition P of x equals f of g of x is differentiable at x sub zero too. And its derivative is the outer derivative at the inner function, times the inner derivative. Read it from the inside out. We'll earn this with a proof a little later -- for now, let's learn to use it.</p>
+  </details>
+</section>
+<section class="scene">
+  <div class="shead"><span class="snum">04</span><span class="sid">composed_mapping_figure</span><span class="tmpl">graph</span><span class="metrics">82 字 · 約 35 秒</span></div>
+  <div class="stitle">Two Stretches in a Row</div>
+  <p class="say">Picture the rule as a relay of two stretches. Start with a small increment $h$ sitting at $x_0$. The first function $g$ carries it forward and stretches it to about $g'(x_0)\,h$, now sitting at $u_0=g(x_0)$. The second function $f$ stretches that again by its own slope there, landing at about $f'(g(x_0))\,g'(x_0)\,h$. Two stretches one after the other -- and stretching by one factor then another just multiplies the factors. That's why the composite's slope is the product of the two local slopes.</p>
+  <details class="spoken">
+    <summary>口語版（MiMo 實際要唸的那一串）</summary>
+    <p class="spk">Picture the rule as a relay of two stretches. Start with a small increment h sitting at x sub zero. The first function g carries it forward and stretches it to about g prime of x sub zero, times h, now sitting at u sub zero equals g of x sub zero. The second function f stretches that again by its own slope there, landing at about f prime at g of x sub zero, times g prime of x sub zero, times h. Two stretches one after the other -- and stretching by one factor then another just multiplies the factors. That's why the composite's slope is the product of the two local slopes.</p>
+  </details>
+</section>
+<section class="scene">
+  <div class="shead"><span class="snum">05</span><span class="sid">leibniz_form</span><span class="tmpl">definition_math</span><span class="metrics">100 字 · 約 43 秒</span></div>
+  <div class="stitle">The Leibniz Form</div>
+  <p class="say">There's a second way to write the rule, and it's the one you'll actually compute with. Name the inner variable $u=g(x)$ and the output $y=f(u)$. Then the chain rule takes its memorable shape: the rate of $y$ per $x$ equals the rate of $y$ per $u$ times the rate of $u$ per $x$. It looks as though the $du$'s simply cancel -- a handy way to remember it, but not a proof. These aren't fractions with a common factor to strike out; each is a limit. What truly makes the rule work is the error argument we're about to give.</p>
+  <details class="spoken">
+    <summary>口語版（MiMo 實際要唸的那一串）</summary>
+    <p class="spk">There's a second way to write the rule, and it's the one you'll actually compute with. Name the inner variable u equals g of x and the output y equals f of u. Then the chain rule takes its memorable shape: the rate of y per x equals the rate of y per u times the rate of u per x. It looks as though the d u's simply cancel -- a handy way to remember it, but not a proof. These aren't fractions with a common factor to strike out; each is a limit. What truly makes the rule work is the error argument we're about to give.</p>
+  </details>
+</section>
+<section class="scene">
+  <div class="shead"><span class="snum">06</span><span class="sid">decomposition_strategy</span><span class="tmpl">procedure_steps</span><span class="metrics">62 字 · 約 27 秒</span></div>
+  <div class="stitle">Differentiating a Composition</div>
+  <p class="say">Here's a reliable way to take any composition apart -- work from the outside in. First, spot the outermost operation -- the last thing you'd do if you plugged in a number. That's the outer function $f$. Whatever it's applied to is the inner function $u=g(x)$. Differentiate the outside at the inside, keeping the inside whole. Then multiply by the inner derivative.</p>
+  <details class="spoken">
+    <summary>口語版（MiMo 實際要唸的那一串）</summary>
+    <p class="spk">Here's a reliable way to take any composition apart -- work from the outside in. First, spot the outermost operation -- the last thing you'd do if you plugged in a number. That's the outer function f. Whatever it's applied to is the inner function u equals g of x. Differentiate the outside at the inside, keeping the inside whole. Then multiply by the inner derivative.</p>
+  </details>
+</section>
+<section class="scene">
+  <div class="shead"><span class="snum">07</span><span class="sid">decomposition_strategy_repeat</span><span class="tmpl">definition_math</span><span class="metrics">29 字 · 約 13 秒</span></div>
+  <div class="stitle">Differentiating a Composition</div>
+  <p class="say">And if the inside is itself a composition, just run the steps again. So $\sqrt $ has outer root and inner $1+x^2$; $\sin(x^2)$ has outer sine and inner $x^2$.</p>
+  <details class="spoken">
+    <summary>口語版（MiMo 實際要唸的那一串）</summary>
+    <p class="spk">And if the inside is itself a composition, just run the steps again. So the square root of the quantity one plus x squared has outer root and inner one plus x squared; sine of x squared has outer sine and inner x squared.</p>
+  </details>
+</section>
+<div class="act">
+  <div class="act-eyebrow">Stage 2 · 幕界</div>
+  <div class="act-title">Why the Rule Is True</div>
+  <div class="act-sub">Local linear approximations, and how they compose.</div>
+  <div class="act-note">此為分幕卡，<b>無旁白</b>（4.0 秒靜場）</div>
+</div>
+<section class="scene">
+  <div class="shead"><span class="snum">08</span><span class="sid">proof_strategy_bridge</span><span class="tmpl">definition_math</span><span class="metrics">87 字 · 約 38 秒</span></div>
+  <div class="stitle">Repackaging the Derivative</div>
+  <p class="say">The rule is already usable -- now let's earn it. To prove the two slopes really multiply, we handle both functions' tangent-line approximations at once -- and for that we repackage what differentiable means. Two facts we'll lean on without re-proving: the product rule, and that a differentiable function is continuous. We earlier called $f$ differentiable at $x_0$ when its difference quotient has a limit -- and that limit is $f'(x_0)$. We're about to say exactly the same thing, only phrased as approximation by a straight line.</p>
+  <details class="spoken">
+    <summary>口語版（MiMo 實際要唸的那一串）</summary>
+    <p class="spk">The rule is already usable -- now let's earn it. To prove the two slopes really multiply, we handle both functions' tangent-line approximations at once -- and for that we repackage what differentiable means. Two facts we'll lean on without re-proving: the product rule, and that a differentiable function is continuous. We earlier called f differentiable at x sub zero when its difference quotient has a limit -- and that limit is f prime of x sub zero. We're about to say exactly the same thing, only phrased as approximation by a straight line.</p>
+  </details>
+</section>
+<section class="scene">
+  <div class="shead"><span class="snum">09</span><span class="sid">remainder_form_definition</span><span class="tmpl">definition_math</span><span class="metrics">68 字 · 約 29 秒</span></div>
+  <div class="stitle">Differentiability, Remainder Form</div>
+  <p class="say">Here's the form. We say $f$ is differentiable at $x_0$ if there's a number $m$ and a function $R$ with this equation, where the remainder over $h$ goes to zero. The number $m$ is just the derivative, $f'(x_0)$. Informally: $f(x_0+h)$ equals its tangent-line value plus an error that dies faster than $h$ itself. That "faster than $h$" is the whole point -- it's what lets these pieces compose.</p>
+  <details class="spoken">
+    <summary>口語版（MiMo 實際要唸的那一串）</summary>
+    <p class="spk">Here's the form. We say f is differentiable at x sub zero if there's a number m and a function R with this equation, where the remainder over h goes to zero. The number m is just the derivative, f prime of x sub zero. Informally: f of the quantity x sub zero plus h equals its tangent-line value plus an error that dies faster than h itself. That "faster than h" is the whole point -- it's what lets these pieces compose.</p>
+  </details>
+</section>
+<section class="scene">
+  <div class="shead"><span class="snum">10</span><span class="sid">remainder_tangent_figure</span><span class="tmpl">graph</span><span class="metrics">95 字 · 約 41 秒</span></div>
+  <div class="stitle">The Error Shrinks Faster</div>
+  <p class="say">Let's watch that error shrink. Here's the graph of $f$ near $x_0$, hugging its tangent line. At a nearby point $x_0+h$ the two don't quite agree, and the little vertical gap between them is exactly the remainder $R(h)$. Now halve $h$. The gap doesn't merely halve -- it collapses far faster, shrinking to nothing next to $h$. That's the picture of the remainder over $h$ going to zero. And this single-curve fact is what's underneath the composition: up close, each function is almost its own tangent line, and it's those straight-line parts whose slopes multiply.</p>
+  <details class="spoken">
+    <summary>口語版（MiMo 實際要唸的那一串）</summary>
+    <p class="spk">Let's watch that error shrink. Here's the graph of f near x sub zero, hugging its tangent line. At a nearby point x sub zero plus h the two don't quite agree, and the little vertical gap between them is exactly the remainder R of h. Now halve h. The gap doesn't merely halve -- it collapses far faster, shrinking to nothing next to h. That's the picture of the remainder over h going to zero. And this single-curve fact is what's underneath the composition: up close, each function is almost its own tangent line, and it's those straight-line parts whose slopes multiply.</p>
+  </details>
+</section>
+<section class="scene">
+  <div class="shead"><span class="snum">11</span><span class="sid">two_forms_equivalent</span><span class="tmpl">theorem_proof</span><span class="metrics">86 字 · 約 37 秒</span></div>
+  <div class="stitle">The Two Forms Agree</div>
+  <p class="say">Before we use this, let's check it's not a new idea -- just the old one rewritten. The claim: the limit form and the remainder form are equivalent, with the same $m$. One direction -- if the difference quotient tends to $m$, set $R(h)=f(x_0+h)-f(x_0)-mh$; then $R(h)/h$ is that quotient minus $m$, which goes to zero. The other way runs backward: divide the remainder equation by $h$ and the quotient becomes $m+R(h)/h$, which goes to $m$. Same property, same derivative -- two ways of saying one thing.</p>
+  <details class="spoken">
+    <summary>口語版（MiMo 實際要唸的那一串）</summary>
+    <p class="spk">Before we use this, let's check it's not a new idea -- just the old one rewritten. The claim: the limit form and the remainder form are equivalent, with the same m. One direction -- if the difference quotient tends to m, set R of h equals f of the quantity x sub zero plus h, minus f of x sub zero, minus m h; then the ratio of R of h to h is that quotient minus m, which goes to zero. The other way runs backward: divide the remainder equation by h and the quotient becomes m plus the ratio of R of h to h, which goes to m. Same property, same derivative -- two ways of saying one thing.</p>
+  </details>
+</section>
+<section class="scene">
+  <div class="shead"><span class="snum">12</span><span class="sid">proof_setup_substitution</span><span class="tmpl">theorem_proof</span><span class="metrics">84 字 · 約 36 秒</span></div>
+  <div class="stitle">Why the Slopes Multiply</div>
+  <p class="say">Now the proof, and the remainder form does the heavy lifting. Because $g$ is differentiable at $x_0$, write it in remainder form, with $m_1=g'(x_0)$. Because $f$ is differentiable at $g(x_0)$, apply its remainder form too -- with $m_1 h+R_1(h)$ playing the role of $h$. Collect the part linear in $h$, and sweep everything else into a single remainder $R_3$. Matched against the remainder form, that already gives the derivative we want -- provided $R_3(h)/h$ goes to zero. That one limit is all that's left.</p>
+  <details class="spoken">
+    <summary>口語版（MiMo 實際要唸的那一串）</summary>
+    <p class="spk">Now the proof, and the remainder form does the heavy lifting. Because g is differentiable at x sub zero, write it in remainder form, with m sub one equals g prime of x sub zero. Because f is differentiable at g of x sub zero, apply its remainder form too -- with m sub one times h, plus R sub one of h, playing the role of h. Collect the part linear in h, and sweep everything else into a single remainder R sub three. Matched against the remainder form, that already gives the derivative we want -- provided the ratio of R sub three of h to h goes to zero. That one limit is all that's left.</p>
+  </details>
+</section>
+<section class="scene">
+  <div class="shead"><span class="snum">13</span><span class="sid">proof_easy_piece</span><span class="tmpl">theorem_proof</span><span class="metrics">62 字 · 約 27 秒</span></div>
+  <div class="stitle">Why the Slopes Multiply</div>
+  <p class="say">Split that quotient into two pieces. The first is easy: $m_2$ is a constant and $R_1(h)/h$ goes to zero, so the whole first piece goes to zero. And note for later -- the inner increment $m_1 h+R_1(h)$ itself goes to zero, since both $m_1 h$ and $R_1(h)$ do. So the easy piece is settled; everything delicate now lives in the second piece.</p>
+  <details class="spoken">
+    <summary>口語版（MiMo 實際要唸的那一串）</summary>
+    <p class="spk">Split that quotient into two pieces. The first is easy: m sub two is a constant and the ratio of R sub one of h to h goes to zero, so the whole first piece goes to zero. And note for later -- the inner increment m sub one times h, plus R sub one of h, itself goes to zero, since both m sub one times h and R sub one of h do. So the easy piece is settled; everything delicate now lives in the second piece.</p>
+  </details>
+</section>
+<section class="scene">
+  <div class="shead"><span class="snum">14</span><span class="sid">proof_delicate_choices</span><span class="tmpl">theorem_proof</span><span class="metrics">85 字 · 約 37 秒</span></div>
+  <div class="stitle">Why the Slopes Multiply</div>
+  <p class="say">The second piece is the careful one -- a remainder of $f$ at that wobbling inner increment, over $h$. Run an epsilon-delta argument; fix any $\varepsilon&gt;0$. Since $R_2(y)/y\to 0$, there's a $\delta$ so the relative remainder of $f$ is below $\varepsilon$ for $0&lt;|y|&lt;\delta$. Since the inner increment goes to zero, there's an $\alpha$ keeping it below $\delta$ for $0&lt;|h|&lt;\alpha$. Take such an $h$. If the inner increment is exactly zero, then $R_2(0)=0$ and the piece is just zero. So only the nonzero case is left.</p>
+  <details class="spoken">
+    <summary>口語版（MiMo 實際要唸的那一串）</summary>
+    <p class="spk">The second piece is the careful one -- a remainder of f at that wobbling inner increment, over h. Run an epsilon-delta argument; fix any epsilon greater than zero. Since the ratio of R sub two of y to y goes to zero, there's a delta so the relative remainder of f is below epsilon for zero less than the absolute value of y, less than delta. Since the inner increment goes to zero, there's an alpha keeping it below delta for zero less than the absolute value of h, less than alpha. Take such an h. If the inner increment is exactly zero, then R sub two of zero equals zero and the piece is just zero. So only the nonzero case is left.</p>
+  </details>
+</section>
+<section class="scene">
+  <div class="shead"><span class="snum">15</span><span class="sid">proof_delicate_bound</span><span class="tmpl">theorem_proof</span><span class="metrics">78 字 · 約 34 秒</span></div>
+  <div class="stitle">Why the Slopes Multiply</div>
+  <p class="say">Take the nonzero case. Multiply and divide by the inner increment, splitting the piece into two factors. The second factor is below $\varepsilon$ by our choice of $\delta$, the first is bounded by the triangle inequality, and shrinking the window once more so $|R_1(h)|/|h|&lt;1$ puts the whole piece below $(|m_1|+1)\,\varepsilon$. A fixed constant times $\varepsilon$, and $\varepsilon$ was arbitrary -- so this piece vanishes too. Both pieces vanish, $R_3(h)/h$ goes to zero, and the chain rule is proved.</p>
+  <details class="spoken">
+    <summary>口語版（MiMo 實際要唸的那一串）</summary>
+    <p class="spk">Take the nonzero case. Multiply and divide by the inner increment, splitting the piece into two factors. The second factor is below epsilon by our choice of delta, the first is bounded by the triangle inequality, and shrinking the window once more so the absolute value of the ratio of R sub one of h to h is less than one puts the whole piece below the quantity, the absolute value of m sub one, plus one, times epsilon. A fixed constant times epsilon, and epsilon was arbitrary -- so this piece vanishes too. Both pieces vanish, the ratio of R sub three of h to h goes to zero, and the chain rule is proved.</p>
+  </details>
+</section>
+<div class="act">
+  <div class="act-eyebrow">Stage 3 · 幕界</div>
+  <div class="act-title">Using the Rule</div>
+  <div class="act-sub">Compositions, layer by layer.</div>
+  <div class="act-note">此為分幕卡，<b>無旁白</b>（4.0 秒靜場）</div>
+</div>
+<section class="scene">
+  <div class="shead"><span class="snum">16</span><span class="sid">example_single_composition</span><span class="tmpl">derivation</span><span class="metrics">69 字 · 約 30 秒</span></div>
+  <div class="stitle">A Single Composition</div>
+  <p class="say">Time to use it -- two quick ones. For $\sqrt $, the outer is the square root and the inner is $1+x^2$: the outer derivative times $2x$ tidies to $x$ over $\sqrt $. For $\sin(x^2)$, the outer is sine and the inner is $x^2$: cosine of the inside times $2x$. Notice that $2x$ in each -- it's the inner derivative, and forgetting it is the single most common slip.</p>
+  <details class="spoken">
+    <summary>口語版（MiMo 實際要唸的那一串）</summary>
+    <p class="spk">Time to use it -- two quick ones. For the square root of the quantity one plus x squared, the outer is the square root and the inner is one plus x squared: the outer derivative times two x tidies to x over the square root of the quantity one plus x squared. For sine of x squared, the outer is sine and the inner is x squared: cosine of the inside times two x. Notice that two x in each -- it's the inner derivative, and forgetting it is the single most common slip.</p>
+  </details>
+</section>
+<section class="scene">
+  <div class="shead"><span class="snum">17</span><span class="sid">caution_inner_derivative</span><span class="tmpl">callout</span><span class="metrics">52 字 · 約 22 秒</span></div>
+  <div class="stitle">Never Drop the Inner Derivative</div>
+  <p class="say">Let's make that mistake explicit, so you never make it. The most common chain-rule error is to differentiate the outer function and then stop -- to write the derivative of $\sin(g(x))$ as just $\cos(g(x))$. That's wrong; the right answer carries the inner factor $g'(x)$. The $2x$ back in $\sin(x^2)$ is never optional.</p>
+  <details class="spoken">
+    <summary>口語版（MiMo 實際要唸的那一串）</summary>
+    <p class="spk">Let's make that mistake explicit, so you never make it. The most common chain-rule error is to differentiate the outer function and then stop -- to write the derivative of sine of g of x as just cosine of g of x. That's wrong; the right answer carries the inner factor g prime of x. The two x back in sine of x squared is never optional.</p>
+  </details>
+</section>
+<section class="scene">
+  <div class="shead"><span class="snum">18</span><span class="sid">example_nested_three_layers</span><span class="tmpl">derivation</span><span class="metrics">67 字 · 約 29 秒</span></div>
+  <div class="stitle">Three Layers Deep</div>
+  <p class="say">Now let the inside be a composition too -- $\sqrt $ is three layers deep, since $\sin^2 x$ is itself $(\sin x)^2$. The square root gives one over twice itself, times the derivative of the inside. That inside derivative is the square of $\sin x$, which by the chain rule again is $2\sin x\cos x$. Three layers, three factors -- and they simply multiply down the chain.</p>
+  <details class="spoken">
+    <summary>口語版（MiMo 實際要唸的那一串）</summary>
+    <p class="spk">Now let the inside be a composition too -- the square root of the quantity one plus sine squared x is three layers deep, since sine squared x is itself sine x, all squared. The square root gives one over twice itself, times the derivative of the inside. That inside derivative is the square of sine x, which by the chain rule again is two sine x cosine x. Three layers, three factors -- and they simply multiply down the chain.</p>
+  </details>
+</section>
+<section class="scene">
+  <div class="shead"><span class="snum">19</span><span class="sid">example_chain_times_quotient</span><span class="tmpl">derivation</span><span class="metrics">80 字 · 約 35 秒</span></div>
+  <div class="stitle">When the Inside Is Its Own Problem</div>
+  <p class="say">Sometimes the inner derivative is a small problem of its own. The outer is the square root, the inner is the fraction -- so the chain rule gives one over twice the root, times the derivative of the fraction. And that derivative is a quotient rule: it comes out to three over $(x+2)^2$. Tidy the front factor and multiply -- the answer is three over twice the product. The chain rule started the job; the quotient rule finished the inside.</p>
+  <details class="spoken">
+    <summary>口語版（MiMo 實際要唸的那一串）</summary>
+    <p class="spk">Sometimes the inner derivative is a small problem of its own. The outer is the square root, the inner is the fraction -- so the chain rule gives one over twice the root, times the derivative of the fraction. And that derivative is a quotient rule: it comes out to three over the square of the quantity x plus two. Tidy the front factor and multiply -- the answer is three over twice the product. The chain rule started the job; the quotient rule finished the inside.</p>
+  </details>
+</section>
+<section class="scene">
+  <div class="shead"><span class="snum">20</span><span class="sid">example_chain_times_product</span><span class="tmpl">derivation</span><span class="metrics">56 字 · 約 24 秒</span></div>
+  <div class="stitle">Two Rules Cooperate</div>
+  <p class="say">Same story, a different partner rule. The outermost operation is a product, so start with the product rule. The leftover derivative needs the chain rule, since $\cos^2 x$ is $(\cos x)^2$ -- giving minus $2\sin x\cos x$. Put it together. The product rule split the work; the chain rule supplied the slope inside the second piece.</p>
+  <details class="spoken">
+    <summary>口語版（MiMo 實際要唸的那一串）</summary>
+    <p class="spk">Same story, a different partner rule. The outermost operation is a product, so start with the product rule. The leftover derivative needs the chain rule, since cosine squared x is cosine x, all squared -- giving minus two sine x cosine x. Put it together. The product rule split the work; the chain rule supplied the slope inside the second piece.</p>
+  </details>
+</section>
+<section class="scene">
+  <div class="shead"><span class="snum">21</span><span class="sid">example_leibniz_rates</span><span class="tmpl">derivation</span><span class="metrics">76 字 · 約 33 秒</span></div>
+  <div class="stitle">Signs Along a Chain</div>
+  <p class="say">Here's the Leibniz form earning its keep. Kelp $K$ depends on the urchins $U$ that eat it, and $U$ on the otters $O$ that eat them. Read each link: more urchins, less kelp, so $dK/dU$ is negative; more otters, fewer urchins, so $dU/dO$ is negative. The chain rule chains the two rates. A product of two negatives is positive -- so $dK/dO$ is positive: more otters ultimately means more kelp. The signs multiply along the chain.</p>
+  <details class="spoken">
+    <summary>口語版（MiMo 實際要唸的那一串）</summary>
+    <p class="spk">Here's the Leibniz form earning its keep. Kelp K depends on the urchins U that eat it, and U on the otters O that eat them. Read each link: more urchins, less kelp, so d K over d U is negative; more otters, fewer urchins, so d U over d O is negative. The chain rule chains the two rates. A product of two negatives is positive -- so d K over d O is positive: more otters ultimately means more kelp. The signs multiply along the chain.</p>
+  </details>
+</section>
+<section class="scene">
+  <div class="shead"><span class="snum">22</span><span class="sid">toward_section_3_3</span><span class="tmpl">definition_math</span><span class="metrics">57 字 · 約 25 秒</span></div>
+  <div class="stitle">A Key, Not Just a Rule</div>
+  <p class="say">With the chain rule in hand, any function you build by composing the elementary ones can now be differentiated, almost mechanically. But the rule does something more interesting next -- it becomes a key, unlocking derivatives we couldn't otherwise reach: the inverse functions, and even something like $x^x$ through a clever trick. That's where we head next.</p>
+  <details class="spoken">
+    <summary>口語版（MiMo 實際要唸的那一串）</summary>
+    <p class="spk">With the chain rule in hand, any function you build by composing the elementary ones can now be differentiated, almost mechanically. But the rule does something more interesting next -- it becomes a key, unlocking derivatives we couldn't otherwise reach: the inverse functions, and even something like x to the x through a clever trick. That's where we head next.</p>
+  </details>
+</section>
+<section class="scene">
+  <div class="shead"><span class="snum">23</span><span class="sid">recap</span><span class="tmpl">recap_cards</span><span class="metrics">66 字 · 約 29 秒</span></div>
+  <div class="stitle">Key Takeaways</div>
+  <p class="say">Pull the section together. The chain rule differentiates a composition: the outer derivative at the inner function, times the inner derivative. In Leibniz form, the rates multiply. To use it, decompose from the outside in -- every layer contributes one slope factor. The number-one pitfall is dropping the inner derivative; and underneath it all, each function is locally its tangent line, so the local slopes multiply.</p>
+  <details class="spoken">
+    <summary>口語版（MiMo 實際要唸的那一串）</summary>
+    <p class="spk">Pull the section together. The chain rule differentiates a composition: the outer derivative at the inner function, times the inner derivative. In Leibniz form, the rates multiply. To use it, decompose from the outside in -- every layer contributes one slope factor. The number-one pitfall is dropping the inner derivative; and underneath it all, each function is locally its tangent line, so the local slopes multiply.</p>
+  </details>
+</section>
+<h2 class="h2">你不會聽到的東西</h2>
+<p class="h2sub">下面三處，<b>某個東西從「耳朵」移到了「眼睛」</b>——旁白沒有唸，只在畫面上。這種落差最容易拖到聽感關卡才被發現，所以先攤在這裡：請看「畫面上有沒有」那一欄，判斷<b>耳朵＋眼睛合起來</b>夠不夠。</p>
+<section class="gap">
+  <div class="gap-head"><code>remainder_form_definition</code></div>
+  <p class="gap-what"><span class="tagx">移走的是</span> Definition 3.1 的式子 $f(x_0+h)=f(x_0)+m\,h+R(h)$ 與 $\lim_{h\to 0} R(h)/h = 0$</p>
+  <p class="gap-row"><span class="k">耳朵聽到的</span>旁白只說 “…if there’s a number $m$ and a function $R$ with <b>this equation</b>, where the remainder over $h$ goes to zero.” ——式子本身<b>沒有被逐項唸出</b>，“this equation” 是指示詞，指向畫面。</p>
+  <p class="gap-row"><span class="k">畫面上有沒有</span><b>有。</b>完整式子在該場的 <code>statement:</code>，隨 <code>{show statement}</code> 上畫面；$m=f'(x_0)$ 與 tangent-line 拆解圖在 <code>math.0</code>／<code>math.1</code>。</p>
+  <p class="gap-row"><span class="k">怎麼判</span>聽者只聽得到「有這麼一條式子，且餘項除以 $h$ 趨近零」的<b>語意</b>，聽不到符號本身。耳眼合起來才是完整的定義。</p>
+</section>
+<section class="gap">
+  <div class="gap-head"><code>proof_setup_substitution ／ proof_easy_piece</code></div>
+  <p class="gap-what"><span class="tagx">移走的是</span> $m_2=f'(g(x_0))$ 的<b>定義</b></p>
+  <p class="gap-row"><span class="k">耳朵聽到的</span>`proof_setup_substitution` 的旁白只說 “apply its remainder form too”，沒有為 $m_2$ 命名；下一場 `proof_easy_piece` 直接說 “<b>$m_2$ is a constant</b>”。也就是說，$m_2$ 是什麼，<b>耳朵從頭到尾沒聽到</b>。</p>
+  <p class="gap-row"><span class="k">畫面上有沒有</span><b>有（A2b 補的）。</b>2026-09-14 把 $m_2=f'(g(x_0))$ 接在 <code>proof.1</code> 那一列的式尾，補上這個「被命名、被當常數用，卻從未在畫面上定義」的缺口。</p>
+  <p class="gap-row"><span class="k">怎麼判</span>這是本節最需要「耳眼合看」的一處：只聽不看，$m_2$ 會是一個憑空出現的常數。</p>
+</section>
+<section class="gap">
+  <div class="gap-head"><code>proof_delicate_bound</code></div>
+  <p class="gap-what"><span class="tagx">移走的是</span> $\alpha_1$ 這個<b>名字</b>（第二次縮小窗口所取的門檻）</p>
+  <p class="gap-row"><span class="k">耳朵聽到的</span>旁白改說 “…and <b>shrinking the window once more</b> so the absolute value of the ratio of $R_1(h)$ to $h$ is less than one…”——數學等價，但 $\alpha_1$ <b>不再被點名</b>。</p>
+  <p class="gap-row"><span class="k">畫面上有沒有</span><b>沒有。</b>畫面兩列 <code>proof</code> 也未出現 $\alpha_1$；講義（`chapter3.tex`）有這個名字，影片版兩端都以「再縮一次窗口」的說法代替。</p>
+  <p class="gap-row"><span class="k">怎麼判</span>對影片聽眾這是<b>簡化，不是缺漏</b>——該步驟的內容（取更小的門檻使 $\lvert R_1(h)/h\rvert &lt; 1$）耳朵聽得到；只是那個希臘字母沒有被引入。若您認為證明的可追溯性需要這個名字，這一場就要改。</p>
+</section>
+<h2 class="h2">本輪對旁白動過什麼</h2>
+<p class="h2sub">與 2026 年 7 月那一版相比，旁白只有下面這些變化。</p>
+<div class="chg-list">
+  <div class="chg">
+    <div class="chg-head"><span class="chg-tag">分場</span><code>decomposition_strategy</code></div>
+    <p>用 <code>part:</code> 拆成兩場（<code>decomposition_strategy</code> 1/2 ＋ <code>decomposition_strategy_repeat</code> 2/2）。接縫處：<code>derivative -- and</code> → <code>derivative. And</code>——只動<b>標點與首字母大小寫</b>，<b>沒有增字、沒有刪字</b>。</p>
+  </div>
+  <div class="chg">
+    <div class="chg-head"><span class="chg-tag">唸法</span><code>proof_delicate_bound</code></div>
+    <p>口語端把 $\lvert R_1(h)\rvert/\lvert h\rvert$ 改唸成 $\lvert R_1(h)/h\rvert$ 的形（NFA gate-1 N1-02，D4：主詞與動詞原本相距 23 字）。<b>數學等價、散文一字未動</b>。</p>
+  </div>
+  <div class="chg">
+    <div class="chg-head"><span class="chg-tag">唸法</span><code>example_chain_times_quotient</code></div>
+    <p>口語端把 $3/(x+2)^2$ 改唸成 “the square of the quantity x plus two”（NFA gate-1 N1-03，D3：原唸法的 “squared” 右界沒關，會被聽成 $\bigl(3/(x+2)\bigr)^2$）。<b>散文未動</b>。</p>
+  </div>
+  <div class="chg">
+    <div class="chg-head"><span class="chg-tag">書寫</span><code>example_chain_times_quotient</code></div>
+    <p>NFA gate-2 N2-01：把 <code>say:</code> 的 <code>$(x+2)$ squared</code> 改成 <code>$(x+2)^2$</code>，讓 <code>squared</code> 不再是 <code>$…$</code> 外的散文字。<b>口語文字一字未改</b>，<b>朗讀出來完全一樣</b>——只是修掉一個 register 破口。</p>
+  </div>
+  <div class="chg">
+    <div class="chg-head"><span class="chg-tag">零改動</span><code>其餘 22 場</code></div>
+    <p>除上述以外，<b>旁白英文一個字都沒改</b>。2026-09-14 的 A1 上游對齊（`chapter3.tex` 只動標點平實化／同義詞／圖說精簡）結論＝<b>24 個單元零跟改</b>（A1 §8）。</p>
+  </div>
+</div>
+<section class="ask">
+  <h2>請您裁決</h2>
+  <ol>
+    <li><b>這 23 場旁白，可以拿去合成嗎？</b></li>
+    <li><b>有沒有哪一場要改？</b>（請指出場 id 與想改的句子）</li>
+  </ol>
+  <p class="ask-note">現在改<b>零成本</b>；合成之後再改，該場要<b>重新合成、重新計費</b>。</p>
+</section>
+<footer class="foot">
+  本檔由 <code>_audit/_gen/build_s32_narration_signoff_html.py</code> 從
+  <code>storyboards/ch03_chain_rule.yml</code>（canonical <code>say:</code>）＋
+  <code>content_scripts/ch03_chain_rule.spoken.yml</code>（口語版）編譯產生，改稿後重跑即同步。
+  緣由與裁決紀錄見 <code>_audit/REPORT-ch03_chain_rule-narration-faithfulness.md</code> §5。
+  場次：content 23／divider 3。
+</footer>
+</div>
+</body>
+</html>
