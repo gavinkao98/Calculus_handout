@@ -737,8 +737,9 @@ severity ∈ {`error`, `warn`}；`make.py` 有 error 即 abort（`--skip-sizeche
 
 ### 本輪（2026-09-13～14）做完之後新增的 backlog
 
-> 以下十五條都是**本輪落地時查到、但刻意不在本輪修**的（外科手術原則）。認領時各自一個工具線 task。
-> ①–⑨ 在四個 task 落地時查到；**⑩–⑮ 是 2026-09-14 §6 驗收當場查到的**（④ 亦於當時改寫）。
+> 以下十八條都是**本輪落地時查到、但刻意不在本輪修**的（外科手術原則）。認領時各自一個工具線 task。
+> ①–⑨ 在四個 task 落地時查到；**⑩–⑮ 是 2026-09-14 §6 驗收當場查到的**（④ 亦於當時改寫）；
+> **⑯–⑱ 是 2026-09-14 §3.1 里程碑審 session 查到的**。
 
 1. **`\tfrac`／`\frac` 內縮的 floor 盲點。** `sizecheck._effective_font_px` 還原的是 authored px，
    **看不到 scriptstyle 的內縮係數**，所以「含分數的標籤」的 floor 閘等於不設防——
@@ -790,6 +791,18 @@ severity ∈ {`error`, `warn`}；`make.py` 有 error 即 abort（`--skip-sizeche
     新版比對讀不到就 **exit 2 什麼都不寫**——2026-09-14 §6 的 `rewatch_pack_after21` 即因此被拒，
     改以兩包 `INDEX.md` 逐場比對代替。協定已由 §3.1 里程碑審 session 回寫、並用備份成片重生基線；
     此處記一筆，免得下一個人再撞一次。
+16. **`derivation._transform_anim` 的 paced 無 rail 列燒掉整拍。** `video/pipeline/templates/derivation.py`
+    的 `_rail()`（約 :201）對沒有 `reason` 的列回傳等式自己的 glow wrapper，`_rail_walk_seconds`（:209）
+    因此把 paced 拍的剩餘秒數全走完——場 22 `all_six_cot_csc` 的 `result` 靜止 11.26 s 即此。
+    同型場：`grep "paced:.*result" storyboards/*.yml`（`ch03_trig_derivatives{,_mimo}.yml` 4 場、
+    `_demo_worked_example.yml:56`）。里程碑審只在 hook 內縮 `beat_seconds` 繞開，stock 未改；
+    修法走工具線（chip「修 derivation 的 paced result 無 rail 時燒掉整拍」已開）。
+17. **`sizecheck` 量的是 build 佈局，執行期縮放／退場它看不到。** 場 22 新增 2 條 overlap warn
+    （`step.1`／`step.2` vs `all_six` 26%／25%），實際執行期推導鏈縮小、rail 退場、終幀無碰撞。
+    與 ⑩「`critic --per scene` 對 `exit:` 場取末幀」同類：靜態閘與時間性畫面的落差要一起記。
+18. **`rewatch_pack --scene` 子集仍需要全 deck 的 `_av`。** 只 render 兩場時它在 `intro.mp4` 就 exit；
+    里程碑審改用直接對 per-scene mp4 做 4 fps／192×108 幀差量測（數字與工具一致）。
+    子集量測若要常設，工具要允許缺場。
 
 ---
 
