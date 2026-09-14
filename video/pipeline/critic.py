@@ -45,6 +45,7 @@ from __future__ import annotations
 
 import argparse
 import base64
+import contextlib
 import json
 import os
 import re
@@ -67,6 +68,7 @@ import yaml  # noqa: E402
 
 from pipeline.timing import SCENE_LEAD_SECONDS  # noqa: E402
 from pipeline.sizecheck import graph_label_geometry  # noqa: E402
+from pipeline.texlock import tex_lock  # noqa: E402
 
 LEAD_SECONDS = SCENE_LEAD_SECONDS
 BEAT_BACKOFF = 0.20     # grab this far before a beat boundary: reveal has settled,
@@ -235,40 +237,45 @@ def plan_frames(storyboard: dict, manifest: dict, selector: str, per: str = "sce
         order = [x.strip() for x in selector.split(",") if x.strip()]
 
     plan: list[dict] = []
-    for sid in order:
-        entry = by_id.get(sid)
-        if entry is None or entry.get("narration_mode") not in ("beats", "scene_aligned"):
-            continue  # intro/outro are silent brand templates -- skip for now
-        beats = entry.get("beats", [])
-        if not beats:
-            continue
-        common = {"scene_id": sid, "scene_number": scene_numbers[sid],
-                  "title": titles.get(sid, "")}
-        if per == "scene":
-            item = {**common, "beat_index": 0, "final": True,
-                    # sentinel: extract_frames() resolves this to the fullest-ink ts
-                    # (or, under --dry-run / a missing mp4, clamps it to duration -
-                    # 0.05 -- the last held frame, the old behaviour).
-                    "ts": 1e9,
-                    "fullest_ts": None, "ink_ratio_vs_last": None,
-                    "narration": entry.get("script", ""), "reveal": None,
-                    "revealed_so_far": cumulative_reveals(beats, len(beats) - 1)}
-            # B.1b: attach deterministic graph-label geometry so build_prompt can
-            # ground the VLM's V2/A1 judgment (only the fullest frame is judged, so
-            # the final layout the labels settle into is the right one to describe).
-            try:
-                geom = graph_label_geometry(meta, scenes_by_id.get(sid, {}), scenes_by_id)
-            except Exception:  # noqa: BLE001
-                geom = None
-            if geom:
-                item["label_geometry"] = geom
-            plan.append(item)
-        else:
-            for i, beat in enumerate(beats):
-                plan.append({**common, "beat_index": beat["index"], "final": False,
-                             "ts": max(LEAD_SECONDS + float(beat["end_seconds"]) - BEAT_BACKOFF, 0.05),
-                             "narration": beat.get("text", ""), "reveal": beat.get("reveal"),
-                             "revealed_so_far": cumulative_reveals(beats, i)})
+    # per="scene" attaches label geometry, and graph_label_geometry BUILDS the scene --
+    # i.e. it compiles Tex into the cwd's shared media/Tex. One hold for the whole loop
+    # rather than one per scene (pipeline/texlock.py). per="beat" builds nothing, so it
+    # stays lock-free: a --dry-run beat plan must not queue behind someone else's render.
+    with tex_lock(reason="critic label geometry") if per == "scene" else contextlib.nullcontext():
+        for sid in order:
+            entry = by_id.get(sid)
+            if entry is None or entry.get("narration_mode") not in ("beats", "scene_aligned"):
+                continue  # intro/outro are silent brand templates -- skip for now
+            beats = entry.get("beats", [])
+            if not beats:
+                continue
+            common = {"scene_id": sid, "scene_number": scene_numbers[sid],
+                      "title": titles.get(sid, "")}
+            if per == "scene":
+                item = {**common, "beat_index": 0, "final": True,
+                        # sentinel: extract_frames() resolves this to the fullest-ink ts
+                        # (or, under --dry-run / a missing mp4, clamps it to duration -
+                        # 0.05 -- the last held frame, the old behaviour).
+                        "ts": 1e9,
+                        "fullest_ts": None, "ink_ratio_vs_last": None,
+                        "narration": entry.get("script", ""), "reveal": None,
+                        "revealed_so_far": cumulative_reveals(beats, len(beats) - 1)}
+                # B.1b: attach deterministic graph-label geometry so build_prompt can
+                # ground the VLM's V2/A1 judgment (only the fullest frame is judged, so
+                # the final layout the labels settle into is the right one to describe).
+                try:
+                    geom = graph_label_geometry(meta, scenes_by_id.get(sid, {}), scenes_by_id)
+                except Exception:  # noqa: BLE001
+                    geom = None
+                if geom:
+                    item["label_geometry"] = geom
+                plan.append(item)
+            else:
+                for i, beat in enumerate(beats):
+                    plan.append({**common, "beat_index": beat["index"], "final": False,
+                                 "ts": max(LEAD_SECONDS + float(beat["end_seconds"]) - BEAT_BACKOFF, 0.05),
+                                 "narration": beat.get("text", ""), "reveal": beat.get("reveal"),
+                                 "revealed_so_far": cumulative_reveals(beats, i)})
     return plan
 
 

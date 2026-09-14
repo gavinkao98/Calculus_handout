@@ -48,6 +48,7 @@ from pipeline.tts import read_manifest_status, _has_audio  # noqa: E402 (manim-f
 from pipeline import house_audio  # noqa: E402
 from pipeline import pauses  # noqa: E402
 from pipeline.stillness import UNDECLARED_STILL_SECONDS, undeclared_still_beats  # noqa: E402
+from pipeline.texlock import tex_lock  # noqa: E402
 from pipeline.timing import (  # noqa: E402
     SCENE_LEAD_SECONDS,
     SCENE_TAIL_SECONDS,
@@ -1065,7 +1066,10 @@ def main() -> int:
     # no video), so a regression of "wrap, don't shrink" is caught before render.
     if not args.skip_sizecheck:
         from pipeline.sizecheck import check_scenes
-        issues = check_scenes(meta, scenes, deck=all_scenes)
+        # check_scenes takes the TeX lock itself; holding it here too is the re-entrant
+        # no-op that documents the preflight as one Tex-building segment (texlock.py).
+        with tex_lock(reason="make preflight"):
+            issues = check_scenes(meta, scenes, deck=all_scenes)
         errors = [m for s, m in issues if s == "error"]
         warns = [m for s, m in issues if s == "warn"]
         for msg in warns:
@@ -1113,11 +1117,15 @@ def main() -> int:
     # so the picture and the narration cannot drift apart. No-op for decks without the field.
     manifest = pauses.apply_pauses(scenes, manifest, audio_dir / "paused")
 
-    _warn_short_beats(meta, scenes, manifest, deck=all_scenes)
-    _warn_undeclared_stillness(meta, scenes, manifest, deck=all_scenes)
+    # One TeX-building segment: both advisories build blocks, and the render loop builds
+    # them again per scene. Held across the whole render so no other gate in this cwd can
+    # interleave on the Tex directory for the minutes it runs (pipeline/texlock.py).
+    with tex_lock(reason="make render"):
+        _warn_short_beats(meta, scenes, manifest, deck=all_scenes)
+        _warn_undeclared_stillness(meta, scenes, manifest, deck=all_scenes)
 
-    # render
-    rendered, failures = render(meta, scenes, manifest, out_dir, args.quality, deck=all_scenes)
+        # render
+        rendered, failures = render(meta, scenes, manifest, out_dir, args.quality, deck=all_scenes)
     if failures:
         print(f"[render] {failures} scene(s) failed; aborting before compose", flush=True)
         return 1
