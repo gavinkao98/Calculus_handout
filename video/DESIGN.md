@@ -948,6 +948,15 @@ muted（opacity 0.55）。用 `TransformMatchingShapes` 逐字形配對，**不�
 **不**帶 rail（leader／reason），morph 之後把 rail 的各段平均鋪在**拍子剩餘時間**上（`beat_run_time − 已耗秒數`；
 n 段切 n 個間隔，同 `paced_reveal`，兩者共用 `pacing.walk`）——1.2 s 變形接 10 s 靜止就變成「變形、讀 leader、讀理由」。
 剩餘時間不夠 n 個 fade、或該列沒有 rail（沒寫 reason；theorem_proof 列）→ 退回 rail 跟 morph 同一個 play。
+**無 rail 就不走，改由 schema 報（2026-09-14，§8 backlog ⑯）：** `_rail` 認的是「row group 裡不是等式的那些
+部件」，而等式常被**包一層**（result 在 glow group 裡、帶判定符號的列是 `VGroup(等式, 符號)`），所以包裝層本身
+永遠不算一段（只取它裡面非等式的成員）。此前包裝層算一段，於是沒寫 reason 的列也回報「有 rail」：paced 列
+把整拍交給 `pacing.walk`，走的是剛 morph 完的等式自己（再淡入一次然後 hold），而 `paced:` 又讓 `[stillness]`
+免檢——宣告 paced、實際整拍靜止且無人報（ch03 22 `all_six_cot_csc.result` 11.26 s）；未 paced 的同型列則是
+`FadeIn(包裝層)` 與 morph 同一個 play，對 morph 自己的終點再放一次動畫（ch03 20 `all_six_tan_sec.result`）。
+改後兩者都只剩 morph 本身，拍子剩下的是誠實的 hold；**author 端的閘＝`schema._paced_no_rail_issues`**
+（`paced` 列出的 `anim: transform`／`cancel` 列沒有 `reason` → warn `paced row '<rid>' has nothing to walk
+(no reason rail)`）——`[stillness]` 對列在 `paced:` 的 reveal 一律免檢，看不到這種拍，所以要由 schema 出聲。
 `derivation.build` 自己把 `paced` 傳進 closure；`pacing.apply` 仍跳過 callable。**`fixed_seconds`：** closure 掛
 `anim.fixed_seconds = 1.2`（frame 再 +0.4），`[stillness]` 據此判定（見上）。**theorem_proof 的 `proof[]` 也收 dict 列：**
 `{tex: "$…$", anim: transform, frame: true}`（字串列不變；`theorem_proof.proof_texts(spec)` 給所有讀 `proof[]` 的消費端），
