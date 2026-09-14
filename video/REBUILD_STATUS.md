@@ -81,6 +81,14 @@
   **內容階段（要動旁白、另案報價）：** **14 `companion_limit`——六鏡三鏡給 weak、全片評價最低的一場**：45.5 秒建立 (1−cosθ)/θ → 0、畫面寫 Bank（存起來），但 15–27 場旁白裡再沒出現過（唯一的 companion 是 17 場的 companion sum-to-product formula，不是同一件事）——本片走 sum-to-product 路線根本用不到它；它也是全片唯一沒有「為什麼現在做」開場句的場。本輪只做了純畫面側。另有 R5 的 08–09 順序（連續性證明插在基本極限收尾之前）與 R3 的 STAGE 2 佔全片 42% 只有一個路標，同屬內容／結構層。
   **兩條 T2 advisory 實測後裁定不改（附量測，避免下次重查）：** ① `11 squeeze_graph` 的 `\tfrac` 內列 1080p 實測 ink 高度＝曲線標籤 17 px、`±π/2` 刻度 **11 px**（對照正文散文 48 px），換算字級約 24／16 px 都低於 `MIN_FONT_FLOOR` 26——但 T2 只放大 1.18×，**改之前刻度就已低於 floor**，且 fontfloor 閘對 `\tfrac` 結構性失明（`_effective_font_px` 只看 `font_size`，**全書任何含分數的標籤都不設防**），正確修法是補閘＋全書掃，不是單場打補丁。② `04` 結論列 leader 實測 **73 px**（其餘三列 412／389／310），而 `templates/derivation.py:67` 的 `MIN_LEADER = 0.55` 註解寫「~74 px at 1080p」——**這是下限被剛好咬住，機制照設計運作**，不是 rail 壞掉。曾據「數學太寬」的假設把 `\quad\text{and}\quad` 改成 `,\qquad`，實測**否證**（四列淨空一致 +22 px、row1–3 的 leader 各縮短 22 px、row4 仍停 73 px），已回退；要處理是共用層的事（下限咬住時換連接樣式或允許 rail 再右移），工具線已收進 §8 backlog。
 
+- **§3.1 backlog 首項：六條導數收成一張表（2026-09-14；里程碑審 backlog 的第 ① 項，使用者指派）。** 六鏡一致指出的缺口——**這一節的成果物（六條三角導數）全片從未同框**，而宣告「六條都到齊」的那一刻正好是全片最長的靜止。對象＝場 22 `all_six_cot_csc` 與場 26 `recap`（兩場原本都沒有 hook）。
+  **成果（我獨立量測覆核，非照子代理回報收）：** fine 最長靜止 **22：11.0 → 4.75 s**（死區整個離開 beat 5）、**26：10.5 → 4.00 s**（全片最後一個實質畫面）——**全片最長的兩段靜止同時消失**。做法：`six_derivatives_table()` builder 在 22 的 beat 5 逐列長出六列表（推導鏈縮小退左），在 26 的 bottom band 以 2 上 4 下的 banner 召回同一張表；26 的 beat 5 另在 hook 內拆成兩個視覺時刻（四步循環 → 度數 fine print，`π/180` 警示色），**未動任何 `{show}` 標記**。
+  **語意色用「來源軸」而非函數軸：** 列 1–2（`sin'=cos`／`cos'=-sin`）用 `result`（藍，＝場 16／17 兩個定理本身的 accent），列 3–6 用 `practice`（綠，＝場 22 自己的 accent）。理由：旁白畫的線是**來源**（`every one built on sin'=cos and cos'=-sin`）不是 sin-vs-cos，且列 1、2 各自同時含 sin 與 cos，函數軸配色會有歧義。兩色都是講義 `calcbook` 的 `aResult`／`aPractice` 色相，未發明新色。26 的 banner 另把警示框畫在那兩條藍列上——旁白的 fine print 正是「這兩條只在弧度制下成立」，忠實。
+  **驗收：** `schema` OK、`lint` 0 error、`sizecheck` **0 error**／20 warn、`run_selftests` **51 綠**、`derive --check` parity OK、`make.py --reuse-audio` 兩道 `[sync]` clean＋`[stillness] no undeclared still > 6s`。**零 TTS**（`--reuse-audio` 能過本身即 `text_hash` 未變的證明）。新增的 2 條 sizecheck warn（`step.1`／`step.2` vs `all_six` overlap 26%／25%）是**build 佈局**的量測，執行期推導鏈會縮小、rail 會退場——我抽終幀確認無碰撞，與 `exit:` 既有的「閘讀 pre-exit 幀」caveat 同類。
+  **P4（各 point 配里程碑縮圖）未做**：要跨 20 個場重建圖形、無 `carry:` 可用，成本不成比例；bottom band 已由 banner 填滿，評審「查 sec′ 要倒回 14:03」的訴求已由本輪滿足。
+  **⚠ 尚未進成片：** 本輪的修正**還沒有 render**，現行 §3.1 成片（共用層 v1 版）不含它們。下一次 §3.1 render（4K final 或任何 1080p 重跑）才會帶進去。
+  **轉給工具線的共用層發現（本輪查到的根因）：** 場 22 那 11.0 s 靜止的本體是——`result` 在該場 `paced:` 清單內，`derivation._transform_anim` 因此走「morph 後把剩下整拍用掉」的 rail 路徑，但 `result` 沒有 reason rail，`_rail()` 回傳的是 equation 的 glow wrapper，於是它 morph 完再淡入一次等式、然後把整整 11.26 s 走完。**這是 `pipeline/templates/derivation.py` 的共用層行為，可能在別的 deck 也有**；本輪只在 hook 內借一段縮短的 `beat_seconds` 繞開，stock 一行未改。
+
 ## 每節成本量測（2026-07-07 起；量三節後檢視模板紅利，再定 per-scene 客製 hook 上限）
 
 | 節 | audit/撰稿 tokens | render 次數 | 客製 hook 數 | 真 TTS calls | 回歸輪數 |
