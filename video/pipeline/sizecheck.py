@@ -987,6 +987,17 @@ def check_scenes(meta: dict, scenes: list[dict], deck: "list[dict] | None" = Non
     `deck` is the WHOLE storyboard's scene list when `scenes` is a subset (make.py
     --scene): a `carry:` rebuilds the scene it carries from, which may not be among the
     scenes being checked. Defaults to `scenes`."""
+    from pipeline.texlock import tex_lock
+
+    # Every scene below compiles Tex into the cwd's shared media/Tex. Hold the lock for
+    # the WHOLE pass, not per scene: interleaving two passes is exactly what produced the
+    # false `could not build scene` this guards against (pipeline/texlock.py).
+    with tex_lock(reason="sizecheck"):
+        return _check_scenes_locked(meta, scenes, deck)
+
+
+def _check_scenes_locked(meta: dict, scenes: list[dict], deck: "list[dict] | None") -> "list[tuple[str, str]]":
+    """check_scenes' body; separated only so the lock wraps it (see check_scenes)."""
     from pipeline.templates import build_blocks
     from pipeline.visuals import theme as T
     from pipeline.schema import reveal_targets

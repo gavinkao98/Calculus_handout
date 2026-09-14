@@ -1632,6 +1632,35 @@ manifest render）。（gen-2 的 Gemini 直鏈 `build.py`／`mux.py` 已於 202
 Gemini 路線退場。）以 visual payload 為 key 的 per-stage caching（編輯 `say` 重新
 synthesize audio 但不重新 render Manim）仍為 (TODO)。
 
+**Tex 建置的互斥鎖（`pipeline/texlock.py`；2026-09-14 r2 Task H）。** 每一支會 build blocks 的程式
+——`sizecheck.check_scenes`、`make.py` 的 pre-render sizecheck 與 render 迴圈、`critic.py --per scene`
+的 `graph_label_geometry`、`scratch_frames.py`——都透過 manim 把 LaTeX 編到 `config.media_dir` 底下的
+`Tex/`。manim 對那個目錄沒有任何鎖，所以**同一個 cwd** 的兩支程式會在同一批 `<hash>.tex`／`.dvi`／`.svg`
+上交錯，輸掉的那一支吐出**假的** `could not build scene (PermissionError/FileNotFoundError)`
+（2026-09-14 實測：冷 Tex cache 下兩支並行 `sizecheck.py` 三輪三中）。因此這些「會編 Tex 的段落」
+一律包在 `with tex_lock(reason=...)` 裡：
+
+- **鎖檔＝`<media_dir>/Tex.lock`**（預設即 `./media/Tex.lock`），用 `os.open(O_CREAT|O_EXCL)` 原子建檔、
+  內寫 pid 與 reason；不引入新套件，Windows／POSIX 同一條路徑。**per cwd**——兩個 worktree（或任何兩個
+  不同的工作目錄）天生不互卡，這正好對應競態的所在（`KICKOFF-shared-layer-v1.md` §8 ⑧）。
+  **鎖檔放在 `Tex/` 旁邊、不是裡面**：manim 每做完一次 Tex→SVG 就呼叫
+  `tex_file_writing.delete_nonsvg_files()`，把 `media/Tex` 底下**所有非 `.svg`／`.tex` 的檔案刪光**
+  ——鎖檔擺進去會被它要守護的那些 build 掃掉（2026-09-14 實測：第二支在第 1 秒就撿到「沒人持有」的鎖，
+  兩支照撞）。**順帶一提，這個清掃也正是競態具破壞性的一半**：它刪的是**另一支**的 `.dvi`／`.log`，
+  就是假 error 裡 `FileNotFoundError` 的那一半。
+- **鎖的粒度是「整段」不是「每個 Tex」**：逐個 snippet 上鎖只會讓兩支交錯、Tex cache 照樣互寫；
+  要的是一支程式從第一次 build 到最後一次都獨佔那個目錄。
+- **等待而非報錯**：每 0.5 s 重試，每 10 s 印一行 `[texlock] waiting for pid N (sizecheck) … 20s`
+  （等待永遠不該看起來像掛住），逾時預設 10 分鐘後丟 `TimeoutError` 並指名持有者。
+- **同一個 process 內可重入**：`make.py` 在 preflight 外層持鎖、`check_scenes` 內層再持一次，
+  深度計數讓內層變成 no-op 而不是自我死鎖。
+- **stale 回收需同時成立兩個條件**：鎖檔 mtime 超過 15 分鐘**且**寫在裡面的 pid 已不存在，才覆蓋並印
+  `[texlock] stale lock from pid N removed`——因為一支正常的整 deck render 會持鎖遠超過 15 分鐘而且活得好好的。
+
+`_selftest_*` **不另外包鎖**（`run_selftests.py` 本來就序列跑；包了只會讓測試互等）；
+`rewatch_pack.py`／`review_pack.py`／`derived_check.py` 查過**不需要**——它們只呼叫 `_bootstrap.bootstrap()`
+設 TeX template、不 build blocks，Tex 一行都不編。
+
 ### 產線硬化：新增資料契約與旗標（2026-07-11，kickoff `KICKOFF-pipeline-hardening.md` T1–T10）
 
 一輪產線硬化在 §3.2 進真 TTS 前補齊三個結構缺口（生成稿漂移、計費面不可稽核、QA 靜默略過）＋
