@@ -151,3 +151,8 @@ mock render 場 04、14、21、22 改前後幀（scratchpad/taskG），`visual-f
   ＋負向 selftest（含非法轉義的契約不得被當成「沒有契約」）。**已追加給 Task I**（若 I 已 commit 則為 r3 首項）。
 - **Task I 的驗收數據（§3.2 session 提供）**：其分支 `30c5358` 補了 `decomposition_strategy` 的 `screen_contract`（7 條 required_steps，兩個 `part:` 場 covers 4＋3；契約 10→11、required 29→36）；
   模擬 `_SCOPED_TEMPLATES` 加 `procedure_steps` 後 `ch03_chain_rule{,_mimo}` 1 error → 0；全 repo 24 份 storyboard 零新增 error。
+- **Task I 回報的 r3 候選（2026-09-14）：** ① `step_coverage.py:97` missing-contract 訊息字面仍寫 `proof/derivation unit`，`procedure_steps` 納入後不準（現役 deck 0 條印到）；
+  ② `provenance.py:26` 的 `TEACHING_TEXT_FIELDS` 常數早已落後 `_present_text_fields`（`strategy`／`notes.*.text`／`steps.*.text` 都沒進去），只被 selftest 讀——補齊或刪掉；
+  ③ `parse_block` 對「非 dict」（純 scalar）仍回 `None` 與「沒寫」混在一起，可用同一個 `ParseError` 分流。
+  **`definition_math` 納入 SC 的分析（r3 依據）**：全 repo 12 份契約無一掛在 definition 單元；該模板是單一陳述框、散文只有 `statement` 且已由 provenance 覆蓋；
+  若現在加入，`ch03_trig_derivatives{,_mimo}` 立刻各 +3 `[SC]` error、`ch03_chain_rule` 開 enforce 後再 +7——要加就連同那些單元的 `coverage_exempt: true` 一起做。
