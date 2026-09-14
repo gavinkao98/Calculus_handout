@@ -2230,7 +2230,8 @@ def ratio_readouts(spec, ctx, blocks):
     # ceiling up is better than dropping the tips, which every other graph in the deck has.
     axes = Axes(x_range=[X0, X1, 1.0], y_range=[0.0, 1.32, 0.5],
                 x_length=7.6, y_length=2.0, tips=True,
-                axis_config={"color": mut, "stroke_width": 1.6, "include_ticks": False})
+                axis_config={"color": mut, "stroke_width": 1.6, "include_ticks": False,
+                             "tip_width": T.AXIS_TIP, "tip_height": T.AXIS_TIP})
     # stop at pi exactly: past it the ratio goes negative, off the bottom of this y range
     # and straight through the theta label at the axis tip -- and pi is where the
     # narration stops too ('at theta = pi it is zero').

@@ -111,8 +111,11 @@ def test_tall_proof_prefers_band_but_falls_back_to_rail():
 # -- sizecheck promotion advisory (reads the built band geometry, no drift) ------
 
 def _band_warns():
+    """Which of the fixture scenes got the statement-promotion advisory. Matches sizecheck's
+    stable `(band promotion)` code, not prose -- sizecheck.py's own top-of-file note says the
+    message text may change but this code may not."""
     issues = sizecheck.check_scenes(_META, list(_DATA["scenes"]))
-    return {sid: any(sev == "warn" and sid in msg and "band" in msg.lower()
+    return {sid: any(sev == "warn" and sid in msg and "(band promotion)" in msg
                      for sev, msg in issues)
             for sid in _SCENES}
 

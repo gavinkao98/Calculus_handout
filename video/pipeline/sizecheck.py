@@ -21,6 +21,10 @@ Run standalone (checks every content scene):
 
 ``make.py`` runs it on the scenes it is about to render (pass ``--skip-sizecheck``
 to bypass).
+
+A finding's MESSAGE TEXT is free to reword; its stable machine CODE (the parenthesised
+tag a caller greps for, e.g. ``(band promotion)`` or ``(LayoutRules L1)``) is not --
+callers (selftests, other tooling) match on the code, never on prose.
 """
 from __future__ import annotations
 
@@ -567,7 +571,7 @@ def _statement_regime_issues(scene: dict, blocks) -> "list[tuple[str, str]]":
     return [("warn",
         f"{sid}: the statement wrapped, so it renders as a full-width band (not the compact right "
         f"rail); trim it to a single rail line / a rail-width formula to keep the rail, or accept "
-        f"the band.")]
+        f"the band. (band promotion)")]
 
 
 def _effective_font_px(node) -> float:
@@ -779,10 +783,9 @@ def _bottom_band_issues(scene: dict, blocks, sev: str) -> "list[tuple[str, str]]
     fill = _rect_union_area(rects) / band_area
     if fill >= L2_MIN_FILL:
         return []
-    # Wording note: this message must not contain "band" -- _selftest_theorem_regime._band_warns
-    # picks the statement-promotion advisory out of check_scenes' output by matching
-    # `sid in msg and "band" in msg.lower()`, so any other warn using that word on a
-    # theorem_regime scene reads as a false promotion advisory there.
+    # This message is free to say "band" (bottom "band" of the frame) -- it is not the
+    # statement-promotion advisory, and _selftest_theorem_regime._band_warns now matches
+    # that one by its stable `(band promotion)` code, not by the word "band" in the prose.
     return [(sev,
         f"{scene.get('id')}: the bottom third is {fill:.0%} filled (< {L2_MIN_FILL:.0%}) -- the "
         f"frame reads as half-loaded, and that strip is the most visible one in a lecture hall "
