@@ -224,6 +224,8 @@
 - [ ] TTS 依 [RUNBOOK-mimo-narration-route.md](RUNBOOK-mimo-narration-route.md)：`--reuse-existing`／`--no-billing`／`--skip-qa` 的適用範圍
       （reuse key 不含場號——**已做**）
 - [ ] **兩道硬閘在**：`[sync]`（§一 層 6）與 `[still-gate]`（§一 層 7），render 後必跑
+- [ ] `rewatch_pack --scene <子集>` **一律另給 `--out`**（2026-09-14 起：不給 exit 2；`--out` 已存在
+      且其 `pack.json` 非 subset 也 exit 2——子集一律不得覆寫全包的 `INDEX.md`／`pack.json`）
 
 > **在 worktree 裡跑第一項要注意（2026-09-13 實跑）：** `tools/doctor.py --smoke` 的 deck 閘走 `<repo>/.venv`，
 > 而 `<repo>` 是**當前工作樹**——worktree 沒有 `.venv`，那一段會直接 `[info] 略過`，**打勾等於沒跑**。

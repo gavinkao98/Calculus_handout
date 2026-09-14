@@ -10,7 +10,7 @@ images and text but not video; this pack is the bridge, and it is the shared inp
 multi-lens rewatch review so every lens looks at exactly the same evidence.
 
     python video/pipeline/rewatch_pack.py --deck ch03_trig_derivatives_mimo
-    python video/pipeline/rewatch_pack.py --deck <deck> --scene sector_inequality,recap
+    python video/pipeline/rewatch_pack.py --deck <deck> --scene sector_inequality,recap --out <dir>
     python video/pipeline/rewatch_pack.py --deck <deck> --out <new> --baseline <old pack>
 
 It is also the HARD gate on the 12 s still line, so exit code carries a verdict:
@@ -18,7 +18,8 @@ It is also the HARD gate on the 12 s still line, so exit code carries a verdict:
     1  the pack is written (a human still needs to look at it) and at least one content
        scene is over the line -- `--gate-still` moves the line, nothing turns it off
     2  `--baseline` points at a pack rendered at another fps / frame size, or this render's
-       own scenes disagree; nothing is written to --out
+       own scenes disagree; or a `--scene` subset has no `--out` of its own, or its `--out`
+       already holds a full (non-subset) pack; nothing is written to --out
 The 12 s line was already met in round 13 and stayed met through round 21, yet it and
 `[sync]` were both warn-only, which is how eight `[sync]` warnings lived from round 13 to
 round 20: a gate that cannot stop anything is not a gate (KICKOFF-process-reform §2.3, G1).
@@ -96,9 +97,18 @@ def ffprobe_video(p: Path) -> dict:
     return {"fps": st["r_frame_rate"], "size": f"{st['width']}x{st['height']}"}
 
 
-def fmt(t: float) -> str:
+def fmt(t: "float | None") -> str:
+    """m:ss, or `--` when `t` is None -- a `--scene` subset pack has no full-timeline global
+    offset for a scene that was not rendered (or for any scene, once one is missing)."""
+    if t is None:
+        return "--"
     m, s = divmod(max(t, 0.0), 60)
     return f"{int(m)}:{s:04.1f}"
+
+
+def _goff(g0: "float | None", x: float) -> "float | None":
+    """g0 + x, or None when g0 is unknown (see `fmt`)."""
+    return None if g0 is None else g0 + x
 
 
 # ---- words at time -----------------------------------------------------------------
@@ -149,16 +159,31 @@ def words_at(t_video: float, beats: list[dict], words: "list[dict] | None") -> t
 # ---- motion -------------------------------------------------------------------------
 
 def _beat_at(span: list[float], beats: list[dict]) -> str:
-    """Which beat a still span sits in, as ` (beat 2, proof.1)`. Empty when there are no
-    beats (silent scenes) or the span straddles several."""
+    """Which beat(s) a still span sits in, as ` (beat 2, proof.1)`, or, when the span
+    overlaps more than one beat, ` (beat 2, proof.1; spans beats 1–3)` -- naming the beat
+    with the MOST overlap first. Empty only when there are no beats (silent scenes) or the
+    span touches none of them (e.g. it sits in the scene's lead-in or tail, not in a beat).
+
+    This used to pick a beat by asking whether the span's MIDPOINT fell inside its range --
+    a span that genuinely straddles a beat boundary (or runs past the last beat into the
+    tail) can have that single point land in neither, so a cross-beat still span came back
+    with no beat at all and the FAIL line it feeds had nowhere to point (2026-09-14). Overlap
+    only needs the span to touch a beat at all, so it cannot miss one this way.
+    """
     if not beats:
         return ""
-    lo, hi = span
-    mid = (lo + hi) / 2.0 - SCENE_LEAD_SECONDS
-    for b in beats:
-        if b["start_seconds"] - 1e-6 <= mid <= b["end_seconds"] + 1e-6:
-            return f" (beat {b['index']}, {b.get('reveal') or 'no reveal'})"
-    return ""
+    lo, hi = span[0] - SCENE_LEAD_SECONDS, span[1] - SCENE_LEAD_SECONDS
+    overlaps = [(b, min(hi, b["end_seconds"]) - max(lo, b["start_seconds"])) for b in beats]
+    overlaps = [(b, ov) for b, ov in overlaps if ov > 1e-6]
+    if not overlaps:
+        return ""
+    best = max(overlaps, key=lambda pair: pair[1])[0]
+    label = f" (beat {best['index']}, {best.get('reveal') or 'no reveal'}"
+    if len(overlaps) > 1:
+        lo_i = min(b["index"] for b, _ in overlaps)
+        hi_i = max(b["index"] for b, _ in overlaps)
+        label += f"; spans beats {lo_i}–{hi_i}"
+    return label + ")"
 
 
 def motion_stats(av: Path, duration: float, reveal_times: list[float]) -> dict:
@@ -384,6 +409,33 @@ def baseline_source(pack_dir: "Path | None") -> "dict | None":
     return json.loads(p.read_text(encoding="utf-8")).get("source") if p and p.exists() else None
 
 
+def scene_subset_verdict(subset: bool, out: "Path | None", existing: "dict | None") -> tuple[bool, str]:
+    """(may we proceed, message) for a `--scene` subset's `--out`.
+
+    A `--scene` subset must never land in the full deck's default pack dir: writing there
+    replaces INDEX.md/pack.json (same names as a full pack, partial content) with no sign
+    anything was left out. So a subset (a) always needs an `--out` of its own, and (b)
+    refuses an `--out` that already holds a FULL pack (`existing` is that pack.json's dict,
+    or None when `--out` is empty or new) -- overwriting one would silently discard it.
+    A non-subset (`--scene all`, the default) run is never restricted by this check.
+    """
+    if not subset:
+        return (True, "")
+    if out is None:
+        return (False, "[rewatch_pack] REFUSE: --scene <subset> requires --out (a subset must "
+                        "not write into the full deck's default pack dir) -- pass --out <dir>")
+    if existing is not None and not existing.get("subset"):
+        return (False, f"[rewatch_pack] REFUSE: --out {out} already holds a full pack (not a "
+                        "subset) -- a --scene subset must not overwrite it; pass a different --out")
+    return (True, "")
+
+
+def out_pack_source(out: "Path | None") -> "dict | None":
+    """The full pack.json dict already at `out`, or None when there is nothing there yet."""
+    p = out / "pack.json" if out else None
+    return json.loads(p.read_text(encoding="utf-8")) if p and p.exists() else None
+
+
 # ---- main ------------------------------------------------------------------------------
 
 def load_manifest(section_dir: Path) -> tuple[dict, Path]:
@@ -410,8 +462,11 @@ def main() -> int:
             pass
     ap = argparse.ArgumentParser(description=__doc__.split("\n\n")[0])
     ap.add_argument("--deck", required=True, help="rendered deck id, e.g. ch03_trig_derivatives_mimo")
-    ap.add_argument("--scene", default="all", help="comma-separated scene ids (default all)")
-    ap.add_argument("--out", type=Path, default=None, help="pack dir (default <section>/rewatch_pack)")
+    ap.add_argument("--scene", default="all", help="comma-separated scene ids (default all); a "
+                    "subset requires --out of its own (exit 2 without one) and only its scenes "
+                    "need a rendered _av file")
+    ap.add_argument("--out", type=Path, default=None, help="pack dir (default <section>/rewatch_pack; "
+                    "required for a --scene subset, and refused if it already holds a full pack)")
     ap.add_argument("--gate-still", type=float, default=12.0, metavar="SECONDS",
                     help="a content scene whose FINE longest still stretch exceeds this fails "
                          "the run (exit 1). Deliberately has no off switch (kickoff G1).")
@@ -435,16 +490,31 @@ def main() -> int:
 
     scenes = sb["scenes"]
     wanted = None if args.scene == "all" else set(args.scene.split(","))
+    subset = wanted is not None
+
+    # Settle the --out question BEFORE anything is probed or written: a --scene subset must
+    # never overwrite the full deck's default pack dir (kickoff §2.D point 2).
+    ok, msg = scene_subset_verdict(subset, args.out, out_pack_source(args.out))
+    if not ok:
+        print(msg, flush=True)
+        return 2
 
     # exact global timeline from the concatenated per-scene files (+ what they were rendered at)
-    durs: dict[str, float] = {}
+    # -- a subset only needs the _av of the scenes it was asked for; the rest get None durs, so
+    # the running global start below also comes out None (there is no true global timeline
+    # without every scene's length).
+    durs: dict[str, "float | None"] = {}
     probes: dict[str, dict] = {}
     for s in scenes:
-        av = av_dir / f"{s['id']}.mp4"
+        sid = s["id"]
+        if subset and sid not in wanted:
+            durs[sid] = None
+            continue
+        av = av_dir / f"{sid}.mp4"
         if not av.exists():
             raise SystemExit(f"[rewatch_pack] missing per-scene A/V file {av} (render the deck first)")
-        durs[s["id"]] = ffprobe_duration(av)
-        probes[s["id"]] = ffprobe_video(av)
+        durs[sid] = ffprobe_duration(av)
+        probes[sid] = ffprobe_video(av)
     src = source_record(args.deck, probes)
     # Settle the A/B question BEFORE a byte is written to --out: a pack built against a
     # baseline at another fps is worse than no pack, because its numbers look comparable.
@@ -455,12 +525,15 @@ def main() -> int:
             return 2
 
     out.mkdir(parents=True, exist_ok=True)
-    starts: dict[str, float] = {}
+    starts: dict[str, "float | None"] = {}
     t = 0.0
     for s in scenes:
+        if subset:
+            starts[s["id"]] = None            # no full timeline to accumulate against
+            continue
         starts[s["id"]] = t
         t += durs[s["id"]]
-    total = t
+    total = None if subset else t
 
     records, gate_rows = [], []
     for n, s in enumerate(scenes, 1):
@@ -476,7 +549,7 @@ def main() -> int:
         stem = f"{n:02d}_{sid}"
         title = s.get("title") or sid
         reveal_times = [SCENE_LEAD_SECONDS + b["start_seconds"] for b in beats if b.get("reveal")]
-        print(f"[rewatch_pack] {stem}  {fmt(g0)}–{fmt(g0 + dur)}  ({dur:.1f}s, {mode}, {len(beats)} beats)", flush=True)
+        print(f"[rewatch_pack] {stem}  {fmt(g0)}–{fmt(_goff(g0, dur))}  ({dur:.1f}s, {mode}, {len(beats)} beats)", flush=True)
 
         # frames
         fdir = out / stem
@@ -489,16 +562,17 @@ def main() -> int:
             if not dst.exists():
                 extract_frame(av, tv, dst)
             snippet, bi = words_at(tv, beats, words)
-            label = f"#{k:02d}  +{tv:5.1f}s  ({fmt(g0 + tv)})  {why}  │  {snippet}"
+            gt = _goff(g0, tv)
+            label = f"#{k:02d}  +{tv:5.1f}s  ({fmt(gt)})  {why}  │  {snippet}"
             frames.append((dst, label))
-            sample_rows.append({"k": k, "t_video": round(tv, 2), "t_global": round(g0 + tv, 2),
+            sample_rows.append({"k": k, "t_video": round(tv, 2), "t_global": None if gt is None else round(gt, 2),
                                 "why": why, "beat": bi, "words": snippet, "file": dst.name})
         mot = motion_stats(av, dur, reveal_times)
         still_where = _beat_at(mot["fine_longest_still_span"], beats)
         gate_rows.append({"scene": sid, "kind": s.get("kind", "content"),
                           "still_seconds": mot["fine_longest_still_seconds"], "where": still_where})
         header = [
-            f"{stem}   \"{title}\"   global {fmt(g0)}–{fmt(g0 + dur)}   duration {dur:.1f}s   "
+            f"{stem}   \"{title}\"   global {fmt(g0)}–{fmt(_goff(g0, dur))}   duration {dur:.1f}s   "
             f"{len(reveal_times)} reveals   picture static {mot['static_ratio'] * 100:.0f}% of the time",
             f"tiles: #k  +seconds into scene  (global m:ss)  why sampled  │  words being spoken "
             f"([current word]; ~ = interpolated inside the beat)      motion over the scene (2 s bars, right) →",
@@ -508,7 +582,7 @@ def main() -> int:
         # transcript timeline (viewer-facing)
         canon = canonical_beats(base_by_id.get(sid))
         lines = [f"# {stem} — {title}", "",
-                 f"- global {fmt(g0)} → {fmt(g0 + dur)}  (duration {dur:.1f} s; scene {n}/{len(scenes)})",
+                 f"- global {fmt(g0)} → {fmt(_goff(g0, dur))}  (duration {dur:.1f} s; scene {n}/{len(scenes)})",
                  f"- narration: {mode}; {len(beats)} beats; {len(reveal_times)} on-screen reveals"
                  + (f"; first reveal at +{reveal_times[0]:.1f}s" if reveal_times else ""),
                  f"- picture (coarse, >0.2% of pixels): static {mot['static_ratio'] * 100:.0f}% of the time; "
@@ -555,15 +629,18 @@ def main() -> int:
 
         records.append({"n": n, "id": sid, "title": title, "kind": s.get("kind", "content"),
                         "template": s.get("template"), "hook": s.get("hook"), "mode": mode,
-                        "global_start": round(g0, 3), "duration": round(dur, 3), "reveals": len(reveal_times),
+                        "global_start": None if g0 is None else round(g0, 3), "duration": round(dur, 3), "reveals": len(reveal_times),
                         "reveal_times": [round(r, 2) for r in reveal_times], "motion": mot,
                         "sheet": f"{stem}.sheet.jpg", "timeline": f"{stem}.md", "samples": sample_rows,
                         "beats": [{k: b.get(k) for k in ("index", "reveal", "start_seconds", "end_seconds", "text")} for b in beats],
                         "canonical_beats": canon})
 
     # INDEX (viewer-facing) + PRODUCTION (non-blind lenses) + pack.json
-    idx = [f"# Rewatch pack — {args.deck}", "",
-           f"Film: `{section_dir.name}/{args.deck}.mp4`, {fmt(total)} total, {len(records)} scenes. "
+    idx = [f"# Rewatch pack — {args.deck}", ""]
+    if subset:
+        idx += [f"**subset pack: {len(records)} of {len(scenes)} scenes; global times omitted** "
+                "(not enough of the deck was rendered to know the true global offsets).", ""]
+    idx += [f"Film: `{section_dir.name}/{args.deck}.mp4`, {fmt(total)} total, {len(records)} scenes. "
            "Each scene has a contact sheet (`NN_<scene>.sheet.jpg`: sampled frames labelled with the time and the words "
            "being spoken at that instant), a transcript timeline (`NN_<scene>.md`: every beat with its on-screen reveal, "
            "seconds and words/sec, plus motion statistics), and the sampled frames at full resolution (`NN_<scene>/`).",
@@ -599,7 +676,8 @@ def main() -> int:
     prod += [f"| {r['n']:02d} | `{r['id']}` | {r['kind']} | {r['template'] or '—'} | {r['hook'] or '—'} | {r['mode']} |" for r in records]
     (out / "PRODUCTION.md").write_text("\n".join(prod) + "\n", encoding="utf-8")
     (out / "pack.json").write_text(json.dumps({"deck": args.deck, "film": str(section_dir / f"{args.deck}.mp4"),
-                                               "total_seconds": round(total, 3), "lead_seconds": SCENE_LEAD_SECONDS,
+                                               "total_seconds": None if total is None else round(total, 3),
+                                               "lead_seconds": SCENE_LEAD_SECONDS, "subset": subset,
                                                "source": src, "scenes": records}, ensure_ascii=False, indent=1), encoding="utf-8")
     print(f"[rewatch_pack] wrote {out}  ({len(records)} scenes; INDEX.md, PRODUCTION.md, pack.json)", flush=True)
     for ln in gate_lines:
