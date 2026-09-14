@@ -437,6 +437,7 @@ severity ∈ {`error`, `warn`}；`make.py` 有 error 即 abort（`--skip-sizeche
 > 其 `check` 行因結論階 62 出框＝1 error。** 變因隔離證實**純由 62 造成**（不是 T1 的字體、不是 T3 的新規則）。
 > **主對話裁決＝62 不退、修在 deck 側**——已用 `spawn_task` 另開 chip
 > 「修 ch01 deck `invert_a_rational` 結論階 62 出框」，不在本輪處理（§8 backlog ⑤）。
+> **✅ 2026-09-14 已收（§8 backlog ⑤）：** deck 側把該場 `part:` 分成 `invert_a_rational`（1/2，三步＋62 結論行）＋`invert_a_rational_verify`（2/2，雙向驗證兩列＋`check` 判定列）兩場，不動 `pipeline/`；該 deck `schema`／`lint`／`sizecheck` **0 error**，唯一新增 1 條 L2「下三分之一 11% 填充」advisory warn（與本 deck 既有 8 條同類同級）。
 
 **規則來源**（`_audit/design-template-system/MathRules.dc.html` 規則 5 逐字）：
 > 數學字級只有三階：**conclusion 62 px／body 48 px／rail·inline 34 px**。
@@ -717,6 +718,7 @@ severity ∈ {`error`, `warn`}；`make.py` 有 error 即 abort（`--skip-sizeche
    （目前兩者都沒有，寬度全由結論列剩下多少決定）。
 5. **`ch01_inverse_functions` 的 `invert_a_rational` 結論階 62 出框（1 error）。**
    變因隔離證實純由 62 造成；主對話裁決 62 不退、修在 deck 側，**已用 `spawn_task` 開成獨立 chip**。
+   **✅ 2026-09-14 已收：** deck 側把該場 `part:` 分成 `invert_a_rational`（1/2，三步＋62 結論行）＋`invert_a_rational_verify`（2/2，雙向驗證兩列＋`check` 判定列）兩場，不動 `pipeline/`；該 deck `schema`／`lint`／`sizecheck` **0 error**，唯一新增 1 條 L2「下三分之一 11% 填充」advisory warn（與本 deck 既有 8 條同類同級）。
 6. **L4 `layout:` 佔比宣告欄位、M4 ∎ 字形化。** T3 判「只能人審」的兩條（§7「明確不做」也列了）。
    L4 可自動的只有「宣告了就要跟宣告一致」，但 storyboard 目前沒有這個欄位；
    M4 是 `brand.glyph("qed")` 的視覺做法問題（現在渲成綠色圓角方框），不是可量的幾何。
@@ -762,7 +764,8 @@ severity ∈ {`error`, `warn`}；`make.py` 有 error 即 abort（`--skip-sizeche
    **現況：`run_selftests` 實際 46 支**（預期的 45 ＋ T5 的 `_selftest_theorem_proof_label`）、回歸 deck 23 個；
    **§6 的驗收迴圈尚未跑**——`[sync]`／`[still-gate]`／21 場幀稽核／人閘四項，
    **待 §3.1 里程碑審 session 把 must 修正併進 main 後執行，結果另補一段**。
-   **已知未收乾淨的一項＝`ch01_inverse_functions` 的 `invert_a_rational` 1 error**（§8 backlog ⑤，已開 chip）。
+   ~~**已知未收乾淨的一項＝`ch01_inverse_functions` 的 `invert_a_rational` 1 error**（§8 backlog ⑤，已開 chip）。~~
+   **✅ 2026-09-14 已收**（§8 backlog ⑤）——23 deck 現在 `sizecheck` 0 error。
 
 ### 預估（工時／render 次數）
 
