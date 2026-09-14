@@ -268,6 +268,8 @@ mock render `ch03_trig_derivatives` 場 04、21、22 與一場 bold 標題長的
    任何「改前改後幀比對」型驗收都用不到它，要當回歸基線得改成 frame-count 驅動。
 8. **多子代理共用同一個 scratchpad 會撞檔名**（Task B）：本輪 `reports.py`／`before/` 已互撞；下輪派工 prompt 明寫「產物放 `scratchpad/task<X>/`」。
 
+9. **§3.1 場 23 `shm_compute` 的 reason tag `SIMPLE HARMONIC MOTION` 撞進右側彈簧裝置**（主對話抽查 Task C 的最滿幀時看到；舊的末幀抽法因 `exit:` 清空看不到）。**不是工具線項目**，歸 §3.1 backlog、搭 4K final 一起修；收尾時抄進 `REBUILD_STATUS.md`。
+
 **兩條共識更正（已採信，寫進對應文件）：**
 - `sizecheck`／`schema` 的 TeX cache 競態是 **per-cwd**（`config.media_dir = ./media`，各 worktree 各有 `media/Tex`），跨 worktree
   並行零撞車；MiKTeX fndb 鎖才是全域偶發。→ [`KICKOFF-shared-layer-v1.md`](KICKOFF-shared-layer-v1.md) §8 ⑧ 已補註；
