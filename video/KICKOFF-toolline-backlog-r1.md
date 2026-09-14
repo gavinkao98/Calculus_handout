@@ -241,3 +241,30 @@ mock render `ch03_trig_derivatives` 場 04、21、22 與一場 bold 標題長的
 已記紀律；`{{}}` 段級 role 等有場需要；hook 自建 MathTex 的規則寫進 METHODOLOGY §5 由主對話收尾時補一句，
 §3.1 四個 hook 的遷移歸 §3.1 backlog；9 個 `derivation`＋`prompt:` 例題場遷移與 `meta.example_coverage_enforce`
 歸 §3.2 session 的 A2。**已收、只差打勾**：⑤、⑮、`_SCALE_PX` result token、mockup 數學字體已記 README、RUNBOOK 9→10。
+
+---
+
+## 6. r2 候選 backlog（本輪進行中收到、不擴 r1 範圍）
+
+> 來源＝§3.2 Phase A session 2026-09-14 跨 session 訊息（實測依據在該 session）；主對話只登錄，r1 不收。
+
+1. **`pipeline/provenance.py::_present_text_fields` 不掃 `procedure_steps` 的 `steps[].text`。** 那些文字經 `brand.prose`
+   上畫面（`templates/procedure_steps.py:68`），確定性 OF2 對該模板等於空的——`decomposition_strategy` 整場沒有 `ref:`
+   也不會被報（§3.2 手動補的）。
+2. **`step_coverage._SCOPED_TEMPLATES` 只有 `{theorem_proof, derivation, worked_example}`**，不含 `procedure_steps`／
+   `definition_math`。Strategy 3.1 五步不受 SC 閘保護（§3.2 因第 5 步沒上畫面吃過一條 PD1 blocking）。
+3. **`procedure_steps` 是唯一不吃 `scaffold` 的教學模板**，且四個 step 時 `worked[]` strip 與 row.3 重疊 57%；§3.2 只能用
+   `part:` 分頁修（content 場 +1、TTS 多一次呼叫）。模板層缺口，屬 ⑦ 同級的 polish。
+4. **`pipeline/derive_spoken.py` 的 `MD_CONFIG_AND_CONVENTIONS` §二慣例摘錄表落後 rubric 一列**（`NARRATION-FAITHFULNESS-RUBRIC.md:51`
+   新增 D5「分母整體被平方」念法）。**補的話要連帶重生 §3.1 的 `_narration_spoken.md`**（跨節依賴，另開 chip、不在 r1）。
+
+**兩條共識更正（已採信，寫進對應文件）：**
+- `sizecheck`／`schema` 的 TeX cache 競態是 **per-cwd**（`config.media_dir = ./media`，各 worktree 各有 `media/Tex`），跨 worktree
+  並行零撞車；MiKTeX fndb 鎖才是全域偶發。→ [`KICKOFF-shared-layer-v1.md`](KICKOFF-shared-layer-v1.md) §8 ⑧ 已補註；
+  `KICKOFF-s32-chain-rule.md` §2.3「量測閘一次只能跑一支」由 §3.2 session 自行修。
+- `tts.py --backend mock --storyboard <deck>_mimo.yml` 會把靜音 WAV 與 mock manifest 寫進 `audio_mimo/`（真 MiMo 音檔的同一目錄）；
+  **真合成前要先清掉或帶 `--force-backend-switch`**。→ 待 Task F 併入後補進 `RUNBOOK-mimo-narration-route.md`（避免與 F 的數字校正撞檔）。
+
+**依賴（merge 時要做）：** §3.2 已跑過一次 1080p mock 音檔 render 當 `[sync]` 基線（909.9 s，舊 timing 常數）。r1 的 Task F
+（`STOCK_ANIM_SECONDS` 對齊實際 run_time）與 Task A（paced 無 rail）merge 後該基線作廢——**merge 完通知 §3.2 session 重跑**
+（只重 render、不重合成）。

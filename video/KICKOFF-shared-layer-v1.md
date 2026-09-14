@@ -772,7 +772,7 @@ severity ∈ {`error`, `warn`}；`make.py` 有 error 即 abort（`--skip-sizeche
    答案框高度貼合內容）。其中 `caption 30/ink_2` 那條是**共用層 token 的性質**，不是這個模板的私事。
 8. **環境 flake：`latex.exe`／`dvisvgm.exe` 偶發掛死。** 成因＝MiKTeX 的 fndb 被別的 process 鎖住；
    症狀＝`media/Tex` 不再增長、selftest runner 0 輸出（不是報錯，是靜靜卡住）。
-   **紀律：同一個工作樹絕不並行跑兩個 deck 的報表或 build pass**——`media/Tex` 的競態會偽裝成 `sizecheck` error。
+   **紀律：同一個工作樹絕不並行跑兩個 deck 的報表或 build pass**——`media/Tex` 的競態會偽裝成 `sizecheck` error。 **（2026-09-14 §3.2 session 實測補充：`media/Tex` 競態是 per-cwd——`config.media_dir = ./media`，各 worktree 各有一份——跨 worktree 並行零撞車；fndb 鎖才是全域偶發，症狀是靜靜掛住而非報錯。）**
 9. **`_selftest_theorem_regime` 用 `"band" in msg` 撈 finding。** 於是 `sizecheck` 的新訊息**不得含 band 這個字**
    （T3 已避開），這是一條隱形的耦合。值得改成結構化比對（比對 finding 的 code／severity，而不是訊息字串）。
 10. **`critic.py --per scene` 對有 `exit:` 的場取到末幀、不是最滿幀。** gate 1 的長期覆蓋缺口：
