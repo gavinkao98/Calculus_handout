@@ -25,6 +25,10 @@ The four hooks (scene id -> Figure -> cue):
                                    not-yet (math.0; Task 14 #6)
   derivative_cycle       Remark 3.1 -> 4-node ring diagram, linear chain closed
                                    into a cycle (math.0; Task 14 #3)
+  all_six_summary        Example 3.2 (2/2) -> the derivation steps back and the six
+                                   derivatives arrive as one table (result)
+  recap_six_and_radians  Key Takeaways -> the same six as a banner (point.2) and the
+                                   radian fine print cut to its clauses (point.3)
 """
 from __future__ import annotations
 
@@ -3004,3 +3008,377 @@ def companion_limit_opening(spec, ctx, blocks):
 
         motive.anim = _motive_reveal
     return blocks
+
+
+# ============================================================ hook 13
+# The six derivatives, finally on one screen -- scene 22 (all_six_cot_csc) and scene 26
+# (recap). Two hooks, ONE object: the six-lens milestone review's most-repeated finding is
+# that this section's deliverable -- the six trigonometric derivatives -- never once appears
+# together in a single frame, and that the moment the narration DECLARES them complete
+# ("and all six are done") is the longest frozen picture in the film.
+#
+# Measured on the shared-layer-v1 cut (rewatch_pack_after21):
+#   22 all_six_cot_csc  fine longest still 11.0 s at +27.0-38.0 (beat 5, `result`)  <- worst
+#   26 recap            fine longest still 10.5 s at +36.2-46.8 (beat 5, `point.3`) <- 2nd
+# Both are beat-5 dead zones on the SAME missing object, so they are fixed together.
+#
+# SEMANTIC COLOUR (SPEC-motion-language 規則 5) -- by PROVENANCE, not by function:
+#   rows 1-2  sin'=cos, cos'=-sin        -> role `result` (blue)   = ACCENT_ROLE["theorem"],
+#             the colour scenes 16/17 (`derivative_of_sine`, `derivative_of_cosine`, both
+#             `accent: theorem`) wear: these two rows are the colour of the theorems that
+#             proved them.
+#   rows 3-6  tan', cot', sec', csc'     -> role `practice` (green) = ACCENT_ROLE["example"],
+#             scene 22's own accent, so they match the conclusion row it has just derived.
+# The line the narration draws is the SOURCE one -- "every one built on sin'=cos and
+# cos'=-sin" -- not sin-vs-cos; and rows 1 and 2 each contain BOTH sin and cos, so a
+# function-axis palette (amber sin / blue cos) would be ambiguous on exactly the two rows
+# that matter. Blue/green are the handout's own aResult / aPractice hues (Direction B), so
+# nothing new is invented, and a whole row in one role is one semantic unit under V10
+# (SPEC 規則 5: tokens inside a segment-coloured unit are not a second colour).
+#
+# The six rows are `brand.math_line`, per CONTENT_METHODOLOGY §5 -- a bare MathTex built in a
+# hook would bypass the deck colour table, the `{{...}}` segment cut and `seg_roles`.
+_SIX_DERIVATIVES = (
+    (r"\sin' = \cos",           "result"),
+    (r"\cos' = -\sin",          "result"),
+    (r"\tan' = \sec^{2} x",     "practice"),
+    (r"\cot' = -\csc^{2} x",    "practice"),
+    (r"\sec' = \sec x\tan x",   "practice"),
+    (r"\csc' = -\csc x\cot x",  "practice"),
+)
+FROM_FIRST_PRINCIPLES = (0, 1)          # the two blue rows (scenes 16/17)
+FROM_QUOTIENT_RULE = (2, 3, 4, 5)       # the four green rows (Example 3.2, scenes 21/22)
+
+
+def six_derivatives_table(ground, *, layout: str = "column", size: str = "math",
+                          row_buff: float = 0.34, col_buff: float = 0.80):
+    """The section's deliverable as one object; `.rows` is the six lines in canonical order.
+
+    Two arrangements, because the two scenes have orthogonal free space and the table has to
+    fit the frame it lands in rather than the other way round:
+
+      "column"  six rows stacked -- scene 22, where the only room is a tall narrow strip to
+                the right of the derivation chain once that chain has stepped back.
+      "banner"  the two blue rows over the four green ones -- the recap, whose only room is a
+                wide short strip under the four numbered points. The 2-over-4 split is the
+                recap's own story (point.1 = "two core derivatives", point.2 = "the other
+                four"), so the arrangement carries the same grouping the colour does.
+
+    Same six rows, same order, same roles either way.
+    """
+    rows = [brand.math_line(tex, ground, role=role, size=size)
+            for tex, role in _SIX_DERIVATIVES]
+    if layout == "column":
+        table = VGroup(*rows).arrange(DOWN, buff=row_buff, aligned_edge=LEFT)
+    elif layout == "banner":
+        top = VGroup(*[rows[i] for i in FROM_FIRST_PRINCIPLES])
+        top.arrange(RIGHT, buff=col_buff, aligned_edge=DOWN)
+        bottom = VGroup(*[rows[i] for i in FROM_QUOTIENT_RULE])
+        bottom.arrange(RIGHT, buff=col_buff, aligned_edge=DOWN)
+        table = VGroup(top, bottom).arrange(DOWN, buff=row_buff, aligned_edge=LEFT)
+    else:
+        raise ValueError(f"six_derivatives_table: unknown layout {layout!r}")
+    table.rows = rows
+    return table
+
+
+def _tfrac_cluster(line, index: int = -1):
+    """The glyphs of one ``\\tfrac`` inside a mixed prose/math ``Tex`` line, found by geometry
+    rather than by glyph index: take the *index*-th fraction RULE (manim renders a fraction
+    bar as a ``Rectangle``) and collect every glyph whose centre sits over it.
+
+    Used to put the caution ink on ``\\tfrac{\\pi}{180}`` alone. A mixed ``$math$`` prose line
+    goes through ``brand._tex_with_map``, which only cuts out the deck's colour-mapped tokens,
+    so there is no named part to reach for -- and adding ``\\pi`` to ``meta.color_map`` would
+    recolour every pi in the deck. Returns None when the line has no fraction bar, so the
+    caller can fall back to flashing the whole line.
+    """
+    glyphs = list(getattr(line, "submobjects", []) or [])
+    while len(glyphs) == 1 and getattr(glyphs[0], "submobjects", None):
+        glyphs = list(glyphs[0].submobjects)
+    bars = [g for g in glyphs if isinstance(g, Rectangle)]
+    if not bars:
+        return None
+    bar = bars[index]
+    x0, x1 = float(bar.get_left()[0]) - 0.06, float(bar.get_right()[0]) + 0.06
+    members = [g for g in glyphs if x0 <= float(g.get_center()[0]) <= x1]
+    return VGroup(*members) if members else None
+
+
+class _Cutter:
+    """A beat's play/hold clock, cut to the narration's own word onsets.
+
+    Same device as `difference_quotient_for_sine`'s `_step0_anim`: `t` stays the NOMINAL cue
+    clock the holds schedule against (the cut points are fractions of the beat's run time and
+    must not drift with manim's frame rounding), while what the BEAT is told is the renderer's
+    own clock (`_elapsed` / `_spent`).
+    """
+
+    def __init__(self, scene, cues: dict, fallback: float):
+        self.scene = scene
+        self.cues = cues
+        self.total = TM.beat_run_time(scene, fallback)
+        self.t = 0.0
+        self.t0 = _elapsed(scene)
+
+    def at(self, cue: str) -> float:
+        return self.total * self.cues[cue]
+
+    def play(self, *anims, run_time: float) -> None:
+        rt = max(run_time, 0.2)
+        self.scene.play(*anims, run_time=rt)
+        self.t += rt
+
+    def hold(self, until: float) -> None:
+        if until > self.t:
+            self.scene.wait(until - self.t)
+            self.t = until
+
+    def spend(self) -> float:
+        self.hold(self.total)
+        return _spent(self.scene, self.t0, max(self.total, self.t))
+
+
+# -- scene 22 ------------------------------------------------------------------------------
+# Beat 5 (+24.46 -> +36.32 of the clip, 11.86 s of narration) is the film's longest still:
+# `{show result}` lands the row in ~1.2 s and then 11.0 s pass with the screen frozen while
+# the narration says the one sentence this whole act was for. What it says, word for word,
+# is the shot list: "Cleaned up, that is -csc x cot x" (the row), "and all six are done"
+# (the four the quotient rule just gave), "every one built on sin'=cos" (blue row 1) "and
+# cos'=-sin" (blue row 2). So the four green rows land on the claim that they are done, and
+# the two blue ones land ON THEIR OWN NAMES, above them, as the foundation they are.
+#
+# The chain steps back first (規則 1 的臨時標註退場): the three reason rails are spent
+# annotations, so they shrink-and-fade, and the equation chain scales to 82% about its own
+# left edge -- it stays readable and on the spine, but it stops being the brightest, widest
+# thing in the frame just as the deliverable arrives beside it.
+#
+# The retreat and the table are ANIMATION ONLY -- the built layout is untouched, so every
+# layout gate still measures the frame it measured before plus the table (the same contract
+# `exit:` already runs under: the gates read the pre-exit frame, the viewer sees the post-exit
+# one). Cost: sizecheck's pairwise overlap advisory compares the table against the three rows
+# at their FULL width, rails included, and reports new `warn`s for a collision the rendered
+# frame does not have.
+_RETREAT_SCALE = 0.82           # the chain's own left edge stays on the spine
+_RETREAT_FADE_SECONDS = 0.45    # the rails leave
+_RETREAT_MOVE_SECONDS = 0.60    # ... then the chain steps back
+_RAIL_EXIT_SCALE = 0.92         # 規則 1: 臨時標註退場用縮小加淡出
+_PANEL_GAP = 0.70               # clear space between the retreated chain and the table
+# The beat's own words, from the forced alignment
+# (`audio_mimo/align/22_all_six_cot_csc.words.json`), as a FRACTION of the beat's RUN time
+# (11.26 s = 11.86 s of audio - BEAT_PACED_TAIL_SECONDS), so `total * frac` is the word's own
+# beat-relative second.
+_S22_CUE = {
+    "retreat": 0.213,   #  2.40  after "-csc x cotangent x", before the claim
+    "tan":     0.350,   #  3.94  "and all six are done" begins
+    "cot":     0.409,   #  4.60
+    "sec":     0.462,   #  5.20
+    "csc":     0.512,   #  5.76  "done"
+    "sin":     0.661,   #  7.44  "sine prime equals cosine"
+    "cos":     0.862,   #  9.70  "and cosine prime equals negative sine"
+}
+
+
+def all_six_summary(spec, ctx, blocks):
+    ground = ctx["ground"]
+    ids = _by_id(blocks)
+    row_mobs = [ids[rid].mobject for rid in ("step.0", "step.1", "step.2", "result")]
+    # A derivation row is VGroup(equation[, leader, reason]) -- the equation is always first
+    # (templates/derivation.build), so everything after it is the reason rail.
+    rails = [m for row in row_mobs for m in row.submobjects[1:]]
+    eqs = VGroup(*[row.submobjects[0] for row in row_mobs])
+    anchor = np.array([float(eqs.get_left()[0]), float(eqs.get_center()[1]), 0.0])
+    chain_right = anchor[0] + float(eqs.width) * _RETREAT_SCALE
+
+    table = six_derivatives_table(ground, layout="column")
+    content_right = T.FRAME_W / 2 - T.SIDE_GUTTER
+    table.move_to([(chain_right + _PANEL_GAP + content_right) / 2, anchor[1], 0])
+
+    stock_result = ids["result"].anim      # the template's `anim: transform` closure
+
+    def _result_anim(scene, mob, g):
+        cut = _Cutter(scene, _S22_CUE, 6.0)
+        # (1) "Cleaned up, that is -csc x cot x" -- the row's own in-place rewrite, unchanged
+        #     except for the window it gets. `result` is in this scene's `paced:` list, so
+        #     `derivation._transform_anim` asks `beat_run_time` for what is LEFT of the beat
+        #     after the morph and walks its rail across all of it -- which on this row is the
+        #     whole 11.26 s (and is exactly the measured 11.0 s still: morph, one fade, then
+        #     nothing). Lending it a shortened beat hands it the first `retreat` seconds and
+        #     leaves the rest to the cues below; the row's own choreography is untouched.
+        beat = scene.beat_seconds
+        try:
+            if beat is not None:
+                scene.beat_seconds = (cut.at("retreat") + TM.BEAT_PACED_TAIL_SECONDS
+                                      + (getattr(scene, "beat_reserved_seconds", 0.0) or 0.0))
+            cut.t += _play_stock(scene, stock_result, mob, g)
+        finally:
+            scene.beat_seconds = beat
+        # (2) the derivation steps back: rails out, chain down to 82% on its own left edge.
+        cut.hold(cut.at("retreat"))
+        if rails:
+            cut.play(*[m.animate.set_opacity(0.0).scale(_RAIL_EXIT_SCALE) for m in rails],
+                     run_time=_RETREAT_FADE_SECONDS)
+        scene.add(*row_mobs)      # re-parent whatever the rail exit restructured out
+        cut.play(*[row.animate.scale(_RETREAT_SCALE, about_point=anchor) for row in row_mobs],
+                 run_time=_RETREAT_MOVE_SECONDS)
+        # (3) the deliverable, one row per clause of the claim.
+        for cue, i in (("tan", 2), ("cot", 3), ("sec", 4), ("csc", 5),
+                       ("sin", 0), ("cos", 1)):
+            cut.hold(cut.at(cue))
+            cut.play(FadeIn(table.rows[i], shift=0.1 * UP), run_time=pacing.FADE_SECONDS)
+        scene.add(mob)
+        return cut.spend()
+
+    ids["result"].anim = _result_anim
+    # What the forced plays cost on their own -- what make.py's short-beat warning should
+    # compare against if this beat is ever re-cut shorter.
+    ids["result"].anim_seconds = (TM.STOCK_ANIM_SECONDS["transform"] + _RETREAT_FADE_SECONDS
+                                  + _RETREAT_MOVE_SECONDS + 6 * pacing.FADE_SECONDS)
+    out = list(blocks)
+    # Never reached through a `{show ...}` marker -- the table rides `result`'s beat above.
+    # The Block exists so the layout gates measure it; `static=False` + unrevealed means
+    # scene.py's end-of-beats sweep calls this anim once, so it must be a true no-op (a real
+    # reveal here would fade the finished table in a second time). Same contract as
+    # `degrees_flatten`'s `degfig` and `shm_device`'s `device`.
+    out.append(Block("all_six", table, static=False, anim=lambda scene, mob, ground: 0.0))
+    return out
+
+
+# -- scene 26 ------------------------------------------------------------------------------
+# The recap carries the same hole and the film's second-longest still (10.5 s at +36.2-46.8,
+# the LAST substantive picture in the section). Two things land here:
+#
+#   P2  the same six rows, as a banner in the bottom band -- the one part of this frame that
+#       is empty (the four points stop at y=-2.08, the safe edge is at -3.45). The rewatch
+#       review's complaint was literal: "anyone who wants to look up sec' has to rewind to
+#       14:03". They ride point.2's beat, whose narration is their own index: "From those
+#       two" (the blue pair) "... the quotient rule delivered all the other trig derivatives
+#       -- tangent, cotangent, secant, cosecant" (one green row per name).
+#
+#   P3  beat 5 (+25.08 -> +45.28, 20.2 s on ONE reveal) split into its own clauses. Nothing
+#       new is said: the degrees formula is already in point.3's text. The beat just stops
+#       being one fade -- the cycle half, the radians half, the pi/180 factor going to
+#       caution ink as the narration names it, and finally a caution frame closing round
+#       exactly the two rows the fine print is about ("the clean sin'=cos and cos'=-sin hold
+#       only in radian measure").
+# Clear space above / below the banner in the bottom band. The top pad is the larger of the
+# two because the caution frame of step (5) sits ABOVE the banner's first row, and a frame
+# that grazes point.3's last line reads as a collision (seen on the first cut).
+_BANNER_TOP_PAD = 0.30
+_BANNER_BOTTOM_PAD = 0.14
+_CAUTION_BUFF = 0.10            # the radian-caution frame's clearance round the rows it marks
+# point.2, beat 4 (+17.66 -> +25.08, 7.42 s); fractions of its 6.82 s run time.
+_S26_POINT2_CUE = {
+    "sin":  0.000,   # 0.00  "From ..."
+    "cos":  0.051,   # 0.35  "... those two"
+    "text": 0.147,   # 1.00  "the quotient rule delivered all the other trig derivatives"
+    "tan":  0.622,   # 4.24  "tangent"
+    "cot":  0.777,   # 5.30  "cotangent"
+    "sec":  0.880,   # 6.00  "secant"
+    "csc":  0.931,   # 6.35  "cosecant"
+}
+_S26_POINT2_WRITE = 2.4         # the point's own line, written across the clause that says it
+# point.3, beat 5 (+25.08 -> +45.28, 20.2 s); fractions of its 19.6 s run time.
+_S26_POINT3_CUE = {
+    "cycle":   0.095,   #  1.86  "four derivatives of sine or cosine bring you home"
+    "radians": 0.259,   #  5.08  "with the fine print that it all depends on radians"
+    "degrees": 0.445,   #  8.72  "in degrees ... a factor of pi over one hundred eighty"
+    "sin_box": 0.695,   # 13.62  "so the clean sine prime equals cosine"
+    "cos_box": 0.838,   # 16.42  "and cosine prime equals negative sine"
+    "both":    0.944,   # 18.50  "hold only in radian measure"
+}
+_FLASH_SECONDS = 0.9
+_BOX_SECONDS = 0.6
+_MERGE_SECONDS = 0.7
+
+
+def recap_six_and_radians(spec, ctx, blocks):
+    ground = ctx["ground"]
+    ids = _by_id(blocks)
+    point2, point3 = ids["point.2"], ids["point.3"]
+
+    table = six_derivatives_table(ground, layout="banner")
+    points_bottom = min(float(ids[f"point.{i}"].mobject.get_bottom()[1]) for i in range(4))
+    band_top = points_bottom - _BANNER_TOP_PAD
+    band_bottom = -T.FRAME_H / 2 + T.SAFE_MARGIN + _BANNER_BOTTOM_PAD
+    table.move_to([-T.FRAME_W / 2 + T.SIDE_GUTTER, (band_top + band_bottom) / 2, 0],
+                  aligned_edge=LEFT)
+
+    def _point2_anim(scene, mob, g):
+        cut = _Cutter(scene, _S26_POINT2_CUE, 5.0)
+        chrome = pacing.chrome_of(mob)
+        parts = pacing.block_parts(mob)
+        # "From those two" -- the pair the other four are built on, before the sentence
+        # that spends them.
+        for cue, i in (("sin", 0), ("cos", 1)):
+            cut.hold(cut.at(cue))
+            cut.play(FadeIn(table.rows[i], shift=0.1 * UP), run_time=pacing.FADE_SECONDS)
+        cut.hold(cut.at("text"))
+        entrance = [Write(parts[0])]
+        if chrome is not None:
+            entrance.append(FadeIn(chrome, shift=0.1 * UP))
+        cut.play(*entrance, run_time=min(_S26_POINT2_WRITE, max(cut.total - cut.t, 0.4)))
+        for part in parts[1:]:
+            cut.play(FadeIn(part, shift=0.1 * UP), run_time=pacing.FADE_SECONDS)
+        # ... "tangent, cotangent, secant, cosecant" -- one row per name.
+        for cue, i in (("tan", 2), ("cot", 3), ("sec", 4), ("csc", 5)):
+            cut.hold(cut.at(cue))
+            cut.play(FadeIn(table.rows[i], shift=0.1 * UP), run_time=pacing.FADE_SECONDS)
+        scene.add(mob)
+        return cut.spend()
+
+    def _point3_anim(scene, mob, g):
+        cut = _Cutter(scene, _S26_POINT3_CUE, 8.0)
+        chrome = pacing.chrome_of(mob)
+        parts = pacing.block_parts(mob)
+        pair = VGroup(table.rows[0], table.rows[1])
+        caution = T.color(g, "caution_ink")
+        # (1) "And keep the cycle in mind" -- the cycle half of the line.
+        entrance = [FadeIn(parts[0], shift=0.1 * UP)]
+        if chrome is not None:
+            entrance.append(FadeIn(chrome, shift=0.1 * UP))
+        cut.play(*entrance, run_time=pacing.FADE_SECONDS)
+        # (2) "four derivatives of sine or cosine bring you home" -- the two rows the cycle
+        #     actually runs on, flashed in their own (result) ink.
+        cut.hold(cut.at("cycle"))
+        cut.play(Indicate(table.rows[0], color=T.color(g, "result_ink"), scale_factor=1.10),
+                 Indicate(table.rows[1], color=T.color(g, "result_ink"), scale_factor=1.10),
+                 run_time=_FLASH_SECONDS)
+        # (3) "with the fine print that it all depends on radians" -- the radians half.
+        cut.hold(cut.at("radians"))
+        for part in parts[1:]:
+            cut.play(FadeIn(part, shift=0.1 * UP), run_time=pacing.FADE_SECONDS)
+        # (4) "... picks up a factor of pi over one hundred eighty" -- that factor, and only
+        #     that factor, goes to caution ink and stays there.
+        factor = _tfrac_cluster(parts[-1]) if len(parts) > 1 else None
+        if factor is None:
+            factor = parts[-1]
+        cut.hold(cut.at("degrees"))
+        cut.play(Indicate(factor, color=caution, scale_factor=1.22), run_time=_FLASH_SECONDS)
+        cut.play(factor.animate.set_color(caution), run_time=0.4)
+        # (5) "so the clean sin'=cos and cos'=-sin hold only in radian measure" -- the caution
+        #     closes round the two rows it is about, one on each name, then round both.
+        box1 = SurroundingRectangle(table.rows[0], color=T.color(g, "caution"),
+                                    buff=_CAUTION_BUFF, stroke_width=2.0)
+        box2 = SurroundingRectangle(table.rows[1], color=T.color(g, "caution"),
+                                    buff=_CAUTION_BUFF, stroke_width=2.0)
+        both = SurroundingRectangle(pair, color=T.color(g, "caution"),
+                                    buff=_CAUTION_BUFF, stroke_width=2.0)
+        cut.hold(cut.at("sin_box"))
+        cut.play(Create(box1), run_time=_BOX_SECONDS)
+        cut.hold(cut.at("cos_box"))
+        cut.play(Create(box2), run_time=_BOX_SECONDS)
+        cut.hold(cut.at("both"))
+        cut.play(ReplacementTransform(box1, both), FadeOut(box2), run_time=_MERGE_SECONDS)
+        scene.add(mob)
+        return cut.spend()
+
+    point2.anim = _point2_anim
+    point2.anim_seconds = 6 * pacing.FADE_SECONDS + _S26_POINT2_WRITE
+    point3.anim = _point3_anim
+    point3.anim_seconds = (2 * pacing.FADE_SECONDS + 2 * _FLASH_SECONDS + 0.4
+                           + 2 * _BOX_SECONDS + _MERGE_SECONDS)
+    out = list(blocks)
+    # No `{show ...}` marker of its own (it rides point.2's beat) -- see `all_six` above.
+    out.append(Block("all_six", table, static=False, anim=lambda scene, mob, ground: 0.0))
+    return out
