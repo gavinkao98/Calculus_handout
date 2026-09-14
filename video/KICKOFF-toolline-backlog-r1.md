@@ -258,6 +258,16 @@ mock render `ch03_trig_derivatives` 場 04、21、22 與一場 bold 標題長的
 4. **`pipeline/derive_spoken.py` 的 `MD_CONFIG_AND_CONVENTIONS` §二慣例摘錄表落後 rubric 一列**（`NARRATION-FAITHFULNESS-RUBRIC.md:51`
    新增 D5「分母整體被平方」念法）。**補的話要連帶重生 §3.1 的 `_narration_spoken.md`**（跨節依賴，另開 chip、不在 r1）。**約束（§3.2 session 2026-09-14 補）：新列的適用範圍限「分母整個被平方」（$rac{A}{(X+Y)^2}$ → "A over the square of the quantity X plus Y"），**不推翻**既有「群組次方」列（§3.1 `ch03_trig_derivatives.spoken.yml:17` 的 "expanded the quantity x plus h, to the n" 仍正確）；抄進摘錄表時兩列並存、不合併——這個區分正是 gate-2 抓到 D2 blocking 的根源。已開 chip。
 
+**來自 r1 子代理回報（2026-09-14，順手看到未修）：**
+5. **`sizecheck.py:76` 的 `carriers` 過濾式恆為空**（Task B 發現）：`isinstance(n, Tex) and not isinstance(n, MathTex)` 在此版 manim
+   永遠 False（`Tex` 繼承 `MathTex`），`_block_prose_size` 的 sibling 字級比較實際只收 `Text` 節點，而 Route A 之後畫面上已無 `Text`
+   ——需確認 sibling 字級閘是否等於空跑。
+6. **`floorprobe` 的 `^`／`_` marker 可能放大聲量**（Task B）：34 px rail 數學只要有上下標就報 23.8 px 內縮；warn-only 無害，
+   全 deck 首跑後若吵到看不見重點，考慮只留 `	frac`／`rac`。
+7. **`companion_limit_opening` 的 dt 累加 updater 讓場 14 不可逐像素重現**（Task B）：同 code 連跑兩次 MD5 不同（影格數／時長相同）；
+   任何「改前改後幀比對」型驗收都用不到它，要當回歸基線得改成 frame-count 驅動。
+8. **多子代理共用同一個 scratchpad 會撞檔名**（Task B）：本輪 `reports.py`／`before/` 已互撞；下輪派工 prompt 明寫「產物放 `scratchpad/task<X>/`」。
+
 **兩條共識更正（已採信，寫進對應文件）：**
 - `sizecheck`／`schema` 的 TeX cache 競態是 **per-cwd**（`config.media_dir = ./media`，各 worktree 各有 `media/Tex`），跨 worktree
   並行零撞車；MiKTeX fndb 鎖才是全域偶發。→ [`KICKOFF-shared-layer-v1.md`](KICKOFF-shared-layer-v1.md) §8 ⑧ 已補註；
