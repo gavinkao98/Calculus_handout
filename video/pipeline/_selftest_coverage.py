@@ -26,8 +26,9 @@ def test_parse_block():
     assert [s["id"] for s in SC.must_show(c2)] == []
     # exemption
     assert SC.is_exempt(SC.parse_block(["  coverage_exempt: true"])) is True
-    # fail-closed: malformed / non-dict / empty -> None
-    assert SC.parse_block(["}{ : not : yaml"]) is None
+    # fail-closed: non-dict / empty -> None. Malformed YAML is NO LONGER silent:
+    # it returns a ParseError (r2 Task I) -- see test_unparseable_contract.
+    assert isinstance(SC.parse_block(["}{ : not : yaml"]), SC.ParseError)
     assert SC.parse_block(["just a scalar"]) is None
     assert SC.parse_block([]) is None
     assert SC.required_steps(None) == []
@@ -99,6 +100,79 @@ def test_sc2_and_missing_contract():
     assert not any("nocontract" in m for _, m in coverage.coverage_issues(sb2, exempt, enforce=True))
 
 
+def test_unparseable_contract():
+    """r2 Task I (coordinator addendum): a screen_contract that is PRESENT but does not
+    parse must not read as 'nobody wrote one'. §3.2 hit it for real -- a double-quoted
+    `tex:` with an illegal `\\c` escape -- and the gate answered 'has no screen_contract',
+    sending the author off to write a second one instead of fixing the first."""
+    from pipeline import step_coverage as coverage
+    bad = SC.parse_block([
+        "  required_steps:",
+        "    - id: swap",
+        "      tex: \"f^{-1}(x)=\\c\"",          # illegal YAML escape inside double quotes
+    ])
+    assert isinstance(bad, SC.ParseError), type(bad)
+    assert bad.message                               # carries the yaml error text
+    assert not isinstance(bad, dict)
+    # the accessors stay fail-closed on it (no steps, not exempt) -- no SC1/SC2 noise
+    assert SC.required_steps(bad) == [] and SC.must_show(bad) == [] and SC.is_exempt(bad) is False
+    # ... but coverage_issues says PARSE FAILED, not "no screen_contract", and says so
+    # warn-default too (a broken contract is an authoring bug, not a coverage policy).
+    sb = {"scenes": [{"id": "p", "kind": "content", "template": "derivation",
+                      "ref": "md:u", "covers": []}]}
+    for enforce in (False, True):
+        msgs = [m for _, m in coverage.coverage_issues(sb, {"u": bad}, enforce=enforce)]
+        joined = " | ".join(msgs)
+        assert "failed to parse" in joined and "u" in joined, joined
+        assert "has no screen_contract" not in joined, joined
+    sev = {s for s, _ in coverage.coverage_issues(sb, {"u": bad}, enforce=False)}
+    assert sev == {"error"}                          # own severity, not the enforce flag
+    # a well-formed block is still a plain dict (no wrapper leaking into the good path)
+    ok = SC.parse_block(["  required_steps:", "    - id: swap", "      tex: \"y=x\""])
+    assert isinstance(ok, dict)
+    # absent / empty / non-dict block still reads as "no contract" (unchanged)
+    assert SC.parse_block([]) is None and SC.parse_block(["just a scalar"]) is None
+
+
+def test_scoped_templates():
+    """r2 Task I: which templates the missing-contract check (_SCOPED_TEMPLATES) covers.
+    SC1/SC2 are contract-driven and template-agnostic; _SCOPED_TEMPLATES decides only
+    WHICH scenes must have a screen_contract at all under coverage_enforce."""
+    from pipeline import step_coverage as coverage
+    contract = SC.parse_block([
+        "  required_steps:",
+        "    - id: swap",
+        "      tex: \"y=f^{-1}(x)\"",
+    ])
+    # (1) a procedure_steps scene's covers: feed SC1 exactly like any other scene
+    sb = {"scenes": [{"id": "recipe", "kind": "content", "template": "procedure_steps",
+                      "ref": "md:u", "covers": []}]}
+    msgs = " | ".join(m for _, m in coverage.coverage_issues(sb, {"u": contract}, enforce=False))
+    assert "[SC1]" in msgs and "u.swap" in msgs
+    # (2) a procedure_steps unit with NO screen_contract is a gate hole: under
+    # coverage_enforce it must be flagged, like theorem_proof/derivation/worked_example.
+    # (Strategy 3.1's five steps were unprotected -- §3.2 paid one PD1 blocking for it.)
+    errs = coverage.coverage_issues(sb, {}, enforce=True)
+    assert any(sev == "error" and "recipe" not in m and "u" in m and "screen_contract" in m
+               for sev, m in errs), errs
+    assert "procedure_steps" in coverage._SCOPED_TEMPLATES
+    # (3) a non-scoped template stays out: an exposition callout is not a proof unit
+    sb_callout = {"scenes": [{"id": "c", "kind": "content", "template": "callout",
+                              "ref": "md:u2", "covers": []}]}
+    assert not any("screen_contract" in m for _, m in
+                   coverage.coverage_issues(sb_callout, {}, enforce=True))
+    # (4) definition_math deliberately NOT scoped this round (r2 Task I ruling): no
+    # definition unit in any deck declares required_steps, and a statement frame is not
+    # a step sequence. Flip this assert only together with the units' contracts.
+    sb_def = {"scenes": [{"id": "d", "kind": "content", "template": "definition_math",
+                          "ref": "md:u3", "covers": []}]}
+    assert not any("screen_contract" in m for _, m in
+                   coverage.coverage_issues(sb_def, {}, enforce=True))
+    # (5) warn-default: nothing new appears without coverage_enforce
+    assert not any("screen_contract" in m for _, m in
+                   coverage.coverage_issues(sb, {}, enforce=False))
+
+
 def test_schema_integration():
     import subprocess
     py = sys.executable
@@ -128,6 +202,8 @@ if __name__ == "__main__":
     test_parser_wiring()
     test_sc1_and_orphan()
     test_sc2_and_missing_contract()
+    test_unparseable_contract()
+    test_scoped_templates()
     test_schema_integration()
     test_non_dict_storyboard()
     print("OK coverage self-test")

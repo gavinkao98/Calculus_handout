@@ -17,17 +17,34 @@ import textwrap
 import yaml
 
 
-def parse_block(lines: "list[str]") -> "dict | None":
+class ParseError:
+    """A screen_contract block that is PRESENT but unreadable (bad YAML). Distinct from
+    None ("no block at all") on purpose: silence conflated the two, so a contract with
+    one syntax error vanished from the gate's view and `coverage_issues` answered
+    "has no screen_contract" -- sending the author off to write a second contract
+    instead of fixing the first (§3.2 2026-09-14: a double-quoted `tex:` with an
+    illegal `\\c` escape). Deliberately NOT a dict: required_steps/must_show/is_exempt
+    stay fail-closed on it, so a broken contract never fabricates coverage."""
+    __slots__ = ("message",)
+
+    def __init__(self, message: str) -> None:
+        self.message = message
+
+    def __repr__(self) -> str:        # readable in findings / debugging
+        return f"ParseError({self.message!r})"
+
+
+def parse_block(lines: "list[str]") -> "dict | ParseError | None":
     """Collected block-scalar lines (as captured by the .md parser, 2-space
-    indented) -> dict. Dedent, yaml.safe_load. Malformed / non-dict / empty
-    -> None (fail-closed)."""
+    indented) -> dict. Dedent, yaml.safe_load. Empty / non-dict -> None
+    (fail-closed); a YAML syntax error -> ParseError (present but unreadable)."""
     text = textwrap.dedent("\n".join(lines)).strip()
     if not text:
         return None
     try:
         val = yaml.safe_load(text)
-    except yaml.YAMLError:
-        return None
+    except yaml.YAMLError as exc:
+        return ParseError(" ".join(str(exc).split()))    # one line, for a finding
     return val if isinstance(val, dict) else None
 
 
