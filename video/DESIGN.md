@@ -942,7 +942,7 @@ reveal 既不在 `paced:`、也沒有 `pauses:` 條目、動畫也不是 callabl
 `[stillness] <scene>: beat NN holds X.Xs with nothing declared (reveal=...); add paced:/pauses:/sweep or split the beat`。
 純 advisory：不改 exit code、不擋 render，讓作者在花一次 render 前就看到六鏡抓到的「一次揭示＋18 秒不動」
 與「首拍無 reveal 37.6 s」。判定函式 `stillness.undeclared_still_beats` 是 manim-free 純函式，
-`_selftest_stillness.py` 釘住七個案例。**callable 的誠實（rollout T1-2，2026-09-13）：** 固定長度的 callable
+`_selftest_stillness.py` 釘住十個案例。**callable 的誠實（rollout T1-2，2026-09-13）：** 固定長度的 callable
 （`anim: transform`／`cancel` 的 closure、`carry` 的飛行）在函式上掛 `fixed_seconds`（1.2／1.6（frame）／0.8），
 `timing.stock_animation_seconds` 對 callable 回 `getattr(anim, "fixed_seconds", None)`，所以「1.2 s 的 `transform`
 接 10 s hold」現在會被抓；真的在填拍的 callable（hook／sweep／`seconds: beat`／paced 走法）仍是 `None`＝免檢。

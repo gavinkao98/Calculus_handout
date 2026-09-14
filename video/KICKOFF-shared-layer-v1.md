@@ -283,15 +283,15 @@ severity ∈ {`error`, `warn`}；`make.py` 有 error 即 abort（`--skip-sizeche
 
 ## 3. 全域護欄（每個 task 都適用）
 
-1. **紅測試先行（G6）。** 任何「本來就該成立」的行為，改之前先寫會紅的 selftest 再讓它綠
+1. ✅（r1 Task B，2026-09-14 併入 main）**紅測試先行（G6）。** 任何「本來就該成立」的行為，改之前先寫會紅的 selftest 再讓它綠
    （`REVIEW_GATES.md` §6.5、根 `CLAUDE.md` Karpathy §4）。`run_selftests.py` 全綠才算一個 task 完成。
-2. **一個 task 一個 worktree 一個 commit；主對話只做審核＋merge。**
+2. ✅（r1 Task B，2026-09-14 併入 main）**一個 task 一個 worktree 一個 commit；主對話只做審核＋merge。**
    worktree 開分支後先 `git merge main`（分支點可能落後）。子代理回報必須含：改了哪些檔、
    測試數字、沒做到的條款（根 `CLAUDE.md` 任務分派節）。
-3. **不動任何 storyboard 的內容與旁白。** 四個 task 都是 code／模板層。
+3. ✅（r1 Task E，2026-09-14 併入 main）**不動任何 storyboard 的內容與旁白。** 四個 task 都是 code／模板層。
    `_demo_worked_example.yml`（T4 新增）與 T1／T2 為了看幀而改的**試點 deck 欄位**是唯二例外，
    且不得動 `say:` 一個字（旁白 LOCKED，NFA 不重開）。
-4. **零計費。** 不碰 TTS（真旁白只走 `make.py --reuse-audio`）、不開 agy／Codex／VLM。
+4. ✅（r1 Task E，2026-09-14 併入 main）**零計費。** 不碰 TTS（真旁白只走 `make.py --reuse-audio`）、不開 agy／Codex／VLM。
    本地 Manim render 與 subagent 稽核（`visual-frame-audit`）是免費的，可逕行。
 5. **字型安裝要先徵詢（根 `CLAUDE.md`「缺套件／軟體先問」）。** T1 要下載 Instrument Sans 的
    OTF、要跑 `autoinst` 生字型、可能要 vendoring 進 repo——**這三件都要先說明「裝什麼／為什麼／
@@ -773,36 +773,36 @@ severity ∈ {`error`, `warn`}；`make.py` 有 error 即 abort（`--skip-sizeche
 8. **環境 flake：`latex.exe`／`dvisvgm.exe` 偶發掛死。** 成因＝MiKTeX 的 fndb 被別的 process 鎖住；
    症狀＝`media/Tex` 不再增長、selftest runner 0 輸出（不是報錯，是靜靜卡住）。
    **紀律：同一個工作樹絕不並行跑兩個 deck 的報表或 build pass**——`media/Tex` 的競態會偽裝成 `sizecheck` error。 **（2026-09-14 §3.2 session 實測補充：`media/Tex` 競態是 per-cwd——`config.media_dir = ./media`，各 worktree 各有一份——跨 worktree 並行零撞車；fndb 鎖才是全域偶發，症狀是靜靜掛住而非報錯。）**
-9. **`_selftest_theorem_regime` 用 `"band" in msg` 撈 finding。** 於是 `sizecheck` 的新訊息**不得含 band 這個字**
+9. ✅（r1 Task F，2026-09-14 併入 main）**`_selftest_theorem_regime` 用 `"band" in msg` 撈 finding。** 於是 `sizecheck` 的新訊息**不得含 band 這個字**
    （T3 已避開），這是一條隱形的耦合。值得改成結構化比對（比對 finding 的 code／severity，而不是訊息字串）。
-10. **`critic.py --per scene` 對有 `exit:` 的場取到末幀、不是最滿幀。** gate 1 的長期覆蓋缺口：
+10. ✅（r1 Task C，2026-09-14 併入 main）**`critic.py --per scene` 對有 `exit:` 的場取到末幀、不是最滿幀。** gate 1 的長期覆蓋缺口：
     場退場之後畫面已清空，抽到那一幀等於空跑，稽核看不到該場真正要審的版面。
     **實例＝場 06、場 23**（2026-09-14 §6 的 21 場幀稽核當場發現）。當次繞法＝`--per beat` 補抽
     （`critic_v1_freeze_beats*/`）再自審；正解是讓 `--per scene` 選 ink 量最大的幀。
-11. **`carry` 的 `to.scale` 縮放繞過 floor 閘。** `sizecheck` 讀的是 authored px，
+11. ✅（r1 Task B，2026-09-14 併入 main）**`carry` 的 `to.scale` 縮放繞過 floor 閘。** `sizecheck` 讀的是 authored px，
     carried 過去再乘 `scale` 之後的實效字級它看不到——**場 24 的 carried tag 實測約 19–23 px**，
     低於 26 px 的 floor 卻零 warn。與 ①② 同屬「閘看不到渲染後的真實字級」，但成因是 carry 的縮放鏈，要分開修。
-12. **hook 手刻的 `MathTex` 不受 floor 保護。** 不經模板、由 hook 直接建的 mobject 不進 `sizecheck` 的字級樹——
+12. ✅（r1 Task B，2026-09-14 併入 main）**hook 手刻的 `MathTex` 不受 floor 保護。** 不經模板、由 hook 直接建的 mobject 不進 `sizecheck` 的字級樹——
     **實例：場 06 的 ①②③ chip、場 07 carried circle 的標籤**。
     修法二擇一：讓 hook 走一個共用 helper，或讓閘改掃 scene 樹而非 storyboard 宣告。
-13. **場 21／22 的 reason 第一列右緣餘裕 60→20 px。** Instrument Sans 比 Plex Sans 寬所致
+13. ✅（r1 Task E，2026-09-14 併入 main）**場 21／22 的 reason 第一列右緣餘裕 60→20 px。** Instrument Sans 比 Plex Sans 寬所致
     （2026-09-14 幀稽核 advisory）；目前仍在框內但已無容錯，與 ④ 的 rail 寬度議題同源，宜一起看。
-14. **場 12 的 `Axes(tips=True)` 用 manim 預設箭頭 0.35，deck 其他圖是 0.16。** 同一節兩種箭頭大小；
+14. ✅（r1 Task F，2026-09-14 併入 main）**場 12 的 `Axes(tips=True)` 用 manim 預設箭頭 0.35，deck 其他圖是 0.16。** 同一節兩種箭頭大小；
     修法是讓 `graph` 模板把箭頭尺寸納入 theme，而不是逐場覆寫。
 15. ✅（已收：協定回寫、基線以備份成片重生）**`rewatch_pack --baseline` 拒絕舊版包。** 舊版 `rewatch_pack` 寫的包沒記 fps／畫面尺寸，
     新版比對讀不到就 **exit 2 什麼都不寫**——2026-09-14 §6 的 `rewatch_pack_after21` 即因此被拒，
     改以兩包 `INDEX.md` 逐場比對代替。協定已由 §3.1 里程碑審 session 回寫、並用備份成片重生基線；
     此處記一筆，免得下一個人再撞一次。
-16. **`derivation._transform_anim` 的 paced 無 rail 列燒掉整拍。** `video/pipeline/templates/derivation.py`
+16. ✅（r1 Task A，2026-09-14 併入 main）**`derivation._transform_anim` 的 paced 無 rail 列燒掉整拍。** `video/pipeline/templates/derivation.py`
     的 `_rail()`（約 :201）對沒有 `reason` 的列回傳等式自己的 glow wrapper，`_rail_walk_seconds`（:209）
     因此把 paced 拍的剩餘秒數全走完——場 22 `all_six_cot_csc` 的 `result` 靜止 11.26 s 即此。
     同型場：`grep "paced:.*result" storyboards/*.yml`（`ch03_trig_derivatives{,_mimo}.yml` 4 場、
     `_demo_worked_example.yml:56`）。里程碑審只在 hook 內縮 `beat_seconds` 繞開，stock 未改；
     修法走工具線（chip「修 derivation 的 paced result 無 rail 時燒掉整拍」已開）。
-17. **`sizecheck` 量的是 build 佈局，執行期縮放／退場它看不到。** 場 22 新增 2 條 overlap warn
+17. ✅（r1 Task B，2026-09-14 併入 main）**`sizecheck` 量的是 build 佈局，執行期縮放／退場它看不到。** 場 22 新增 2 條 overlap warn
     （`step.1`／`step.2` vs `all_six` 26%／25%），實際執行期推導鏈縮小、rail 退場、終幀無碰撞。
     與 ⑩「`critic --per scene` 對 `exit:` 場取末幀」同類：靜態閘與時間性畫面的落差要一起記。
-18. **`rewatch_pack --scene` 子集仍需要全 deck 的 `_av`。** 只 render 兩場時它在 `intro.mp4` 就 exit；
+18. ✅（r1 Task D，2026-09-14 併入 main）**`rewatch_pack --scene` 子集仍需要全 deck 的 `_av`。** 只 render 兩場時它在 `intro.mp4` 就 exit；
     里程碑審改用直接對 per-scene mp4 做 4 fps／192×108 幀差量測（數字與工具一致）。
     子集量測若要常設，工具要允許缺場。
 
