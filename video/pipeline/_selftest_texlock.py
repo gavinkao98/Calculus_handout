@@ -10,14 +10,23 @@ Pins the four contract clauses of r2 kickoff §2.H:
       longer produce the false `could not build scene`. Without the lock this failed
       in 3 of 3 measured rounds on a cold Tex cache (see texlock.py's docstring);
       it is the defect the lock exists for, so the deck really is built twice here.
-      It needs a quiet MiKTeX: another LaTeX run anywhere on the machine can fail a
-      build through the global fndb lock, which is a different defect texlock does not
-      address (KICKOFF-shared-layer-v1 §8 (8)). The assertion says which one it hit.
+      It needs a quiet MiKTeX: another LaTeX run anywhere on the machine can fail or
+      stall a build through the global fndb lock, which is a different defect texlock
+      does not address (KICKOFF-shared-layer-v1 §8 (8)). That case is reported and
+      waved through -- only a real `could not build scene` is red -- and the assertion
+      message says which of the two it hit.
 
 (1) and (4) spawn subprocesses in a fresh temp cwd, which is also where their
 `media/Tex` lands -- so the Tex cache is cold (the race needs actual compilation)
 and the worktree's own cache is left alone. (2) and (3) chdir into a temp dir for
 the same isolation.
+
+**Bounded on purpose.** This selftest hung `run_selftests` at its 900 s per-test cap on
+main right after the r2 merge, and the fix is three independent guards, because the hang
+had two causes: `_collect` now drains the children CONCURRENTLY (the real bug -- see its
+docstring), every child gets `TEXLOCK_TIMEOUT=90` instead of inheriting the shipped 30 min
+default, and every wait is additionally capped in wall-clock (`BUILD_BUDGET_SECONDS` /
+`LOCK_BUDGET_SECONDS`). Typical run is ~60 s; the ceiling is a few minutes.
 """
 from __future__ import annotations
 
@@ -25,6 +34,7 @@ import os
 import subprocess
 import sys
 import tempfile
+import threading
 import time
 from pathlib import Path
 
@@ -36,6 +46,19 @@ from pipeline.texlock import PROGRESS_SECONDS, STALE_SECONDS, lock_path, tex_loc
 
 VIDEO = Path(__file__).resolve().parent.parent
 DECK = VIDEO / "storyboards" / "_demo_derivation.yml"
+
+# Every child this test spawns gets a SHORT lock timeout. The shipped default is 30 min
+# (long enough to wait out a full-deck render) against `run_selftests`' 900 s per-test cap,
+# so any child that waits on a slow holder while inheriting the default can only end one
+# way. Nothing here ever wants to wait half an hour.
+CHILD_TEXLOCK_TIMEOUT = "90"
+# Wall-clock cap on the one case that really compiles LaTeX. Two cold builds of
+# _demo_derivation serialised take ~25 s (measured: 12.1 s each on a quiet machine);
+# anything past this is the machine-wide fndb stall, not us.
+BUILD_BUDGET_SECONDS = 240.0
+# The two lock-only cases do no Tex at all, so their duration is deterministic; the cap is
+# only there so a wedged child can never eat the suite's budget.
+LOCK_BUDGET_SECONDS = 90.0
 
 # One holder: take the lock, sit in it, then record the interval it owned.
 _HOLDER = '''
@@ -54,6 +77,48 @@ with tex_lock(reason="selftest"):
 '''
 
 
+def _spawn(argv, cwd):
+    """Popen with a short `TEXLOCK_TIMEOUT` and output captured (see the constants)."""
+    env = dict(os.environ, TEXLOCK_TIMEOUT=CHILD_TEXLOCK_TIMEOUT)
+    return subprocess.Popen(argv, cwd=cwd, env=env, stdout=subprocess.PIPE,
+                            stderr=subprocess.STDOUT, text=True, encoding="utf-8",
+                            errors="replace")
+
+
+def _collect(procs, budget: float):
+    """(outputs, overran): drain every child CONCURRENTLY, within `budget` seconds total.
+
+    One thread per child is not ceremony -- it is the whole point. Draining them in a loop
+    (`[p.communicate() for p in procs]`) blocks on the first child, and manim prints a
+    "Writing ... to media/Tex/..." block per snippet, so the OTHER child fills its ~8 KB
+    stdout pipe and STOPS. When the first child is the one waiting for the lock, the holder
+    it is waiting for is the one frozen on that pipe, and the pair deadlocks until the
+    waiter's timeout expires. That cost 608 s a side in the r2 measurements and is what
+    pushed this selftest past run_selftests' 900 s cap on main -- a harness bug that looked
+    exactly like a MiKTeX stall.
+
+    The budget is the second guard: a genuinely stalled LaTeX must not take the suite down."""
+    outs: list[str] = [""] * len(procs)
+
+    def drain(index: int, proc) -> None:
+        outs[index] = proc.communicate()[0] or ""
+
+    threads = [threading.Thread(target=drain, args=(i, p), daemon=True)
+               for i, p in enumerate(procs)]
+    for t in threads:
+        t.start()
+    deadline = time.monotonic() + budget
+    for t in threads:
+        t.join(max(deadline - time.monotonic(), 0.1))
+    overran = any(t.is_alive() for t in threads)
+    if overran:
+        for p in procs:
+            p.kill()
+        for t in threads:
+            t.join(30)
+    return outs, overran
+
+
 def _chdir(tmp):
     """chdir into `tmp` and return the previous cwd (the lock path is cwd-relative)."""
     old = os.getcwd()
@@ -68,6 +133,28 @@ def _dead_pid() -> int:
     return proc.pid
 
 
+# -- the knob the subprocess cases rely on -------------------------------------
+
+def test_texlock_timeout_env_overrides_the_default():
+    """How a spawned child gets a short wait: there is no argument to pass it."""
+    from pipeline import texlock
+
+    previous = os.environ.get("TEXLOCK_TIMEOUT")
+    try:
+        os.environ["TEXLOCK_TIMEOUT"] = CHILD_TEXLOCK_TIMEOUT
+        assert texlock.default_timeout() == float(CHILD_TEXLOCK_TIMEOUT)
+        os.environ["TEXLOCK_TIMEOUT"] = "not-a-number"  # a typo must not take a build down
+        assert texlock.default_timeout() == texlock.DEFAULT_TIMEOUT
+        os.environ["TEXLOCK_TIMEOUT"] = "0"             # nor an accidental zero
+        assert texlock.default_timeout() == texlock.DEFAULT_TIMEOUT
+        del os.environ["TEXLOCK_TIMEOUT"]
+        assert texlock.default_timeout() == texlock.DEFAULT_TIMEOUT
+    finally:
+        os.environ.pop("TEXLOCK_TIMEOUT", None)
+        if previous is not None:
+            os.environ["TEXLOCK_TIMEOUT"] = previous
+
+
 # -- (1) mutual exclusion ------------------------------------------------------
 
 def test_two_processes_never_hold_the_lock_at_the_same_time():
@@ -75,11 +162,10 @@ def test_two_processes_never_hold_the_lock_at_the_same_time():
         script = Path(tmp) / "holder.py"
         script.write_text(_HOLDER, encoding="utf-8")
         marker = Path(tmp) / "marker.txt"
-        procs = [subprocess.Popen([sys.executable, str(script), str(VIDEO), str(marker)],
-                                  cwd=tmp, stdout=subprocess.PIPE, stderr=subprocess.STDOUT,
-                                  text=True, encoding="utf-8", errors="replace")
+        procs = [_spawn([sys.executable, str(script), str(VIDEO), str(marker)], tmp)
                  for _ in range(2)]
-        outs = [p.communicate()[0] for p in procs]
+        outs, overran = _collect(procs, LOCK_BUDGET_SECONDS)
+        assert not overran, f"holders did not finish in {LOCK_BUDGET_SECONDS}s: {outs}"
         assert all(p.returncode == 0 for p in procs), outs
 
         spans = []
@@ -102,15 +188,12 @@ def test_the_waiter_says_who_it_is_waiting_for():
         hold = 2 * PROGRESS_SECONDS
         script.write_text(_HOLDER.replace("time.sleep(2.0)", f"time.sleep({hold})"), encoding="utf-8")
         marker = Path(tmp) / "marker.txt"
-        first = subprocess.Popen([sys.executable, str(script), str(VIDEO), str(marker)], cwd=tmp,
-                                 stdout=subprocess.PIPE, stderr=subprocess.STDOUT, text=True,
-                                 encoding="utf-8", errors="replace")
+        argv = [sys.executable, str(script), str(VIDEO), str(marker)]
+        first = _spawn(argv, tmp)
         time.sleep(3.0)     # let it get the lock first
-        second = subprocess.Popen([sys.executable, str(script), str(VIDEO), str(marker)], cwd=tmp,
-                                  stdout=subprocess.PIPE, stderr=subprocess.STDOUT, text=True,
-                                  encoding="utf-8", errors="replace")
-        out = second.communicate()[0]
-        first.communicate()
+        second = _spawn(argv, tmp)
+        (_first_out, out), overran = _collect([first, second], LOCK_BUDGET_SECONDS)
+        assert not overran, f"holders did not finish in {LOCK_BUDGET_SECONDS}s"
         assert "[texlock] waiting for pid" in out, out
         assert "(selftest)" in out, out
 
@@ -218,17 +301,29 @@ def test_nesting_in_one_process_does_not_deadlock():
 
 def test_two_concurrent_sizechecks_do_not_fake_a_build_failure():
     with tempfile.TemporaryDirectory() as tmp:
-        procs = [subprocess.Popen([sys.executable, str(VIDEO / "pipeline" / "sizecheck.py"), str(DECK)],
-                                  cwd=tmp, stdout=subprocess.PIPE, stderr=subprocess.STDOUT,
-                                  text=True, encoding="utf-8", errors="replace")
+        procs = [_spawn([sys.executable, str(VIDEO / "pipeline" / "sizecheck.py"), str(DECK)], tmp)
                  for _ in range(2)]
-        outs = [p.communicate()[0] for p in procs]
+        outs, overran = _collect(procs, BUILD_BUDGET_SECONDS)
+
+        # Only ONE outcome is this test's business: a `could not build scene` that carries
+        # the race signature. The other two are the machine-wide MiKTeX fndb stall, which
+        # texlock does not address (KICKOFF-shared-layer-v1 §8 (8)) -- a waiter giving up on
+        # a holder that LaTeX left crawling, or the pair blowing the wall-clock budget. Say
+        # so out loud and let clauses (1)/(3) carry the verdict; failing here would only
+        # teach the reader to ignore a red.
+        if overran:
+            print(f"  NOTE {__name__}: the two builds did not finish in "
+                  f"{BUILD_BUDGET_SECONDS:.0f}s -- machine-wide MiKTeX stall, not the lock; "
+                  f"clauses (1)/(3) stand.", flush=True)
+            return
+        for n, out in enumerate(outs):
+            if "[texlock] gave up after" in out:
+                print(f"  NOTE {__name__}: process {n} hit its {CHILD_TEXLOCK_TIMEOUT}s lock "
+                      f"timeout -- the holder was stalled by MiKTeX, not by the lock; "
+                      f"clauses (1)/(3) stand.", flush=True)
+
         for n, out in enumerate(outs):
             hits = [ln.strip() for ln in out.splitlines() if "could not build scene" in ln]
-            # A hit is either the race this lock fixes (the two processes stepping on each
-            # other's media/Tex files) or the machine-wide MiKTeX fndb flake, which texlock
-            # does NOT address (KICKOFF-shared-layer-v1 §8 (8)) -- say which, so a red here
-            # is not misread as the lock having failed.
             kind = ("the per-cwd Tex race (the lock did not hold)"
                     if any("PermissionError" in h or "FileNotFoundError" in h for h in hits)
                     else "the machine-wide MiKTeX flake, NOT the lock -- rerun with no other "
