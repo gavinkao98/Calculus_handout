@@ -25,6 +25,7 @@ import yaml  # noqa: E402
 from manim import tempconfig  # noqa: E402
 
 from pipeline.scene import LessonScene  # noqa: E402
+from pipeline.texlock import tex_lock  # noqa: E402
 
 
 def main() -> int:
@@ -51,34 +52,37 @@ def main() -> int:
 
     args.out.mkdir(parents=True, exist_ok=True)
     media_dir = args.out / "_media"
-    for scene in scenes:
-        sid = scene["id"]
-        output_file = f"{meta['id']}__{sid}"
-        LessonScene.spec = scene
-        LessonScene.meta = meta
-        LessonScene.beat_durations = None
-        cfg = {
-            "media_dir": str(media_dir),
-            "output_file": output_file,
-            "disable_caching": True,
-            "verbosity": "ERROR",
-            "save_last_frame": True,
-            "write_to_movie": False,
-            "format": "png",
-            "pixel_width": args.width,
-            "pixel_height": args.height,
-        }
-        print(f"[frame] {sid} ...", flush=True)
-        with tempconfig(cfg):
-            LessonScene().render()
-        matches = list(media_dir.rglob(f"{output_file}.png"))
-        if matches:
-            src = max(matches, key=lambda p: p.stat().st_mtime)
-            dst = args.out / f"{sid}.png"
-            shutil.copyfile(src, dst)
-            print(f"        -> {dst}", flush=True)
-        else:
-            print(f"        !! no png for {output_file}", flush=True)
+    # Each scene builds its Tex through the shared per-cwd directory; one lock for the
+    # whole loop keeps a concurrent gate out of it (pipeline/texlock.py).
+    with tex_lock(reason="scratch_frames"):
+        for scene in scenes:
+            sid = scene["id"]
+            output_file = f"{meta['id']}__{sid}"
+            LessonScene.spec = scene
+            LessonScene.meta = meta
+            LessonScene.beat_durations = None
+            cfg = {
+                "media_dir": str(media_dir),
+                "output_file": output_file,
+                "disable_caching": True,
+                "verbosity": "ERROR",
+                "save_last_frame": True,
+                "write_to_movie": False,
+                "format": "png",
+                "pixel_width": args.width,
+                "pixel_height": args.height,
+            }
+            print(f"[frame] {sid} ...", flush=True)
+            with tempconfig(cfg):
+                LessonScene().render()
+            matches = list(media_dir.rglob(f"{output_file}.png"))
+            if matches:
+                src = max(matches, key=lambda p: p.stat().st_mtime)
+                dst = args.out / f"{sid}.png"
+                shutil.copyfile(src, dst)
+                print(f"        -> {dst}", flush=True)
+            else:
+                print(f"        !! no png for {output_file}", flush=True)
     return 0
 
 

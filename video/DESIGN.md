@@ -397,6 +397,31 @@ gutter、`derivation` 的式子右緣、`callout` 的置中…），任何「第
   `difference_quotient_for_sine`（最短 leader 17.9→74.3 px、右緣餘裕 0→333 px，`result` 併行）、
   `companion_limit`（57.6→271.3 px、0→96 px，`step.0` 併行）、`example_chain_times_quotient`
   （右緣餘裕 0→253 px，無列併行——只是那條無 reason 的 10.39u 結論列不再頂住 rail）。
+  **2026-09-14（backlog ⑫，工具線 r2 Task G）：hung 列的底邊夾制＝`_clamp_hang()`。**
+  併回下一行的 reason 是**純粹多出來的高度**，而 `_common._biased_y` 對放不下的內容刻意
+  top-anchor（讓它溢出**下緣**、好讓容量閘看得見），兩者相乘的結果＝`difference_quotient_for_sine`
+  的 tag 落到下緣安全線以下 0.231u（≈31 px）、貼著右下角落 motif（sizecheck 的
+  `block 'result' spills past the safe margin`）。**但這不是容量問題**：該場的**等式全部放得下**
+  （不 hang 的話 4.668u < zone 4.830u），放不下的只有那一行小字，拆頁對它毫無意義。
+  所以 `build` 在 `place_body` 之後把鏈**往上推到底緣坐在安全線上**，推的量以
+  **`hang_extra`（hang 多吃掉的高度）為上限**——本來就太高的鏈只會被退還 hang 的那一份、
+  其餘溢出照舊，`sizecheck._capacity_issues` 的拆頁判定（predictive，看 `Σ列高+(n−1)·MIN_PITCH`）
+  因此完全不受影響。房間出自**標題間距**（`place_body` 在 masthead 下留的 `T.TITLE_GAP`；
+  有 `scaffold.motive` 的場就是 motive 那一行底下），且**保留 `HANG_GAP`**——模板自己最小的
+  可辨間隔——當地板，讓區塊邊界永遠不會被壓成 0（本場地板不咬：gap 0.415u、要 0.231u、
+  留 0.180u；它擋的是未來某條更高的 hung reason 拿「撞到上一行」換「不越下緣」，
+  那種鏈會保留（縮小後的）溢出，那正是它該被拆頁的誠實訊號）。
+  **選它而不選另外三個候選的理由：**
+  ① `HANG_GAP → 0` 最多只還 0.18u（不足 0.231u），且 reason 會貼死等式；
+  ② 「reason 回到等式同一行、不畫 leader」還得回全部高度，但那正是 2026-09-13 視覺稽核
+  在這一場開的原案（30 px 淨空「黏在算式尾巴」），且會破掉 Task E 剛立的
+  「留在 rail 上的列 leader ≥ `MIN_LEADER`」；
+  ③ 「塞進該列與下一列之間的既有 gap」對**最後一列**（正是本場的 `result`）無效，
+  而縮列間 gap 會低於 `MIN_PITCH`、破容量契約。
+  **不加字級、不動 `_SCALE_PX`／`_ROW_GAP`／`MIN_PITCH`／`HANG_GAP`／`RIGHT_SLACK`。**
+  代價寫明：本場 title gap 56 px → 25 px（0.4148u → 0.184u），換掉 31 px 的下緣越界。
+  實測影響面：33 個 derivation 場只有 `difference_quotient_for_sine`（在兩個 deck 各一份）
+  會 hang，其餘 31 場逐 mobject 座標零位移。守門＝`pipeline/_selftest_derivation_hung.py`。
 - `procedure_steps`：result 欄左對齊 `RAIL_X`（原右對齊 far gutter、Codex 兩輪嫌 detached）。
 - `recap_cards`：**不用 rail**——改為單一全幅編號點欄（`points[]` 以 `01/02/03` ＋ 全寬 prose
   左堆疊、`center_in_zone` 上偏置中）；舊「公式卡 snap `RAIL_X`」雙欄版已退場。
@@ -561,8 +586,11 @@ rail 欄（`min_pitch=RAIL_GAP`，`x_bucket=round(RAIL_X)`），兩條獨立流�
 `schema._worked_example_issues`（上表的 error）＋`_seg_roles_issues`＋與 derivation 共用的 `_row_anim_issues`、
 `step_coverage._SCOPED_TEMPLATES`、`provenance._present_text_fields`（`strategy` 與 `notes.i.text` 是上畫面教學文字，
 走 `ref:`／`refs:`）。`pedagogy._MOTIVE_TEMPLATES` **不加**（`prompt` 就是 motive）。
-demo／回歸稿＝[`storyboards/_demo_worked_example.yml`](storyboards/_demo_worked_example.yml)（四場：完整形狀／無 rail／
-容量超量／分頁續頁），selftest＝`pipeline/_selftest_worked_example.py`。
+demo／回歸稿＝[`storyboards/_demo_worked_example.yml`](storyboards/_demo_worked_example.yml)（三場：完整形狀／無 rail／
+分頁續頁，乾淨、`make.py` 跑得完）＋[`storyboards/_demo_worked_example_over.yml`](storyboards/_demo_worked_example_over.yml)
+（容量超量壓測 fixture，刻意 error，要 `--skip-sizecheck`；2026-09-14 r2 Task J 拆自前者，
+理由見 [`KICKOFF-toolline-backlog-r2.md`](KICKOFF-toolline-backlog-r2.md) §2.J），
+selftest＝`pipeline/_selftest_worked_example.py`。
 
 ## 內容分量自適應 ＋ 多頁拆分（2026-06-21）
 
@@ -1631,6 +1659,35 @@ mock synthesis（依 word count 的 silent clip），不計費。Real MiMo TTS �
 manifest render）。（gen-2 的 Gemini 直鏈 `build.py`／`mux.py` 已於 2026-06-16 刪除、
 Gemini 路線退場。）以 visual payload 為 key 的 per-stage caching（編輯 `say` 重新
 synthesize audio 但不重新 render Manim）仍為 (TODO)。
+
+**Tex 建置的互斥鎖（`pipeline/texlock.py`；2026-09-14 r2 Task H）。** 每一支會 build blocks 的程式
+——`sizecheck.check_scenes`、`make.py` 的 pre-render sizecheck 與 render 迴圈、`critic.py --per scene`
+的 `graph_label_geometry`、`scratch_frames.py`——都透過 manim 把 LaTeX 編到 `config.media_dir` 底下的
+`Tex/`。manim 對那個目錄沒有任何鎖，所以**同一個 cwd** 的兩支程式會在同一批 `<hash>.tex`／`.dvi`／`.svg`
+上交錯，輸掉的那一支吐出**假的** `could not build scene (PermissionError/FileNotFoundError)`
+（2026-09-14 實測：冷 Tex cache 下兩支並行 `sizecheck.py` 三輪三中）。因此這些「會編 Tex 的段落」
+一律包在 `with tex_lock(reason=...)` 裡：
+
+- **鎖檔＝`<media_dir>/Tex.lock`**（預設即 `./media/Tex.lock`），用 `os.open(O_CREAT|O_EXCL)` 原子建檔、
+  內寫 pid 與 reason；不引入新套件，Windows／POSIX 同一條路徑。**per cwd**——兩個 worktree（或任何兩個
+  不同的工作目錄）天生不互卡，這正好對應競態的所在（`KICKOFF-shared-layer-v1.md` §8 ⑧）。
+  **鎖檔放在 `Tex/` 旁邊、不是裡面**：manim 每做完一次 Tex→SVG 就呼叫
+  `tex_file_writing.delete_nonsvg_files()`，把 `media/Tex` 底下**所有非 `.svg`／`.tex` 的檔案刪光**
+  ——鎖檔擺進去會被它要守護的那些 build 掃掉（2026-09-14 實測：第二支在第 1 秒就撿到「沒人持有」的鎖，
+  兩支照撞）。**順帶一提，這個清掃也正是競態具破壞性的一半**：它刪的是**另一支**的 `.dvi`／`.log`，
+  就是假 error 裡 `FileNotFoundError` 的那一半。
+- **鎖的粒度是「整段」不是「每個 Tex」**：逐個 snippet 上鎖只會讓兩支交錯、Tex cache 照樣互寫；
+  要的是一支程式從第一次 build 到最後一次都獨佔那個目錄。
+- **等待而非報錯**：每 0.5 s 重試，每 10 s 印一行 `[texlock] waiting for pid N (sizecheck) … 20s`
+  （等待永遠不該看起來像掛住），逾時預設 10 分鐘後丟 `TimeoutError` 並指名持有者。
+- **同一個 process 內可重入**：`make.py` 在 preflight 外層持鎖、`check_scenes` 內層再持一次，
+  深度計數讓內層變成 no-op 而不是自我死鎖。
+- **stale 回收需同時成立兩個條件**：鎖檔 mtime 超過 15 分鐘**且**寫在裡面的 pid 已不存在，才覆蓋並印
+  `[texlock] stale lock from pid N removed`——因為一支正常的整 deck render 會持鎖遠超過 15 分鐘而且活得好好的。
+
+`_selftest_*` **不另外包鎖**（`run_selftests.py` 本來就序列跑；包了只會讓測試互等）；
+`rewatch_pack.py`／`review_pack.py`／`derived_check.py` 查過**不需要**——它們只呼叫 `_bootstrap.bootstrap()`
+設 TeX template、不 build blocks，Tex 一行都不編。
 
 ### 產線硬化：新增資料契約與旗標（2026-07-11，kickoff `KICKOFF-pipeline-hardening.md` T1–T10）
 

@@ -156,3 +156,10 @@ mock render 場 04、14、21、22 改前後幀（scratchpad/taskG），`visual-f
   ③ `parse_block` 對「非 dict」（純 scalar）仍回 `None` 與「沒寫」混在一起，可用同一個 `ParseError` 分流。
   **`definition_math` 納入 SC 的分析（r3 依據）**：全 repo 12 份契約無一掛在 definition 單元；該模板是單一陳述框、散文只有 `statement` 且已由 provenance 覆蓋；
   若現在加入，`ch03_trig_derivatives{,_mimo}` 立刻各 +3 `[SC]` error、`ch03_chain_rule` 開 enforce 後再 +7——要加就連同那些單元的 `coverage_exempt: true` 一起做。
+- **Task J 的裁決與後續（2026-09-14）：** r1 §6 ⑥ **裁決不改**——floorprobe 對 §3.1 27 場首跑 44 條（DIRECT 21／INNER 23），INNER 裡 `\tfrac`／`\frac`／`\sqrt[` 觸發 20、
+  只由 `^`／`_` 觸發 3，聲量主力是分數不是上下標；hook 來源 5 條（`squeeze_to_the_bound` 的 carried circle 標籤 8 條 DIRECT 全來自 `carry: to.scale`，即 r1 §6 ⑪ 的實證）。
+  數據在 `scratchpad/taskJ/floorprobe_s31{,_stats}.txt`。r3 候選：④ `video/_audit/_gen/worked_example_template.gen.py` 仍寫死舊的四場 `_demo_worked_example.yml`（歷史一次性報告產生器，無 selftest 呼叫；重跑該報告時要同步）。
+- **Task G 回報的 r3 候選（2026-09-14）：** ① `[V4]/[A4]` 純數學 reason 與散文 reason 兩種視覺處理（`derivation._reason_mob`：同一語意角色兩種字級／亮度，場 04／14 第 2 列），advisory；
+  ② **§3.1 側**：場 04 hook 的 draft band 用絕對 y（`ch03_trig_derivatives_hooks.py:1613–1620`，`_DRAFT_TAG_Y=0.10` 註解仍寫「step.0 bottom 0.47」，r1 E 後 0.6557、G 後 0.8864）——不相撞但該改成相對 step.0 量，
+  歸 §3.1 chip；③ **`critic.py` 找不到 `--scene` 子集 render 的 mp4**（`make.py --scene a,b,c` 寫到 `output/_av/<deck>_<a>_<b>_<c>/`，critic 只找 `output/_av/<deck>/`）——工具缺口，r3；
+  ④ `_selftest_*` 裡 `isinstance(m, MathTex)` 分不出 reason（`Tex ⊂ MathTex`），值得全掃一次；⑤ `--quality low` 的 480p 幀對 gate 1 偏弱，契約要明寫「幀用 `scratch_frames.py` 1080p、render 只證端到端」。

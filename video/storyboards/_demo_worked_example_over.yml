@@ -1,0 +1,50 @@
+# worked_example 容量壓測 fixture（非正式節，檔名底線前綴；2026-09-14 r2 Task J 拆自 _demo_worked_example.yml）
+#
+# 唯一一場 `capacity_over`：7 個分數列，刻意超量以觸發 sizecheck 的 L2 預測式「拆頁」warn
+# （KICKOFF-worked-example-template.md §3 第 5 條）。獨立成自己的 deck 是因為它帶著
+# 刻意的 SIZE error——混進 `_demo_worked_example.yml` 會讓那個 deck 永遠要
+# `--skip-sizecheck` 才 render 得動；拆開後 `_demo_worked_example.yml` 三場乾淨、
+# 這個 deck 專職當壓測 fixture（`_selftest_worked_example.py` 的容量契約測試指到這裡）。
+#
+# demo 專用：不進正典 deck、不跑 TTS、不 render 成片。合成例，不掛 `ref:` 以免假造出處。
+# 本 deck 的 `meta.chapter` 是 "Demo"，`provenance.Loci` 因此讀不到任何章錨點——會有
+# provenance WARN，這是 demo deck 的預期狀態（warn-only，不擋 build，比照其餘 `_demo_*`）。
+# 刻意超量的 SIZE error 是這個 deck 存在的理由，不是缺陷；`make.py` 要跑這個 deck 得帶
+# `--skip-sizecheck`（比照壓測型 `_demo_capacity.yml` 等既有 fixture）。
+
+meta:
+  id: demo_worked_example_over
+  chapter: "Demo"
+  chapter_title: "Template Validation"
+  section: "0.0"
+  title: "Worked Example Capacity Overflow Fixture"
+  language: en
+  theme: midnight
+  voice: Mia
+  video: { w: 1920, h: 1080, fps: 30 }
+  sections:
+    - { id: "0.0", title: "Worked Example Capacity Overflow Fixture" }
+
+scenes:
+
+  # 容量壓測：7 個分數列 → L2 預測式「拆 ~N 頁」warn
+  - id: capacity_over
+    kind: content
+    template: worked_example
+    accent: example
+    source: "容量壓測（合成例，非講義內容）"
+    prompt: "Simplify the compound quotient, one factor at a time."
+    say: |
+      A deliberately over-long chain, to trip the capacity gate.
+      {show step.0} One. {show step.1} Two. {show step.2} Three.
+      {show step.3} Four. {show step.4} Five. {show step.5} Six.
+      {show step.6} Seven. {show result} And the answer.
+    steps:
+      - { math: "S = \\frac{(a+b)^{2} - (a-b)^{2}}{4ab}\\cdot\\frac{a^{2}-b^{2}}{a+b}" }
+      - { math: "= \\frac{4ab}{4ab}\\cdot\\frac{(a+b)(a-b)}{a+b}" }
+      - { math: "= \\frac{a^{2}-b^{2}}{a+b}\\cdot\\frac{a+b}{a+b}" }
+      - { math: "= \\frac{(a+b)(a-b)}{a+b}" }
+      - { math: "= \\frac{a-b}{1}" }
+      - { math: "= \\frac{2(a-b)}{2}" }
+      - { math: "= \\frac{a-b}{1}\\cdot\\frac{1}{1}" }
+    result: { math: "S = a - b", reason: "answer" }

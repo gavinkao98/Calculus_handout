@@ -773,6 +773,7 @@ severity ∈ {`error`, `warn`}；`make.py` 有 error 即 abort（`--skip-sizeche
 8. **環境 flake：`latex.exe`／`dvisvgm.exe` 偶發掛死。** 成因＝MiKTeX 的 fndb 被別的 process 鎖住；
    症狀＝`media/Tex` 不再增長、selftest runner 0 輸出（不是報錯，是靜靜卡住）。
    **紀律：同一個工作樹絕不並行跑兩個 deck 的報表或 build pass**——`media/Tex` 的競態會偽裝成 `sizecheck` error。 **（2026-09-14 §3.2 session 實測補充：`media/Tex` 競態是 per-cwd——`config.media_dir = ./media`，各 worktree 各有一份——跨 worktree 並行零撞車；fndb 鎖才是全域偶發，症狀是靜靜掛住而非報錯。）**
+   **✅ 競態那半已由 texlock 接管（r2 Task H，2026-09-14）**：`pipeline/texlock.py` 在所有會編 Tex 的段落（`sizecheck.check_scenes`、`make.py` 的 preflight 與 render、`critic.plan_frames --per scene`、`scratch_frames.py`）上了 per-cwd 檔案鎖 `<media_dir>/Tex.lock`，第二支改成**等待**（每 10 s 印 `[texlock] waiting for pid N …`）、不再吐假的 `could not build scene`（改前實測：冷 Tex cache 下兩支並行 `sizecheck.py` 3/3 輪都撞出假 error）。**剩下沒被接管的是 fndb 全域鎖**——症狀仍是靜靜掛住（不報錯），上面那條「超過 3 分鐘就 kill 掉重跑」的紀律照舊。
 9. ✅（r1 Task F，2026-09-14 併入 main）**`_selftest_theorem_regime` 用 `"band" in msg` 撈 finding。** 於是 `sizecheck` 的新訊息**不得含 band 這個字**
    （T3 已避開），這是一條隱形的耦合。值得改成結構化比對（比對 finding 的 code／severity，而不是訊息字串）。
 10. ✅（r1 Task C，2026-09-14 併入 main）**`critic.py --per scene` 對有 `exit:` 的場取到末幀、不是最滿幀。** gate 1 的長期覆蓋缺口：

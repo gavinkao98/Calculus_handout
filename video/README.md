@@ -130,7 +130,10 @@ video/
   已經給了 `strategy:`／`notes:`。`accent` 省略時預設 `example`（綠）。
   契約與兩處刻意偏離設計畫布的理由見 [DESIGN.md](DESIGN.md)
   「Worked-example 模板 `worked_example`」；demo 稿
-  `storyboards/_demo_worked_example.yml`。
+  `storyboards/_demo_worked_example.yml`（三場乾淨形狀，不帶刻意 error，
+  `make.py` 跑得完）＋`storyboards/_demo_worked_example_over.yml`
+  （容量壓測 fixture，2026-09-14 r2 Task J 拆出，刻意超量、要
+  `--skip-sizecheck`）。
 
 模板層的 **motion primitive**（2026-09-12 首輪，全部 opt-in；契約與理由見
 [DESIGN.md](DESIGN.md)「motion primitive」節）：

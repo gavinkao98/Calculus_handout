@@ -1,16 +1,20 @@
 # worked_example 模板 demo／回歸樣本（非正式節，檔名底線前綴）
 #
-# 四場，各驗一條契約（KICKOFF-worked-example-template.md §3 第 5 條）：
+# 三場，各驗一條契約（KICKOFF-worked-example-template.md §3 第 5 條）：
 #   companion_limit_example : 照 mockup 的完整形狀——題目＋策略 rail＋notes＋答案框；
 #                             取材 §3.1 Example 3.1（伴隨極限），旁白取自
 #                             content_scripts/ch03_trig_derivatives.md 的 companion_limit 單元。
 #   no_rail                 : 無 strategy／notes → 步驟欄吃滿 CONTENT_W（D8）。
-#   capacity_over           : 7 個分數列 → sizecheck 的 L2 預測式拆頁 warn。
 #   multipage_p1            : part 1/2 且無 result → 證 D4 的唯一例外（續頁答案還沒到）。
 #
+# `capacity_over`（7 個分數列，驗 sizecheck 的 L2 預測式拆頁 warn）搬到
+# `_demo_worked_example_over.yml`（2026-09-14 r2 Task J 拆分）：它是刻意超量的壓測場，
+# 混在同一 deck 會讓 `make.py` 永遠要 `--skip-sizecheck` 才跑得完；拆開後這個乾淨 deck
+# 能不帶 `--skip-sizecheck` 正常 render 到底，壓測 fixture 獨立成另一個 deck。
+#
 # demo 專用：不進正典 deck、不跑 TTS、不 render 成片。只有第一場帶 `ref:`（它真的出自
-# Example 3.1，`ex:3.1` 是 chapter3.tex 的 label）；另外三場是合成例，不掛 ref 以免假造出處。
-# 本 deck 的 `meta.chapter` 是 "Demo"，`provenance.Loci` 因此讀不到任何章錨點——四場都會有
+# Example 3.1，`ex:3.1` 是 chapter3.tex 的 label）；另外兩場是合成例，不掛 ref 以免假造出處。
+# 本 deck 的 `meta.chapter` 是 "Demo"，`provenance.Loci` 因此讀不到任何章錨點——三場都會有
 # provenance WARN，這是 demo deck 的預期狀態（warn-only，不擋 build，比照其餘 `_demo_*`）。
 
 meta:
@@ -89,29 +93,7 @@ scenes:
     result: { math: "\\frac{d}{dx}\\tan x = \\sec^{2} x" }
     check: { math: "\\sec^{2} 0 = 1" }
 
-  # 3 -------------------- 容量壓測：7 個分數列 → L2 預測式「拆 ~N 頁」warn
-  - id: capacity_over
-    kind: content
-    template: worked_example
-    accent: example
-    source: "容量壓測（合成例，非講義內容）"
-    prompt: "Simplify the compound quotient, one factor at a time."
-    say: |
-      A deliberately over-long chain, to trip the capacity gate.
-      {show step.0} One. {show step.1} Two. {show step.2} Three.
-      {show step.3} Four. {show step.4} Five. {show step.5} Six.
-      {show step.6} Seven. {show result} And the answer.
-    steps:
-      - { math: "S = \\frac{(a+b)^{2} - (a-b)^{2}}{4ab}\\cdot\\frac{a^{2}-b^{2}}{a+b}" }
-      - { math: "= \\frac{4ab}{4ab}\\cdot\\frac{(a+b)(a-b)}{a+b}" }
-      - { math: "= \\frac{a^{2}-b^{2}}{a+b}\\cdot\\frac{a+b}{a+b}" }
-      - { math: "= \\frac{(a+b)(a-b)}{a+b}" }
-      - { math: "= \\frac{a-b}{1}" }
-      - { math: "= \\frac{2(a-b)}{2}" }
-      - { math: "= \\frac{a-b}{1}\\cdot\\frac{1}{1}" }
-    result: { math: "S = a - b", reason: "answer" }
-
-  # 4 ------------------- 分頁：part 1/2 且無 result（D4 的唯一例外）
+  # 3 ------------------- 分頁：part 1/2 且無 result（D4 的唯一例外）
   - id: multipage_p1
     kind: content
     template: worked_example
