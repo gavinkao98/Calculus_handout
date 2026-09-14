@@ -256,7 +256,7 @@ mock render `ch03_trig_derivatives` 場 04、21、22 與一場 bold 標題長的
 3. **`procedure_steps` 是唯一不吃 `scaffold` 的教學模板**，且四個 step 時 `worked[]` strip 與 row.3 重疊 57%；§3.2 只能用
    `part:` 分頁修（content 場 +1、TTS 多一次呼叫）。模板層缺口，屬 ⑦ 同級的 polish。
 4. **`pipeline/derive_spoken.py` 的 `MD_CONFIG_AND_CONVENTIONS` §二慣例摘錄表落後 rubric 一列**（`NARRATION-FAITHFULNESS-RUBRIC.md:51`
-   新增 D5「分母整體被平方」念法）。**補的話要連帶重生 §3.1 的 `_narration_spoken.md`**（跨節依賴，另開 chip、不在 r1）。
+   新增 D5「分母整體被平方」念法）。**補的話要連帶重生 §3.1 的 `_narration_spoken.md`**（跨節依賴，另開 chip、不在 r1）。**約束（§3.2 session 2026-09-14 補）：新列的適用範圍限「分母整個被平方」（$rac{A}{(X+Y)^2}$ → "A over the square of the quantity X plus Y"），**不推翻**既有「群組次方」列（§3.1 `ch03_trig_derivatives.spoken.yml:17` 的 "expanded the quantity x plus h, to the n" 仍正確）；抄進摘錄表時兩列並存、不合併——這個區分正是 gate-2 抓到 D2 blocking 的根源。已開 chip。
 
 **兩條共識更正（已採信，寫進對應文件）：**
 - `sizecheck`／`schema` 的 TeX cache 競態是 **per-cwd**（`config.media_dir = ./media`，各 worktree 各有 `media/Tex`），跨 worktree
@@ -267,4 +267,4 @@ mock render `ch03_trig_derivatives` 場 04、21、22 與一場 bold 標題長的
 
 **依賴（merge 時要做）：** §3.2 已跑過一次 1080p mock 音檔 render 當 `[sync]` 基線（909.9 s，舊 timing 常數）。r1 的 Task F
 （`STOCK_ANIM_SECONDS` 對齊實際 run_time）與 Task A（paced 無 rail）merge 後該基線作廢——**merge 完通知 §3.2 session 重跑**
-（只重 render、不重合成）。
+（只重 render、不重合成）。§3.2 基準線（2026-09-14）：28 場（content 23）、mock 音檔 828 s、成片 909.9 s、28 場全 narration under video；STOCK 對齊若讓畫面變短，最先撐不住的是最長三場 `proof_delicate_choices` 50.0 s／`two_forms_equivalent` 49.2 s／`proof_setup_substitution` 47.6 s。§3.2 會等真合成完再重跑 `[sync]`，不只對 mock 驗。
