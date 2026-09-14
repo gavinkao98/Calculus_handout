@@ -45,11 +45,11 @@ both older than `STALE_SECONDS` **and** owned by a pid that no longer exists --
 both conditions, because a legitimate full-deck render holds the lock far longer
 than the staleness window while very much alive.
 
-Known limit of `DEFAULT_TIMEOUT`: a full-deck render holds the lock for 15-25 min,
-which is longer than the 10 min a waiter gives it, so a gate started in the same cwd
-DURING such a render raises `TimeoutError` instead of waiting it out. That is still
-better than the false errors it replaces (it says who holds the lock and why), but
-it means "wait for the render" is a conscious `timeout=` choice, not the default.
+`DEFAULT_TIMEOUT` is 30 min (raised from 10 at the r2 merge, 2026-09-14): a full-deck
+render holds the lock for 15-25 min, and a gate started in the same cwd DURING such a
+render should wait it out rather than raise -- the every-10-s progress line is what keeps
+that wait from looking like a hang. It stays finite so a wedged holder that is somehow
+alive but stuck cannot block a cwd forever; pass `timeout=` to tighten it for a gate.
 """
 from __future__ import annotations
 
@@ -59,7 +59,8 @@ import time
 from pathlib import Path
 
 RETRY_SECONDS = 0.5         # poll interval while another process holds the lock
-DEFAULT_TIMEOUT = 600.0     # 10 min: give up rather than wait forever on a wedged holder
+DEFAULT_TIMEOUT = 1800.0    # 30 min: outlasts a full-deck render (15-25 min) so a waiter waits it out;
+                            # still finite so a wedged holder cannot block forever (r2 merge ruling)
 STALE_SECONDS = 900.0       # 15 min untouched AND a dead pid -> reclaim
 PROGRESS_SECONDS = 10.0     # say something every 10 s so a wait never looks like a hang
 
