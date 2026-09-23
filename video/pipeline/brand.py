@@ -321,46 +321,51 @@ _math_width_cache: dict[tuple[str, float], float] = {}
 def _token_width(tok: str, fsz: float) -> float:
     """Width of one token: rendered width for math spans, char estimate for text.
 
-    Handles math spans with trailing punctuation glued on (e.g. ``$...$,``)
-    by splitting into math width + punctuation width.
+    A token is one whitespace-free run of the source, so text can be glued to a math span
+    on either side (``$...$,``, ``($f$)``, ``$x$-axis``): it is measured piecewise --
+    each math span at its rendered width plus each text piece at the char estimate.
     """
-    if tok.startswith("$"):
-        dollar_end = tok.rfind("$", 1)
-        if dollar_end > 0:
-            math_part = tok[:dollar_end + 1]
-            tail = tok[dollar_end + 1:]
-            key = (math_part, fsz)
+    w = 0.0
+    for part in re.split(r"(\$[^$]*\$)", tok):
+        if part.startswith("$") and part.endswith("$") and len(part) >= 2:
+            key = (part, fsz)
             if key not in _math_width_cache:
-                _math_width_cache[key] = _math_render_width(math_part, fsz)
-            w = _math_width_cache[key]
-            if tail:
-                w += estimate_text_width(tail, fsz)
-            return w
-    return estimate_text_width(tok, fsz)
+                _math_width_cache[key] = _math_render_width(part, fsz)
+            w += _math_width_cache[key]
+        elif part:
+            w += estimate_text_width(part, fsz)
+    return w
 
 
 def _wrap_mixed(text: str, fsz: float, max_width: float | None) -> list[str]:
     """Word-wrap prose that may carry inline ``$math$`` into line strings.
 
-    A ``$...$`` span is one atomic token (never broken, even across its inner spaces);
-    trailing punctuation is glued onto its token so a period never wraps off alone.
-    Text tokens use the char estimate; math spans use their actual rendered width
+    A token is one whitespace-free run of the SOURCE: a ``$...$`` span is atomic (never
+    broken, even across its inner spaces) and text touching it with no space in between
+    stays glued to it (``$x$,``, ``($f$)``, ``$x$-axis``, ``$f$'s``). Lines are rebuilt
+    with one space only where the source had whitespace, and break only there -- so a
+    period never wraps off alone and no space is invented next to a math span.
+    Text pieces use the char estimate; math spans use their actual rendered width
     so display-style formulas don't get over-estimated and pushed to a new line.
     Each returned line still carries its ``$...$`` spans for prose() to render as one Tex.
     """
     tokens: list[str] = []
+    cur_tok = ""
     for part in re.split(r"(\$[^$]*\$)", text):
         if part.startswith("$") and part.endswith("$") and len(part) >= 2:
-            tokens.append(part)
-        else:
-            tokens.extend(part.split())
-    merged: list[str] = []
-    for tok in tokens:
-        if merged and re.fullmatch(r"[,.;:!?)\]}]+", tok):
-            merged[-1] += tok
-        else:
-            merged.append(tok)
-    tokens = merged
+            cur_tok += part
+            continue
+        for piece in re.split(r"(\s+)", part):
+            if not piece:
+                continue
+            if piece.isspace():
+                if cur_tok:
+                    tokens.append(cur_tok)
+                cur_tok = ""
+            else:
+                cur_tok += piece
+    if cur_tok:
+        tokens.append(cur_tok)
     if not tokens:
         return []
     if max_width is None:
