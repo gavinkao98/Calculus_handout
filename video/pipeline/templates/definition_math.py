@@ -33,6 +33,7 @@ LABEL = {
     "definition": "[ definition ]", "theorem": "[ theorem ]",
     "proposition": "[ proposition ]", "corollary": "[ corollary ]", "example": "[ example ]",
     "warning": "[ note ]", "procedure": "[ procedure ]", "recap": "[ recap ]",
+    "proof": "[ proof ]", "solution": "[ solution ]", "strategy": "[ strategy ]",
 }
 
 

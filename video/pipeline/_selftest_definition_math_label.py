@@ -38,6 +38,23 @@ def test_corollary_has_its_own_chip():
     assert "COROLLARY" in tex and "DEFINITION" not in tex, tex
 
 
+def test_proof_solution_strategy_have_their_own_chips():
+    """The D2-08 fix covered only the accents scene_roles has a chip for; proof / solution /
+    strategy are in neither table and still fell back to "[ definition ]" (RG3 round)."""
+    for accent in ("proof", "solution", "strategy"):
+        tex = _eyebrow_tex(accent)
+        assert accent.upper() in tex and "DEFINITION" not in tex, (accent, tex)
+
+
+def test_no_accent_but_definition_falls_back_to_the_definition_chip():
+    """Completeness over the whole accent vocabulary (blocks.ACCENT_ROLE), so a new accent
+    cannot silently wear the definition chip again."""
+    from pipeline.blocks import ACCENT_ROLE
+    from pipeline.templates.definition_math import _default_label
+    wrong = [a for a in ACCENT_ROLE if a != "definition" and _default_label(a) == "[ definition ]"]
+    assert not wrong, wrong
+
+
 def test_the_existing_label_table_is_unchanged():
     assert "DEFINITION" in _eyebrow_tex("definition")
     assert "THEOREM" in _eyebrow_tex("theorem")
