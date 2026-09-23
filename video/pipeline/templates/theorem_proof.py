@@ -193,10 +193,13 @@ def build(spec: dict[str, Any], ctx: dict[str, Any]) -> list[Block]:
     #    the rail, the pair centred (Lectern bias). --
     use_aside = bool(spec.get("aside")) and not steps and not qed_text
     if use_aside:
+        # wrap inside the card's own side padding too, so the card's right edge stays a
+        # 0.3u column gap short of RAIL_X, where the aside card starts
+        pad_x = 0.6
         statement = brand.prose(spec.get("statement", ""), ground, role="primary",
-                                size="h2", max_width=PRIMARY_W - 0.3)
+                                size="h2", max_width=PRIMARY_W - 2 * pad_x - 0.3)
         card = brand.accent_panel(statement, ground, bar_role=accent_role(spec),
-                                  fill_role="panel", pad=0.42, pad_x=0.6)
+                                  fill_role="panel", pad=0.42, pad_x=pad_x)
         aside = build_aside(spec["aside"], ground, max_width=RAIL_W)
         card.move_to([left + card.width / 2, 0, 0])
         aside.move_to([RAIL_X, 0, 0], aligned_edge=LEFT)
