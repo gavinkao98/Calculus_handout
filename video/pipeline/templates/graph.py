@@ -219,6 +219,10 @@ def _place_function_label(label, graph, axes: Axes, plot: dict[str, Any],
             ly = safe_eval_expression(plot["expression"], lx)
             if not math.isfinite(ly):
                 raise ValueError(f"y={ly}")
+            # a y_clip curve is not drawn outside y_range: a label there hangs off the axes and
+            # _fit_graph_to_safe_zone shrinks the whole figure to hold it (RG3-01)
+            if plot.get("y_clip") and not yr[0] <= ly <= yr[1]:
+                raise ValueError(f"y={ly:g} is clipped off (y_range [{yr[0]:g}, {yr[1]:g}])")
             label.next_to(axes.c2p(lx, ly), side, buff=0.18)
             return
         except Exception as exc:

@@ -1158,13 +1158,16 @@ inset:
   follow: true           # 主圖 sweep 播放時鏡片內游標／點／色帶跟著（預設 true）
 ```
 
-第二組 axes 蓋在矩形上、固定在版面角落（安全區內），同一批 `plots[]` **裁到矩形**重畫（function／line／
+第二組 axes 蓋在矩形上、停在版面角落（安全區內），同一批 `plots[]` **裁到矩形**重畫（function／line／
 band／point／sweep；不畫 label）；主圖上 `hairline_strong` 框標出區域、兩條虛線導引到 panel；panel 白邊＋
-不透明底、整組 z_index 最高（之後才揭示的 plot 不會畫在鏡片上）。`Block("inset", …, anim="fade",
+不透明底、整組 z_index 最高（之後才揭示的 plot 不會畫在鏡片上）。**title（top 角）或 annotation（bottom
+角）伸進面板的 x 範圍時，面板垂直避讓**：top 角往下讓到 title 底下 `_TITLE_GRAPH_GAP`、bottom 角往上讓到
+annotation 頂上 `_GRAPH_ANNOTATION_GAP`；兩者都沒伸進來就留在角落。`Block("inset", …, anim="fade",
 static=False, layer="graph")`，`{show inset}` 才進場；**建在 `_fit_graph_to_safe_zone` 之後、不進它的
-group，所以主圖零縮放零位移**，建好就在角落（sizecheck 量到的就是終態）。`follow: true` 讀主圖 sweep 的
-tracker，且**主圖 sweep 播了鏡片才有游標**（播前鏡片不能有主圖沒有的東西）。缺 `x`／`y`、`lo ≥ hi`、
-`corner` 非法、2up 模式寫 `inset` 一律 build 時 raise（sizecheck 轉 error）。已知限制：鏡片內容是 plot
+group，所以主圖零縮放零位移**，建好就在終位（角落或避讓後的位置；sizecheck 量到的就是終態）。
+`follow: true` 讀主圖 sweep 的 tracker，且**主圖 sweep 播了鏡片才有游標**（播前鏡片不能有主圖沒有的東西）。
+缺 `x`／`y`、`lo ≥ hi`、`corner` 非法、2up 模式寫 `inset`、title 與 annotation 之間放不下 3.2×2.0 u 面板
+（`inset.corner '…' has no room …`，換個角落）一律 build 時 raise（sizecheck 轉 error）。已知限制：鏡片內容是 plot
 spec 的靜態終態——`reveal: true` 的 plot 在鏡片裡不等主圖揭示就在（把 `{show inset}` 排在它們之後）；
 hook 手繪的物件（如 06 `sector_inequality` 的 `plots: []`＋hook）鏡片看不到；`focus` 壓暗不鏡射進鏡片。
 實作 [`pipeline/templates/graph.py`](pipeline/templates/graph.py) `_inset_block`；範例
