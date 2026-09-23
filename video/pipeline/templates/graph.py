@@ -839,7 +839,10 @@ def _build_single(spec: dict[str, Any], ctx: dict[str, Any]) -> list[Block]:
     _add_axis_labels(axes, ground, ac)
     blocks.append(Block("axes", axes, anim="create", static=True, layer="graph"))
 
-    plot_blocks, _ = _plot_blocks(spec, axes, ground)
+    # the plots (and the inset) read spec["axes"]: hand them the merged defaults drawn above,
+    # as _panel does for 2up -- an omitted axes / x_range was a bare KeyError here
+    merged = dict(spec, axes=ac)
+    plot_blocks, _ = _plot_blocks(merged, axes, ground)
     ticks = _axis_ticks(axes, ac, ground, spec.get("plots", []))
     if ticks is not None:
         plot_blocks.append(Block("ticks", ticks, anim="fade", static=True))
@@ -877,7 +880,7 @@ def _build_single(spec: dict[str, Any], ctx: dict[str, Any]) -> list[Block]:
     # after the fit: the inset's frame reads the main axes' FINAL position, and the
     # panel is outside graph_group so the main plot is never scaled to make room for it.
     if "inset" in spec:
-        blocks.append(_inset_block(spec, axes, plot_blocks, ground))
+        blocks.append(_inset_block(merged, axes, plot_blocks, ground))
 
     if group is not None:
         for i, ann in enumerate(annotations):
