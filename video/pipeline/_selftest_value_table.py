@@ -8,6 +8,13 @@ catalog: "punchline 欄／列鋪 scene accent 同色 tint + 抬升 ink"). The in
 private map keyed by the pre-Direction-B role names (secondary/accent/success/warning);
 `accent_role()` now only returns semantic roles, so every accent missed the map and every
 accent cell fell back to blue_ink -- a green `example` column carried blue numbers.
+
+D2-05: a cell routes like every author field (brand.prose): a whole-cell single `$...$` is
+display math at the math anchor (unchanged), plain words are text, and MIXED words + inline
+`$math$` are text too -- at the text scale. `_cell` used to send anything with a `$` to
+math_line, whose mixed branch sets the line at the math anchor WITHOUT TEXT_SCALE, so
+"exists at $x=2$" came out at 1/1.2748 = 78% of the "exists" cell above it, with no prose
+tag for the sibling / floor gates to measure.
 """
 from pipeline import _bootstrap
 
@@ -69,6 +76,31 @@ def test_ch01_when_inversion_fails_accent_column_is_practice_green():
     by = _blocks(spec)
     assert _hex(by["row.0"].mobject[2]) == T.color("dark", "practice_ink").lower()
     assert _hex(by["row.0"].mobject[2]) != T.color("dark", "blue_ink").lower()
+
+
+def _property_table() -> dict:
+    """value_table's own docstring use case: a property comparison with a mixed cell."""
+    return _table(accent="theorem", header=["side", "value", "limit"],
+                  rows=[["left", "$3$", "exists"], ["right", "$5$", "exists at $x=2$"]])
+
+
+def test_mixed_text_and_math_cell_renders_at_the_plain_text_cell_size():
+    by = _blocks(_property_table())
+    plain = by["row.0"].mobject[2]           # "exists"
+    mixed = by["row.1"].mobject[2]           # "exists at $x=2$"
+    assert abs(float(mixed.font_size) - float(plain.font_size)) < 1e-6, (
+        f"mixed cell font_size {float(mixed.font_size):.2f} != plain {float(plain.font_size):.2f}")
+    # prose-tagged, so sizecheck's sibling / floor gates can see it
+    assert getattr(mixed, "_brand_prose", False), "mixed cell carries no brand.prose tag"
+
+
+def test_whole_math_cell_keeps_the_math_anchor_size():
+    """The pure `$...$` cell path is unchanged: display MathTex at T.fs(size)."""
+    by = _blocks(_property_table())
+    math_cell = by["row.0"].mobject[1]       # "$3$"
+    assert abs(float(math_cell.font_size) - T.fs("prose")) < 1e-6, float(math_cell.font_size)
+    head = by["header"].mobject[1]           # "value" (plain header, prose_sm)
+    assert abs(float(head.font_size) - T.fs("prose_sm") * T.TEXT_SCALE) < 1e-6
 
 
 if __name__ == "__main__":
