@@ -1,8 +1,9 @@
-"""Design system: NTU Calculus Video System — Direction D layout, all-LaTeX Plex type.
+"""Design system: NTU Calculus Video System — Direction D layout, all-LaTeX type.
 
 Port of the redesign (the "Manim Video Design System" handoff): a 3Blue1Brown-style
-dark glowing teaching ground, four semantic accents, and IBM Plex Sans for all text with
-Latin Modern math — set through LaTeX so it is kerned (Route A, 2026-06-24).
+dark glowing teaching ground, the handout's six semantic accents, and Instrument Sans for
+all text with Latin Modern math — set through LaTeX so it is kerned (Route A, 2026-06-24;
+the text face was IBM Plex Sans until 2026-09-13).
 
 Tokens (colour, type scale, geometry, glow) mirror the redesign's tokens/*.css.
 
@@ -10,28 +11,38 @@ Two grounds:
 - DARK  -> teaching frames (definition/derivation/theorem/procedure/graph/...)
 - PAPER -> brand frames (intro / divider / outro), warm #f4f1e9 with the NTU lockup
 
-Fonts (Route A, 2026-06-24): ALL on-screen text renders through LaTeX (Tex) -- IBM Plex
-Sans for headings/prose, IBM Plex Mono for eyebrows/labels, Latin Modern for math. The
-families live in the TeX preamble (_bootstrap.apply_tex_template); nothing goes through
-Pango, so this module no longer carries Pango family names. (Was Pango Times/NCM text +
-newtx/lmodern math.)
+Fonts (Route A, 2026-06-24): ALL on-screen text renders through LaTeX (Tex) -- Instrument
+Sans for headings/prose (IBM Plex Sans until 2026-09-13), IBM Plex Mono for eyebrows/labels,
+Latin Modern for math. The families live in the TeX preamble
+(_bootstrap.apply_tex_template); nothing goes through Pango, so this module no longer carries
+Pango family names. (Was Pango Times/NCM text + newtx/lmodern math.)
 
-Colour contract (reference SEMANTIC roles, not raw hues):
-- blue   -> definitions, default curve, default highlight     (role secondary / blue)
-- amber  -> theorems, key results, the second curve, emphasis (role accent / amber)
-- green  -> positive sign, success, QED, increasing           (role success / green)
-- red    -> negative sign, warning, counterexample, decreasing (role warning / red)
-Math defaults to bright ink (ink_1) and is *tinted* blue/amber only for emphasis.
-violet is a RESERVED third-object accent — use sparingly.
+Colour contract (reference SEMANTIC roles, not raw hues) -- Direction B, 2026-09-12: the
+handout's own axis (handout/latex/template/calcbook.sty), hue-matched; blocks.ACCENT_ROLE
+maps every scene `accent` onto one of these, each with a lifted `<role>_ink` text tint:
+- concept  (ochre/amber) -> definitions
+- result   (blue)        -> theorems, propositions, corollaries, proofs, recaps, derivations
+- practice (green)       -> examples, solutions
+- caution  (red)         -> cautions, warnings
+- strategy (violet)      -> strategies, procedures
+- aside    (slate)       -> remarks, notes, and the neutral default of an unmarked scene
+The raw hues (blue/amber/green/red/violet/slate) stay for non-semantic marks (plot curves,
+sign-chart signs, glow halos). Math defaults to bright ink (ink_1), tinted only for emphasis.
 
-Back-compat: the old Direction-B role names (secondary/accent/math/warning/...) are kept
-as live ALIASES pointing at the new hues, so the existing templates resolve unchanged;
-only blocks.ACCENT_ROLE needed remapping.
+Back-compat: the older role names (primary/secondary/accent/math/warning/success/text/...)
+are kept as aliases so the templates that still use them resolve. The ink-tier aliases
+(primary/math/text/muted/heading/subtitle/card_fill) equal their targets, but the four hue
+aliases (secondary/accent/warning/success) are FROZEN hexes from before the 2026-09-12
+palette change -- they do NOT follow blue/amber/red/green (DARK secondary #5cc8ec vs blue
+#4fa6de), so editing a hue does not move them. Whether to re-point them (it would change
+rendered colours: default graph curve, procedure numerals, sign-chart +/-; and glow_curve's
+halo already takes GLOW["blue"] under a `secondary` stroke) is an open decision, code review
+2026-09-23 D2-07.
 """
 from __future__ import annotations
 
 # Fonts are no longer named here: all text renders through LaTeX (Tex) and the families
-# (Plex Sans / Plex Mono / Latin Modern) are set in _bootstrap.apply_tex_template. (Route
+# (Instrument Sans / Plex Mono / Latin Modern) are set in _bootstrap.apply_tex_template. (Route
 # A removed the FONT_DISPLAY/FONT_BODY/FONT_MONO Pango family names this module used to
 # expose; nothing reads them now.)
 
@@ -106,7 +117,8 @@ MIN_FONT_FLOOR = 26.0  # px; calibrated in PLAN-…-plan4 Task 5
 
 
 # -- palettes (hex from the redesign tokens) ------------------------------
-# Canonical Direction-D keys + back-compat aliases (old name -> new hue). color()
+# Canonical Direction-D keys + back-compat aliases (old role names; the four hue aliases are
+# frozen hexes that do NOT follow the hue keys -- see the module docstring). color()
 # falls back to 'primary' for any unknown role, so a stray name degrades to ink_1.
 DARK: dict[str, str] = {
     # grounds (flat NTU-navy ink, 2026-06-24 Step 2-B1 A/B: was neutral near-black
@@ -148,11 +160,11 @@ DARK: dict[str, str] = {
     "grid_line": "#1b2740",   # latent (SHOW_GRID=False)
     # ---- back-compat aliases (old Direction-B role names) ----
     "primary": "#eef2fb",     # -> ink_1
-    "secondary": "#5cc8ec",   # -> blue   (definitions / default highlight)
-    "accent": "#f2b13c",      # -> amber  (theorems / key)
+    "secondary": "#5cc8ec",   # frozen old blue, != "blue" #4fa6de (default curve / highlight)
+    "accent": "#f2b13c",      # frozen old amber, != "amber" #d98f3c
     "math": "#eef2fb",        # -> ink_1  (was electric cyan; math is bright ink now)
-    "warning": "#fb6a5d",     # -> red
-    "success": "#54d199",     # -> green
+    "warning": "#fb6a5d",     # frozen old red, != "red" #d96b6b
+    "success": "#54d199",     # frozen old green, != "green" #3ebe7c
     "text": "#c6cedd",        # -> ink_2  (body prose; lifted for navy+Plex, see ink_2 note)
     "muted": "#6b748a",       # -> ink_3  (captions / faded)
     "heading": "#eef2fb",     # -> ink_1
@@ -186,11 +198,11 @@ LIGHT: dict[str, str] = {
     "grid_line": "#e2e6ee",
     # ---- back-compat aliases ----
     "primary": "#16294e",     # -> brand_navy (navy headline / wordmark)
-    "secondary": "#1f8fc0",   # -> blue
+    "secondary": "#1f8fc0",   # frozen old blue, != "blue" #0068a7
     "accent": "#ba0c2f",      # -> brand_red (eyebrows / numbering / rules)
     "math": "#161a22",        # -> ink_1
-    "warning": "#d8453b",     # -> red
-    "success": "#1ba272",     # -> green
+    "warning": "#d8453b",     # == brand_red_bright, != "red" #aa3333
+    "success": "#1ba272",     # frozen old green, != "green" #04773b
     "text": "#444b59",        # -> ink_2
     "muted": "#767d8c",       # -> ink_3
     "heading": "#16294e",     # -> brand_navy
