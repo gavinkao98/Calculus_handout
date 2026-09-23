@@ -433,7 +433,8 @@ def build(spec: dict[str, Any], ctx: dict[str, Any]) -> list[Block]:
         head, body_ref = example_head(spec, ctx)
     else:
         head = scene_head(spec, ctx, label="[ derivation ]")
-        body_ref = head[1].mobject
+        # by id, not head[1]: a `part:` scene puts the page indicator before the title
+        body_ref = next(b.mobject for b in head if b.id == "title")
     blocks += head
 
     scaffold_blocks = render_scaffold(spec.get("scaffold"), ground, ctx.get("meta"))

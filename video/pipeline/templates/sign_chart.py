@@ -79,7 +79,7 @@ def build(spec: dict[str, Any], ctx: dict[str, Any]) -> list[Block]:
     ground = ctx["ground"]
     blocks: list[Block] = []
     blocks += scene_head(spec, ctx, label="[ sign chart ]")
-    title = blocks[1].mobject
+    title = next(b.mobject for b in blocks if b.id == "title")
 
     content_w = T.FRAME_W - 2 * T.SIDE_GUTTER
     text_col = T.color(ground, "muted")   # number line + ticks read dim (ink-3)

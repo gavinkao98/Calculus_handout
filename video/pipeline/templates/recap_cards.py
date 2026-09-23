@@ -37,7 +37,7 @@ def build(spec: dict[str, Any], ctx: dict[str, Any]) -> list[Block]:
     ground = ctx["ground"]
     blocks: list[Block] = []
     blocks += scene_head(spec, ctx, label="[ recap ]")
-    title = blocks[1].mobject
+    title = next(b.mobject for b in blocks if b.id == "title")
     content: list = []
 
     left = SPINE_X

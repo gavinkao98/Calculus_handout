@@ -266,8 +266,8 @@ def scene_head(spec: dict[str, Any], ctx: dict[str, Any], *, label: str) -> list
     # A chipless scene_role (motivation / intuition / bridge / forward-ref / ...) resolves
     # to None: we still build + position the eyebrow at its default text -- so the title
     # anchor, and thus every downstream body zone, is IDENTICAL to a chipped scene (no
-    # drift) -- but render it invisible. Keeping the block at index 0 preserves the
-    # head[1] / blocks[1] title contract the other templates rely on.
+    # drift) -- but render it invisible. Templates find the title by id, never by index:
+    # a `part:` scene puts its page indicator between the eyebrow and the title.
     chip = resolve_chip(spec, label)
     eyebrow = brand.eyebrow(label if chip is None else chip, ground, role=role)
     if chip is None:
