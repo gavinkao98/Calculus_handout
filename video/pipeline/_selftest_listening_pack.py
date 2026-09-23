@@ -57,6 +57,48 @@ def test_measure_loudness_is_error_safe():
         assert isinstance(out, dict) and "error" in out    # missing file -> {"error":...}, never raises
 
 
+def test_measure_loudness_reads_audio_only():
+    # C-03 (code review 2026-09-23): make._loudnorm_final measures the finished MP4 with this;
+    # decoding its video too (no -vn) puts a ~1049 s 4K60 film at ~182 s, past the 120 s timeout.
+    import subprocess
+    seen = []
+    real = LP.subprocess.run
+
+    def fake(cmd, **kwargs):
+        seen.append(cmd)
+        return subprocess.CompletedProcess(cmd, 0, stdout="", stderr="")
+
+    with tempfile.TemporaryDirectory() as d:
+        film = Path(d) / "film.mp4"
+        film.write_bytes(b"")
+        LP.subprocess.run = fake
+        try:
+            LP.measure_loudness(film)
+        finally:
+            LP.subprocess.run = real
+    cmd = seen[0]
+    assert "-vn" in cmd and cmd.index("-vn") > cmd.index("-i"), cmd   # output option: drop video
+
+
+def _tone_wav(path: Path, seconds: float = 4.0) -> Path:
+    import math
+    import struct
+    from pipeline.audio import write_pcm_wav
+    pcm = b"".join(struct.pack("<h", int(8000 * math.sin(2 * math.pi * 440 * i / 24000)))
+                   for i in range(int(24000 * seconds)))
+    write_pcm_wav(path, pcm)
+    return path
+
+
+def test_measure_loudness_in_non_ascii_dir():
+    # A-05 (code review 2026-09-23): ffmpeg echoes the input path to stderr as UTF-8; decoded
+    # with the Windows locale (cp950) the reader thread died, stderr came back None, and every
+    # measurement under a Chinese folder turned into "could not parse ebur128 summary".
+    with tempfile.TemporaryDirectory() as d:
+        out = LP.measure_loudness(_tone_wav(Path(d) / "旁白測試" / "tone.wav"))
+        assert "I" in out and "TP" in out, out
+
+
 def test_html_escapes_user_text():
     rows = [{"scene_id": "s<1>", "narration_mode": "scene_aligned", "script": "a < b & c",
              "audio_file": None, "audio_seconds": 5.0, "wpm": 10.0, "status": "pass",

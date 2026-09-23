@@ -56,7 +56,7 @@ def loudnorm_2pass(in_wav: Path, out_wav: Path, target_i: float,
         p1 = subprocess.run(
             ["ffmpeg", "-hide_banner", "-i", str(in_wav),
              "-af", f"loudnorm=I={target_i}:TP={target_tp}:print_format=json", "-f", "null", "-"],
-            capture_output=True, text=True, timeout=300)
+            capture_output=True, text=True, encoding="utf-8", errors="replace", timeout=300)
     except (FileNotFoundError, OSError, subprocess.SubprocessError) as exc:
         return {"error": f"ffmpeg unavailable: {exc}"}
     meas = _parse_loudnorm_json(p1.stderr or "")
@@ -69,7 +69,8 @@ def loudnorm_2pass(in_wav: Path, out_wav: Path, target_i: float,
     try:
         subprocess.run(["ffmpeg", "-y", "-hide_banner", "-i", str(in_wav),
                         "-af", af, "-ar", "48000", "-ac", "2", str(out_wav)],
-                       capture_output=True, text=True, timeout=300, check=True)
+                       capture_output=True, text=True, encoding="utf-8", errors="replace",
+                       timeout=300, check=True)
     except (subprocess.SubprocessError, OSError) as exc:
         return {"error": f"loudnorm pass-2 failed: {exc}"}
     return measure_i_tp(out_wav)

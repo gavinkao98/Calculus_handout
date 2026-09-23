@@ -94,9 +94,9 @@ def measure_loudness(wav: Path) -> dict:
         return {"error": f"missing wav: {wav.name}"}
     try:
         proc = subprocess.run(
-            ["ffmpeg", "-hide_banner", "-nostats", "-i", str(wav),
-             "-af", "ebur128=peak=true", "-f", "null", "-"],
-            capture_output=True, text=True, timeout=120)
+            ["ffmpeg", "-hide_banner", "-nostats", "-i", str(wav), "-vn",   # audio only: an MP4's
+             "-af", "ebur128=peak=true", "-f", "null", "-"],                # video is never decoded
+            capture_output=True, text=True, encoding="utf-8", errors="replace", timeout=120)
     except (FileNotFoundError, OSError, subprocess.SubprocessError) as exc:
         return {"error": f"ffmpeg unavailable: {exc}"}
     summary = (proc.stderr or "").rsplit("Summary:", 1)[-1]   # the integrated block is last

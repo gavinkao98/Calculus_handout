@@ -45,6 +45,7 @@ from pipeline import captions  # noqa: E402
 from pipeline.derived_check import check_derived_freshness, text_sha256  # noqa: E402
 from pipeline.narration import estimate_seconds, parse_say  # noqa: E402
 from pipeline.tts import read_manifest_status, _has_audio  # noqa: E402 (manim-free fail-closed guard reuse)
+from pipeline.tts import _IDENTITY_KEYS, merged_manifest, renumber_scenes  # noqa: E402 (F5 subset merge)
 from pipeline import house_audio  # noqa: E402
 from pipeline import pauses  # noqa: E402
 from pipeline.stillness import UNDECLARED_STILL_SECONDS, undeclared_still_beats  # noqa: E402
@@ -165,6 +166,25 @@ def synth(meta: dict, scenes: list[dict], scene_numbers: dict[str, int],
             synth_scene(scene, scene_numbers[scene["id"]], audio_dir, empty_seconds=empty_seconds)
         )
     return manifest
+
+
+def _merge_mock_subset(existing: dict | None, fresh: dict, all_scenes: list[dict],
+                       scene_numbers: dict[str, int]) -> dict:
+    """F5 for make.py's own mock writer (C-06): a --scene subset merges INTO the prior
+    manifest, exactly as tts.py does -- critic's `--scene all` and rewatch_pack plan off the
+    manifest, so an entry dropped here silently shrinks their coverage. Carried-over entries
+    get today's full-deck scene numbers (tts.renumber_scenes). Merges only when the identity
+    matches; a prior manifest of another identity (a tts.py mock, or a real one under
+    --force-clobber) is replaced by the subset as before, but no longer silently."""
+    if existing is None:
+        return fresh
+    mismatch = [k for k in _IDENTITY_KEYS if existing.get(k) != fresh.get(k)]
+    if mismatch:
+        print(f"[synth] WARN existing manifest differs on {mismatch}; this --scene subset replaces "
+              f"it whole (every other scene's entry is dropped) -- re-run --scene all", flush=True)
+        return fresh
+    merged = merged_manifest(existing, fresh, [s["id"] for s in all_scenes])
+    return renumber_scenes(merged, scene_numbers)
 
 
 # ---- render -------------------------------------------------------------
@@ -503,7 +523,7 @@ def render(meta: dict, scenes: list[dict], manifest: dict, out_dir: Path, qualit
 # ---- compose (ffmpeg) ---------------------------------------------------
 
 def _ffmpeg(cmd: list[str]) -> None:
-    result = subprocess.run(cmd, capture_output=True, text=True)
+    result = subprocess.run(cmd, capture_output=True, text=True, encoding="utf-8", errors="replace")
     if result.returncode != 0:
         raise RuntimeError("ffmpeg failed:\n" + " ".join(cmd) + "\n" + result.stderr[-1500:])
 
@@ -513,7 +533,7 @@ def _probe_duration(path: Path) -> float:
     result = subprocess.run(
         ["ffprobe", "-v", "error", "-show_entries", "format=duration",
          "-of", "default=noprint_wrappers=1:nokey=1", str(path)],
-        capture_output=True, text=True,
+        capture_output=True, text=True, encoding="utf-8", errors="replace",
     )
     try:
         return float(result.stdout.strip())
@@ -531,7 +551,7 @@ def _probe_duration_fps(path: Path) -> tuple[float, float]:
         ["ffprobe", "-v", "error", "-select_streams", "v:0",
          "-show_entries", "format=duration:stream=r_frame_rate",
          "-of", "default=noprint_wrappers=1", str(path)],
-        capture_output=True, text=True,
+        capture_output=True, text=True, encoding="utf-8", errors="replace",
     )
     fields = dict(ln.split("=", 1) for ln in result.stdout.splitlines() if "=" in ln)
     try:
@@ -773,28 +793,35 @@ LOUDNORM_TOL_I = 1.0   # WARN when the delivered integrated loudness misses targ
 
 
 def _loudnorm_final(src: Path, out: Path, abr: str, target_i: float,
-                    target_tp: float = LOUDNORM_TP) -> dict:
+                    target_tp: float = LOUDNORM_TP) -> tuple[bool, dict]:
     """Two-pass loudnorm the AUDIO of `src` to target_i LUFS -> `out` (video stream-COPIED,
-    preserving the single T8 video encode; linear gain keeps A/V sync). Returns the output's
-    measured {I, TP} via ebur128, or {'error':...} with `out` left unwritten (caller falls
-    back to the un-normalized concat)."""
+    preserving the single T8 video encode; linear gain keeps A/V sync). Returns
+    (normalized, loudness), kept apart (C-03): normalized=False means pass 1 or pass 2
+    failed, `out` is not a normalized film, and the caller falls back to the un-normalized
+    concat; normalized=True means `out` IS the normalized film and loudness is its ebur128
+    {I, TP} -- or {'error':...} when only that after-the-fact measurement failed, which
+    must never throw the finished film away."""
     from pipeline.loudness_ab import _parse_loudnorm_json
     from pipeline.listening_pack import measure_loudness
     p1 = subprocess.run(
         ["ffmpeg", "-hide_banner", "-i", str(src), "-vn",
          "-af", f"loudnorm=I={target_i}:TP={target_tp}:print_format=json", "-f", "null", "-"],
-        capture_output=True, text=True)
+        capture_output=True, text=True, encoding="utf-8", errors="replace")
     meas = _parse_loudnorm_json(p1.stderr or "")
     if not all(k in meas for k in ("input_i", "input_tp", "input_lra", "input_thresh", "target_offset")):
-        return {"error": "loudnorm pass-1 measurement failed"}
+        return False, {"error": "loudnorm pass-1 measurement failed"}
     af = (f"loudnorm=I={target_i}:TP={target_tp}:linear=true:"
           f"measured_I={meas['input_i']}:measured_TP={meas['input_tp']}:"
           f"measured_LRA={meas['input_lra']}:measured_thresh={meas['input_thresh']}:"
           f"offset={meas['target_offset']}")
-    _ffmpeg(["ffmpeg", "-y", "-i", str(src), "-map", "0:v:0", "-map", "0:a:0",
-             "-c:v", "copy", "-af", af, "-c:a", "aac", "-b:a", abr,
-             "-ar", "48000", "-ac", "2", str(out)])
-    return measure_loudness(out)
+    # this mux IS the delivered file on the real-audio path, so it carries T8's +faststart too
+    try:
+        _ffmpeg(["ffmpeg", "-y", "-i", str(src), "-map", "0:v:0", "-map", "0:a:0",
+                 "-c:v", "copy", "-af", af, "-c:a", "aac", "-b:a", abr,
+                 "-ar", "48000", "-ac", "2", "-movflags", "+faststart", str(out)])
+    except RuntimeError as exc:   # e.g. an all-silent film: pass 1 measures -inf, pass 2 rejects it
+        return False, {"error": "loudnorm pass-2 failed: " + " | ".join(str(exc).strip().splitlines()[-4:])}
+    return True, measure_loudness(out)
 
 
 def _concat(segments: list[Path], out: Path, abr: str) -> None:
@@ -880,12 +907,18 @@ def compose(scenes: list[dict], manifest: dict, rendered: dict[str, Path | None]
         # mock silence is never normalized). video stays copy (single T8 encode); on failure
         # fall back to the un-normalized concat rather than ship nothing.
         concat_tmp = av_dir / "_concat_preloudnorm.mp4"
-        _concat(segments, concat_tmp, abr)
-        loud = _loudnorm_final(concat_tmp, output, abr, loudness_target)
-        concat_tmp.unlink(missing_ok=True)
-        if "error" in loud:
+        try:
+            _concat(segments, concat_tmp, abr)
+            normalized, loud = _loudnorm_final(concat_tmp, output, abr, loudness_target)
+        finally:
+            concat_tmp.unlink(missing_ok=True)
+        if not normalized:
             print(f"[loudness] WARN loudnorm failed ({loud['error']}); shipping un-normalized concat", flush=True)
             _concat(segments, output, abr)
+        elif "error" in loud:
+            # the film IS normalized; only the after-the-fact ebur128 check failed -- keep it
+            print(f"[loudness] WARN normalized, unmeasured ({loud['error']}); shipping the "
+                  f"loudnorm'd film (target {loudness_target} LUFS) without a verified reading", flush=True)
         else:
             i, tp = loud.get("I"), loud.get("TP")
             print(f"[loudness] integrated I={i} LUFS  TP={tp} dBTP  (target {loudness_target} LUFS)", flush=True)
@@ -1108,6 +1141,8 @@ def main() -> int:
             raise SystemExit(f"[synth] {abort}")
         manifest = synth(meta, scenes, scene_numbers, audio_dir, args.backend,
                          empty_seconds=args.empty_beat_seconds)
+        if args.scene != "all":
+            manifest = _merge_mock_subset(existing, manifest, all_scenes, scene_numbers)
         manifest_path.write_text(json.dumps(manifest, indent=2, ensure_ascii=False) + "\n", encoding="utf-8")
         print(f"[synth] manifest -> {manifest_path}", flush=True)
 

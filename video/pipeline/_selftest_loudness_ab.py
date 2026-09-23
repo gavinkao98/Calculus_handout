@@ -40,6 +40,20 @@ def test_parse_loudnorm_json_missing():
     assert LA._parse_loudnorm_json('{"unrelated": 1}') == {}   # no input_i -> {}
 
 
+def test_loudnorm_2pass_in_non_ascii_dir():
+    # A-05 (code review 2026-09-23): pass 1 read ffmpeg's stderr with the locale codec (cp950);
+    # the UTF-8 input path in it blanked stderr, so every target under a Chinese folder errored.
+    import math
+    import struct
+    from pipeline.audio import write_pcm_wav
+    with tempfile.TemporaryDirectory() as d:
+        src = Path(d) / "旁白測試" / "tone.wav"
+        write_pcm_wav(src, b"".join(struct.pack("<h", int(8000 * math.sin(2 * math.pi * 440 * i / 24000)))
+                                    for i in range(24000 * 4)))
+        out = LA.loudnorm_2pass(src, src.with_name("tone_-19.wav"), -19.0)
+        assert "I" in out and abs(out["I"] + 19.0) <= 1.0, out
+
+
 def test_row_html_escapes():
     # a target's row must escape any text it renders
     row = LA._version_html("t<1>", {"I": -19.0, "TP": -1.6}, "sample<x>.wav")

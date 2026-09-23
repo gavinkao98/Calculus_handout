@@ -9,9 +9,10 @@ video is narration-first: only the brand scenes carry a cue --
     divider -> soft one-shot stinger (candidate_b_divider_stinger.wav)
 
 -- and every teaching template (definition_math / theorem_proof / derivation /
-graph / value_table / sign_chart / callout / recap_cards) stays dry. The caution
-ping is available in the set but OFF by default (DESIGN.md: enable per-deck only
-for a real notation trap; §3.1 uses no ping).
+graph / value_table / sign_chart / callout / recap_cards) stays dry. There is no
+caution ping: every ``*_caution_ping.wav`` was deleted 2026-07-07 with the losing
+candidate sets (``assets/audio/house/README.md``), and compose has no path that
+mixes a cue under narration (see ``cue_for_scene``).
 
 Cues are the repo's own procedural WAVs (``assets/audio/house/``, no third-party
 samples). They are 48 kHz stereo -- the compose output format -- so compose mixes
@@ -51,9 +52,12 @@ def cue_for_scene(scene: dict) -> CueSpec | None:
     """Return the house cue for a scene, or None for a dry (narration-first) scene.
 
     Only brand scenes carry a cue: intro bed, outro bed, divider stinger. Every
-    teaching template returns None. The caution ping is off by default -- to
-    enable it for a deck, add a branch here matching ``template == 'callout'`` and
-    ``type == 'caution'`` (compose would then amix the ping under the narration).
+    teaching template returns None. A caution ping for ``callout``/``caution`` is NOT
+    one branch away: its WAV no longer exists, and compose only uses a cue for a
+    scene WITHOUT narration -- a narrated content scene always takes the narration
+    mux (``make._mux_content``), so a branch added here alone would be a silent
+    no-op. Enabling one means regenerating the file AND adding a narration+cue amix
+    path to compose.
     """
     kind = scene.get("kind", "content")
     if kind == "intro":
