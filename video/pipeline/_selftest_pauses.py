@@ -10,9 +10,15 @@ and the player needs no new concept. This test pins:
   (c) schema -- a `pauses[].after` naming no {show} reveal in `say` is an ERROR (a typo'd
       pause would otherwise silently do nothing)
   (d) zero behaviour change -- a scene with no `pauses` key is returned untouched
+  (e) the timing-only transform (code review 2026-09-23 B-02) -- `apply_pauses_timing` gives
+      the beat table apply_pauses gives, reads and writes no file, and `shift_words` moves
+      forced-alignment word times by the same cut the WAV splice makes. rewatch_pack and
+      critic re-read the ON-DISK manifest and apply this, so they time the film make.py
+      rendered rather than one `seconds` early after every hold.
 
 Manim-free: operates on plain dicts + WAV files.
 """
+import copy
 import json
 import tempfile
 from pathlib import Path
@@ -130,6 +136,59 @@ def test_wav_grows_by_exactly_the_pause_and_keeps_both_sides():
 def test_original_wav_is_not_modified():
     entry, tmp = _apply([{"after": "step.0", "seconds": 1.5}])
     assert abs(audio.wav_duration(tmp / "scene.wav") - 9.0) < 1e-6
+
+
+# -- (e) the timing-only transform the review tools re-apply ------------------
+
+def _disk(per_beat=(2.0, 3.0, 4.0)):
+    tmp = Path(tempfile.mkdtemp())
+    wav = tmp / "scene.wav"
+    _tone_wav(wav, list(per_beat))
+    return {"deck_id": "d", "scenes": [_entry(wav, list(per_beat))]}, tmp
+
+
+def test_timing_only_transform_gives_apply_pauses_beat_table_and_writes_nothing():
+    field = [{"after": "step.0", "seconds": 1.0}, {"after": "step.1", "seconds": 0.5}]
+    disk, tmp = _disk()
+    before = sorted(tmp.rglob("*"))
+    timed = pauses.apply_pauses_timing([_scene(field)], disk)
+    assert sorted(tmp.rglob("*")) == before, "the timing transform must not touch a file"
+    assert disk["scenes"][0]["beats"][2]["start_seconds"] == 5.0, "the input stays the disk copy"
+    full = pauses.apply_pauses([_scene(field)], copy.deepcopy(disk), tmp / "paused")
+    t_entry, f_entry = timed["scenes"][0], full["scenes"][0]
+    assert t_entry["audio_seconds"] == f_entry["audio_seconds"] == 10.5
+    for key in ("start_seconds", "end_seconds", "audio_seconds"):
+        assert [b[key] for b in t_entry["beats"]] == [b[key] for b in f_entry["beats"]], key
+    assert t_entry["audio_file"] == str(tmp / "scene.wav"), "no WAV -> the audio file is not swapped"
+
+
+def test_timing_only_transform_without_pauses_is_the_same_object():
+    disk, _ = _disk()
+    assert pauses.apply_pauses_timing([_scene(None)], disk) is disk
+    assert pauses.apply_pauses_timing([_scene([])], disk) is disk
+
+
+def test_fa_words_move_by_the_same_cut_the_wav_splice_makes():
+    field = [{"after": "step.0", "seconds": 1.5}]            # beat 2 starts at 2.0
+    disk, tmp = _disk()
+    words = [{"word": "one", "start": 0.2, "end": 2.0},        # ends exactly at the cut: stays
+             {"word": "two", "start": 2.0, "end": 4.8},        # starts at the cut: moves
+             {"word": "three", "start": 5.1, "end": 8.9}]      # beat 3: moves
+    timed = pauses.apply_pauses_timing([_scene(field)], disk)
+    moved = pauses.shift_words(words, timed["scenes"][0]["pause_splices"])
+    assert [(w["word"], w["start"], w["end"]) for w in moved] == [
+        ("one", 0.2, 2.0), ("two", 3.5, 6.3), ("three", 6.6, 10.4)], moved
+    assert words[1]["start"] == 2.0, "the caller's word list is not modified"
+    # and each moved word still sits on its own speech in the spliced WAV
+    full = pauses.apply_pauses([_scene(field)], copy.deepcopy(disk), tmp / "paused")
+    pcm, _sr, _ch, _sw = audio.read_wav_pcm(Path(full["scenes"][0]["audio_file"]))
+
+    def val(at_seconds):
+        i = int(at_seconds * _SR) * 2
+        return int.from_bytes(pcm[i:i + 2], "little", signed=True)
+
+    assert [val((w["start"] + w["end"]) / 2) for w in moved] == [1000, 2000, 3000]
+    assert pauses.shift_words(words, None) is words and pauses.shift_words(None, [(2.0, 1.5)]) is None
 
 
 # -- pause naming a reveal this scene never makes ----------------------------

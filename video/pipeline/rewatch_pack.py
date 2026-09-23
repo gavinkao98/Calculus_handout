@@ -19,7 +19,8 @@ It is also the HARD gate on the 12 s still line, so exit code carries a verdict:
        scene is over the line -- `--gate-still` moves the line, nothing turns it off
     2  `--baseline` points at a pack rendered at another fps / frame size, or this render's
        own scenes disagree; or a `--scene` subset has no `--out` of its own, or its `--out`
-       already holds a full (non-subset) pack; nothing is written to --out
+       already holds a full (non-subset) pack; or the audio manifest's `deck_id` is another
+       deck's; nothing is written to --out
 The 12 s line was already met in round 13 and stayed met through round 21, yet it and
 `[sync]` were both warn-only, which is how eight `[sync]` warnings lived from round 13 to
 round 20: a gate that cannot stop anything is not a gate (KICKOFF-process-reform §2.3, G1).
@@ -28,9 +29,11 @@ This is the 12 s threshold of the three: make.py `[stillness]` is the 6 s author
 and REWATCH R4 is the subjective one (DESIGN.md).
 
 Reads (all local, no API): storyboards/<deck>.yml (+ the base canonical deck for the
-written-math form of each beat), the audio manifest (audio_mimo/ or audio/) for beat
-timings + forced-alignment word timings, and output/_av/<deck>/<scene>.mp4 -- the per-scene
-A/V files compose concatenated, so their durations give exact global scene starts.
+written-math form of each beat), the deck's audio manifest (audio_mimo/ for an `_mimo` deck,
+else audio/ -- never the other one) for beat timings + forced-alignment word timings, with
+the storyboard's `pauses:` folded in as make.py rendered them, and
+output/_av/<deck>/<scene>.mp4 -- the per-scene A/V files compose concatenated, so their
+durations give exact global scene starts.
 
 Writes output/ch<NN>/s<X.Y>/rewatch_pack/ (gitignored, regenerable):
     INDEX.md            viewer-facing table of all scenes (times, reveals, motion) + how to read
@@ -50,12 +53,14 @@ from __future__ import annotations
 import argparse
 import json
 import re
+import shutil
 import subprocess
 import sys
 from pathlib import Path
 
 sys.path.insert(0, str(Path(__file__).resolve().parents[1]))
 from pipeline import _bootstrap  # noqa: E402
+from pipeline import pauses  # noqa: E402
 from pipeline.timing import SCENE_LEAD_SECONDS  # noqa: E402
 
 _bootstrap.bootstrap()
@@ -438,12 +443,16 @@ def out_pack_source(out: "Path | None") -> "dict | None":
 
 # ---- main ------------------------------------------------------------------------------
 
-def load_manifest(section_dir: Path) -> tuple[dict, Path]:
-    for sub in ("audio_mimo", "audio"):
-        p = section_dir / sub / "manifest.json"
-        if p.exists():
-            return json.loads(p.read_text(encoding="utf-8")), section_dir / sub
-    raise SystemExit(f"[rewatch_pack] no manifest under {section_dir}/audio_mimo or audio/")
+def load_manifest(section_dir: Path, deck: str) -> tuple[dict, Path]:
+    """The deck's OWN audio manifest: audio_mimo/ for an `_mimo` deck, audio/ otherwise --
+    the rule make.py and critic.py pick by. Never the other subdir: a section's canonical
+    and `_mimo` decks share its output dir, so falling back to whichever manifest exists
+    timed a mock render against the real-voice beats (code review 2026-09-23, B-03)."""
+    sub = "audio_mimo" if deck.endswith("_mimo") else "audio"
+    p = section_dir / sub / "manifest.json"
+    if not p.exists():
+        raise SystemExit(f"[rewatch_pack] no manifest at {p} (deck {deck} reads {sub}/ only)")
+    return json.loads(p.read_text(encoding="utf-8")), section_dir / sub
 
 
 def canonical_beats(base_scene: "dict | None") -> list[str]:
@@ -483,7 +492,15 @@ def main() -> int:
     base_by_id = {s["id"]: s for s in (base or {}).get("scenes", [])}
 
     section_dir = _bootstrap.section_output_dir(meta)
-    manifest, audio_dir = load_manifest(section_dir)
+    manifest, audio_dir = load_manifest(section_dir, args.deck)
+    if manifest.get("deck_id") not in (None, args.deck):
+        print(f"[rewatch_pack] REFUSE: {audio_dir / 'manifest.json'} is deck "
+              f"{manifest['deck_id']!r}'s, not {args.deck!r} -- re-synthesise or re-render "
+              f"this deck before packing it", flush=True)
+        return 2
+    # make.py rendered from this manifest with the storyboard's `pauses:` folded in (in
+    # memory only); fold the same holds in here or every beat after one is timed early
+    manifest = pauses.apply_pauses_timing(sb["scenes"], manifest)
     by_id = {e["scene_id"]: e for e in manifest["scenes"]}
     av_dir = REPO / "video" / "output" / "_av" / args.deck
     out = args.out or (section_dir / "rewatch_pack")
@@ -543,7 +560,8 @@ def main() -> int:
         entry = by_id.get(sid, {})
         mode = entry.get("narration_mode", "silent")
         beats = [b for b in entry.get("beats", []) if "start_seconds" in b] if mode in ("beats", "scene_aligned") else []
-        words = load_words(entry, audio_dir) if mode == "scene_aligned" else None
+        words = (pauses.shift_words(load_words(entry, audio_dir), entry.get("pause_splices"))
+                 if mode == "scene_aligned" else None)
         dur, g0 = durs[sid], starts[sid]
         av = av_dir / f"{sid}.mp4"
         stem = f"{n:02d}_{sid}"
@@ -551,16 +569,19 @@ def main() -> int:
         reveal_times = [SCENE_LEAD_SECONDS + b["start_seconds"] for b in beats if b.get("reveal")]
         print(f"[rewatch_pack] {stem}  {fmt(g0)}–{fmt(_goff(g0, dur))}  ({dur:.1f}s, {mode}, {len(beats)} beats)", flush=True)
 
-        # frames
+        # frames -- always this render's: a frame's name is only (k, sample time), so a
+        # re-render with unchanged timing packed into the same dir would otherwise keep the
+        # last render's pictures (and frames of other sample times would linger beside them)
         fdir = out / stem
-        fdir.mkdir(exist_ok=True)
+        if fdir.exists():
+            shutil.rmtree(fdir)
+        fdir.mkdir()
         samples = sample_times(dur, beats)
         frames: list[tuple[Path, str]] = []
         sample_rows = []
         for k, (tv, why) in enumerate(samples, 1):
             dst = fdir / f"f_{k:02d}_+{tv:05.1f}s.jpg"
-            if not dst.exists():
-                extract_frame(av, tv, dst)
+            extract_frame(av, tv, dst)
             snippet, bi = words_at(tv, beats, words)
             gt = _goff(g0, tv)
             label = f"#{k:02d}  +{tv:5.1f}s  ({fmt(gt)})  {why}  │  {snippet}"

@@ -66,6 +66,7 @@ _bootstrap.bootstrap()
 import numpy as np  # noqa: E402
 import yaml  # noqa: E402
 
+from pipeline import pauses  # noqa: E402
 from pipeline.timing import SCENE_LEAD_SECONDS  # noqa: E402
 from pipeline.sizecheck import graph_label_geometry  # noqa: E402
 from pipeline.texlock import tex_lock  # noqa: E402
@@ -76,7 +77,7 @@ BEAT_BACKOFF = 0.20     # grab this far before a beat boundary: reveal has settl
 
 # per == "scene" fullest-frame pick (backlog #10): decode the whole scene video at
 # this fps in 192x108 gray, same recipe as rewatch_pack.motion_stats, to find which
-# frame has the most "ink" -- for a scene with `exit:` that is NOT the last frame
+# settled frame has the most "ink" -- for a scene with `exit:` that is NOT the last frame
 # (the picture has been cleared by then), so grabbing the end (the old behaviour)
 # extracted a blank frame and gate 1 audited nothing (scenes 06, 23, 2026-09-14).
 INK_FPS = 4
@@ -157,14 +158,33 @@ def _ffprobe_duration(video: Path) -> float | None:
         return None
 
 
-def _fullest_frame_ts(video: Path) -> "tuple[float, float | None] | None":
-    """(ts_seconds, ink_ratio_vs_last) of the frame with the most "ink" in the whole
-    scene video, or None if it can't be decoded (caller falls back to the old
-    end-of-scene pick). Ties go to the LATEST frame; and if the last frame's ink is
-    within 1% of the true peak, the last frame wins anyway regardless of the tie
-    scan -- so a purely-additive scene (nothing ever leaves the screen) still picks
-    the same frame this always picked, and only a scene that clears itself (an
-    `exit:`) moves off the end.
+def _ffprobe_fps(video: Path) -> float | None:
+    """The video stream's frame rate (`r_frame_rate`, e.g. "30/1"), or None."""
+    try:
+        out = subprocess.run(
+            ["ffprobe", "-v", "error", "-select_streams", "v:0", "-show_entries",
+             "stream=r_frame_rate", "-of", "default=noprint_wrappers=1:nokey=1", str(video)],
+            capture_output=True, text=True,
+        )
+        num, _, den = out.stdout.strip().partition("/")
+        return float(num) / float(den or 1) if out.returncode == 0 else None
+    except Exception:  # noqa: BLE001
+        return None
+
+
+def _fullest_frame_ts(video: Path, settled: list[float],
+                      end: float) -> "tuple[float, float | None] | None":
+    """(ts_seconds, ink_ratio_vs_last) of the SETTLED frame with the most "ink", or None
+    if the video can't be decoded (caller falls back to the end-of-scene pick).
+
+    Only settled moments are candidates: `settled` (each beat's end, where its reveal and
+    any `focus.indicate` are done and the next beat has not begun -- see `_settled_ts`)
+    plus `end`, the last frame. An argmax over EVERY frame picked the middle of an
+    indicate flash (block scaled 1.15x = +32 % ink) even in a purely additive scene
+    (code review 2026-09-23, C-02). Ties go to the LATEST candidate; and if the last
+    frame's ink is within 1% of the best, the last frame wins anyway -- so a purely
+    additive scene still picks its end, and only a scene that clears itself (an `exit:`)
+    moves off it.
 
     ink = fraction of pixels that differ from the scene's background gray level by
     more than INK_DIFF_THRESHOLD. The background level is not hard-coded (the deck
@@ -186,18 +206,27 @@ def _fullest_frame_ts(video: Path) -> "tuple[float, float | None] | None":
     frames = np.frombuffer(raw[: n * 192 * 108], dtype=np.uint8).reshape(n, 108, 192)
     bg = int(np.bincount(frames.reshape(-1)).argmax())
     ink = (np.abs(frames.astype(np.int16) - bg) > INK_DIFF_THRESHOLD).mean(axis=(1, 2))
-    best_idx, best_val = 0, -1.0
-    for i, v in enumerate(ink):          # tie -> latest: >= keeps overwriting on ties
+    pool = [(t, float(ink[min(max(int(round(t * INK_FPS)), 0), n - 1)]))
+            for t in sorted(settled) if t < end]
+    pool.append((end, float(ink[-1])))   # the last decoded sample is the end composition
+    best_ts, best_val = pool[0]
+    for t, v in pool:                    # tie -> latest: >= keeps overwriting on ties
         if v >= best_val:
-            best_idx, best_val = i, float(v)
-    last_val = float(ink[-1])
+            best_ts, best_val = t, v
+    last_val = pool[-1][1]
     if last_val >= 0.99 * best_val:      # purely additive: keep the end-of-scene pick
-        best_idx = n - 1
+        best_ts = end
     ratio = round(best_val / last_val, 2) if last_val > 0 else None
-    return best_idx / INK_FPS, ratio
+    return best_ts, ratio
 
 
 # ---- frame plan ---------------------------------------------------------
+
+def _settled_ts(beat: dict) -> float:
+    """Video time at which a beat's composition has settled: BEAT_BACKOFF before its end,
+    after its reveal (and any indicate) and before the next beat's reveal begins."""
+    return max(LEAD_SECONDS + float(beat["end_seconds"]) - BEAT_BACKOFF, 0.05)
+
 
 def cumulative_reveals(beats: list[dict], upto: int) -> list[str]:
     """Reveal targets that should be on screen by the end of beat `upto`
@@ -254,9 +283,9 @@ def plan_frames(storyboard: dict, manifest: dict, selector: str, per: str = "sce
             if per == "scene":
                 item = {**common, "beat_index": 0, "final": True,
                         # sentinel: extract_frames() resolves this to the fullest-ink ts
-                        # (or, under --dry-run / a missing mp4, clamps it to duration -
-                        # 0.05 -- the last held frame, the old behaviour).
-                        "ts": 1e9,
+                        # among the settled moments below + the last frame (or, if that
+                        # decode fails, clamps it to the last frame).
+                        "ts": 1e9, "settled": [_settled_ts(b) for b in beats],
                         "fullest_ts": None, "ink_ratio_vs_last": None,
                         "narration": entry.get("script", ""), "reveal": None,
                         "revealed_so_far": cumulative_reveals(beats, len(beats) - 1)}
@@ -273,7 +302,7 @@ def plan_frames(storyboard: dict, manifest: dict, selector: str, per: str = "sce
             else:
                 for i, beat in enumerate(beats):
                     plan.append({**common, "beat_index": beat["index"], "final": False,
-                                 "ts": max(LEAD_SECONDS + float(beat["end_seconds"]) - BEAT_BACKOFF, 0.05),
+                                 "ts": _settled_ts(beat),
                                  "narration": beat.get("text", ""), "reveal": beat.get("reveal"),
                                  "revealed_so_far": cumulative_reveals(beats, i)})
     return plan
@@ -291,18 +320,17 @@ def reset_frames_dir(out_dir: Path) -> None:
         shutil.rmtree(frames_dir)
 
 
-def extract_frames(deck_id: str, plan: list[dict], out_dir: Path, *,
-                   compute_fullest: bool = True) -> list[dict]:
+def extract_frames(deck_id: str, plan: list[dict], out_dir: Path) -> list[dict]:
     """ffmpeg-grab one PNG per planned frame. Offline, free. Returns the plan
     with `frame_path` filled (or None on miss).
 
-    compute_fullest: for a `final` (per=="scene") item, decode the whole scene
-    video once to find the fullest-ink frame (see `_fullest_frame_ts`) before
-    grabbing it -- this is the one part of extraction that is NOT cheap (it reads
-    every frame, not just one), so --dry-run passes False to stay free and to keep
-    working with no mp4 rendered yet; the item's `ts` sentinel then falls through
-    to the existing duration-0.05 clamp below (the old end-of-scene behaviour)."""
-    durations: dict[str, float | None] = {}
+    A `final` (per=="scene") item first decodes the whole scene video once to find
+    the fullest-ink frame (see `_fullest_frame_ts`). That is local work and no API
+    call, so `--dry-run` -- gate 1's documented invocation -- does it too: skipping it
+    there handed gate 1 the cleared end frame of every `exit:` scene (code review
+    2026-09-23, C-01). If the decode fails, the item's `ts` sentinel falls through to
+    the end-of-scene clamp below."""
+    probes: dict[str, tuple[float | None, float | None]] = {}
     for item in plan:
         sid = item["scene_id"]
         video = find_scene_video(deck_id, sid)
@@ -310,15 +338,18 @@ def extract_frames(deck_id: str, plan: list[dict], out_dir: Path, *,
             print(f"[critic] no rendered mp4 for scene '{sid}' -- skipping", flush=True)
             item["frame_path"] = None
             continue
-        if sid not in durations:
-            durations[sid] = _ffprobe_duration(video)
-        dur = durations[sid]
-        if item.get("final") and compute_fullest:
-            found = _fullest_frame_ts(video)
+        if sid not in probes:
+            probes[sid] = (_ffprobe_duration(video), _ffprobe_fps(video))
+        dur, fps = probes[sid]
+        # the last frame starts one frame interval before the end: aim half a frame
+        # before it, so `-ss` lands on it at any fps (`dur - 0.05` fell past it < 20 fps)
+        end = None if dur is None or not fps else dur - 1.5 / fps
+        if item.get("final") and end is not None:
+            found = _fullest_frame_ts(video, item.get("settled", []), end)
             if found is not None:
                 item["ts"], item["ink_ratio_vs_last"] = found
                 item["fullest_ts"] = item["ts"]
-        ts = item["ts"] if dur is None else min(item["ts"], dur - 0.05)
+        ts = item["ts"] if end is None else min(item["ts"], end)
         frame_dir = out_dir / "frames" / f"{item['scene_number']:02d}_{sid}"
         frame_dir.mkdir(parents=True, exist_ok=True)
         name = "final.png" if item.get("final") else f"beat_{item['beat_index']:02d}.png"
@@ -519,6 +550,9 @@ def _write_md(results: list[dict], path: Path) -> None:
         lab = "final frame" if r.get("final") else f"beat {r['beat_index']:02d}"
         out.append(f"## {r['scene_number']:02d} {r['scene_id']} -- {lab}")
         out.append(f"*{r['title']}*  \n`{r['frame_path']}`\n")
+        if r.get("error"):           # the call itself failed: say why, not "bad JSON"
+            out.append(f"> call failed, no critique: {r['error']}\n")
+            continue
         c = r.get("critique")
         if not c:
             out.append("> could not parse JSON; raw model output:\n")
@@ -624,7 +658,10 @@ def dry_run(plan: list[dict], rubric: str) -> None:
     for p in plan:
         tag = p.get("frame_path") or "(no frame)"
         lab = "final" if p.get("final") else f"beat {p['beat_index']:02d}"
-        ts = "end" if p.get("final") else f"{p['ts']:.2f}s"
+        if p.get("final"):
+            ts = "end" if p.get("fullest_ts") is None else f"{p['fullest_ts']:.2f}s (fullest)"
+        else:
+            ts = f"{p['ts']:.2f}s"
         print(f"  {p['scene_number']:02d} {p['scene_id']} {lab} @ {ts} -> {tag}", flush=True)
     if have:
         print("\n  --- example prompt (first extracted frame) ---", flush=True)
@@ -671,7 +708,9 @@ def main() -> int:
     storyboard = load_storyboard(args.storyboard)
     meta = storyboard["meta"]
     deck_id = meta["id"]
-    manifest = load_manifest(deck_id, meta)
+    # make.py rendered from this manifest with the storyboard's `pauses:` folded in (in
+    # memory only); fold the same holds in here or every grab after one is early
+    manifest = pauses.apply_pauses_timing(storyboard["scenes"], load_manifest(deck_id, meta))
 
     sec_dir = _bootstrap.section_output_dir(meta)
     critic_subdir = "critic_mimo" if deck_id.endswith("_mimo") else "critic"
@@ -684,7 +723,7 @@ def main() -> int:
     print(f"[critic] output dir: {out_dir}", flush=True)
     rubric = load_rubric()
     reset_frames_dir(out_dir)
-    plan = extract_frames(deck_id, plan, out_dir, compute_fullest=not args.dry_run)
+    plan = extract_frames(deck_id, plan, out_dir)
     (out_dir / "frame_plan.json").write_text(
         json.dumps(plan, indent=2, ensure_ascii=False) + "\n", encoding="utf-8")
 
@@ -697,13 +736,25 @@ def main() -> int:
         res = run_critique(plan, base_url=args.base_url, api_key=api_key,
                            model=args.model, out_dir=out_dir, rubric=rubric,
                            smoke=args.smoke)
-        return 0 if res else 1
-    if args.dry_run:
+        if not res:
+            return 1
+        failed = [r for r in res if r.get("error")]
+        if failed:           # recorded and skipped so the batch goes on -- not a pass
+            print(f"[critic] {len(failed)}/{len(res)} VLM call(s) failed -- exit 1", flush=True)
+            return 1
+    elif args.dry_run:
         dry_run(plan, rubric)
     else:
         print("[critic] frames extracted. Re-run with --dry-run for the send plan + "
               "estimate, or --confirm to run the billed critique (env MIMO_API_KEY).",
               flush=True)
+    # a gate that audits fewer frames than it planned must not pass as if it had audited them
+    missed = [p for p in plan if not p.get("frame_path")]
+    if missed:
+        print(f"[critic] {len(missed)}/{len(plan)} planned frame(s) not extracted: "
+              + ", ".join(f"{p['scene_id']} beat {p['beat_index']:02d}" for p in missed)
+              + " -- exit 1", flush=True)
+        return 1
     return 0
 
 

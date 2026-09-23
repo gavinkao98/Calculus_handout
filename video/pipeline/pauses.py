@@ -14,7 +14,9 @@ transformed manifest, so nothing can drift out of step; `scene.py` needs no new 
 
 The ON-DISK manifest is never rewritten: it is the TTS record of what was actually
 synthesized, and the reuse/freshness contract hashes off it. This transform is applied to
-the in-memory copy make.py renders and composes from.
+the in-memory copy make.py renders and composes from. So anything that re-reads the on-disk
+manifest to time the rendered film -- rewatch_pack, critic -- must fold the same holds in
+first: `apply_pauses_timing` is the timing half of `apply_pauses` (same code), without the WAV.
 
 The narration text is untouched, so a pause costs no TTS call.
 """
@@ -57,9 +59,11 @@ def _splice_silence(src: Path, dst: Path, at_seconds: list[tuple[float, float]])
                         sample_width=width)
 
 
-def _apply_to_entry(entry: dict[str, Any], holds: list[tuple[str, float]],
-                    out_dir: Path) -> dict[str, Any]:
-    """One scene's manifest entry, with the holds folded into its beats + scene WAV."""
+def _fold_timing(entry: dict[str, Any], holds: list[tuple[str, float]]) -> list[tuple[float, float]]:
+    """Fold the holds into one entry's beat table, in place: the paused beat grows, every
+    later beat shifts, the scene total grows. Returns the splices -- `(offset_seconds,
+    hold_seconds)` on the ORIGINAL audio timeline -- where the scene WAV takes its silence.
+    Arithmetic only: no file is read or written."""
     beats = entry.get("beats") or []
     by_reveal = {b.get("reveal"): i for i, b in enumerate(beats) if b.get("reveal")}
     splices: list[tuple[float, float]] = []
@@ -81,29 +85,68 @@ def _apply_to_entry(entry: dict[str, Any], holds: list[tuple[str, float]],
         beat["audio_seconds"] = round(float(beat["audio_seconds"]) + grow.get(i, 0.0), 3)
         beat["end_seconds"] = round(float(beat["end_seconds"]) + shift, 3)
     entry["audio_seconds"] = round(float(entry["audio_seconds"]) + shift, 3)
-
-    src = Path(entry["audio_file"])
-    dst = out_dir / src.name
-    _splice_silence(src, dst, splices)
-    entry["audio_file"] = str(dst.resolve())
-    return entry
+    return splices
 
 
-def apply_pauses(scenes: list[dict[str, Any]], manifest: dict[str, Any],
-                 out_dir: Path) -> dict[str, Any]:
-    """A copy of *manifest* with every scene's `pauses:` folded in. Returns the manifest
-    unchanged (same object) when no selected scene declares any."""
+def apply_pauses_timing(scenes: list[dict[str, Any]], manifest: dict[str, Any]) -> dict[str, Any]:
+    """A copy of *manifest* with every scene's `pauses:` folded into its TIMING only -- beat
+    start/end/audio_seconds and the scene's audio_seconds -- reading and writing no file.
+    Returns the manifest unchanged (same object) when no selected scene declares any.
+
+    This is the clock make.py renders by (apply_pauses is exactly this plus the WAV
+    splice), and what a tool that re-reads the ON-DISK manifest -- rewatch_pack, critic --
+    must apply before timing anything against the rendered video; without it every beat
+    after a hold reads `seconds` early (code review 2026-09-23, B-02). Each paused entry
+    carries `pause_splices` (see `_fold_timing`), so forced-alignment word times, which live
+    in their own file, can be moved onto the same clock with `shift_words`."""
     holds_by_scene = {s["id"]: scene_pauses(s) for s in scenes if scene_pauses(s)}
     if not holds_by_scene:
         return manifest
 
     out = copy.deepcopy(manifest)
-    out_dir.mkdir(parents=True, exist_ok=True)
     for entry in out.get("scenes", []):
         holds = holds_by_scene.get(entry.get("scene_id"))
         if not holds or entry.get("narration_mode") not in ("beats", "scene_aligned"):
             continue
-        _apply_to_entry(entry, holds, out_dir)
+        entry["pause_splices"] = _fold_timing(entry, holds)
+    return out
+
+
+def shift_words(words: "list[dict[str, Any]] | None",
+                splices: "list[tuple[float, float]] | None") -> "list[dict[str, Any]] | None":
+    """Forced-alignment words `[{word, start, end}]` moved onto the paused clock by the same
+    cut `_splice_silence` makes: audio from an offset on moves later by that hold, audio
+    before it stays -- so a word STARTING at the cut moves, one ENDING there does not."""
+    if not words or not splices:
+        return words
+
+    def moved(t: float, *, ends: bool) -> float:
+        return round(t + sum(h for off, h in splices if (t > off if ends else t >= off)), 3)
+
+    return [{**w, "start": moved(float(w["start"]), ends=False),
+             "end": moved(float(w["end"]), ends=True)} for w in words]
+
+
+def apply_pauses(scenes: list[dict[str, Any]], manifest: dict[str, Any],
+                 out_dir: Path) -> dict[str, Any]:
+    """A copy of *manifest* with every scene's `pauses:` folded in: `apply_pauses_timing`'s
+    beat table plus each paused scene's WAV with the silence spliced in. Returns the
+    manifest unchanged (same object) when no selected scene declares any."""
+    out = apply_pauses_timing(scenes, manifest)
+    if out is manifest:
+        return manifest
+
+    holds_by_scene = {s["id"]: scene_pauses(s) for s in scenes}
+    out_dir.mkdir(parents=True, exist_ok=True)
+    for entry in out.get("scenes", []):
+        splices = entry.pop("pause_splices", None)
+        if splices is None:
+            continue
+        src = Path(entry["audio_file"])
+        dst = out_dir / src.name
+        _splice_silence(src, dst, splices)
+        entry["audio_file"] = str(dst.resolve())
+        holds = holds_by_scene[entry["scene_id"]]
         total = sum(s for _a, s in holds)
         print(f"[pauses] {entry['scene_id']}: +{total:.2f}s hold "
               f"({', '.join(f'{a}+{s:g}s' for a, s in holds)})", flush=True)

@@ -21,10 +21,19 @@ real ffmpeg/numpy arithmetic (not a mock of it):
      pick the last frame -- so every deck without an `exit:` sees ZERO change
      from this fix (the 99%-of-peak override).
 
-A third test pins the `--dry-run` contract: `extract_frames(..., compute_fullest=
-False)` must never call `_fullest_frame_ts` at all, so `--dry-run` stays free
-(no full-clip decode) and keeps working before a render exists.
+The `--dry-run` contract (code review 2026-09-23 C-01). r1 Task C made `--dry-run`
+skip the fullest-frame decode to "stay free", but `--dry-run` IS gate 1's documented
+invocation (REVIEW_GATES layer 7, the visual-frame-audit agent, VISUAL-FRAME-RUBRIC),
+so gate 1 went on reading the cleared end frame of every `exit:` scene. The decode is
+local and costs no API call -- which is all "dry" promises -- so `--dry-run` now picks
+the fullest frame too (the old "dry-run never decodes" test is replaced). Two more
+failures on the same path: the end clamp `dur - 0.05` fell past the last frame's
+timestamp below 20 fps (480p15 `--quality low` got no frame at all) -- it is now half a
+frame before the last one, from the stream's own fps; and a planned frame that cannot
+be extracted used to leave the run at exit 0 -- it now fails the run.
 """
+import json
+import subprocess
 import sys
 import tempfile
 from pathlib import Path
@@ -49,13 +58,44 @@ def _frame(ink_frac: float) -> np.ndarray:
     return f
 
 
-def _encode(frames: np.ndarray, path: Path) -> None:
-    import subprocess
+def _encode(frames: np.ndarray, path: Path, fps: int = critic.INK_FPS) -> None:
     subprocess.run(
         ["ffmpeg", "-v", "error", "-y", "-f", "rawvideo", "-pix_fmt", "gray",
-         "-s", f"{W}x{H}", "-r", str(critic.INK_FPS), "-i", "-",
+         "-s", f"{W}x{H}", "-r", str(fps), "-i", "-",
          "-c:v", "libx264", "-pix_fmt", "yuv420p", str(path)],
         input=frames.tobytes(), check=True, capture_output=True)
+
+
+def _png_ink(png: Path) -> float:
+    raw = subprocess.run(["ffmpeg", "-v", "error", "-i", str(png), "-vf",
+                          f"scale={W}:{H},format=gray", "-f", "rawvideo", "-"],
+                         capture_output=True, check=True).stdout
+    return float((np.frombuffer(raw, dtype=np.uint8) > 127).mean())
+
+
+def _run_main(td: Path, clips: dict, flags: list, beats=((0.0, 1.0),)) -> tuple:
+    """Drive critic.main() over a one-scene-per-clip deck: `clips` maps scene id -> mp4
+    (None = not rendered). Only the manifest and mp4 lookups are stubbed -- plan_frames,
+    extract_frames, ffmpeg and ffprobe all run for real. Returns (rc, plan)."""
+    sb = td / "deckx.yml"
+    sb.write_text("meta: {id: deckx, section: '9.9'}\nscenes:\n" + "".join(
+        f"  - {{id: {sid}, kind: content, template: callout}}\n" for sid in clips),
+        encoding="utf-8")
+    manifest = {"deck_id": "deckx", "scenes": [{
+        "scene_id": sid, "narration_mode": "beats", "script": "x",
+        "beats": [{"index": i, "reveal": f"r{i}", "text": "x", "start_seconds": a,
+                   "end_seconds": b} for i, (a, b) in enumerate(beats, 1)]} for sid in clips]}
+    out = td / "out"
+    out.mkdir()
+    orig = critic.load_manifest, critic.find_scene_video, sys.argv
+    critic.load_manifest = lambda deck_id, meta=None: manifest
+    critic.find_scene_video = lambda deck_id, sid: clips[sid]
+    sys.argv = ["critic.py", "--storyboard", str(sb), "--out", str(out), *flags]
+    try:
+        rc = critic.main()
+    finally:
+        critic.load_manifest, critic.find_scene_video, sys.argv = orig
+    return rc, json.loads((out / "frame_plan.json").read_text(encoding="utf-8"))
 
 
 def test_exit_scene_picks_the_content_frame_not_the_cleared_end():
@@ -65,11 +105,12 @@ def test_exit_scene_picks_the_content_frame_not_the_cleared_end():
     with tempfile.TemporaryDirectory() as td:
         clip = Path(td) / "exit.mp4"
         _encode(frames, clip)
-        found = critic._fullest_frame_ts(clip)
+        # settled beat ends at 0.75 s and 1.75 s; the end is half a frame before 3.0 s
+        found = critic._fullest_frame_ts(clip, [0.75, 1.75], 3.0 - 1.5 / critic.INK_FPS)
     assert found is not None, "could not decode the synthesised clip"
     ts, ratio = found
     assert ts < 2.0, found                      # from the content half, not the cleared tail
-    assert ts == 7 / critic.INK_FPS, found       # 8 tied-max frames -> tie-break picks the latest
+    assert ts == 1.75, found                     # two tied settled frames -> tie-break picks the latest
     assert ratio is None, found                  # cleared end has exactly zero ink: undefined ratio
 
 
@@ -82,39 +123,87 @@ def test_pure_accumulation_still_picks_the_last_frame():
     with tempfile.TemporaryDirectory() as td:
         clip = Path(td) / "accum.mp4"
         _encode(frames, clip)
-        found = critic._fullest_frame_ts(clip)
+        end = 3.0 - 1.5 / critic.INK_FPS
+        found = critic._fullest_frame_ts(clip, [0.75, 1.75], end)
     assert found is not None, "could not decode the synthesised clip"
     ts, ratio = found
-    assert ts == 11 / critic.INK_FPS, found      # last frame, same as the old behaviour
+    assert ts == end, found                      # last frame, same as the old behaviour
     assert ratio == 1.0, found
 
 
-def test_dry_run_skips_the_expensive_decode():
-    """--dry-run must never trigger the full-clip decode -- extract_frames() takes
-    a compute_fullest flag for exactly this, and main() passes `not args.dry_run`."""
-    calls = []
-    orig_fullest = critic._fullest_frame_ts
-    orig_find = critic.find_scene_video
-    critic._fullest_frame_ts = lambda video: (calls.append(video), (0.0, 1.0))[1]
-    try:
-        with tempfile.TemporaryDirectory() as td:
-            clip = Path(td) / "any.mp4"
-            _encode(np.stack([_frame(0.0)] * 8), clip)   # ~2 s, just needs to exist
-            critic.find_scene_video = lambda deck_id, sid: clip
-            item = {"scene_id": "s", "scene_number": 1, "title": "t", "beat_index": 0,
-                    "final": True, "ts": 1e9, "fullest_ts": None, "ink_ratio_vs_last": None,
-                    "narration": "", "reveal": None, "revealed_so_far": []}
-            plan = critic.extract_frames("deck", [dict(item)], Path(td),
-                                         compute_fullest=False)
-    finally:
-        critic._fullest_frame_ts = orig_fullest
-        critic.find_scene_video = orig_find
-    assert calls == [], "compute_fullest=False must not decode the scene video"
-    assert plan[0]["ts"] == 1e9 and plan[0]["fullest_ts"] is None, plan[0]
+def test_dry_run_hands_gate_1_the_fullest_frame_of_an_exit_scene():
+    """`--dry-run` is how gate 1 is run; it must extract what gate 1 is told it reads."""
+    # 30 fps like the 1080p30 render: 2 s of content, then 1 s cleared (an `exit:` tail)
+    frames = np.stack([_frame(0.10)] * 60 + [_frame(0.0)] * 30)
+    with tempfile.TemporaryDirectory(ignore_cleanup_errors=True) as td:
+        td = Path(td)
+        clip = td / "exit.mp4"
+        _encode(frames, clip, fps=30)
+        rc, plan = _run_main(td, {"s1": clip}, ["--dry-run"])
+        ink = _png_ink(Path(plan[0]["frame_path"]))
+    assert rc == 0, rc
+    assert plan[0]["fullest_ts"] is not None and plan[0]["fullest_ts"] < 2.0, plan[0]
+    assert ink > 0.05, f"--dry-run extracted the cleared end frame (ink {ink:.3f})"
+
+
+def test_the_end_frame_is_reachable_at_15_fps():
+    """`--quality low` renders 480p15: one frame lasts 0.067 s, so `dur - 0.05` asked for
+    a moment after the last frame and ffmpeg returned nothing, for every scene."""
+    frames = np.stack([_frame(0.02 * (i // 5 + 1)) for i in range(45)])   # 3 s, ink only grows
+    with tempfile.TemporaryDirectory(ignore_cleanup_errors=True) as td:
+        td = Path(td)
+        clip = td / "low.mp4"
+        _encode(frames, clip, fps=15)
+        rc, plan = _run_main(td, {"s1": clip}, ["--dry-run"])
+        ink = _png_ink(Path(plan[0]["frame_path"])) if plan[0]["frame_path"] else None
+    assert plan[0]["frame_path"], f"no frame extracted at 15 fps: {plan[0]}"
+    assert rc == 0, rc
+    assert abs(ink - 0.18) < 0.01, ink       # the last (fullest) frame, not an earlier one
+
+
+def test_an_indicate_flash_is_never_picked_over_the_settled_frame():
+    """Code review 2026-09-23 C-02. `focus.indicate` scales a block 1.15x (+32 % area) for
+    0.8 s, so mid-flash frames hold more ink than the settled end -- an argmax over EVERY
+    frame picked the flash in a purely additive scene, and gate 1/2 then judged a block
+    enlarged and recoloured over its neighbours. Only settled moments may be picked: each
+    beat's end (reveal and indicate done, next beat not begun) and the last frame."""
+    lead, fps = 1.0, 30
+    # beats a [0,2], b [2,4], c [4,6]; each reveal adds 4 % ink; c is indicated
+    # 5.5-6.3 s into the video (block c at 1.32x); then 1 s tail. Nothing leaves.
+    def ink_at(t):
+        shown = sum(t >= lead + s for s in (0.0, 2.0, 4.0))
+        return 0.04 * shown + (0.04 * 0.32 if 5.5 <= t < 6.3 else 0.0)
+    frames = np.stack([_frame(ink_at(i / fps)) for i in range(int(8.0 * fps))])
+    with tempfile.TemporaryDirectory(ignore_cleanup_errors=True) as td:
+        td = Path(td)
+        clip = td / "flash.mp4"
+        _encode(frames, clip, fps=fps)
+        rc, plan = _run_main(td, {"s1": clip}, ["--dry-run"],
+                             beats=((0.0, 2.0), (2.0, 4.0), (4.0, 6.0)))
+        ink = _png_ink(Path(plan[0]["frame_path"]))
+    ts = plan[0]["fullest_ts"]
+    assert rc == 0, rc
+    assert not 5.5 <= ts < 6.3, f"picked the indicate flash at {ts:.2f} s"
+    assert abs(ink - 0.12) < 0.005, f"extracted frame is not the settled composition (ink {ink:.3f})"
+
+
+def test_a_planned_frame_that_cannot_be_extracted_fails_the_run():
+    with tempfile.TemporaryDirectory(ignore_cleanup_errors=True) as td:
+        td = Path(td)
+        clip = td / "s1.mp4"
+        _encode(np.stack([_frame(0.10)] * 60), clip, fps=30)
+        rc, plan = _run_main(td, {"s1": clip, "s2": None}, ["--dry-run"])
+    assert [bool(p["frame_path"]) for p in plan] == [True, False], plan
+    assert rc != 0, "a gate that silently audits fewer frames than it planned must not pass"
 
 
 if __name__ == "__main__":
-    test_exit_scene_picks_the_content_frame_not_the_cleared_end()
-    test_pure_accumulation_still_picks_the_last_frame()
-    test_dry_run_skips_the_expensive_decode()
-    print("OK critic fullest-frame self-test (backlog #10 / task C)")
+    import traceback
+    fails = 0
+    for name, fn in sorted(globals().items()):
+        if name.startswith("test_") and callable(fn):
+            try:
+                fn(); print(f"PASS {name}")
+            except Exception:
+                fails += 1; print(f"FAIL {name}"); traceback.print_exc()
+    sys.exit(1 if fails else 0)
