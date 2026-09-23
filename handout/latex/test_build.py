@@ -9,9 +9,12 @@
   - **實跑層**（有 latexmk 才跑）：用迷你 .tex 真的跑 latexmk，驗 log 格式與互動模式的假設。
 
   - E-02（`RefCheckTest`）：log 有 undefined reference／multiply defined label 就 FAIL 並列出 key。
+  - E-03（`InteractionTest`＋實跑）：latexmk 以 nonstopmode／halt-on-error 跑、stdin 接 DEVNULL——
+    TeX 錯誤不得停在 `?` 提示等主控台輸入。
 """
 import contextlib
 import io
+import os
 import shutil
 import subprocess
 import sys
@@ -126,6 +129,17 @@ class RefCheckTest(StubBuild):
         self.assertFalse(in_dist)
 
 
+class InteractionTest(StubBuild):
+    """E-03：沒指定 interaction 的 lualatex 是 errorstopmode，錯誤時停在 `?` 等 stdin。"""
+
+    def test_latexmk_runs_non_interactive(self):
+        _, out, _, fake = self.build()
+        args, kw = next((a, k) for a, k in fake.calls if a[0] == "latexmk")
+        self.assertIn("-interaction=nonstopmode", args)
+        self.assertIn("-halt-on-error", args)
+        self.assertIs(kw.get("stdin"), subprocess.DEVNULL, "stdin 不得沿用父程序（主控台）")
+
+
 @unittest.skipUnless(shutil.which("latexmk"), "需要 latexmk（MiKTeX）")
 class RealLatexmkTest(unittest.TestCase):
     """實跑 latexmk：log 格式與 stub 的假設一致（審查員 undef_repro 的測試化）。"""
@@ -155,6 +169,29 @@ class RealLatexmkTest(unittest.TestCase):
         self.assertIn("thm:nope", out.getvalue())
         self.assertNotIn("sec:a", out.getvalue(), "sec:a 第二輪已解析，只該列最後一輪 log 的 key")
         self.assertFalse((self.tmp / "dist" / "x" / "x.pdf").exists())
+
+    def test_tex_error_does_not_wait_on_open_stdin(self):
+        """E-03 實跑：stdin 是一條開著、沒人寫的 pipe（＝在主控台直接跑、沒人按鍵）時，
+        TeX 錯誤要讓 build.py 直接 FAIL 返回，不得卡在錯誤提示。"""
+        self.unit("y", "Hello \\undefinedmacro{} world.")
+        code = ("import sys; from pathlib import Path; sys.path.insert(0, sys.argv[1]); import build; "
+                "build.HERE = Path(sys.argv[2]); build.UNITS = {'y': 'y'}; build.build('y')")
+        log = self.tmp / "child.out"
+        with open(log, "wb") as fout:
+            proc = subprocess.Popen([sys.executable, "-c", code, str(HERE), str(self.tmp)],
+                                    stdin=subprocess.PIPE, stdout=fout, stderr=subprocess.STDOUT,
+                                    env={**os.environ, "PYTHONIOENCODING": "utf-8"})
+            try:
+                rc = proc.wait(timeout=60)
+            except subprocess.TimeoutExpired:
+                proc.kill()
+                rc = None
+            finally:
+                proc.stdin.close()               # 讓殘留的 lualatex 讀到 EOF 自行結束
+        out = log.read_text(encoding="utf-8", errors="replace")
+        self.assertIsNotNone(rc, "60 秒內沒返回：TeX 停在錯誤提示等 stdin")
+        self.assertEqual(rc, 1, out)
+        self.assertIn("Undefined control sequence", out)
 
 
 if __name__ == "__main__":

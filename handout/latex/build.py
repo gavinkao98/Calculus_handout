@@ -35,9 +35,13 @@ def build(ch):
     if not tex.exists():
         sys.exit(f"{ch}: 找不到源 {tex}")
 
+    # nonstopmode＋halt-on-error：不指定時 lualatex 是 errorstopmode，錯誤會停在 `?` 提示等 stdin
+    # （提示寫進被 capture 的 stdout，人看不到）；stdin 接 DEVNULL 是第二道保險。
     r = subprocess.run(
-        ["latexmk", "-lualatex", f"-auxdir=../../build/aux-{ch}", f"{name}.tex"],
-        cwd=srcdir, capture_output=True, text=True, encoding="utf-8", errors="replace")
+        ["latexmk", "-lualatex", "-interaction=nonstopmode", "-halt-on-error",
+         f"-auxdir=../../build/aux-{ch}", f"{name}.tex"],
+        cwd=srcdir, stdin=subprocess.DEVNULL, capture_output=True, text=True, encoding="utf-8",
+        errors="replace")
     log_path = HERE / "build" / f"aux-{ch}" / f"{name}.log"
     log = log_path.read_text(encoding="utf-8", errors="replace") if log_path.exists() else ""
 
