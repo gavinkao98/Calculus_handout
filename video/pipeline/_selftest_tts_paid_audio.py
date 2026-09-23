@@ -419,6 +419,82 @@ def test_budget_abort_never_pays_for_half_a_beats_scene():
         assert code == 0 and backend.stats["calls"] == 3, (code, backend.stats)
 
 
+# ---- A-04: a take the small.en arbiter accepted is reused without paying for a new one ----
+
+class _NamedMock(tts.MockTTSBackend):
+    name = "mimo"      # the prior manifest's identity (a real run's backend.name)
+
+
+def _arbiter_rescued_prior(out: Path, scene):
+    """A scene_aligned entry exactly as the ladder leaves it when base.en failed on this WAV
+    and the small.en arbiter accepted it."""
+    from pipeline import scene_align as SA
+    plan = SA.build_scene_plan(scene)
+    wav = out / "scenes" / "26_recap.wav"
+    write_pcm_wav(wav, silence_pcm(7.0))
+    words, aligned = out / "align" / "26_recap.words.json", out / "align" / "26_recap.aligned.json"
+    words.parent.mkdir(parents=True)
+    words.write_text("{}", encoding="utf-8")
+    aligned.write_text("{}", encoding="utf-8")
+    return wav, {"backend": "mimo", "model": "m", "voice": "Dean", "style": "", "scenes": [{
+        "scene_id": "recap", "scene_number": 26, "narration_mode": "scene_aligned",
+        "scene_text_hash": plan["scene_text_hash"], "audio_file": str(wav), "audio_seconds": 7.0,
+        "alignment": {"words_file": str(words), "aligned_file": str(aligned),
+                      "aligner": {"tool": "stable-ts", "model": "small.en"}},
+        "validation": {"status": "pass"},
+        "fallback_history": [{"rung": "arbiter", "status": "pass",
+                              "reason": "small.en arbiter re-align"}]}]}
+
+
+def test_arbiter_rescued_scene_is_reused_for_free():
+    """scene_reuse_ok (rightly) ignores the aligner, but the reuse re-align then ran base.en --
+    the model that had already failed on this very WAV (stable-ts is deterministic) -- and
+    fell straight through to a BILLED re-synthesis, overwriting the accepted take. With
+    --no-billing such a scene could never be re-mapped at all."""
+    from pipeline import scene_align as SA
+    scene = {"id": "recap", "kind": "content", "template": "recap_cards",
+             "say": "Here is what we found. {show point.0} Sine goes to cosine. "
+                    "{show point.1} Cosine goes to minus sine."}
+    calls = []
+
+    def base_fails_small_passes(wav_path, plan, *, model="base.en", device="cpu", **kw):
+        calls.append((Path(wav_path).name, model))
+        if model == "base.en":
+            raise SA.AlignmentError("stable-ts aborted: > 20% of words failed to align")
+        return _fake_align(wav_path, plan, model=model)
+
+    args = argparse.Namespace(model="m", style="", voice="Dean", aligner_model="base.en",
+                              aligner_device="cpu", skip_qa=True, unit="auto", fallback_budget=2,
+                              empty_beat_seconds=0.4, reuse_existing=True)
+    saved = SA.align_scene
+    SA.align_scene = base_fails_small_passes
+    try:
+        for label, cap in (("uncapped", None), ("--no-billing", 0)):
+            with tempfile.TemporaryDirectory() as d:
+                out = Path(d)
+                wav, prior = _arbiter_rescued_prior(out, scene)
+                inner = _NamedMock(0.4)
+                backend = inner if cap is None else tts.BudgetedBackend(inner, cap)
+                calls.clear()
+                try:
+                    with redirect_stdout(io.StringIO()):
+                        entry = tts._synthesize_scene_aligned(
+                            backend=backend, meta={}, scene=scene, scene_number=26,
+                            output_dir=out, args=args, reuse_index={},
+                            scene_reuse_index=tts.build_scene_reuse_index(prior))
+                except SystemExit as exc:
+                    raise AssertionError(f"{label}: aborted -- {str(exc)[:120]}") from None
+                assert inner.stats["calls"] == 0, f"{label}: paid {inner.stats['calls']} for a kept take"
+                assert entry["narration_mode"] == "scene_aligned", (label, entry["narration_mode"])
+                assert entry["validation"]["status"] in ("pass", "pass_with_warnings"), label
+                assert abs(wav_duration(wav) - 7.0) <= TOL, f"{label}: the accepted take was replaced"
+                assert ("26_recap.wav", "small.en") in calls, (label, calls)
+                assert [h["rung"] for h in entry["fallback_history"]] == ["arbiter"], \
+                    (label, entry["fallback_history"])
+    finally:
+        SA.align_scene = saved
+
+
 if __name__ == "__main__":
     test_beat_reuse_swap_keeps_both_takes()
     test_beat_reuse_prepend_keeps_every_take_and_bills_once()
@@ -431,4 +507,5 @@ if __name__ == "__main__":
     test_beats_abort_then_revert_binds_each_beat_to_its_own_take()
     test_no_billing_abort_after_a_moved_beats_scene_retries_free()
     test_budget_abort_never_pays_for_half_a_beats_scene()
+    test_arbiter_rescued_scene_is_reused_for_free()
     print("OK tts paid-audio self-test (code review 2026-09-23 batch T)")

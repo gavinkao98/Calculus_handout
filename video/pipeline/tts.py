@@ -1275,7 +1275,20 @@ def _synthesize_scene_aligned(*, backend, meta, scene, scene_number, output_dir,
         entry = _align_and_gate(plan, scene_wav, scene_number, words_file, aligned_file,
                                 args, audio_file=scene_wav, promote_from=None)
         if entry["validation"]["status"] in ("pass", "pass_with_warnings"):
-            return entry   # else fall through to resynth
+            return entry
+        # Before paying for a new take, give the reused WAV the free rung the ladder would:
+        # the small.en arbiter (code review 2026-09-23, A-04). A scene the arbiter rescued
+        # last run fails base.en again here -- stable-ts is deterministic on the same WAV and
+        # model -- so this used to re-bill an accepted take, and under --no-billing such a
+        # scene could never be re-mapped.
+        if args.aligner_model != "small.en":
+            entry = _align_and_gate(plan, scene_wav, scene_number, words_file, aligned_file,
+                                    args, audio_file=scene_wav, promote_from=None,
+                                    aligner_model="small.en")
+            if entry["validation"]["status"] in ("pass", "pass_with_warnings"):
+                entry["fallback_history"] = [{"rung": "arbiter", "status": "pass",
+                                              "reason": "small.en arbiter re-align of the reused WAV"}]
+                return entry   # else fall through to resynth
     elif moved_from:
         print(f"[tts] {scene_id}: prior scene audio moved onto {scene_wav.name} "
               f"(from {moved_from}) but is not reusable; synthesizing", flush=True)
