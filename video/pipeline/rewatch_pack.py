@@ -19,7 +19,8 @@ It is also the HARD gate on the 12 s still line, so exit code carries a verdict:
        scene is over the line -- `--gate-still` moves the line, nothing turns it off
     2  `--baseline` points at a pack rendered at another fps / frame size, or this render's
        own scenes disagree; or a `--scene` subset has no `--out` of its own, or its `--out`
-       already holds a full (non-subset) pack; nothing is written to --out
+       already holds a full (non-subset) pack; or the audio manifest's `deck_id` is another
+       deck's; nothing is written to --out
 The 12 s line was already met in round 13 and stayed met through round 21, yet it and
 `[sync]` were both warn-only, which is how eight `[sync]` warnings lived from round 13 to
 round 20: a gate that cannot stop anything is not a gate (KICKOFF-process-reform §2.3, G1).
@@ -28,8 +29,8 @@ This is the 12 s threshold of the three: make.py `[stillness]` is the 6 s author
 and REWATCH R4 is the subjective one (DESIGN.md).
 
 Reads (all local, no API): storyboards/<deck>.yml (+ the base canonical deck for the
-written-math form of each beat), the audio manifest (audio_mimo/ or audio/) for beat
-timings + forced-alignment word timings, and output/_av/<deck>/<scene>.mp4 -- the per-scene
+written-math form of each beat), the deck's audio manifest (audio_mimo/ for an `_mimo` deck,
+else audio/ -- never the other one) for beat timings + forced-alignment word timings, and output/_av/<deck>/<scene>.mp4 -- the per-scene
 A/V files compose concatenated, so their durations give exact global scene starts.
 
 Writes output/ch<NN>/s<X.Y>/rewatch_pack/ (gitignored, regenerable):
@@ -438,12 +439,16 @@ def out_pack_source(out: "Path | None") -> "dict | None":
 
 # ---- main ------------------------------------------------------------------------------
 
-def load_manifest(section_dir: Path) -> tuple[dict, Path]:
-    for sub in ("audio_mimo", "audio"):
-        p = section_dir / sub / "manifest.json"
-        if p.exists():
-            return json.loads(p.read_text(encoding="utf-8")), section_dir / sub
-    raise SystemExit(f"[rewatch_pack] no manifest under {section_dir}/audio_mimo or audio/")
+def load_manifest(section_dir: Path, deck: str) -> tuple[dict, Path]:
+    """The deck's OWN audio manifest: audio_mimo/ for an `_mimo` deck, audio/ otherwise --
+    the rule make.py and critic.py pick by. Never the other subdir: a section's canonical
+    and `_mimo` decks share its output dir, so falling back to whichever manifest exists
+    timed a mock render against the real-voice beats (code review 2026-09-23, B-03)."""
+    sub = "audio_mimo" if deck.endswith("_mimo") else "audio"
+    p = section_dir / sub / "manifest.json"
+    if not p.exists():
+        raise SystemExit(f"[rewatch_pack] no manifest at {p} (deck {deck} reads {sub}/ only)")
+    return json.loads(p.read_text(encoding="utf-8")), section_dir / sub
 
 
 def canonical_beats(base_scene: "dict | None") -> list[str]:
@@ -483,7 +488,12 @@ def main() -> int:
     base_by_id = {s["id"]: s for s in (base or {}).get("scenes", [])}
 
     section_dir = _bootstrap.section_output_dir(meta)
-    manifest, audio_dir = load_manifest(section_dir)
+    manifest, audio_dir = load_manifest(section_dir, args.deck)
+    if manifest.get("deck_id") not in (None, args.deck):
+        print(f"[rewatch_pack] REFUSE: {audio_dir / 'manifest.json'} is deck "
+              f"{manifest['deck_id']!r}'s, not {args.deck!r} -- re-synthesise or re-render "
+              f"this deck before packing it", flush=True)
+        return 2
     by_id = {e["scene_id"]: e for e in manifest["scenes"]}
     av_dir = REPO / "video" / "output" / "_av" / args.deck
     out = args.out or (section_dir / "rewatch_pack")
