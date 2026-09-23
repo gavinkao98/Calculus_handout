@@ -105,11 +105,12 @@ def test_exit_scene_picks_the_content_frame_not_the_cleared_end():
     with tempfile.TemporaryDirectory() as td:
         clip = Path(td) / "exit.mp4"
         _encode(frames, clip)
-        found = critic._fullest_frame_ts(clip)
+        # settled beat ends at 0.75 s and 1.75 s; the end is half a frame before 3.0 s
+        found = critic._fullest_frame_ts(clip, [0.75, 1.75], 3.0 - 1.5 / critic.INK_FPS)
     assert found is not None, "could not decode the synthesised clip"
     ts, ratio = found
     assert ts < 2.0, found                      # from the content half, not the cleared tail
-    assert ts == 7 / critic.INK_FPS, found       # 8 tied-max frames -> tie-break picks the latest
+    assert ts == 1.75, found                     # two tied settled frames -> tie-break picks the latest
     assert ratio is None, found                  # cleared end has exactly zero ink: undefined ratio
 
 
@@ -122,10 +123,11 @@ def test_pure_accumulation_still_picks_the_last_frame():
     with tempfile.TemporaryDirectory() as td:
         clip = Path(td) / "accum.mp4"
         _encode(frames, clip)
-        found = critic._fullest_frame_ts(clip)
+        end = 3.0 - 1.5 / critic.INK_FPS
+        found = critic._fullest_frame_ts(clip, [0.75, 1.75], end)
     assert found is not None, "could not decode the synthesised clip"
     ts, ratio = found
-    assert ts == 11 / critic.INK_FPS, found      # last frame, same as the old behaviour
+    assert ts == end, found                      # last frame, same as the old behaviour
     assert ratio == 1.0, found
 
 
@@ -157,6 +159,32 @@ def test_the_end_frame_is_reachable_at_15_fps():
     assert plan[0]["frame_path"], f"no frame extracted at 15 fps: {plan[0]}"
     assert rc == 0, rc
     assert abs(ink - 0.18) < 0.01, ink       # the last (fullest) frame, not an earlier one
+
+
+def test_an_indicate_flash_is_never_picked_over_the_settled_frame():
+    """Code review 2026-09-23 C-02. `focus.indicate` scales a block 1.15x (+32 % area) for
+    0.8 s, so mid-flash frames hold more ink than the settled end -- an argmax over EVERY
+    frame picked the flash in a purely additive scene, and gate 1/2 then judged a block
+    enlarged and recoloured over its neighbours. Only settled moments may be picked: each
+    beat's end (reveal and indicate done, next beat not begun) and the last frame."""
+    lead, fps = 1.0, 30
+    # beats a [0,2], b [2,4], c [4,6]; each reveal adds 4 % ink; c is indicated
+    # 5.5-6.3 s into the video (block c at 1.32x); then 1 s tail. Nothing leaves.
+    def ink_at(t):
+        shown = sum(t >= lead + s for s in (0.0, 2.0, 4.0))
+        return 0.04 * shown + (0.04 * 0.32 if 5.5 <= t < 6.3 else 0.0)
+    frames = np.stack([_frame(ink_at(i / fps)) for i in range(int(8.0 * fps))])
+    with tempfile.TemporaryDirectory(ignore_cleanup_errors=True) as td:
+        td = Path(td)
+        clip = td / "flash.mp4"
+        _encode(frames, clip, fps=fps)
+        rc, plan = _run_main(td, {"s1": clip}, ["--dry-run"],
+                             beats=((0.0, 2.0), (2.0, 4.0), (4.0, 6.0)))
+        ink = _png_ink(Path(plan[0]["frame_path"]))
+    ts = plan[0]["fullest_ts"]
+    assert rc == 0, rc
+    assert not 5.5 <= ts < 6.3, f"picked the indicate flash at {ts:.2f} s"
+    assert abs(ink - 0.12) < 0.005, f"extracted frame is not the settled composition (ink {ink:.3f})"
 
 
 def test_a_planned_frame_that_cannot_be_extracted_fails_the_run():

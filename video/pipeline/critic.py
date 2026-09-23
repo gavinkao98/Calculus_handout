@@ -77,7 +77,7 @@ BEAT_BACKOFF = 0.20     # grab this far before a beat boundary: reveal has settl
 
 # per == "scene" fullest-frame pick (backlog #10): decode the whole scene video at
 # this fps in 192x108 gray, same recipe as rewatch_pack.motion_stats, to find which
-# frame has the most "ink" -- for a scene with `exit:` that is NOT the last frame
+# settled frame has the most "ink" -- for a scene with `exit:` that is NOT the last frame
 # (the picture has been cleared by then), so grabbing the end (the old behaviour)
 # extracted a blank frame and gate 1 audited nothing (scenes 06, 23, 2026-09-14).
 INK_FPS = 4
@@ -172,14 +172,19 @@ def _ffprobe_fps(video: Path) -> float | None:
         return None
 
 
-def _fullest_frame_ts(video: Path) -> "tuple[float, float | None] | None":
-    """(ts_seconds, ink_ratio_vs_last) of the frame with the most "ink" in the whole
-    scene video, or None if it can't be decoded (caller falls back to the old
-    end-of-scene pick). Ties go to the LATEST frame; and if the last frame's ink is
-    within 1% of the true peak, the last frame wins anyway regardless of the tie
-    scan -- so a purely-additive scene (nothing ever leaves the screen) still picks
-    the same frame this always picked, and only a scene that clears itself (an
-    `exit:`) moves off the end.
+def _fullest_frame_ts(video: Path, settled: list[float],
+                      end: float) -> "tuple[float, float | None] | None":
+    """(ts_seconds, ink_ratio_vs_last) of the SETTLED frame with the most "ink", or None
+    if the video can't be decoded (caller falls back to the end-of-scene pick).
+
+    Only settled moments are candidates: `settled` (each beat's end, where its reveal and
+    any `focus.indicate` are done and the next beat has not begun -- see `_settled_ts`)
+    plus `end`, the last frame. An argmax over EVERY frame picked the middle of an
+    indicate flash (block scaled 1.15x = +32 % ink) even in a purely additive scene
+    (code review 2026-09-23, C-02). Ties go to the LATEST candidate; and if the last
+    frame's ink is within 1% of the best, the last frame wins anyway -- so a purely
+    additive scene still picks its end, and only a scene that clears itself (an `exit:`)
+    moves off it.
 
     ink = fraction of pixels that differ from the scene's background gray level by
     more than INK_DIFF_THRESHOLD. The background level is not hard-coded (the deck
@@ -201,18 +206,27 @@ def _fullest_frame_ts(video: Path) -> "tuple[float, float | None] | None":
     frames = np.frombuffer(raw[: n * 192 * 108], dtype=np.uint8).reshape(n, 108, 192)
     bg = int(np.bincount(frames.reshape(-1)).argmax())
     ink = (np.abs(frames.astype(np.int16) - bg) > INK_DIFF_THRESHOLD).mean(axis=(1, 2))
-    best_idx, best_val = 0, -1.0
-    for i, v in enumerate(ink):          # tie -> latest: >= keeps overwriting on ties
+    pool = [(t, float(ink[min(max(int(round(t * INK_FPS)), 0), n - 1)]))
+            for t in sorted(settled) if t < end]
+    pool.append((end, float(ink[-1])))   # the last decoded sample is the end composition
+    best_ts, best_val = pool[0]
+    for t, v in pool:                    # tie -> latest: >= keeps overwriting on ties
         if v >= best_val:
-            best_idx, best_val = i, float(v)
-    last_val = float(ink[-1])
+            best_ts, best_val = t, v
+    last_val = pool[-1][1]
     if last_val >= 0.99 * best_val:      # purely additive: keep the end-of-scene pick
-        best_idx = n - 1
+        best_ts = end
     ratio = round(best_val / last_val, 2) if last_val > 0 else None
-    return best_idx / INK_FPS, ratio
+    return best_ts, ratio
 
 
 # ---- frame plan ---------------------------------------------------------
+
+def _settled_ts(beat: dict) -> float:
+    """Video time at which a beat's composition has settled: BEAT_BACKOFF before its end,
+    after its reveal (and any indicate) and before the next beat's reveal begins."""
+    return max(LEAD_SECONDS + float(beat["end_seconds"]) - BEAT_BACKOFF, 0.05)
+
 
 def cumulative_reveals(beats: list[dict], upto: int) -> list[str]:
     """Reveal targets that should be on screen by the end of beat `upto`
@@ -269,8 +283,9 @@ def plan_frames(storyboard: dict, manifest: dict, selector: str, per: str = "sce
             if per == "scene":
                 item = {**common, "beat_index": 0, "final": True,
                         # sentinel: extract_frames() resolves this to the fullest-ink ts
-                        # (or, if that decode fails, clamps it to the last frame).
-                        "ts": 1e9,
+                        # among the settled moments below + the last frame (or, if that
+                        # decode fails, clamps it to the last frame).
+                        "ts": 1e9, "settled": [_settled_ts(b) for b in beats],
                         "fullest_ts": None, "ink_ratio_vs_last": None,
                         "narration": entry.get("script", ""), "reveal": None,
                         "revealed_so_far": cumulative_reveals(beats, len(beats) - 1)}
@@ -287,7 +302,7 @@ def plan_frames(storyboard: dict, manifest: dict, selector: str, per: str = "sce
             else:
                 for i, beat in enumerate(beats):
                     plan.append({**common, "beat_index": beat["index"], "final": False,
-                                 "ts": max(LEAD_SECONDS + float(beat["end_seconds"]) - BEAT_BACKOFF, 0.05),
+                                 "ts": _settled_ts(beat),
                                  "narration": beat.get("text", ""), "reveal": beat.get("reveal"),
                                  "revealed_so_far": cumulative_reveals(beats, i)})
     return plan
@@ -329,8 +344,8 @@ def extract_frames(deck_id: str, plan: list[dict], out_dir: Path) -> list[dict]:
         # the last frame starts one frame interval before the end: aim half a frame
         # before it, so `-ss` lands on it at any fps (`dur - 0.05` fell past it < 20 fps)
         end = None if dur is None or not fps else dur - 1.5 / fps
-        if item.get("final"):
-            found = _fullest_frame_ts(video)
+        if item.get("final") and end is not None:
+            found = _fullest_frame_ts(video, item.get("settled", []), end)
             if found is not None:
                 item["ts"], item["ink_ratio_vs_last"] = found
                 item["fullest_ts"] = item["ts"]

@@ -35,7 +35,9 @@ def _disk_manifest(wav: Path) -> dict:
         "audio_file": str(wav), "audio_seconds": t, "beats": beats}]}
 
 
-def test_per_beat_grabs_are_timed_on_the_rendered_clock():
+def _plan(per: str) -> tuple[list, dict, dict]:
+    """(frame_plan.json of `critic.py --per <per> --dry-run`, disk manifest, make.py's
+    in-memory manifest) for one paused scene."""
     with tempfile.TemporaryDirectory(ignore_cleanup_errors=True) as td:
         tmp = Path(td)
         sb = tmp / "deckp.yml"
@@ -54,18 +56,32 @@ def test_per_beat_grabs_are_timed_on_the_rendered_clock():
         orig = critic.load_manifest, critic.find_scene_video, sys.argv
         critic.load_manifest = lambda deck_id, meta=None: copy.deepcopy(disk)
         critic.find_scene_video = lambda deck_id, sid: None
-        sys.argv = ["critic.py", "--storyboard", str(sb), "--per", "beat", "--dry-run",
+        sys.argv = ["critic.py", "--storyboard", str(sb), "--per", per, "--dry-run",
                     "--out", str(out)]
         try:
             critic.main()
         finally:
             critic.load_manifest, critic.find_scene_video, sys.argv = orig
-        plan = json.loads((out / "frame_plan.json").read_text(encoding="utf-8"))
+        return json.loads((out / "frame_plan.json").read_text(encoding="utf-8")), disk, mem
 
-    want = [round(max(critic.LEAD_SECONDS + b["end_seconds"] - critic.BEAT_BACKOFF, 0.05), 3)
+
+def _settled_on_the_rendered_clock(mem: dict) -> list:
+    return [round(max(critic.LEAD_SECONDS + b["end_seconds"] - critic.BEAT_BACKOFF, 0.05), 3)
             for b in mem["scenes"][0]["beats"]]
+
+
+def test_per_beat_grabs_are_timed_on_the_rendered_clock():
+    plan, disk, mem = _plan("beat")
+    want = _settled_on_the_rendered_clock(mem)
     assert [round(p["ts"], 3) for p in plan] == want, ([p["ts"] for p in plan], want)
     assert want[1] > disk["scenes"][0]["beats"][1]["end_seconds"] + 1.0, "fixture has no hold"
+
+
+def test_per_scene_fullest_candidates_are_on_the_rendered_clock():
+    """The fullest-frame pick only considers settled moments (C-02); those must be the
+    rendered film's, or a candidate after the hold lands inside the next beat's reveal."""
+    plan, _disk, mem = _plan("scene")
+    assert [round(t, 3) for t in plan[0]["settled"]] == _settled_on_the_rendered_clock(mem), plan[0]
 
 
 if __name__ == "__main__":
