@@ -57,6 +57,29 @@ def test_measure_loudness_is_error_safe():
         assert isinstance(out, dict) and "error" in out    # missing file -> {"error":...}, never raises
 
 
+def test_measure_loudness_reads_audio_only():
+    # C-03 (code review 2026-09-23): make._loudnorm_final measures the finished MP4 with this;
+    # decoding its video too (no -vn) puts a ~1049 s 4K60 film at ~182 s, past the 120 s timeout.
+    import subprocess
+    seen = []
+    real = LP.subprocess.run
+
+    def fake(cmd, **kwargs):
+        seen.append(cmd)
+        return subprocess.CompletedProcess(cmd, 0, stdout="", stderr="")
+
+    with tempfile.TemporaryDirectory() as d:
+        film = Path(d) / "film.mp4"
+        film.write_bytes(b"")
+        LP.subprocess.run = fake
+        try:
+            LP.measure_loudness(film)
+        finally:
+            LP.subprocess.run = real
+    cmd = seen[0]
+    assert "-vn" in cmd and cmd.index("-vn") > cmd.index("-i"), cmd   # output option: drop video
+
+
 def _tone_wav(path: Path, seconds: float = 4.0) -> Path:
     import math
     import struct

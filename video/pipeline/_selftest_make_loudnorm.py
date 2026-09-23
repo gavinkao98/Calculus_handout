@@ -25,6 +25,52 @@ def _av_clip(path: Path, seconds: int = 4) -> Path:
     return path
 
 
+def _compose_one_scene(d: Path, narration_src: str) -> Path:
+    """Drive the real compose() over one content scene -- a silent 4 s picture plus a
+    narration WAV made from the lavfi source `narration_src` -- with the real-audio (T10)
+    loudnorm tail on. Checks the film came out and the pre-loudnorm concat did not linger."""
+    scene_video = d / "scene.mp4"
+    _ff("-f", "lavfi", "-i", "color=c=0x0f1720:s=320x180:r=30:d=4", "-c:v", "libx264",
+        "-pix_fmt", "yuv420p", str(scene_video))
+    narr = d / "narr.wav"
+    _ff("-f", "lavfi", "-i", narration_src, "-ac", "1", str(narr))
+    manifest = {"deck_id": "deckx", "scenes": [{
+        "scene_id": "s1", "narration_mode": "beats", "audio_file": str(narr), "audio_seconds": 2.0,
+        "beats": [{"text": "x", "start_seconds": 0.0, "end_seconds": 2.0}]}]}
+    out = d / "film.mp4"
+    result = make.compose([{"id": "s1", "kind": "content"}], manifest, {"s1": scene_video}, d / "out",
+                          lead=make.SCENE_LEAD_SECONDS, abr="192k", output=out, transition=0.0,
+                          meta={"id": "deckx"}, quality="high", storyboard_path=d / "none.yml",
+                          manifest_path=d / "none.json", apply_loudnorm=True)
+    assert result == out and out.exists(), result
+    assert not list((d / "out").rglob("_concat_preloudnorm.mp4")), "pre-loudnorm concat left behind"
+    return out
+
+
+def test_compose_keeps_the_normalized_film_when_only_the_measurement_fails():
+    # C-03 (code review 2026-09-23): pass 2 had already written the normalized film when the
+    # after-the-fact ebur128 measurement failed (e.g. its 120 s timeout on a 4K final), and
+    # compose re-concatenated the UN-normalized film over it. Measurement failure = WARN only.
+    real = listening_pack.measure_loudness
+    with tempfile.TemporaryDirectory() as d:
+        listening_pack.measure_loudness = lambda p: {"error": "ffmpeg unavailable: TimeoutExpired (simulated)"}
+        try:
+            out = _compose_one_scene(Path(d), "sine=frequency=500:sample_rate=24000:duration=2")
+        finally:
+            listening_pack.measure_loudness = real
+        loud = real(out)
+        assert abs(loud["I"] - make.HOUSE_LUFS) <= make.LOUDNORM_TOL_I, loud
+
+
+def test_compose_falls_back_to_the_concat_when_pass2_fails():
+    # C-03: an all-silent film measures -inf in pass 1, which pass 2 rejects ("Value -inf for
+    # parameter 'measured_I'"). That used to escape compose as a RuntimeError after the whole
+    # render; it must fall back to the un-normalized concat, as the T10 comment promises.
+    with tempfile.TemporaryDirectory() as d:
+        out = _compose_one_scene(Path(d), "anullsrc=r=24000:cl=mono:d=2")
+        assert make._probe_duration(out) > 0
+
+
 def _top_level_boxes(path: Path) -> list[str]:
     data = path.read_bytes()
     i, order = 0, []
