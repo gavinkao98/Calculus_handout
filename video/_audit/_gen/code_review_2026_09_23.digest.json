@@ -4,13 +4,14 @@
   "diff_base": "82eeea3",
   "date": "2026-09-23",
   "reviewers": "7 片並行唯讀審查（Opus 5.5、effort xhigh），主模型稽核",
-  "status": "只審查、未修改任何程式碼（使用者 2026-09-23 裁示：今天先不修，先寫成報告）",
+  "status": "已修正並驗收（2026-09-23 同日；先只審未修寫成報告，之後使用者裁示照清單修復，修正結果見第〇節）",
   "tldr": [
+    "【修正結果】裁決要修的 47 條已全部修完並驗收：selftest 58→78 支全綠，24 份 deck 的閘與修正前逐字相同，回歸審核抓到的 3 條新問題也已修掉並再審通過。細節見第〇節與第九節。",
     "1080p 真音檔主線（render→[sync]→compose）沒找到會產錯的問題；58 支 selftest 全綠、doctor --smoke 全綠。",
     "7 片共 52 條 finding，去掉跨片重複 4 條後剩 48 條不同的議題；審查員自評 level 1 有 39 條（去重後 36 條），high 3 條。",
     "最急的是 tts.py 的 beat 級 reuse：順序有變的 beats 場帶 --reuse-existing 重跑，會毀掉已付費的 take（A-01，主模型重跑重現成立）。在修好之前，beats 場不要用 reuse 做會移動 beat 的編輯。",
     "問題集中在四處：① tts.py 的 reuse／中止路徑會多計費或弄丟付費音檔；② rewatch_pack／critic 給盲審的證據本身有錯（舊幀、停頓錯位、讀錯音軌、gate 1 抽到清空後的末幀）；③ 閘的 false negative 與模板選項組合下的版面錯誤；④ 講義 LaTeX 建置閘漏擋 undefined reference 與 Type 3 字型。",
-    "裁決：47 條要修（含補文件），1 條只記錄（死碼）。修正已排成 8 個互不衝突的批次，照下方表格派工即可；今天沒有動任何程式碼。"
+    "裁決：47 條要修（含補文件），1 條只記錄（死碼）。修正排成 8 個互不衝突的批次（第四節），已照表派工完成。"
   ],
   "activities": [
     ["盤點", "列出版控內所有程式：243 檔／約 5.7 萬行（含 legacy）；現役約 190 檔／4.3 萬行，video/pipeline 佔 2.85 萬行（正式程式約 1.64 萬行＋58 支 selftest 約 1.2 萬行）。"],
@@ -20,7 +21,8 @@
     ["主模型稽核", "逐條讀完 52 條的描述、失敗情境、證據與重現；A-01 親自重跑重現腳本（prepend／swap／revert 三情境皆重現）；另有 18 條親自讀 code 對過證據（見各條的「稽核」欄）；合併 4 條跨片重複；照四級規則裁決。"],
     ["跨 session 協調", "檢查其他 worktree：§3.2 未合併分支（claude/reverent-lovelace-e56072）只改內容與文件，不碰 pipeline code；它擁有的 KICKOFF-s32／ch03_chain_rule.yml 三處修正不在本次範圍，列為該線待辦。曾把 A-01 警示與文件修正發給 peer session「審查結論修復 2026-09-23」，對方回覆它是另一個專案（D:\\Kakashi），未轉出——目前沒有 session 在跑 §3.2。"],
     ["排修正批次後停手", "裁決與 8 個派工批次（檔案所有權互不重疊）已排好；使用者改變主意，今天不修，只寫報告。沒有派任何修正代理、沒有 commit 任何程式碼改動。"],
-    ["寫報告與收尾", "本報告由 video/_audit/_gen/code_review_2026_09_23.gen.py 從兩份 JSON 產生（審查員原始回傳照登＋主模型稽核結論）；桌機與手機寬度檢查過版面、錨點無失效；REBUILD_STATUS.md 加一條進度錨；跑 doc_lint 時順帶發現 main 的 CI 紅燈（見第五節最後一列）；移除審查快照 worktree。"]
+    ["修正與驗收（同日稍後）", "使用者裁示照清單修復、中間不需裁決：第一輪 8 批並行修正 → 主模型逐批審 diff、依序 merge → 全面驗收 → 3 位回歸審查員 → 第二輪修掉回歸抓到的 3 條新問題（每項再由獨立審查員審）→ 收尾批次 → 最終驗收。詳見第〇節與第九節。"],
+    ["寫報告與收尾","本報告由 video/_audit/_gen/code_review_2026_09_23.gen.py 從兩份 JSON 產生（審查員原始回傳照登＋主模型稽核結論）；桌機與手機寬度檢查過版面、錨點無失效；REBUILD_STATUS.md 加一條進度錨；跑 doc_lint 時順帶發現 main 的 CI 紅燈（見第五節最後一列）；移除審查快照 worktree。"]
   ],
   "decisions": {
     "A-01": ["fix", "T", "reran", "主模型重跑 repro_collision2.py：prepend 情境 FileNotFoundError、P 的 take 遺失；revert 情境 Q 的 beat 綁到 N 的 take 且 make._validate_reuse_manifest 照收。"],

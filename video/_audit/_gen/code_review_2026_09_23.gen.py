@@ -2,11 +2,12 @@
 
     python video/_audit/_gen/code_review_2026_09_23.gen.py [--out <html>]
 
-讀兩份資料：
+讀三份資料：
   * code_review_2026_09_23.findings.json -- 7 片審查員的原始回傳（Workflow 結構化輸出，照登不改字）
   * code_review_2026_09_23.digest.json   -- 主模型的稽核結論（裁決、批次、活動紀錄、限制）
+  * code_review_2026_09_23.outcome.json  -- 修正輪的結果（輪次、驗收、每條 finding 的修正與回歸判定；沒有時只呈現審查）
 預設輸出 video/_audit/REVIEW-code-review-2026-09-23.html。純 stdlib；報告不含數學式，所以不載 MathJax
-（finding 原文裡的 `$...$` 是被審的字串，要照字面顯示）。本產生器不下判斷——所有評語取自兩份 JSON。
+（finding 原文裡的 `$...$` 是被審的字串，要照字面顯示）。本產生器不下判斷——所有評語取自這三份 JSON。
 """
 from __future__ import annotations
 
@@ -20,6 +21,7 @@ from pathlib import Path
 HERE = Path(__file__).resolve().parent
 FINDINGS = HERE / "code_review_2026_09_23.findings.json"
 DIGEST = HERE / "code_review_2026_09_23.digest.json"
+OUTCOME = HERE / "code_review_2026_09_23.outcome.json"   # 修正輪的結果；不存在時報告只呈現審查
 OUT = HERE.parent / "REVIEW-code-review-2026-09-23.html"
 
 DECISION = {"fix": "修", "doc": "補文件", "dup": "重複", "record": "只記錄"}
@@ -89,6 +91,7 @@ def main() -> None:
 
     slices = json.loads(FINDINGS.read_text(encoding="utf-8"))
     dg = json.loads(DIGEST.read_text(encoding="utf-8"))
+    oc = json.loads(OUTCOME.read_text(encoding="utf-8")) if OUTCOME.exists() else None
     dec = dg["decisions"]
     order = ["A", "B", "C", "D1", "D2", "E", "F"]
     slices.sort(key=lambda s: order.index(slice_key(s["slice"])))
@@ -98,6 +101,20 @@ def main() -> None:
         raise SystemExit(f"decisions and findings disagree on: {sorted(missing)}")
     uniq = [f for f in allf if dec[f["id"]][0] != "dup"]
     dcount = Counter(dec[f["id"]][0] for f in allf)
+
+    def result_cell(fid: str) -> str:
+        """One finding's fix outcome: status pill + commits (+ the regression closure verdict)."""
+        r = (oc or {}).get("findings", {}).get(fid)
+        if r is None:
+            return '<span class="muted">—</span>'
+        cls = {"fixed": "fix", "partial": "record", "not_fixed": "record", "no_change_needed": "dup",
+               "recorded": "record"}.get(r["status"], "dup")
+        label = {"fixed": "已修", "partial": "部分", "not_fixed": "未修", "no_change_needed": "免修",
+                 "recorded": "只記錄"}.get(r["status"], r["status"])
+        commits = " ".join(f"<code>{html.escape(c)}</code>" for c in r.get("commits", []))
+        verdict = r.get("closure")
+        tail = f' <span class="muted">回歸：{html.escape(verdict)}</span>' if verdict else ""
+        return pill(cls, label) + commits + tail
 
     out: list[str] = []
     w = out.append
@@ -112,6 +129,20 @@ def main() -> None:
       f'<span>{len(allf)} 條 finding／去重 {len(uniq)} 條</span><span>{html.escape(dg["reviewers"])}</span></div>')
     w(f'<div class="meta"><span>狀態：{html.escape(dg["status"])}</span></div>')
     w('<div class="tldr"><ul>' + "".join(f"<li>{t(x)}</li>" for x in dg["tldr"]) + "</ul></div></header>")
+
+    # ---- fix outcome (only once the fixes landed) ----
+    if oc:
+        w(f"<h2>〇、修正結果（{html.escape(oc['date'])}）</h2>")
+        w("<ul>" + "".join(f"<li>{t(x)}</li>" for x in oc["summary"]) + "</ul>")
+        w("<h3>修正輪次</h3><div class=\"scroll\"><table><tr><th>輪</th><th>內容</th><th>merge</th><th>審核</th></tr>")
+        for rnd, body, merge, review in oc["rounds"]:
+            w(f"<tr><td style=\"white-space:nowrap\"><b>{t(rnd)}</b></td><td>{t(body)}</td><td>{t(merge)}</td><td>{t(review)}</td></tr>")
+        w("</table></div><h3>驗收</h3><div class=\"scroll\"><table><tr><th>項目</th><th>結果</th></tr>")
+        for item, result in oc["verification"]:
+            w(f"<tr><td style=\"white-space:nowrap\">{t(item)}</td><td>{t(result)}</td></tr>")
+        w("</table></div><h3>有意的畫面改變（修正前後末幀已逐張目視）</h3><ul>"
+          + "".join(f"<li>{t(x)}</li>" for x in oc["visual_changes"]) + "</ul>")
+        w("<h3>仍未處理（已記錄）</h3><ul>" + "".join(f"<li>{t(x)}</li>" for x in oc["remaining"]) + "</ul>")
 
     # ---- activities ----
     w("<h2>一、本次做了哪些事</h2><table><tr><th>步驟</th><th>內容</th></tr>")
@@ -141,17 +172,19 @@ def main() -> None:
 
     # ---- decision table ----
     w("<h2>三、裁決總表</h2><p class=\"muted\">點 ID 跳到該條詳情。重複條標出它併入的主條；批次代號見第四節。</p>")
-    w("<div class=\"scroll\"><table><tr><th>ID</th><th>等級</th><th>嚴重度</th><th>把握</th><th>標題</th><th>裁決</th><th>批次</th><th>稽核</th></tr>")
+    w("<div class=\"scroll\"><table><tr><th>ID</th><th>等級</th><th>嚴重度</th><th>把握</th><th>標題</th><th>裁決</th><th>批次</th><th>稽核</th>"
+      + ("<th>結果</th>" if oc else "") + "</tr>")
     sev_rank = {"high": 0, "medium": 1, "low": 2}
     for f in sorted(allf, key=lambda f: (dec[f["id"]][0] == "dup", f["level"], sev_rank[f["severity"]])):
         d, batch, audit, _ = dec[f["id"]]
         w(f"<tr><td><a href=\"#{f['id']}\"><code>{f['id']}</code></a></td><td>{pill('l%d' % f['level'], LEVEL[f['level']])}</td>"
           f"<td>{pill(f['severity'], f['severity'])}</td><td class=\"muted\">{f['confidence']}</td><td>{t(f['title'])}</td>"
-          f"<td>{pill(d, DECISION[d])}</td><td><code>{batch or '—'}</code></td><td class=\"muted\">{AUDIT[audit]}</td></tr>")
+          f"<td>{pill(d, DECISION[d])}</td><td><code>{batch or '—'}</code></td><td class=\"muted\">{AUDIT[audit]}</td>"
+          + (f"<td>{result_cell(f['id'])}</td>" if oc else "") + "</tr>")
     w("</table></div>")
 
     # ---- batches ----
-    w("<h2>四、修正批次（下次派工照表執行）</h2>")
+    w("<h2>四、修正批次</h2>")
     w("<div class=\"scroll\"><table><tr><th>批</th><th>主題</th><th>檔案所有權</th><th>findings</th><th>做法重點</th></tr>")
     for key, theme, files, items, how in dg["batches"]:
         w(f"<tr><td><code>{key}</code></td><td>{t(theme)}</td><td>{t(files)}</td><td>{t(items)}</td><td>{t(how)}</td></tr>")
@@ -191,12 +224,31 @@ def main() -> None:
             if f["known_ref"]:
                 w(f"<dt>既有記載</dt><dd>{t(f['known_ref'])}</dd>")
             w(f"<dt>稽核</dt><dd><b>{AUDIT[audit]}</b>{'：' + t(note) if note else ''}</dd>")
+            r = (oc or {}).get("findings", {}).get(f["id"])
+            if r:
+                tests = "、".join(f"<code>{html.escape(x)}</code>" for x in r.get("tests", []))
+                w(f"<dt>修正結果</dt><dd>{result_cell(f['id'])}<br>{t(r.get('summary', ''))}"
+                  + (f"<br><span class=\"muted\">紅→綠測試：</span>{tests}" if tests else "")
+                  + (f"<br><span class=\"muted\">回歸審核：</span>{t(r['closure_evidence'])}" if r.get("closure_evidence") else "")
+                  + "</dd>")
             w("</dl></div>")
 
     # ---- limits / regression ----
     w("<h2>八、稽核限制</h2><ul>" + "".join(f"<li>{t(x)}</li>" for x in dg["limits"]) + "</ul>")
-    w("<h2>九、回歸審核</h2><div class=\"note\">本次只審查、未修改任何程式碼，因此沒有回歸審核。"
-      "照第四節修正後，回歸審核結果補在這一節（CLAUDE.md：審核 finding 修完後必須回歸審核）。</div>")
+    if not oc:
+        w("<h2>九、回歸審核</h2><div class=\"note\">本次只審查、未修改任何程式碼，因此沒有回歸審核。"
+          "照第四節修正後，回歸審核結果補在這一節（CLAUDE.md：審核 finding 修完後必須回歸審核）。</div>")
+    else:
+        rg = oc["regression"]
+        w("<h2>九、回歸審核</h2>")
+        w(f"<p>{t(rg['method'])}</p>")
+        w("<table><tr><th>鏡頭</th><th>總評</th></tr>"
+          + "".join(f"<tr><td style=\"white-space:nowrap\">{t(k)}</td><td>{t(v)}</td></tr>" for k, v in rg["lenses"])
+          + "</table>")
+        w("<h3>修正本身帶進的新問題與處理</h3><div class=\"scroll\"><table><tr><th>ID</th><th>等級</th><th>問題</th><th>處理</th></tr>")
+        for rid, lvl, title, handling in rg["new_issues"]:
+            w(f"<tr><td><code>{html.escape(rid)}</code></td><td>{pill('l%d' % lvl, LEVEL[lvl])}</td><td>{t(title)}</td><td>{t(handling)}</td></tr>")
+        w("</table></div>")
     w(f"<p class=\"muted\">由 <code>video/_audit/_gen/{Path(__file__).name}</code> 產生；資料："
       f"<code>{FINDINGS.name}</code>（審查員原始回傳）＋<code>{DIGEST.name}</code>（主模型稽核結論）。</p>")
     w("</div></body></html>")

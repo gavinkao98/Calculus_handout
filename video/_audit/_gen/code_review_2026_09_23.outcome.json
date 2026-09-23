@@ -1,0 +1,842 @@
+{
+ "date": "2026-09-23 同日修正並驗收",
+ "summary": [
+  "裁決要修的 47 條全部修完：審查員自評 level 1 的 36 條（去重後）全修、level 2 文件缺口全補、順手修的 L3 閘也都落地；唯一只記錄的是 D2-09 死碼。修正範圍 d255311..7950269：61 個一般 commit 加 13 個 merge，67 個檔案，+4836／−419 行。",
+  "修正方式：8 個批次各自 worktree 並行修（Opus 5.5／xhigh），每條 L1 先寫紅測試、看到紅再修到綠；主模型逐批審 diff 後依序 merge，8 個分支自動合併、零衝突。",
+  "回歸審核：3 位沒參與修正的審查員逐條驗 51 條（含跨片重複），49 條 closed、2 條 partial（A-07、D2-08，之後都已補完）；另抓到修正本身帶進的 3 條新 level 1（皆 low）與 3 條文件缺口，第二輪全部修掉，每項再由一位獨立審查員審（3/3 approve_with_notes），註記在收尾批次處理完畢。",
+  "selftest 由 58 支增為 78 支（新增 20 支紅→綠測試），全綠；24 份 deck 的 schema／lint／sizecheck 與修正前逐字相同（扣除 Manim 日誌），唯一差異是示範 deck _demo_aside 的 thm_aside 填充率 7%→9%（D1-05 的預期結果）。",
+  "全程沒有呼叫任何付費或外部 API：TTS 一律 mock，沒有 render 整份 deck。main 的 CI（Handout Checks）自 2026-09-13 起的紅燈也在 d255311 修掉。"
+ ],
+ "rounds": [
+  [
+   "第一輪",
+   "8 批並行修正：T（tts.py 付費音檔）、R（rewatch_pack／critic／pauses）、M（make.py／響度）、G（schema／sizecheck／scene）、V1（graph）、V2（其他核心模板）、V3（brand／value_table／definition_math）、E（講義 LaTeX 建置）",
+   "edd36d1 b82fe8a ac80bc6 6448a2c c5e0700 3fe8c7e d9c4810 b8a31a3",
+   "主模型逐批審 diff；3 位回歸審查員（RG1／RG2／RG3）"
+  ],
+  [
+   "文件同步",
+   "Sonnet 子代理同步 DESIGN.md 6 處、CLAUDE.md 速查、README 的 critic／rewatch 退出碼",
+   "603a068",
+   "主模型審 diff"
+  ],
+  [
+   "第二輪",
+   "F1＝RG1-01（staging 故障時間窗）＋ENVIRONMENT mock 指令；F2＝RG2-01（C-08 放行 corner carry）＋_tail／DESIGN 措辭；F3＝RG3-01（label_x 裁切區）＋D2-08 補完＋inset 契約",
+   "fee0591 86ee572 94720b3",
+   "每項一位獨立審查員：3/3 approve_with_notes"
+  ],
+  [
+   "收尾",
+   "graph label_x 守衛改用曲線實際裁切界（y_clip: [lo, hi]）；DESIGN 補 staged take 取回與 reuse 時長核對、corner carry 壓暗措辭",
+   "7950269",
+   "主模型審 diff＋最終驗收"
+  ]
+ ],
+ "verification": [
+  [
+   "run_selftests.py",
+   "78/78 綠（修正前 58/58）；第一輪 merge 後、收尾 merge 後各跑一次，皆全綠"
+  ],
+  [
+   "24 份 deck 的閘",
+   "schema／lint／sizecheck＋derive --check 與修正前基線比對（扣除 Manim Tex 日誌）：新增 error 0、exit code 全同；唯一差異 _demo_aside thm_aside 7%→9%（D1-05 預期）。修正前就回非 0 的 5 份示範 fixture 不變"
+  ],
+  [
+   "doctor --smoke",
+   "正典 deck 閘 9/9 OK；唯一 FAIL 是本機 pdftotext 為 xpdf 4.06（非 poppler），環境問題，與本次無關"
+  ],
+  [
+   "CI 兩道 lint",
+   "doc_lint、quote_lint 皆 clean（main 的 CI 從 2026-09-13 起每次紅，原因是 ch03_trig_derivatives.md 一條連結，已修）"
+  ],
+  [
+   "講義",
+   "test_check_glyphs 12、test_build 11、test_export_figs 1 全綠；12 份 dist PDF 字形閘 PASS；ch03 端到端建置 PASS（測完 dist 已還原）"
+  ],
+  [
+   "畫面",
+   "3 場以 scratch_frames 分別在修正前（d255311）與修正後 render 1080p 末幀，逐張目視（見下節）"
+  ],
+  [
+   "付費 API",
+   "0 次"
+  ]
+ ],
+ "visual_changes": [
+  "ch01 when_inversion_fails、temperature_inverse：value_table accent 欄的文字由不相配的藍（blue_ink）改為該場 accent 的 practice_ink 綠，與底色同系，符合 DESIGN 契約（D2-01）。",
+  "ch03 all_six_tan_sec、all_six_cot_csc：reason「( cos x≠0)」左括號後多出的空格消失；ch03_chain_rule proof_delicate_choices 的「ε -- δ」恢復成「ε–δ」（D2-03）。",
+  "ch01 inverse_definition：aside 卡下移約 0.28u（約 40px），夾回 body zone、離標題更遠。這一處事先沒列入預期，已看過修正前後末幀，確認可以接受（D2-02）。",
+  "示範 deck _demo_aside 的 thm_aside：陳述卡寬度扣掉 padding 後多折一行（D1-05）。",
+  "審核證據（不是成片畫面）：critic 的 gate 1 幀改抽有內容的定格幀，不再抽 exit 淡出後的空幀；rewatch_pack 與 critic 對有 pauses: 的場改用成片時鐘。",
+  "scene._tail：只有舊碼會被 MIN_HOLD 撐長的場，片長會縮短並往 [sync] 預期收斂；兩份正典 ch03 deck 靜態估算都落在不變區。"
+ ],
+ "remaining": [
+  "D2-09 死碼（visuals/layout.py 的 SceneLayout、graph_utils.sample_function_points）：依 CLAUDE.md 只提出，是否移進 _archive/ 待使用者決定。",
+  "D2-07：theme 舊別名的色值凍結在 Direction B 之前、glow_curve 的 halo 與 stroke 是兩種藍。改值會動到現有畫面色，待使用者裁決；docstring 已如實記載。",
+  "A-07：generate_house_cues.main() 仍會重生已刪除的 house 資產（一次性工具）。",
+  "§3.2 未合併分支擁有的檔（本次不碰）：KICKOFF-s32 :523／:575 的 --deck 應為 ch03_chain_rule_mimo、:422 的 mock 指令缺 --unit beat、:444-446「中止時原封不動」措辭已過時；ch03_chain_rule.yml:699 的 formulas: 是死欄位。",
+  "已知殘餘：beat reuse 的內容核對用 WAV 時長（容差 1 ms），兩個不同 take 時長差不到 1 ms 時仍可能漏判（真實 TTS 極少見，要更嚴得改記 sha）；故障時保留的 .wav.staged 不會被自動回收，免費取回方法寫在 DESIGN「交易與計費安全」⑸。",
+  "回歸審查員列為 L3、未修：C-08 的播放端第二道防線沒做（schema 已擋）；derive_spoken 閱讀視圖的 {show} regex 沒統一（`{ show x}` 在閱讀視圖不會被去掉）；critic.py 讀 ffprobe 輸出仍用 locale 解碼（不在 A-05 範圍）。",
+  "本機 main 比 origin/main 超前（原本 63 個 commit，加上本次），尚未 push。"
+ ],
+ "regression": {
+  "method": "第一輪 merge 後，依三個鏡頭各派一位沒參與修正的 Opus 5.5（xhigh）唯讀審查員，逐條判定 51 條 finding（含跨片重複）是否關閉、附證據（多數實際重跑原審查員的重現腳本），並找修正本身引入的問題與批次之間的互動。第二輪的 3 項修正，每項修完再由一位獨立審查員審該分支。",
+  "lenses": [
+   [
+    "RG1 音訊與建置（T＋M 批）：tts.py 的 staging、checkp",
+    "T＋M 批的 11 條 finding 中，10 條關閉，A-07 部分關閉：house_audio 的 docstring 已改，但 DESIGN.md:312 仍說 caution ping 可用。原審查員的重現腳本改指 repo 後重跑，結果都符合修正後的預期；9 支相關 selftest 全綠。新發現 1 條 level 1：beats 場的 staging 交易若在 phase 3 到 manifest checkpoint 之間出例外，retry 會把 take 靜默綁到錯的 beat 上，而 finally 也會刪掉尚未 promote 的唯一複本；這一條已用故障注入重現。另有 1 條 level 2：A-03 之後，CLAUDE.md 速查裡不帶 --unit 的 mock 指令會 fail-closed，DESIGN.md 的資料流契約也沒寫 checkpoint 與 staging。make.py 改成回傳 (bool, dict) 後，唯一的呼叫點已同步；mock 子集的 merge／renumber 只在 make-mock 同 identity 時觸發，搬不到真音檔。"
+   ],
+   [
+    "RG2 閘與證據工具（R＋G 批）：rewatch_pack／critic／pa",
+    "15 條 finding 全數關閉（F-04 的 KICKOFF-s32 那半屬 §3.2 待辦、C-08 的 scene.py 第二道防線依 digest 只加 schema error，兩者都不算未關）。apply_pauses 拆成 timing＋splice 後，拿真的 §3.1 _mimo manifest 跑新舊兩版比對：輸出 manifest、stdout、兩支 paused WAV 的 sha256 都逐位元相同；rewatch_pack 的 rmtree、deck／manifest 規則在 --scene 子集與 --baseline 下都沒有誤傷；G 與 V3 合併後的 sizecheck.py 沒有重複定義，相關 selftest 全綠。回歸只找到兩條：C-08 新加的 schema error 會誤擋「corner carry 物件在飛行前先 dim／indicate」這種合法寫法（L1，低）；C-01／F-03 修完後，DESIGN.md 兩處和 scene._tail 的 docstring 仍然寫舊行為（L2）。"
+   ],
+   [
+    "RG3 模板與講義（V1＋V2＋V3＋E 批）：graph／derivation",
+    "25 條 finding 裡，23 條已關閉，D2-08 部分關閉（accent 為 proof／solution／strategy 時仍顯示 [ definition ]）。V2 和 V3 都動了 definition_math.py，這個檔的合併是乾淨的三方合併，無衝突；V2 改取標題那一行，V3 改 label 與 aside，完整檔案彼此一致。value_table.py 只是兩邊的改動各自併入。16 支相關 selftest、3 個 handout 測試檔（含 2 支真 latexmk）、原審查員的 D1／D2 重現腳本（改指 repo 後）都跑過：各 finding 的失敗情境都已消失，sizecheck 的新 aside 閘對 theorem_proof 的合法輸入沒有誤報。找到一個修正本身引入的新問題：D1-07 讓 label_x 真正生效之後，在 y_clip 曲線上若 label_x 指到被裁掉的區段，標籤會飄到軸外，整張圖被縮小 27–38%，任何閘都不報；修正前 y_clip 會忽略 label_x，不會出現這個狀況。另有一條 L2：DESIGN 的 inset 契約沒有隨 D1-02 更新。"
+   ]
+  ],
+  "new_issues": [
+   [
+    "RG1-01",
+    1,
+    "beats 場的 staging 交易若在 promote 途中或 checkpoint 之前出例外，重試會把錯的 take 綁到 beat 上，finally 也會刪掉唯一的 staged 複本（故障注入重現）",
+    "第二輪 F1（81d36ba）：reuse 核對 WAV 時長與 manifest 記錄（1 ms）、失敗時保留 <beat>.wav.staged（不以 .wav 結尾，不觸發 overwrite_guard）；獨立審查 approve；收尾在 DESIGN 補契約與免費取回方法（712fda9）"
+   ],
+   [
+    "RG1-02",
+    2,
+    "CLAUDE.md 速查的 mock 指令在 A-03 之後會 fail-closed；DESIGN 沒寫 checkpoint 與 staging",
+    "文件同步 0dd40aa（CLAUDE.md、DESIGN）＋F1 1bc3a4a（ENVIRONMENT.md）"
+   ],
+   [
+    "RG2-01",
+    1,
+    "C-08 新 error 誤擋 corner carry 物件（它開場就在畫面上，卻被當成較晚才 reveal）",
+    "第二輪 F2（0604944）：排除 corner carry 的 as id；獨立審查 approve；其 L3 註記（壓暗跨過飛行的後果）收尾 31c6401"
+   ],
+   [
+    "RG2-02",
+    2,
+    "DESIGN 與 scene._tail docstring 仍寫 critic 抽末幀、MIN_HOLD 地板",
+    "0dd40aa、125b2a6、4db4a79"
+   ],
+   [
+    "RG3-01",
+    1,
+    "label_x 落在 y_clip 裁切區時標籤飄到軸外，整張圖被無聲縮小",
+    "第二輪 F3（1451376）；獨立審查指出 y_clip: [lo, hi] 寫法未涵蓋（L1 low）→ 收尾 7dae590 改用曲線實際裁切界"
+   ],
+   [
+    "RG3-02",
+    2,
+    "DESIGN 的 graph inset 契約沒跟上 D1-02 的避讓與新 raise",
+    "第二輪 F3（d313591）"
+   ],
+   [
+    "A-07（partial）",
+    2,
+    "DESIGN.md:312 仍寫 caution ping 可用",
+    "文件同步 0dd40aa"
+   ],
+   [
+    "D2-08（partial）",
+    3,
+    "proof／solution／strategy 仍退回 [ definition ]",
+    "第二輪 F3（9d364ea）"
+   ]
+  ]
+ },
+ "findings": {
+  "E-01": {
+   "status": "fixed",
+   "commits": [
+    "07e672f"
+   ],
+   "tests": [
+    "test_check_glyphs.FontIdentityTest.test_unlisted_type3_font_fails_and_is_named",
+    "test_check_glyphs.FontIdentityTest.test_type3_system_cjk_fallback_fails",
+    "test_check_glyphs.FontIdentityTest.test_type3_lookalike_family_is_not_listed",
+    "test_check_glyphs.FontIdentityTest.test_unembedded_truetype_fails_and_is_named",
+    "test_check_glyphs.FontIdentityTest.test_standard14_type1_without_descriptor_fails"
+   ],
+   "summary": "check_glyphs.py 新增 fonts_without_fontfile()：掃所有 /Type /Font（Type0 外殼略過），列出 Type 3 與沒有 FontFile 的字型。新增具名白名單 FIG_TYPE3_OK=(\"Inter\",\"mjx-ncm\")，以「家族」比對（名稱等於條目或以「條目-」開頭），理由與盤點依據寫在常數註解。白名單內的 Type 3 印 [圖匯入 Type 3]；名單外的 Type 3、沒嵌入的非 Type 3 字型一律進 [未驗]、FAIL 並指名。docstring 已知極限補上「Type 3 只驗字型身分、不驗輪廓」。FAIL 摘要「N 個嵌入字型無法驗」改為「N 個字型無法驗」。",
+   "closure": "closed",
+   "closure_evidence": "check_glyphs.py 新增 fonts_without_fontfile 與 FIG_TYPE3_OK=(\"Inter\",\"mjx-ncm\")，以家族規則比對：名稱加上 '-' 後以「條目-」開頭。自跑 12 份 dist PDF 全部 rc=0。原審查員的 appA-type3-fallback.pdf rc=1，指名 MicrosoftJhengHeiUIRegular；fb.pdf rc=1，指名 Bahnschrift（Type 3）。白名單不算過寬：InterDisplay、InterTight 這類別的家族不會通過，Chrome 退字時會產生另一套字型名稱，身分檢查仍有效。沒有 FontName 的 Type 3 以 xref 指名並 FAIL，屬保守方向。唯一的判斷點是不帶字重的「Inter」（ch01／ch02 的舊 Google Fonts 匯出），已在常數註解說明來源。"
+  },
+  "E-02": {
+   "status": "fixed",
+   "commits": [
+    "1673794"
+   ],
+   "tests": [
+    "test_build.RefCheckTest.test_undefined_reference_fails_and_names_key",
+    "test_build.RefCheckTest.test_multiply_defined_label_fails_and_names_key",
+    "test_build.RefCheckTest.test_wrapped_warning_key_is_recovered",
+    "test_build.RefCheckTest.test_summary_line_alone_still_fails",
+    "test_build.RealLatexmkTest.test_undefined_reference_real_log"
+   ],
+   "summary": "build.py 在 latexmk 之後掃 log：先把 TeX 在 79 字元處的硬斷行接回，再抓 Reference `KEY' on page N undefined 與 Label `KEY' multiply defined。抓到 key，或 log 有 There were undefined references／There were multiply-defined labels 摘要行，就 FAIL，FAIL 行加上兩項計數並逐條列出 key；只有摘要行、抓不到 key 時也 FAIL 並指向 log。模組 docstring 與 latex/README.md 驗收閘第 1 條同步更新。",
+   "closure": "closed",
+   "closure_evidence": "build.py:61-83 先接回 79 字元斷行再抓 key，只剩摘要行時也 FAIL。自跑真 latexmk 迷你文件（長 key 被切成兩行，加上重複 label）：輸出 undefined-ref=1、multiply-defined=1，兩個 key 都完整列出，rc 為 1。用新 regex 掃本機 12 個章的既有 log，0 命中，不會誤擋。key 抽不完整時仍有摘要行兜底，不會漏報；只有剛好 79 字元的非續行被接起來時才可能誤接，但不會製造出假的 Reference 句型。test_build 11/11 綠。"
+  },
+  "E-03": {
+   "status": "fixed",
+   "commits": [
+    "34aa276"
+   ],
+   "tests": [
+    "test_build.InteractionTest.test_latexmk_runs_non_interactive",
+    "test_build.RealLatexmkTest.test_tex_error_does_not_wait_on_open_stdin"
+   ],
+   "summary": "latexmk 參數加上 -interaction=nonstopmode -halt-on-error，subprocess.run 加上 stdin=subprocess.DEVNULL，並加註解說明原因。",
+   "closure": "closed",
+   "closure_evidence": "build.py:47-53 已加 -interaction=nonstopmode、-halt-on-error 與 stdin=DEVNULL。test_build 的 RealLatexmkTest.test_tex_error_does_not_wait_on_open_stdin（stdin 是開著的 pipe）綠。自跑 \\undefinedmacro 與缺圖兩份文件都立即 FAIL，分別印出「! Undefined control sequence.」與「! LaTeX Error: File `z/figs/missing' not found.」。只印 ^! 行、不印 l.N 上下文，這是修正前就有的行為。"
+  },
+  "E-04": {
+   "status": "fixed",
+   "commits": [
+    "f62bc0d"
+   ],
+   "tests": [
+    "test_build.DiagnosticsTest.test_glyph_gate_crash_shows_stderr",
+    "test_build.DiagnosticsTest.test_glyph_gate_nonzero_rc_fails_even_if_pass_printed",
+    "test_build.DiagnosticsTest.test_latexmk_failure_without_bang_lines_shows_latexmk_output"
+   ],
+   "summary": "新增 print_tail()。latexmk 失敗時，若 log 沒有 `!` 行、也沒有 E-02 的 key 可列，就加印 latexmk stdout 與 stderr 各最後 6 行（實測 latexmk 自己的錯誤寫在 stderr）。字形閘的判斷條件改為 g.returncode != 0 or 「字形閘 PASS」不在 stdout；FAIL 行附上 rc，並加印 check_glyphs stderr 的尾巴。",
+   "closure": "closed",
+   "closure_evidence": "build.py 新增 print_tail；字形閘改看 rc，並印出 stderr 尾巴；log 沒有 ! 行也沒有 key 時，印 latexmk 的 stdout／stderr。test_build 的 DiagnosticsTest 3 條綠。"
+  },
+  "E-05": {
+   "status": "fixed",
+   "commits": [
+    "6335fcc"
+   ],
+   "tests": [
+    "test_check_glyphs.FindOriginalTest.test_cjk_texmf_path_is_found",
+    "test_check_glyphs.FindOriginalTest.test_stdout_none_means_not_found"
+   ],
+   "summary": "find_original 呼叫 kpsewhich 時加上 encoding=\"utf-8\", errors=\"replace\"；結果改讀 (out.stdout or \"\").strip()，stdout 為 None 時當成找不到。",
+   "closure": "closed",
+   "closure_evidence": "check_glyphs.py:123-128 指定 encoding=utf-8、errors=replace，並以 (out.stdout or \"\") 防 None。test_check_glyphs 的 FindOriginalTest.test_cjk_texmf_path_is_found 在本機 cp950 locale 下用真 kpsewhich 跑，綠。"
+  },
+  "E-06": {
+   "status": "fixed",
+   "commits": [
+    "4de2d7c"
+   ],
+   "tests": [
+    "test_export_figs.InterDirPathTest.test_inter_found_under_space_and_cjk_path"
+   ],
+   "summary": "export_figs.mjs 改從 node:url import fileURLToPath，INTER_DIR 改為 resolve(fileURLToPath(new URL(\".\", import.meta.url)), \"template/fonts/inter\")，並註明為什麼不用 .pathname。",
+   "closure": "closed",
+   "closure_evidence": "export_figs.mjs:69 改用 fileURLToPath。test_export_figs（含空白與中文的路徑）綠，已走到 spawn ENOENT，不再出現 font not found。"
+  },
+  "E-07": {
+   "status": "fixed",
+   "commits": [
+    "a305dd6"
+   ],
+   "tests": [],
+   "summary": "latex/README.md 的改圖段、figkit/README.md 的已知事項、PIPELINE.md 的圖鏈自驗句，各補一句：pull 進別台改過的 figs-<ch>.html 後也要重匯，因為 build.py 不比對新鮮度，本機的舊圖會照樣編進有版控的 dist PDF。PIPELINE.md 只動這一句。",
+   "closure": "closed",
+   "closure_evidence": "latex/README.md、figkit/README.md、PIPELINE.md 各補一句「pull 進別台改過的 figs-<ch>.html 後要重匯」。mtime WARN 依 digest 屬可選項。"
+  },
+  "E-08": {
+   "status": "fixed",
+   "commits": [
+    "1d175c1"
+   ],
+   "tests": [],
+   "summary": "figkit/README.md 把「figures.json 進版控」改成「figures.json 同在 figs/ 下、一併不進版控（mm 僅供新圖初值，隨重匯重生）」。",
+   "closure": "closed",
+   "closure_evidence": "figkit/README.md:36 已改為「figures.json 同在 figs/ 下、一併不進版控」。git grep 顯示其餘提到 figures.json 的只有凍結的 DIALECT 存檔，說法本來就是 gitignored。"
+  },
+  "A-05": {
+   "status": "fixed",
+   "commits": [
+    "3ab42c6"
+   ],
+   "tests": [
+    "_selftest_listening_pack.test_measure_loudness_in_non_ascii_dir",
+    "_selftest_loudness_ab.test_loudnorm_2pass_in_non_ascii_dir",
+    "_selftest_make_loudnorm.test_loudnorm_final_in_non_ascii_dir",
+    "_selftest_make_loudnorm.test_ffmpeg_failure_message_in_non_ascii_dir"
+   ],
+   "summary": "make.py 的 _ffmpeg、_probe_duration、_probe_duration_fps、_loudnorm_final pass 1，listening_pack.measure_loudness，以及 loudness_ab.loudnorm_2pass 的兩段 ffmpeg 呼叫，共七處讀 ffmpeg／ffprobe 輸出的 subprocess.run，都加上 encoding=\"utf-8\", errors=\"replace\"。make.py 裡的 git rev-parse 不讀 ffmpeg 輸出，沒有改。",
+   "closure": "closed",
+   "closure_evidence": "diff 確認以下 subprocess.run 都加了 encoding=\"utf-8\", errors=\"replace\"：make.py 的 _ffmpeg、_probe_duration、_probe_duration_fps、loudnorm pass 1，listening_pack.measure_loudness，loudness_ab.loudnorm_2pass 的兩處。改指 repo 重跑 repro_cp950.py，本機 preferred encoding 為 cp950；「旁白測試」目錄量得 {'I': -15.9, 'TP': -12.2}，與 ASCII 目錄相同。_selftest_listening_pack、_selftest_loudness_ab、_selftest_make_loudnorm 的非 ASCII 路徑測試都綠。critic.py:154/167/363 的 ffprobe 仍用 locale 解碼，不在 A-05 範圍，見 not_covered。"
+  },
+  "C-04": {
+   "status": "fixed",
+   "commits": [
+    "2246635"
+   ],
+   "tests": [
+    "_selftest_make_loudnorm.test_loudnorm_final_output_is_faststart"
+   ],
+   "summary": "_loudnorm_final 的 pass 2 mux 在輸出檔前加上 \"-movflags\", \"+faststart\"，並加一行註解說明這支 mux 就是真音檔路徑的交付檔。",
+   "closure": "closed",
+   "closure_evidence": "make.py:819-821 的 pass 2 帶了 -movflags +faststart。重跑 repro_loudnorm.py (a)：_loudnorm_final 輸出 moov-before-mdat=True（修前為 False），量得 (True, {'I': -19.0, 'TP': -17.8})。selftest test_loudnorm_final_output_is_faststart 綠。"
+  },
+  "C-03": {
+   "status": "fixed",
+   "commits": [
+    "22d3c4d"
+   ],
+   "tests": [
+    "_selftest_make_loudnorm.test_compose_keeps_the_normalized_film_when_only_the_measurement_fails",
+    "_selftest_make_loudnorm.test_compose_falls_back_to_the_concat_when_pass2_fails",
+    "_selftest_listening_pack.test_measure_loudness_reads_audio_only"
+   ],
+   "summary": "_loudnorm_final 改成回傳 (normalized, loudness)。pass 1 或 pass 2 失敗時回 (False, {'error'})，由 compose 退回未正規化的 concat；pass 2 成功時回 (True, 量測結果)，量測失敗也保留成品，compose 只印『WARN normalized, unmeasured (...)』。pass 2 的 _ffmpeg 包在 try/except RuntimeError 裡，錯誤訊息取 stderr 最後 4 行。compose 用 try/finally 包住 _concat 和 _loudnorm_final，_concat_preloudnorm.mp4 一定會刪掉。listening_pack.measure_loudness 加 -vn（輸出選項，只解碼音訊），timeout 維持 120 s。",
+   "closure": "closed",
+   "closure_evidence": "讀了 make.py:795-824：_loudnorm_final 回傳 (normalized, loudness)，pass 2 包在 try/except RuntimeError 內。:908-921 的 compose 用 try/finally 刪 concat_tmp；not normalized 才退回 concat，只有量測失敗時印 WARN 並保留成品。repo 內唯一的呼叫端是 compose（git grep 確認，selftest 只呼叫不讀回傳值）。measure_loudness 已加 -vn。改指 repo 重跑 review-work/C/repro_loudnorm.py 的 (b)：把量測換成回 error，印出「WARN normalized, unmeasured」，成片實量 {'I': -19.0, 'TP': -17.6}（修前為 -22.4）。_selftest_make_loudnorm 的 falls_back_to_the_concat_when_pass2_fails（全靜音、pass 2 失敗）綠。"
+  },
+  "C-06": {
+   "status": "fixed",
+   "commits": [
+    "df0453a"
+   ],
+   "tests": [
+    "_selftest_make_mock_subset.test_mock_scene_subset_merges_into_the_prior_manifest",
+    "_selftest_make_mock_subset.test_mock_scene_subset_renumbers_carried_entries_to_todays_deck",
+    "_selftest_make_mock_subset.test_mock_scene_subset_over_another_identity_replaces_it_as_before"
+   ],
+   "summary": "make.py 新增 _merge_mock_subset。main() 在 --scene 不是 all 時呼叫它：既有 manifest 的 identity（tts._IDENTITY_KEYS）相同，就用 tts.merged_manifest 併回（新 entry 取代同 id 的舊 entry，其餘保留，順序依 storyboard），再比照 tts.py 呼叫 renumber_scenes 重蓋今天的全 deck 序號，WAV 也跟著搬。identity 不同時照舊由子集取代整份 manifest，但會印一行 WARN。沒有既有 manifest、或 manifest 損壞時照舊。--scene all 的行為不變。",
+   "closure": "closed",
+   "closure_evidence": "讀了 make.py:171-187 的 _merge_mock_subset 與 :1144-1146：只有 --scene 不是 all、且 identity（tts._IDENTITY_KEYS）相同時，才走 merged_manifest 加 renumber_scenes。make-mock manifest 沒有 model、voice、style，tts.py 的 manifest 有，real 的 backend 又是 mimo，而 _mock_synth_guard 本來就擋 real backend；所以 renumber 只會搬 make-mock 的靜音檔，碰不到真音檔。identity 不同時照舊整份取代，但印 WARN。在 RG1 跑 _selftest_make_mock_subset：真的 make.main()，3 支綠，包括 abc→cab 後 renumber 成 c1/a2/b3、檔名跟著改、檔案存在。merged manifest 流到下游時，apply_pauses、compose、_audit_render_sync 都以 scenes 子集為準（與 --reuse-audio 的既有情境相同），沒有新問題。"
+  },
+  "A-07": {
+   "status": "fixed",
+   "commits": [
+    "731fd96",
+    "0dd40aa"
+   ],
+   "tests": [],
+   "summary": "只改 house_audio.py 的兩段 docstring。寫明 *_caution_ping.wav 已在 2026-07-07 刪除；compose 只對沒有旁白的場使用 cue，沒有 amix 路徑；只加一個分支會是無聲的 no-op，要啟用必須先重生檔案，並在 compose 新增旁白＋cue 的 amix 路徑。\n回歸審核判 partial（DESIGN.md:312 仍寫 caution ping 可用），文件同步 0dd40aa 已改為如實描述。",
+   "closure": "partial → 已補完",
+   "closure_evidence": "house_audio.py 模組 docstring 與 cue_for_scene docstring 已改正：ping 已刪、compose 只對無旁白場用 cue、沒有 amix 路徑。_selftest_house_audio 4/4 綠。generate_house_cues.main() 已列在 digest not_fixing，接受。未關閉的部分：A-07 的 failure_scenario 明寫「依 DESIGN／docstring 啟用 caution ping」，而 video/DESIGN.md:312 到 HEAD 仍寫「`type: caution` 可用裁決出的 caution ping」。M 批已在 not_done 點名這一行（不在其所有權內），merge 時沒有處理，也沒列進 not_fixing。"
+  },
+  "B-01": {
+   "status": "fixed",
+   "commits": [
+    "c7d4175"
+   ],
+   "tests": [
+    "_selftest_rewatch_pack_evidence.test_a_repack_into_the_same_dir_extracts_the_new_renders_frames",
+    "_selftest_rewatch_pack_evidence.test_the_scene_folder_holds_exactly_the_frames_this_pack_lists"
+   ],
+   "summary": "rewatch_pack 每場抽幀前先 rmtree 該場 NN_<scene>/ 再重建，拿掉 `if not dst.exists()` 的沿用判斷，每次都用 ffmpeg 重抽（extract_frame 本帶 -y）。",
+   "closure": "closed",
+   "closure_evidence": "rewatch_pack.py:574-583 改成先 rmtree 該場 NN_<scene>/ 再 mkdir，每張幀一律呼叫 extract_frame。把 review-work/B/repro_rewatch.py 改成指向 repo 再跑：換成藍片重跑後，第二次的幀像素是 (0,0,254)，判定為 fresh（修前是 (254,0,0)，STALE）。_selftest_rewatch_pack_evidence 綠。另外拿真的 ch03_trig_derivatives_mimo 跑 --scene difference_quotient_for_sine --out <scratch>：資料夾裡有 12 張幀，正好等於 pack 的 12 列樣張。"
+  },
+  "B-02": {
+   "status": "fixed",
+   "commits": [
+    "19c80a5",
+    "612b12d"
+   ],
+   "tests": [
+    "_selftest_pauses.test_timing_only_transform_gives_apply_pauses_beat_table_and_writes_nothing",
+    "_selftest_pauses.test_timing_only_transform_without_pauses_is_the_same_object",
+    "_selftest_pauses.test_fa_words_move_by_the_same_cut_the_wav_splice_makes",
+    "_selftest_rewatch_pack_evidence.test_a_paused_scene_is_packed_on_the_rendered_clock",
+    "_selftest_critic_pauses.test_per_beat_grabs_are_timed_on_the_rendered_clock"
+   ],
+   "summary": "pauses.py 抽出 _fold_timing（只算拍表、回傳 splices）與純函式 apply_pauses_timing(scenes, manifest)（不讀寫檔，paused entry 帶 pause_splices）、shift_words(words, splices)（FA 字詞依同一刀位移）。apply_pauses 改成 apply_pauses_timing＋WAV splice，簽名與 make.py 呼叫不變、輸出不含 pause_splices。rewatch_pack 與 critic 讀完磁碟 manifest 後都依 storyboard 的 pauses 套 apply_pauses_timing；rewatch 的 scene_aligned FA 字詞經 shift_words。",
+   "closure": "closed",
+   "closure_evidence": "pauses.py 抽出 _fold_timing 與 apply_pauses_timing；rewatch_pack.py:503 和 critic.py:713 讀完磁碟 manifest 後都會套用。apply_pauses 的零行為改變實測：以 d255311 版 pauses.py 當對照組，對 output/ch03/s3.1/audio_mimo/manifest.json（27 場，其中 2 場有 pauses）跑新舊 apply_pauses，manifest JSON（含 key 順序）、[pauses] stdout、04／08 兩支 paused WAV 的 sha256 全部相同；apply_pauses_timing 的拍表也與 apply_pauses 一致。改指 repo 重跑 repro_pauses_rewatch.py：reveal_times=[1.0, 4.5]，與真正揭示時點 4.5 一致，『beat 2 reveal -> b』那格已看得到 b。FA 字詞在真實資料上也驗過：場 04 的 step.2 拍，第一個字落在 64.92＝63.42＋1.5；場 08 的 proof.1 拍落在 47.8＝46.6＋1.2。真片子集 pack 的 tail 列是 1.0 s，等於 SCENE_TAIL（修前是 2.5）。"
+  },
+  "F-02": {
+   "status": "fixed",
+   "commits": [
+    "19c80a5"
+   ],
+   "tests": [
+    "_selftest_rewatch_pack_evidence.test_a_paused_scene_is_packed_on_the_rendered_clock",
+    "_selftest_critic_pauses.test_per_beat_grabs_are_timed_on_the_rendered_clock"
+   ],
+   "summary": "與 B-02 同根因，同一個 commit（19c80a5）修正；採 finding 建議的替代做法（純時序函式＋兩支工具套用），未改讀 timeline.json。",
+   "closure": "closed",
+   "closure_evidence": "與 B-02 同一個修法。still_where 和 _beat_at 改吃已套 pauses 的 beats。在真片子集 pack 裡，LOCATE DEAD ZONES 行指到（beat 2, scaffold.motive），各張 reveal 樣張的時間落在停頓後的時鐘上（result 在 +87.4）。_selftest_rewatch_pack_evidence.test_a_paused_scene_is_packed_on_the_rendered_clock 與 _selftest_critic_pauses 都綠。"
+  },
+  "C-07": {
+   "status": "fixed",
+   "commits": [
+    "19c80a5"
+   ],
+   "tests": [
+    "_selftest_critic_pauses.test_per_beat_grabs_are_timed_on_the_rendered_clock",
+    "_selftest_critic_pauses.test_per_scene_fullest_candidates_are_on_the_rendered_clock"
+   ],
+   "summary": "critic 端（--per beat 抓幀時間與 C-02 的 per-scene 定格候選）改用套過 pauses 的時序；與 B-02 同 commit。",
+   "closure": "closed",
+   "closure_evidence": "critic.main 在 plan 之前先呼叫 pauses.apply_pauses_timing（critic.py:713），--per beat 的 ts 和 per-scene 的 settled 候選因此都在成片時鐘上。_selftest_critic_pauses 的兩條測試（per beat、per scene 候選）在 scratch cwd 以 -m 執行，全綠。"
+  },
+  "B-03": {
+   "status": "fixed",
+   "commits": [
+    "2ab4043",
+    "612b12d"
+   ],
+   "tests": [
+    "_selftest_rewatch_pack_evidence.test_canonical_deck_reads_audio_even_when_audio_mimo_exists",
+    "_selftest_rewatch_pack_evidence.test_no_fallback_to_the_other_decks_manifest",
+    "_selftest_rewatch_pack_evidence.test_a_manifest_naming_another_deck_is_refused_before_anything_is_written",
+    "_selftest_rewatch_pack_evidence.test_mimo_deck_reads_audio_mimo_even_when_audio_exists"
+   ],
+   "summary": "rewatch_pack.load_manifest(section_dir, deck) 只讀該 deck 的子目錄（_mimo 結尾用 audio_mimo/，否則 audio/），找不到就 SystemExit、不退回另一個目錄；manifest 帶 deck_id 且不等於 --deck 時印 REFUSE 並 exit 2（寫任何檔之前）。docstring 的 exit 2 與 Reads 段同步。",
+   "closure": "closed",
+   "closure_evidence": "load_manifest(section_dir, deck) 只讀該 deck 自己的子目錄，找不到就 SystemExit；main 在寫任何檔之前核對 deck_id，不符就 return 2。改指 repo 重跑 repro_rewatch.py：--deck demo_deck 讀到『beat from demo_deck end 2.0』，不再是 _mimo 的 0.5。真實資料上，--deck ch03_trig_derivatives 讀的是 audio/，最後停在缺 _av 檔，沒有去拿 audio_mimo 充數。"
+  },
+  "F-04": {
+   "status": "partial",
+   "commits": [
+    "2ab4043"
+   ],
+   "tests": [
+    "_selftest_rewatch_pack_evidence.test_canonical_deck_reads_audio_even_when_audio_mimo_exists",
+    "_selftest_rewatch_pack_evidence.test_no_fallback_to_the_other_decks_manifest"
+   ],
+   "summary": "程式部分與 B-03 同修（rewatch 依 deck id 選 manifest、核對 deck_id）。KICKOFF-s32-chain-rule.md §5 B2／§6.2 的 `--deck ch03_chain_rule` 應改 `ch03_chain_rule_mimo` 這一半未做。",
+   "closure": "closed",
+   "closure_evidence": "程式這半與 B-03 同修，重現結果同上。KICKOFF-s32-chain-rule.md 的 --deck 指令那半，列在 digest 的 s32_pending（F-04）裡，依規則不算未關。修正之後，照原 kickoff 指令跑只會明確報錯（找不到 manifest 或 _av），不會再靜默量錯片。"
+  },
+  "C-01": {
+   "status": "fixed",
+   "commits": [
+    "591bdfe"
+   ],
+   "tests": [
+    "_selftest_critic_fullest.test_dry_run_hands_gate_1_the_fullest_frame_of_an_exit_scene",
+    "_selftest_critic_fullest.test_the_end_frame_is_reachable_at_15_fps",
+    "_selftest_critic_fullest.test_a_planned_frame_that_cannot_be_extracted_fails_the_run"
+   ],
+   "summary": "extract_frames 拿掉 compute_fullest 參數，--dry-run 也解碼找最滿幀（本地運算、零 API）；新增 _ffprobe_fps，末幀夾制改為 dur - 1.5/fps；main() 在任一規劃幀抽不到時列出哪幾幀並 exit 1（dry-run／無旗標／--confirm 都適用）；dry-run 計畫列印實際選到的 fullest 秒數。改寫 _selftest_critic_fullest 中把舊行為釘成契約的 test_dry_run_skips_the_expensive_decode。",
+   "closure": "closed",
+   "closure_evidence": "extract_frames 拿掉了 compute_fullest；末幀夾制改成 dur−1.5/fps（新增 _ffprobe_fps）；任一規劃幀抽不到就 exit 1。改指 repo 重跑 review-work/C/repro_critic_dryrun.py：--dry-run 得到 rc=0、plan.ts=1.8、fullest_ts=1.8、frame_ink=0.100（修前 fullest=None、ink=0）。repro_critic_lastframe.py 在 15／30／60 fps 都是 frame_path OK（修前 15 fps 會 MISS）。_selftest_critic_fullest 綠。"
+  },
+  "C-02": {
+   "status": "fixed",
+   "commits": [
+    "c27066e"
+   ],
+   "tests": [
+    "_selftest_critic_fullest.test_an_indicate_flash_is_never_picked_over_the_settled_frame"
+   ],
+   "summary": "新增 _settled_ts(beat)＝LEAD + end_seconds - BEAT_BACKOFF（--per beat 抓幀也改呼叫它）；per-scene 計畫項帶 settled 候選（已套 pauses）；_fullest_frame_ts(video, settled, end) 只在各拍定格時間點與末幀之間挑 ink 最大者，平手取最晚、末幀達 99% 仍取末幀的規則不變，解碼方式不變。",
+   "closure": "closed",
+   "closure_evidence": "_fullest_frame_ts(video, settled, end) 只在各拍定格時間點與末幀之間挑。拿審查員用真 manim Indicate 做的 480p15 片段直接呼叫：settled=[2.8, 4.8, 9.1] 選到末幀 (10.167, ratio 1.0)，修前選到閃爍中的 7.25。§3.1 _mimo 有 indicate 的 11 拍，套 pauses 後音長都 ≥5.92 s，定格點遠在 0.8 s 閃爍結束之後。還有殘餘邊界：拍長短於 reveal＋indicate＋0.2 時，定格點會落在閃爍中（刻意構造 settled=7.3 就會選到 ratio 1.28），但現役 deck 都不會觸發。"
+  },
+  "C-05": {
+   "status": "fixed",
+   "commits": [
+    "f237272"
+   ],
+   "tests": [
+    "_selftest_critic_confirm.test_a_batch_where_every_call_failed_exits_non_zero",
+    "_selftest_critic_confirm.test_one_failed_call_in_a_batch_exits_non_zero",
+    "_selftest_critic_confirm.test_critique_md_shows_the_error_not_a_json_parse_story",
+    "_selftest_critic_confirm.test_a_clean_batch_still_exits_zero_and_an_unparseable_reply_is_still_labelled_so"
+   ],
+   "summary": "main() --confirm 路徑：results 中有任何 error 項就印出失敗數並 exit 1（批次照舊跑完）；_write_md 對 error 項改寫「call failed, no critique: <error 原文>」，不再套 could not parse JSON。模型回覆解析不出 JSON 仍不算呼叫失敗（維持 exit 0 與原文案）。",
+   "closure": "closed",
+   "closure_evidence": "critic.main 的 --confirm 路徑只要有 error 項就 return 1；_write_md 對 error 項印『call failed, no critique: <原文>』。_selftest_critic_confirm 共 4 條（全失敗、單條失敗、md 文案、乾淨批次仍回 0）在 scratch cwd 全綠。"
+  },
+  "A-01": {
+   "status": "fixed",
+   "commits": [
+    "c2a5802"
+   ],
+   "tests": [
+    "_selftest_tts_paid_audio.test_beat_reuse_swap_keeps_both_takes",
+    "_selftest_tts_paid_audio.test_beat_reuse_prepend_keeps_every_take_and_bills_once",
+    "_selftest_tts_paid_audio.test_beat_reuse_rewrite_then_move_then_revert"
+   ],
+   "summary": "`_synthesize_scene_beats` 改成一場一筆交易，分三段。(1) 先查完所有拍的 reuse 來源，這一步不動檔。(2) 每拍的 take，不論是舊 WAV 的複本還是新合成，一律先放進 `<beat_dir>/.staging/`，複製過去時不刪來源（`_relocate` 和 `synthesize_beat` 新增 `retired` 參數，給了就只記錄、不刪）。(3) 全部備妥後才 promote 到最終路徑，再把沒被任何最終路徑覆蓋的舊來源刪掉。staging 在 finally 清掉。來源本來就在最終路徑上的拍（原地命中）不經 staging。另新增 `_retire` 集中處理刪檔與空目錄清理。",
+   "closure": "closed",
+   "closure_evidence": "讀了 tts.py:884-1001 `_synthesize_scene_beats` 的三段流程：先 peek、再全部進 .staging、最後 promote，retire 時排除 finals。把 review-work/A 的 repro_collision.py、repro_collision2.py 改指 repo，cwd 設在 regress/RG1 重跑。swap：backend calls=0，01_a=2.0 s（Q）、02_b=1.0 s（P），兩拍各拿到自己的 take。rewrite_then_move：calls=1，不崩潰。prepend：不崩潰，calls=1，磁碟上 01_beat_01=2.4（N）、02_x=1.0（P）、03_b=2.0（Q）。repro_collision2 (b) 的 revert 步驟仍會錯綁，原因是腳本直接呼叫內部函式、餵的是編輯前的 manifest；走 main() 時每場 checkpoint 會記下新綁定（test_beats_abort_then_revert_binds_each_beat_to_its_own_take 綠）。例外視窗下的殘餘風險另列 RG1-01。"
+  },
+  "F-01": {
+   "status": "fixed",
+   "commits": [
+    "c2a5802"
+   ],
+   "tests": [
+    "_selftest_tts_paid_audio.test_beat_reuse_prepend_keeps_every_take_and_bills_once",
+    "_selftest_tts_paid_audio.test_beat_reuse_swap_keeps_both_takes"
+   ],
+   "summary": "與 A-01 同一根因，由同一個 commit（c2a5802）修掉：beat reuse 改成兩階段 staging，新合成的 take 也先寫暫存再 promote。",
+   "closure": "closed",
+   "closure_evidence": "與 A-01 同根因，由同一個 commit c2a5802 修掉。F-01 的「開頭插新句＋marker」對應 repro_collision2 (a) 與 selftest test_beat_reuse_prepend_keeps_every_take_and_bills_once，兩者在 repo HEAD 都不崩潰、每個 take 都在、只計費 1 次；「兩拍互換」對應 test_beat_reuse_swap_keeps_both_takes，為綠。"
+  },
+  "A-02": {
+   "status": "fixed",
+   "commits": [
+    "cb89872"
+   ],
+   "tests": [
+    "_selftest_tts_paid_audio.test_budget_abort_retry_bills_only_the_unfinished_scene",
+    "_selftest_tts_paid_audio.test_beats_abort_then_revert_binds_each_beat_to_its_own_take",
+    "_selftest_tts_paid_audio.test_no_billing_abort_after_a_moved_beats_scene_retries_free",
+    "_selftest_tts_paid_audio.test_budget_abort_never_pays_for_half_a_beats_scene"
+   ],
+   "summary": "四處修改：\n(1) `main()` 每做完一場，就把本次 run 已完成的場 merge 進 prior manifest，原子寫入（identity 不同時只寫 fresh）；receipt 抽成 `_receipt`，每次一起寫。還沒處理到的場保留 prior 記錄與舊路徑，renumber 仍只在最後一次寫入時做，因為 reuse index 還指著舊路徑。\n(2) synthesize_scene、_synthesize_scene_beats、_synthesize_scene_aligned、_build_fallback_rungs、adopt_prior_scene_artifacts 新增 `retired` 參數：main 傳入清單，搬走的來源先只記錄，等該場的 manifest 寫出後才刪。傳 None 則在該場結束時就刪，直接呼叫的人行為與舊版相同。\n(3) 新增 `BudgetedBackend.reserve()`：beats 模式一場要付幾次在第一階段就已知，放不下就在第一次呼叫前中止，不會付了一半再丟掉。第一階段同時印出 `not reusing ...` 的原因，中止前就看得到是哪一拍要錢。\n(4) 文字同步改成新的保證：BudgetedBackend docstring、中止訊息、`--max-billed-calls` 的 help、adopt 與 synthesize_scene 的 docstring，以及 RUNBOOK:86-88。新保證是：已完成的場都記在 manifest，重試不再付錢；被中斷的那一場沒有 promote 任何東西，舊音檔仍在 manifest 記的路徑上。",
+   "closure": "closed",
+   "closure_evidence": "讀了 main() 的 tts.py:1511-1531：每場結束先寫 checkpoint，也就是 merged_manifest(existing, …)，再 _retire(retired)。adopt、_relocate、synthesize_beat 都加了 retired 參數，BudgetedBackend 新增 reserve()。改指 repo 重跑 repro_abort_e2e.py（用 run_with_aligner 讓 preflight 放行）：cap=2 中止後，manifest 裡的 s1、s2 已是 7.2 s，與磁碟一致；調高上限重試的 receipt 為 backend_calls=1（修前是 3）。重跑 repro_budget_abort.py：--no-billing 中止後，舊 manifest 記錄的 beat 檔都還在，舊 storyboard 的 --reuse-audio 驗證 ACCEPTED；還原後再帶 --no-billing 重試可跑完。BudgetedBackend 的 docstring、--max-billed-calls 的 help、RUNBOOK:86-91 都已改寫成新保證。KICKOFF-s32:446 仍寫「原封不動」，但現在重試確實安全，只剩措辭不準，已併入 RG1-02 的次要項。"
+  },
+  "A-03": {
+   "status": "fixed",
+   "commits": [
+    "ac67d91"
+   ],
+   "tests": [
+    "_selftest_tts_paid_audio.test_missing_stable_ts_fails_closed_before_any_call",
+    "_selftest_tts_paid_audio.test_missing_stable_ts_is_flagged_by_dry_run",
+    "_selftest_tts_paid_audio.test_ladder_history_records_the_root_cause"
+   ],
+   "summary": "新增可 monkeypatch 的 `_scene_aligner_missing()`，內容是試著 import stable_whisper。只要有任何場 resolve 成 scene unit，`main()` 就會先檢查。缺件時，真跑在 overwrite guard 之後、`build_backend` 之前以非 0 中止，訊息列出受影響的場次，並指向 ENVIRONMENT.md 5c 或 `--unit beat`；dry-run 則印 `NOTE: a real run WOULD abort`。另外 arbiter 與 resynth 兩個 rung 的 reason 會附上 `entry['validation'].get('error')`（`_why`），根因因此寫進 fallback_history。",
+   "closure": "closed",
+   "closure_evidence": "讀了 tts.py:1332-1345 `_scene_aligner_missing` 與 :1395-1401、:1477-1478：只要有場 resolve 成 scene unit，真跑就在 build_backend 之前 SystemExit，dry-run 則印 NOTE。:1176-1199 的 `_why` 讓 arbiter 與 resynth 的 reason 帶上 validation.error。在本 venv（沒有 stable-ts）重跑 repro_missing_aligner.py：真跑印出「1 scene(s) resolve to the scene unit (s1) but stable-ts (stable_whisper) is not importable … or pass --unit beat.」後中止，沒有任何計費呼叫。selftest 的 missing_stable_ts_fails_closed、dry_run、beat_unit_needs_no_aligner（--unit beat 不會被誤擋）、ladder_history_records_the_root_cause 全綠。whisper_timestamped 的 WARN 屬建議性質、不在批次 T 的條款內，沒做。"
+  },
+  "A-04": {
+   "status": "fixed",
+   "commits": [
+    "e54eeba"
+   ],
+   "tests": [
+    "_selftest_tts_paid_audio.test_arbiter_rescued_scene_is_reused_for_free"
+   ],
+   "summary": "reuse 的重新對齊失敗，而且這次的 `--aligner-model` 不是 small.en 時，先在同一支 reused WAV 上跑一次 small.en（promote_from=None，不計費，等同 ladder 的 arbiter rung）。通過就直接回傳，並在 fallback_history 記一筆 arbiter pass；兩者都失敗才進原本的計費合成。",
+   "closure": "closed",
+   "closure_evidence": "讀了 tts.py:1275-1291：reuse 重新對齊失敗、且 aligner_model 不是 small.en 時，先在 reused WAV 上跑 promote_from=None 的 small.en，通過就記一筆 arbiter 到 fallback_history。改指 repo 重跑 repro_arbiter_reuse.py：uncapped 與 --no-billing 兩種情況，aligner 呼叫都是 [('26_recap.wav','base.en'),('26_recap.wav','small.en')]，backend synth calls 皆為 0，history=['arbiter']。selftest test_arbiter_rescued_scene_is_reused_for_free 綠。"
+  },
+  "A-06": {
+   "status": "fixed",
+   "commits": [
+    "5598818"
+   ],
+   "tests": [],
+   "summary": "README 的離線 mock 指令補上 `--unit beat`，並加一段說明：為什麼必帶；這一步只驗 beats 時鐘，不代表 scene_aligned 的 beat 時序；`[sync]` 與 short-beat 的判讀以真音檔版為準。文末提到 mock 的地方也註明要配 `--unit beat`。KICKOFF-s32 依指示沒有動。",
+   "closure": "closed",
+   "closure_evidence": "video/README.md:202 的 mock 指令已補 --unit beat，並說明為什麼必帶、只驗 beats 時鐘、不代表 scene_aligned 時序；:385 的提及也補上了。KICKOFF-s32:411/422 屬 §3.2 分支，已列在 digest 的 s32_pending，不算 not_closed。CLAUDE.md、ENVIRONMENT.md 的裸 mock 指令不在 A-06 原範圍，但 A-03 之後會 fail-closed，另列 RG1-02。"
+  },
+  "D1-01": {
+   "status": "fixed",
+   "commits": [
+    "52a6cda"
+   ],
+   "tests": [
+    "_selftest_inset_lens.test_lens_sweep_colour_when_sweep_is_not_the_last_plot",
+    "_selftest_inset_lens.test_two_lens_sweeps_each_ride_their_own_tracker"
+   ],
+   "summary": "_inset_block 的 sweep 分支裡，band()／rule()／dot() 三個閉包改用預設參數綁定本次迭代的 x_of、x_from、top_fn、bot_fn、col、opacity，不再在 always_redraw 每幀呼叫時讀到最後一個 plot 的顏色或 tracker。",
+   "closure": "closed",
+   "closure_evidence": "graph.py:767-797：band／rule／dot 三個閉包都以預設參數綁定本輪的 x_of、x_from、top_fn、bot_fn、col、opacity。nothing() 與 lens 在迴圈中不變，late-binding 無害。原審查員 r5b.py 改指 repo 重跑：sweep 不在最後時，鏡片 band／rule／dot 為 #F2B13C（accent），修前是 #D98F3C。_selftest_inset_lens 綠。"
+  },
+  "D1-06": {
+   "status": "fixed",
+   "commits": [
+    "68183d6"
+   ],
+   "tests": [
+    "_selftest_inset_lens.test_lens_curve_takes_the_color_map_default_role"
+   ],
+   "summary": "把「沒寫 color／color_role、但 label 含色表 token 時改用色表 role」這段邏輯抽成 _effective_plot(plot)，_plot_blocks 與 _inset_block 取色前都先過它（原本 _plot_blocks 裡的同一段邏輯連同註解一起搬進 helper）。",
+   "closure": "closed",
+   "closure_evidence": "graph.py 新增 _effective_plot，_plot_blocks 與 _inset_block（:679）都先過它。r2_inset_colormap 重跑：主圖與鏡片曲線都是 #D98F3C。"
+  },
+  "D1-09": {
+   "status": "fixed",
+   "commits": [
+    "9866736"
+   ],
+   "tests": [
+    "_selftest_graph_single.test_single_mode_without_axes_uses_the_default_axes",
+    "_selftest_graph_single.test_single_mode_axes_without_ranges_uses_the_default_ranges",
+    "_selftest_graph_single.test_single_mode_with_neither_plots_nor_axes_builds",
+    "_selftest_graph_single.test_single_mode_inset_without_axes_builds"
+   ],
+   "summary": "_build_single 比照 _panel，建立 merged = dict(spec, axes=ac)，傳給 _plot_blocks 與 _inset_block。省略 axes、或 axes 只寫 x_length 時，改用預設的 x_range／y_range，不再丟 KeyError。",
+   "closure": "closed",
+   "closure_evidence": "_build_single 傳 merged=dict(spec, axes=ac) 給 _plot_blocks 與 _inset_block。r1_axes_default 的四個情境全部 OK，修前是 KeyError。"
+  },
+  "D1-07": {
+   "status": "fixed",
+   "commits": [
+    "18279a1"
+   ],
+   "tests": [
+    "_selftest_graph_single.test_label_x_is_honoured_on_a_y_clip_curve",
+    "_selftest_graph_single.test_label_x_with_no_point_on_the_curve_warns"
+   ],
+   "summary": "label_x 改用 axes.c2p(x, safe_eval_expression(expression, x)) 求點（與預設的尾端擺法同一種算法），不再依賴 curve 的型別。算不出來時（丟例外或得到非有限值）印出「[graph] label_x=… no point on the curve …」，再落回預設擺放，不再靜默 pass。_plot_blocks 裡一行提到 input_to_graph_point、因這次改動而過時的註解也一併更新。",
+   "closure": "closed",
+   "closure_evidence": "graph.py:213-226 改用 c2p(lx, f(lx))，非有限值或例外時印 [graph] 警告。r12_labelx_yclip：y_clip 時標籤中心 (-1.57,0.04)，緊貼曲線點 (-1.57,-0.27)。label_x=0 時印出 ZeroDivisionError 警告並退回預設位置。但 label_x 落在 y_clip 的裁切區段時會出新問題，見 RG3-01。"
+  },
+  "D1-02": {
+   "status": "fixed",
+   "commits": [
+    "87c9706"
+   ],
+   "tests": [
+    "_selftest_inset_lens.test_top_left_panel_clears_the_title",
+    "_selftest_inset_lens.test_top_right_panel_clears_a_long_title",
+    "_selftest_inset_lens.test_bottom_panels_clear_a_full_width_annotation",
+    "_selftest_inset_lens.test_no_room_between_title_and_annotations_raises"
+   ],
+   "summary": "在模板端修：_inset_block 多收 title 與 annotation 群組兩個參數。標題的 x 範圍伸進面板的 x 範圍時，面板上緣限制在 title 下緣減 _TITLE_GRAPH_GAP 以下；annotation 群組伸進時，面板下緣限制在其上緣加 _GRAPH_ANNOTATION_GAP 以上。top 角貼上限、bottom 角貼下限；兩者之間的空間不足 _INSET_H 時 raise ValueError（inset.corner …），走 corner 非法時的同一條 build error 路徑。兩帶都沒伸進面板時，位置與原本逐位相同。inset 區段的說明註解補了一句。",
+   "closure": "closed",
+   "closure_evidence": "graph.py:641-657：新增 runs_under，top 角面板夾在 title 之下、bottom 角夾在 annotation 之上，放不下就 raise。r10_inset_title／r10b 重跑：四個角落與 title／annotation 的 y 向交疊都變成 0。自寫 p_graph.py 測 4 角 × 0／1／2 條 annotation：無交疊、合法輸入不會 raise、sizecheck 無 finding。閘端修法 (2) 沒做，屬 V1 所有權外，模板端已足以杜絕此類碰撞。DESIGN 未同步，見 RG3-02。"
+  },
+  "D1-10": {
+   "status": "fixed",
+   "commits": [
+    "73639a5"
+   ],
+   "tests": [
+    "_selftest_graph_single.test_clamped_long_title_stays_inside_the_right_gutter"
+   ],
+   "summary": "_title 的 clamp 上限從 FRAME_W - 2*SAFE_MARGIN（13.126u）改成 FRAME_W - 2*SIDE_GUTTER（即 CONTENT_W，12.740u），與 SIDE_GUTTER 錨點一致，single 與 2up 兩種模式都適用。",
+   "closure": "closed",
+   "closure_evidence": "graph.py:163-165 的 max_w 改為 FRAME_W-2*SIDE_GUTTER。r6_title_clamp：兩個長標題都是 w=12.741、right=6.370，等於 gutter 邊界，修前是 6.755。"
+  },
+  "D2-04": {
+   "status": "fixed",
+   "commits": [
+    "6293b62"
+   ],
+   "tests": [
+    "_selftest_zero_height_prose::test_a_zero_height_node_has_no_size",
+    "_selftest_zero_height_prose::test_value_table_with_a_blank_corner_cell_is_checked_not_crashed"
+   ],
+   "summary": "sizecheck 新增 _has_no_size(node)（height ≤ 0 或 initial_height ≤ 0）。_norm_size 與 _effective_font_px 遇到零高度節點回 None；呼叫端 _block_prose_size 與 _floor_issues 略過 None。非零高度節點的計算完全不變。",
+   "closure": "closed",
+   "closure_evidence": "新增 _has_no_size，_norm_size／_effective_font_px 遇到零高度節點回 None，呼叫端略過。在 scratch cwd 跑 check_scenes，餵 value_table：header ['', …] 加一列空白 body cell，只得到一條 L2 warn，沒有 ZeroDivisionError。G 與 V3 合併後的 sizecheck.py 以 AST 檢查無重複定義；_aside_collision_issues 排在 _overlap_issues 之後；F9 的 import 改成 narration，檔內已沒有其他地方用 reveal_targets。_selftest_sizecheck、zero_height_prose、aside_rail、value_table、worked_example、type_scale 都綠。"
+  },
+  "B-04": {
+   "status": "fixed",
+   "commits": [
+    "7743e56"
+   ],
+   "tests": [
+    "_selftest_show_grammar::test_a_bare_show_is_a_schema_error_not_a_warning",
+    "_selftest_show_grammar::test_malformed_markers_are_errors",
+    "_selftest_show_grammar::test_schema_reads_a_spaced_marker_exactly_as_the_runtime_does",
+    "_selftest_show_grammar::test_sizecheck_checks_the_target_of_a_spaced_marker",
+    "_selftest_show_grammar::test_derive_spoken_parity_uses_the_runtime_grammar"
+   ],
+   "summary": "narration.py 成為 {show} 的唯一文法：新增 _SHOW_LIKE 與 malformed_show_markers(say)，回傳「長得像 marker、但 parse_say 不讀」的片段。schema.reveal_targets 改為呼叫 narration.list_reveal_targets；每一條 malformed marker 報 schema error，取代舊的「unclosed」計數比較和空 target warn。因此不再使用的 _SHOW、_SHOW_OPEN、import re 與 --list 的 \"(empty)\" 分支一併刪除。sizecheck 的 F9 target 檢查改用 narration.list_reveal_targets，並更正「pure beat split」註解。derive_spoken 的 show_markers（parity）也改用 list_reveal_targets。",
+   "closure": "closed",
+   "closure_evidence": "schema.reveal_targets、sizecheck 的 F9、derive_spoken 的 show_markers 都改用 narration.list_reveal_targets，schema 對 malformed_show_markers 報 error。改指 repo 重跑 repro_show_regex.py：『{show}』變成 error；『{ show bodyy}』的 reveal_targets 得到 ['bodyy']，sizecheck F9 因此查得到。以 git archive 取 d255311／b8a31a3 兩版 schema.py 各跑 24 份 deck，輸出逐字相同。剩下兩處獨立的 regex：rewatch_pack.py:84 的 canonical_beats，以及 derive_spoken.gen_md 的閱讀視圖。兩者都不在 finding 範圍內，只算 drift。"
+  },
+  "B-05": {
+   "status": "fixed",
+   "commits": [
+    "271559f"
+   ],
+   "tests": [
+    "_selftest_example_coverage::test_an_unresolvable_section_is_said_not_silently_passed"
+   ],
+   "summary": "examples_for_deck 解析不到時（沒有 chapter、section 不在任何 \\sechead、來源 .tex 不存在）改回 None；找得到該節但該節沒有例題，仍回 []。example_issues 收到 None 時回一條 `[EX] cannot resolve handout section §<sec> ...`，嚴重度同 EX1（預設 warn，enforce 時 error）。schema.py 呼叫端不必改。",
+   "closure": "closed",
+   "closure_evidence": "examples_for_deck 解析不到時回 None，example_issues 回一條『[EX] cannot resolve』。改指 repo 重跑 repro_ex_vacuous.py：{'section':'3.1'}、section 3.10、來源搬走這三種都回 None 並產生 1 條 finding，對照組照舊是 3 條。24 份 deck 新舊 schema 輸出相同，沒有新增 [EX] 行。"
+  },
+  "F-05": {
+   "status": "fixed",
+   "commits": [
+    "ed257e3"
+   ],
+   "tests": [
+    "_selftest_carry_exit_conflict::test_carrying_a_block_the_source_scene_exits_is_an_error",
+    "_selftest_carry_exit_conflict::test_any_id_of_a_carried_group_counts"
+   ],
+   "summary": "schema._carry_issues 讀上一個內容場（即合法的 from）的 exit 清單。carry entry 的 block（或 list 內任一 id）如果出現在清單裡就報 error，訊息同時指名兩邊並給出修法。",
+   "closure": "closed",
+   "closure_evidence": "schema._carry_issues 讀上一個內容場的 exit，carry.block（或 list 內任一 id）落在其中就報 error。_selftest_carry_exit_conflict 綠。24 份 deck 新舊 schema 輸出相同，沒有新增 error。"
+  },
+  "C-08": {
+   "status": "fixed",
+   "commits": [
+    "6cf7d6f"
+   ],
+   "tests": [
+    "_selftest_focus_reveal_order::test_dimming_a_block_a_later_beat_reveals_is_an_error",
+    "_selftest_focus_reveal_order::test_indicating_a_block_a_later_beat_reveals_is_an_error"
+   ],
+   "summary": "schema._focus_issues 按 say 的 reveal 順序記錄每個 target 第一次揭示的拍序。focus entry 的 at 合法時，dim 或 indicate 名單裡凡是「第一次揭示晚於 at」的 id 都報 error。已揭示的 block、以及 indicate 本拍自己的 at（indicate 在 reveal 之後才播）都不受影響。docstring 同步更正。",
+   "closure": "closed",
+   "closure_evidence": "schema._focus_issues 以 reveal 順序記錄各 target 的 beat_of，dim 或 indicate 名單裡凡是 beat_of 大於 at 的 id 都報 error（schema.py:102-114）。_selftest_focus_reveal_order 與 _selftest_focus_and_pacing 綠，24 份 deck 沒有新增 error。scene.py 的播放端過濾依 digest（只加 schema error）不做，不算未關。這條新 error 有誤擋，見 RG2-01。"
+  },
+  "F-03": {
+   "status": "fixed",
+   "commits": [
+    "b858875"
+   ],
+   "tests": [
+    "_selftest_tail_clock::test_corner_carry_without_marker_stays_inside_the_sync_gate",
+    "_selftest_tail_clock::test_last_beat_dim_plus_exit_stays_inside_the_sync_gate",
+    "_selftest_tail_clock::test_a_tail_already_spent_still_fades_the_exit_and_never_waits_zero"
+   ],
+   "summary": "scene._tail 在有旁白時鐘時，exit 之前先算 end＝narration_end＋TAIL 與剩餘 end−now。exit 淡出 run_time＝min(EXIT_FADE_SECONDS, max(剩餘, 1 影格))。淡出後重讀時鐘，只 wait(end−now)：拿掉 MIN_HOLD 下限；不足半影格的浮點殘差不 wait（manim 對 ≤0 會 raise，未滿 1 影格會補成 1 影格）。無時鐘路徑維持原算術。corner carry 無 marker 修後已在閘內，schema 的 warn 維持 warn，不升 error。",
+   "closure": "closed",
+   "closure_evidence": "scene._tail 先算 end 和剩餘；exit 淡出取 min(0.5, max(剩餘, 1 影格))；淡出後重讀時鐘，只在剩餘 ≥ 半影格時才 wait。把 review-work/F/repro_tail_overrun.py 改指 repo，並設 config.frame_rate=30 重跑：A（corner carry 無 marker）、B（最後一拍 dim＋exit）、C（對照組）三組 delta 都是 +0.0 影格（修前 A +3、B +6）。另加一組 tail 已耗盡 1.3 s 的情境：淡出為 1 影格，不呼叫 wait，不會 raise。_selftest_tail_clock 綠。"
+  },
+  "D2-01": {
+   "status": "fixed",
+   "commits": [
+    "3afb721"
+   ],
+   "tests": [
+    "_selftest_value_table::test_accent_col_cells_take_the_scene_accent_ink",
+    "_selftest_value_table::test_accent_row_cells_take_the_scene_accent_ink",
+    "_selftest_value_table::test_ch01_when_inversion_fails_accent_column_is_practice_green"
+   ],
+   "summary": "value_table 的 accent 欄／列 cell 改用 f\"{role}_ink\"，跟 col_tint 同 hue；刪掉只有舊 role 名、永遠 fallback 到 blue_ink 的 _ACCENT_INK。",
+   "closure": "closed",
+   "closure_evidence": "value_table.py:101 改為 accent_ink=f\"{role}_ink\"，_ACCENT_INK 已刪。ACCENT_ROLE 與 DEFAULT_ROLE 的六個語意 role 在 DARK／LIGHT 都有對應 _ink（theme.py:153-154、193-194）。_selftest_value_table 的 5 條（含 ch01 when_inversion_fails）綠。原 repro_value_table_ink 因引用已刪的 _ACCENT_INK 而 AttributeError，屬預期。"
+  },
+  "D2-05": {
+   "status": "fixed",
+   "commits": [
+    "13119f3"
+   ],
+   "tests": [
+    "_selftest_value_table::test_mixed_text_and_math_cell_renders_at_the_plain_text_cell_size"
+   ],
+   "summary": "value_table._cell 只把「整串只有一段 $…$」的純數學 cell 送 math_line（尺寸不變）；純文字、文字夾 inline math 的 cell 一律走 brand.prose，套 text scale 並帶 prose tag。模組 docstring 的路由說明同步改。",
+   "closure": "closed",
+   "closure_evidence": "value_table._cell 只有「整格恰為一段 $…$」才走 math_line，其餘走 prose。repro_vt_mixed_cell：混合 cell 與純文字 cell 的 font_size 比為 1.000，修前 0.784。"
+  },
+  "D2-03": {
+   "status": "fixed",
+   "commits": [
+    "b013885"
+   ],
+   "tests": [
+    "_selftest_wrap_mixed::test_no_wrap_keeps_the_source_spacing_verbatim",
+    "_selftest_wrap_mixed::test_wrapping_breaks_only_at_source_whitespace",
+    "_selftest_wrap_mixed::test_glued_token_width_is_measured_piecewise",
+    "_selftest_wrap_mixed::test_prose_sends_the_s31_reason_to_latex_without_the_phantom_space"
+   ],
+   "summary": "_wrap_mixed 的 token 改成「原字串裡一段不含空白的連續片段」：$…$ 仍是不可拆的整體，緊貼的文字黏在同一個 token；重組時只在原本有空白處補一個空格，換行也只在那裡斷。_token_width 改成逐段量寬（數學用實際 render 寬、文字用字元估寬）。",
+   "closure": "closed",
+   "closure_evidence": "brand.py:340-386 改以原字串中不含空白的連續片段為 token，重組時只在原有空白處補空格。repro_wrap_space 全部照原文輸出；repro_wrap_space2 extra=+0.000u，修前 +0.070u；repro_wrap_space3 輸出 ε--δ，無多餘空格。自寫 p_wrap.py 測邊界：開頭／結尾空白去除、連續空白與 tab 收成一格、只有數學、$a$$b$、空字串、未配對的 $、token 超寬時獨占一行（與修前同）、prose() 能正常編譯，全部正常。已知取捨：「$x$ ,」這類寫法照原文保留空格，24 份 deck 沒有這種寫法。"
+  },
+  "D2-02": {
+   "status": "fixed",
+   "commits": [
+    "ea0d0f2"
+   ],
+   "tests": [
+    "_selftest_aside_rail::test_aside_never_leaves_the_body_zone",
+    "_selftest_aside_rail::test_an_aside_taller_than_the_body_zone_collapses",
+    "_selftest_aside_rail::test_aside_clears_a_scaffold_motive_above_the_body",
+    "_selftest_aside_rail::test_statement_never_runs_under_the_rail_card",
+    "_selftest_aside_rail::test_statement_wraps_short_of_the_rail_with_a_gutter",
+    "_selftest_aside_rail::test_overflow_checks_the_aside_but_still_exempts_other_decoration",
+    "_selftest_aside_rail::test_content_covered_by_the_aside_card_is_an_error",
+    "_selftest_aside_rail::test_aside_collision_is_judged_line_by_line",
+    "_selftest_aside_rail::test_theorem_proof_aside_is_frame_checked_too"
+   ],
+   "summary": "definition_math：aside 模式下 statement 以 PRIMARY_W−0.3（ASIDE_GUTTER）換行；aside 先建好，收合條件多兩項：卡片高過 body zone，或實測 statement／math 寬度超過 PRIMARY_W（math 門檻由 +0.05 收緊到 0）；aside 的 y 夾在 body zone 內。sizecheck：_overflow_issues 不再豁免 id=aside；新增 _aside_collision_issues，逐行比對 aside 與每個 content block，交疊就報 error。DESIGN 的 L3 表列與 aside 契約同步更新。",
+   "closure": "closed",
+   "closure_evidence": "definition_math.py:136-170：statement 改在 PRIMARY_W-0.3 換行；aside 高過 zone 或實測寬度超過 PRIMARY_W 就收合；aside 的 y 夾在 body zone。sizecheck 的 _overflow_issues 不再豁免 aside，另新增 _aside_collision_issues。重現：repro_aside_collide 的情境②改為收合（無 aside block）；repro_aside_scaffold 中 motive 與 aside 的 y 交疊為 0；43 字 aside 收合。自寫 probe：theorem_proof 的合法 aside 場（#0、#2）無誤報，只有真交疊的 #1 報 error。_selftest_aside_rail 9 條綠。main 模型 after-merge 的 deck gate 與 baseline 比對（濾掉 log 雜訊），只剩已知的 _demo_aside thm_aside 7%→9%。"
+  },
+  "D2-08": {
+   "status": "fixed",
+   "commits": [
+    "c5b807e",
+    "9d364ea"
+   ],
+   "tests": [
+    "_selftest_definition_math_label::test_accents_missing_from_label_take_their_scene_role_chip",
+    "_selftest_definition_math_label::test_corollary_has_its_own_chip"
+   ],
+   "summary": "definition_math 的 LABEL 補上 corollary；新增 _default_label(accent)：LABEL 查不到時用 SCENE_ROLE_CHIP.get(accent)，兩邊都沒有才退回 [ definition ]。caution／note／remark／derivation 因此各有自己的 chip。\n回歸審核判 partial（proof／solution／strategy 仍退回 [ definition ]），第二輪 F3（9d364ea）補上三者的 chip。",
+   "closure": "partial → 已補完",
+   "closure_evidence": "definition_math.py:39-43 的 _default_label 查不到 LABEL 時改用 SCENE_ROLE_CHIP，LABEL 補了 corollary。自寫 repro_dm_label2.py 列舉全部 ACCENT_ROLE：caution、corollary、derivation、note、remark 都有正確 chip，但 proof、solution、strategy 仍是 [ definition ]，原 finding 重現列的 8 個值裡有 3 個未修。批次自述「依派工只補 corollary」，digest not_fixing 沒有列入這三個。現有 deck 不受影響，屬 L3。"
+  },
+  "D2-06": {
+   "status": "fixed",
+   "commits": [
+    "3e435ac"
+   ],
+   "tests": [],
+   "summary": "DESIGN 目錄表 recap_cards 列改為單欄編號重點、payload 只剩 points[]、reveal 只剩 point.N（拿掉 formulas[]／formula.N 與 blue-bar 卡）；callout 列和 callout.py docstring 改成 caution＝紅、remark／note＝aside 灰。",
+   "closure": "closed",
+   "closure_evidence": "DESIGN.md:176、179 的 callout 色與 recap_cards 列已對齊 code，callout.py docstring 同步。ch03_chain_rule.yml 的 formulas: 屬 §3.2 分支待辦，不計。"
+  },
+  "D2-07": {
+   "status": "partial",
+   "commits": [
+    "af590ac"
+   ],
+   "tests": [],
+   "summary": "只改 theme.py 的模組 docstring 與註解：字體改寫為 Instrument Sans＋Plex Mono＋Latin Modern；色軸改寫為六個語意 role；Back-compat 段說明四個 hue 別名是凍結的舊色、不會跟著 hue 變；palette 標頭註解與 7 個別名行尾註解改寫成實際關係。所有色值都沒動。",
+   "closure": "closed",
+   "closure_evidence": "theme.py 的模組 docstring 與 7 個別名行尾註解已改成實情（凍結舊 hex，不跟 hue 連動）。色值與 glow halo 刻意不改，屬 digest not_fixing（D2-07 色值）。"
+  },
+  "D1-03": {
+   "status": "fixed",
+   "commits": [
+    "eb87606"
+   ],
+   "tests": [
+    "_selftest_title_by_id::test_derivation_part_without_prompt_keeps_the_chain_on_the_spine",
+    "_selftest_title_by_id::test_derivation_scaffold_hangs_under_the_title_not_the_part_tag",
+    "_selftest_title_by_id::test_every_scene_head_template_ignores_the_part_indicator"
+   ],
+   "summary": "derivation（無 prompt:）的 body_ref，以及 definition_math:84、procedure_steps:45、recap_cards:40、sign_chart:82、value_table:84 取標題的那一行，一律改成 next(b.mobject for b in ... if b.id == \"title\")，和 theorem_proof:172、callout:81 同一寫法。_common.scene_head 裡「head[1]／blocks[1] title contract」這段註解已過時，改成「按 id 取」。",
+   "closure": "closed",
+   "closure_evidence": "derivation、definition_math、procedure_steps、recap_cards、sign_chart、value_table 都改成 next(b for b in head if b.id=='title')。grep templates 已無 head[1]／blocks[1]／[1].mobject。r7_derivation_part 在 part 2/2 下，step.0 位於 x[-6.37,3.23]，修前是 x[5.52,15.12]；加上 scaffold.motive 時也位於 x[-6.37,…]。_selftest_title_by_id 綠。definition_math 的 V2／V3 合併經 git show --cc d9c4810 檢查，兩側是乾淨的三方合併。"
+  },
+  "D1-04": {
+   "status": "fixed",
+   "commits": [
+    "000a7da"
+   ],
+   "tests": [
+    "_selftest_answer_band_paced::test_the_first_play_already_carries_the_answer",
+    "_selftest_answer_band_paced::test_no_play_shows_the_frame_alone",
+    "_selftest_answer_band_paced::test_the_band_walks_answer_then_tag"
+   ],
+   "summary": "worked_example._answer_box 回傳的 band 上宣告 _paced_chrome = box、_paced_parts = [eq, tag]，paced walk 改成框和答案式在同一個 play 進場，接著才是 tag。",
+   "closure": "closed",
+   "closure_evidence": "worked_example.py:145-150 在 band 上宣告 _paced_chrome=box、_paced_parts=[eq,tag]。r3_paced_band 重跑：t=0 同一個 play 內有 FadeIn(MathTex)＋FadeIn(RoundedRectangle)，t=2.70 才出 FadeIn(Tex) tag，不再先出空框。_selftest_answer_band_paced 綠。"
+  },
+  "D1-05": {
+   "status": "fixed",
+   "commits": [
+    "08beebd"
+   ],
+   "tests": [
+    "_selftest_theorem_aside::test_the_statement_card_stays_left_of_the_aside_column"
+   ],
+   "summary": "theorem_proof 的 aside 路徑：陳述折行寬度由 PRIMARY_W - 0.3 改成 PRIMARY_W - 2*pad_x - 0.3，pad_x=0.6，並用同一個變數傳給 accent_panel。卡右緣最多到 RAIL_X - 0.3。aside 的 layer 照指示不動。",
+   "closure": "closed",
+   "closure_evidence": "theorem_proof.py:196-202：max_width 改為 PRIMARY_W-2*pad_x-0.3。r11_aside 的長陳述卡右緣 0.02，修前 1.67，不再越過 RAIL_X 1.06。自寫 probe：含大量 inline math 的陳述因估寬低估，仍可能伸進 0.31u，但現在會由 V3 的 _aside_collision_issues 報 error，不再無聲。殘留一點：這種情形下 band promotion 的誤導 advisory 仍會和 error 同時出現；純文字陳述已不會觸發，卡寬 ≤7.13＜7.64。"
+  },
+  "D1-08": {
+   "status": "fixed",
+   "commits": [
+    "5ec93a8"
+   ],
+   "tests": [
+    "_selftest_theorem_proof_label::test_statement_only_without_aside_builds_no_label"
+   ],
+   "summary": "theorem_proof 主路徑把 proof_label 的建立移到 step_mobs／qrow 之後，只有 row_hs 非空（有 proof 列或 qed）才建立、定位、append。沒有列時 proof_stack_h 為 0。",
+   "closure": "closed",
+   "closure_evidence": "theorem_proof.py:233-278：proof_label 只在 row_hs 非空時建立與 append。:321 的 proof_label.get_bottom() 位於 `if chain:` 內，chain 非空若且唯若 row_hs 非空，不會碰到 None。r8 statement-only 的 ids 已無 proof_label；grep 確認 pipeline 其他處沒有人讀 proof_label。"
+  },
+  "D2-09": {
+   "status": "recorded",
+   "commits": [],
+   "tests": [],
+   "summary": "依 CLAUDE.md「看到無關 dead code 提出、不擅刪」只記錄，未改動；是否移進 _archive/ 待使用者決定。",
+   "closure": null,
+   "closure_evidence": ""
+  }
+ }
+}
