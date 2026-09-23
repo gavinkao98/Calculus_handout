@@ -16,7 +16,9 @@ python build.py all         # 全部 12 單元
 ```
 
 改圖：見 [`../figkit/README.md`](../figkit/README.md)（JS 圖 kit harness → `export_figs.mjs`
-匯向量 PDF 到 `chapters/<ch>/figs/`；匯出品 gitignored、換機重匯）。
+匯向量 PDF 到 `chapters/<ch>/figs/`；匯出品 gitignored、換機重匯）。**pull 進別台改過的
+harness（`figkit/figs-<ch>.html`）後也要重匯**——`build.py` 不比對圖匯出品的新鮮度，本機的
+舊圖會照樣編進有版控的 `dist/` PDF。
 
 ## 12 單元狀態（P1 源接管完成，2026-08-09）
 
