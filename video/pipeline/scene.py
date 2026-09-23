@@ -157,8 +157,8 @@ class LessonScene(Scene):
         """The SCENE_TAIL_SECONDS hold. `exit: [<block id>...]` (content scenes) fades those
         blocks out INSIDE the hold (EXIT_FADE_SECONDS), so what the next scene does not
         carry leaves before the cut while the clip length -- what the render/audio sync
-        audit measures -- is unchanged. NB: the LAST frame, which critic.py / scratch_frames
-        read as the scene's "fullest frame", is then the post-exit frame. An id naming no
+        audit measures -- is unchanged. NB: the LAST frame, which scratch_frames reads as the
+        scene's "fullest frame", is then the post-exit frame. An id naming no
         block is skipped (sizecheck errors on it before render, as for focus.dim).
 
         *narration_end* (content scenes on a real render) is the renderer clock the last
