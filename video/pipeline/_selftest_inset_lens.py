@@ -121,6 +121,24 @@ def test_two_lens_sweeps_each_ride_their_own_tracker():
     assert _drawn_colours(rule_b) == {T.color("dark", "concept").upper()}, _drawn_colours(rule_b)
 
 
+# -- D1-06: the lens draws a curve in the same meta.color_map colour as the main plot ------
+
+def test_lens_curve_takes_the_color_map_default_role():
+    """A plot with no colour of its own whose label names a colour-mapped token is drawn in
+    that token's role on the main axes (SPEC rule 5) -- and must be in the lens too."""
+    meta = dict(_META, color_map={"\\sin": "concept"})
+    sine = {"kind": "function", "expression": "sin(x)", "label": "$y=\\sin x$", "reveal": True}
+    spec = _spec([sine], inset={"x": [1.2, 1.9], "y": [0.8, 1.05], "corner": "top_right"},
+                 say="Look. {show plot.0} curve. {show inset} closer.",
+                 axes={"x_range": [0, 3.2, 0.5], "y_range": [-0.2, 1.2, 0.5]})
+    by = _by_id(spec, meta)
+    want = T.color("dark", "concept").upper()
+    main_curve = by["plot.0"].mobject[1]                   # VGroup(glow, curve, label)
+    assert main_curve.get_stroke_color().to_hex().upper() == want, main_curve.get_stroke_color()
+    lens_curve = by["inset"].mobject._inset_panel[2][1]   # panel: border, lens, VGroup(glow, curve)
+    assert _drawn_colours(lens_curve) == {want}, (_drawn_colours(lens_curve), "want", want)
+
+
 if __name__ == "__main__":
     import sys, traceback
     fails = 0

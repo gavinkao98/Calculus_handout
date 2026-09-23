@@ -397,6 +397,18 @@ def _sweep_block(plot: dict[str, Any], index: int, prior: list[dict[str, Any]],
     return Block(f"plot.{index}", group, anim=anim, anim_seconds=seconds, static=False)
 
 
+def _effective_plot(plot: dict[str, Any]) -> dict[str, Any]:
+    """A plot with no colour of its own whose label names a colour-mapped token takes that
+    token's role (meta.color_map; SPEC rule 5): the sine curve is drawn in sine's colour.
+    Only the DEFAULT is affected -- an explicit color / color_role is the author's. Both the
+    main plot and the inset lens read colours through this, so one curve is one colour."""
+    if "color" not in plot and "color_role" not in plot and plot.get("label"):
+        role = brand.mapped_role(str(plot["label"]))
+        if role:
+            return dict(plot, color_role=role)
+    return plot
+
+
 def _plot_blocks(spec: dict[str, Any], axes: Axes, ground: str) -> tuple[list[Block], list[Any]]:
     blocks: list[Block] = []
     labels = []
@@ -408,13 +420,7 @@ def _plot_blocks(spec: dict[str, Any], axes: Axes, ground: str) -> tuple[list[Bl
     all_plots = spec.get("plots", [])
     for i, plot in enumerate(all_plots):
         kind = plot.get("kind")
-        # A plot with no colour of its own whose label names a colour-mapped token takes that
-        # token's role (meta.color_map; SPEC rule 5): the sine curve is drawn in sine's colour.
-        # Only the DEFAULT is affected -- an explicit color / color_role is the author's.
-        if "color" not in plot and "color_role" not in plot and plot.get("label"):
-            role = brand.mapped_role(str(plot["label"]))
-            if role:
-                plot = dict(plot, color_role=role)
+        plot = _effective_plot(plot)
         col = _role_color(ground, plot, "secondary")
         # reveal: true -> dynamic block, waits for {show plot.N}; its label is
         # folded into the same block so one marker reveals both (see docstring).
@@ -640,6 +646,7 @@ def _inset_block(spec: dict[str, Any], axes: Axes, plot_blocks: list[Block], gro
     pieces: list[Any] = []
     for i, plot in enumerate(all_plots):
         kind = plot.get("kind")
+        plot = _effective_plot(plot)
         col = _role_color(ground, plot, "accent" if kind == "sweep" else "secondary")
 
         if kind == "function":
