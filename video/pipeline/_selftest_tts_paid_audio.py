@@ -3,9 +3,11 @@ for (code review 2026-09-23, batch T). MockTTSBackend + stub aligner + temp dirs
 API, no whisper model, nothing under video/output.
 Run: python video/pipeline/_selftest_tts_paid_audio.py
 
-Every prior take below gets a DISTINCT duration (P=1.0 s, Q=2.0 s, R=3.0 s) and every fresh
-mock take is silence of estimate_seconds(text), so "which take is this?" is answered by the
-WAV's length, not by trusting the manifest."""
+Every take is told apart by its LENGTH, not by trusting the manifest: hand-laid prior takes
+get distinct durations (P=1.0 s, Q=2.0 s), and a fresh mock take is silence of
+estimate_seconds(text), so the main()-driven tests use texts of distinct word counts.
+--no-billing / --max-billed-calls are exercised as tts.BudgetedBackend around the mock
+(build_backend never wraps mock), the aligner seam is stubbed where a scene unit needs it."""
 import argparse
 import io
 import sys
