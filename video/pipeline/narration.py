@@ -23,6 +23,12 @@ import re
 from dataclasses import dataclass
 
 _SHOW = re.compile(r"\{\s*show\s+([A-Za-z0-9_.\[\]]+)\s*\}")
+# Anything that LOOKS like a marker: the opener plus what follows it up to the next brace.
+# This module is the ONE {show} grammar -- schema.py, sizecheck.py and derive_spoken's
+# parity check all ask it (code-review-2026-09-23 B-04) -- so a `{show`-looking run that
+# `_SHOW` does not read (a bare `{show}`, an unclosed `{show x`, `{show a b}`) is exactly
+# what the player would leave in the beat TEXT, uncut and spoken aloud by TTS.
+_SHOW_LIKE = re.compile(r"\{\s*show\b[^{}]{0,40}\}?")
 
 
 @dataclass
@@ -57,6 +63,13 @@ def parse_say(say: str) -> list[Beat]:
 def list_reveal_targets(say: str) -> list[str]:
     """All block ids named by ``{show ...}`` in *say* (for validation/lint)."""
     return [m.group(1).replace("[", ".").replace("]", "") for m in _SHOW.finditer(say or "")]
+
+
+def malformed_show_markers(say: str) -> list[str]:
+    """Every ``{show``-looking run in *say* that `parse_say` does NOT read as a marker, as
+    the offending text -- it would cut no beat and be spoken literally (for validation)."""
+    read = {m.start() for m in _SHOW.finditer(say or "")}
+    return [m.group(0) for m in _SHOW_LIKE.finditer(say or "") if m.start() not in read]
 
 
 def estimate_seconds(text: str, *, wpm: float = 150.0, floor: float = 1.2) -> float:

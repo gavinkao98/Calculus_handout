@@ -70,21 +70,22 @@ def tex_examples_by_section(text: str) -> "dict[str, list[str]]":
     return by_section
 
 
-def examples_for_deck(meta: dict, repo_root: Path) -> "list[str]":
-    """The handout's worked-example keys for this deck's section, or [] when the
-    chapter/section cannot be resolved or the source is missing (never raises --
-    a deck with no handout source simply has nothing to check)."""
+def examples_for_deck(meta: dict, repo_root: Path) -> "list[str] | None":
+    """The handout's worked-example keys for this deck's section ([] when the section is
+    found and holds none), or None when the chapter/section cannot be resolved or the
+    source is missing. Never raises; `example_issues` turns None into a finding, because
+    an empty answer here would read exactly like "every example declared" (B-05)."""
     m = re.search(r"(\d+)", str(meta.get("chapter", "")))
     section = str(meta.get("section", "")).strip()
     if not m or not section:
-        return []
+        return None
     src_dir = repo_root / "handout" / "latex" / "src" / f"ch{int(m.group(1)):02d}"
     for tex in sorted(src_dir.glob("*.tex")):
         by_section = tex_examples_by_section(
             tex.read_text(encoding="utf-8", errors="replace"))
         if section in by_section:
             return by_section[section]
-    return []
+    return None
 
 
 def _split_keys(value) -> "list[str]":
@@ -127,15 +128,22 @@ def declarations(units: "list[dict]") -> "tuple[dict, dict, list]":
     return taught, folded, malformed
 
 
-def example_issues(section: str, handout_keys: "list[str]", units: "list[dict]",
+def example_issues(section: str, handout_keys: "list[str] | None", units: "list[dict]",
                    enforce: bool) -> "list[tuple[str, str]]":
     """Findings as (severity, message). EX1 honours *enforce*; EX2 is always a warning
     (mirrors step_coverage's orphan-`covers` treatment: a bad declaration is an
-    authoring slip to fix, not a reason to block a render)."""
+    authoring slip to fix, not a reason to block a render). *handout_keys* None
+    (`examples_for_deck` could not find the section) is one finding at EX1's severity:
+    there is nothing to check the declarations against, which is not the same as clean."""
+    ex1_sev = "error" if enforce else "warn"
+    if handout_keys is None:
+        return [(ex1_sev,
+                 f"[EX] cannot resolve handout section §{section}: meta.chapter must "
+                 f"name the chapter and handout/latex/src/ch<NN>/*.tex must hold "
+                 f"\\sechead{{{section}}} -- no example could be checked")]
     taught, folded, malformed = declarations(units)
     known = set(handout_keys)
     issues: list[tuple[str, str]] = []
-    ex1_sev = "error" if enforce else "warn"
 
     for key in handout_keys:                                     # EX1, source order
         if key not in taught and key not in folded:

@@ -22,36 +22,40 @@ Run standalone:
 """
 from __future__ import annotations
 
-import re
 import sys
 from pathlib import Path
 
 SCENE_KINDS = ("intro", "content", "outro", "divider")
 
 # A reveal marker: {show <target>} embedded in a content scene's `say`. The target
-# is dotted (e.g. math.0, step.2, plot.0, takeaway). `_SHOW_OPEN` finds every
-# opener so an unclosed `{show` (missing `}`) can be caught.
-_SHOW = re.compile(r"\{show\b([^}]*)\}")
-_SHOW_OPEN = re.compile(r"\{show\b")
+# is dotted (e.g. math.0, step.2, plot.0, takeaway). The grammar is narration.py's -- the
+# one the player splits beats with -- and is not re-derived here: a second regex used to
+# warn on a bare `{show}` the player never reads, and miss a `{ show x}` it does (B-04).
 
 
 def reveal_targets(say: str) -> list[str]:
-    """Every {show <target>} target in order (stripped); empty string for {show}."""
-    return [m.group(1).strip().replace("[", ".").replace("]", "") for m in _SHOW.finditer(say)]
+    """Every {show <target>} target in order, exactly as the player reads them."""
+    from pipeline.narration import list_reveal_targets
+    return list_reveal_targets(say)
 
 
 def _focus_issues(sid: str, scene: dict, say) -> "list[tuple[str, str]]":
     """`focus:` dims everything the narration is not on right now (pipeline/focus.py).
     `at` must name a reveal this scene makes -- same reasoning as `pauses.after`: a focus
-    keyed to a beat that never happens is invisible with no other symptom. The `dim` ids
-    are NOT checked here (block ids only exist once the template has built; sizecheck
-    catches a typo'd one, exactly as it does for `{show}` targets)."""
+    keyed to a beat that never happens is invisible with no other symptom. Whether the `dim`
+    ids EXIST is not checked here (block ids only exist once the template has built; sizecheck
+    catches a typo'd one, exactly as it does for `{show}` targets) -- only that none of them
+    is a reveal a later beat makes (C-08, below)."""
     if "focus" not in scene:
         return []
     entries = scene.get("focus")
     if not isinstance(entries, list):
         return [("error", f"{sid}.focus: must be a list of {{at, dim}}")]
-    revealed = set(reveal_targets(say) if isinstance(say, str) else [])
+    order = reveal_targets(say) if isinstance(say, str) else []
+    revealed = set(order)
+    beat_of: dict[str, int] = {}          # reveal id -> the beat that first reveals it
+    for pos, target in enumerate(order):
+        beat_of.setdefault(target, pos)
     issues: list[tuple[str, str]] = []
     seen: set[str] = set()
     for j, item in enumerate(entries):
@@ -95,6 +99,19 @@ def _focus_issues(sid: str, scene: dict, say) -> "list[tuple[str, str]]":
                 for both in [i for i in ind if i in dim]:
                     issues.append(("error", f"{where}.indicate {both!r}: also in this entry's "
                                             f"dim (cannot flash and dim one block in one beat)"))
+        # A block a LATER beat reveals is not on screen yet either (C-08) -- the same trap as
+        # dimming `at` itself, one beat further on. A fade / Indicate is not an introducer, so
+        # manim ADDS whatever it touches: a dim shows the block early at DIM_OPACITY (and it
+        # fades in again, still dimmed, on its own beat); an indicate leaves it lit.
+        if isinstance(at, str) and at in beat_of:
+            touched = [("dim", d) for d in (dim if isinstance(dim, list) else [])]
+            ind = item.get("indicate")
+            touched += [("indicate", i) for i in (ind if isinstance(ind, list) else [])]
+            for field, bid in touched:
+                if isinstance(bid, str) and beat_of.get(bid, -1) > beat_of[at]:
+                    issues.append(("error", f"{where}.{field} {bid!r}: revealed by a later beat "
+                                            f"({{show {bid}}}), so it is not on screen at {at!r} "
+                                            f"-- the {field} would bring it in early (drop it here)"))
     return issues
 
 
@@ -212,6 +229,14 @@ def _carry_issues(sid: str, scene: dict, say, scenes: list, index: int) -> "list
     if not isinstance(entries, list):
         return [("error", f"{sid}.carry: must be a list of {{from, block, as, to}}")]
     prev = _prev_content_in_act(scenes, index)
+    # What that scene fades out in its tail (`exit:`, scene.py _tail). make.py hard-cuts the
+    # carry boundary, so a block on both lists would fade out and snap back across the cut
+    # (F-05). Shape errors in `exit` itself are _exit_issues' to report.
+    prev_exit: set = set()
+    if prev is not None:
+        prev_scene = next(s for s in reversed(scenes[:index]) if isinstance(s, dict))
+        if isinstance(prev_scene.get("exit"), list):
+            prev_exit = {e for e in prev_scene["exit"] if isinstance(e, str)}
     revealed = set(reveal_targets(say) if isinstance(say, str) else [])
     issues: list[tuple[str, str]] = []
     seen_as: set[str] = set()
@@ -236,6 +261,13 @@ def _carry_issues(sid: str, scene: dict, say, scenes: list, index: int) -> "list
         elif not isinstance(blk, str) or not blk:
             issues.append(("error", f"{where}.block: required non-empty block id (or a list of ids "
                                     f"carried as one group)"))
+        if src == prev:
+            for bid in (blk if isinstance(blk, list) else [blk]):
+                if isinstance(bid, str) and bid in prev_exit:
+                    issues.append(("error", f"{where}.block {bid!r}: {prev!r} fades it out in "
+                                            f"its tail (`exit:`), so the carried copy would "
+                                            f"vanish and snap back across the cut -- drop it "
+                                            f"from {prev}.exit or stop carrying it"))
         as_id = item.get("as")
         if not isinstance(as_id, str) or not as_id:
             issues.append(("error", f"{where}.as: required non-empty block id"))
@@ -570,11 +602,12 @@ def schema_storyboard(data) -> "list[tuple[str, str]]":
             if not isinstance(say, str) or not say.strip():
                 issues.append(("error", f"{sid}: content scene needs a non-empty 'say'"))
             else:
-                if len(_SHOW_OPEN.findall(say)) != len(_SHOW.findall(say)):
-                    issues.append(("error", f"{sid}: malformed {{show}} marker (unclosed '}}')"))
-                for t in reveal_targets(say):
-                    if not t:
-                        issues.append(("warn", f"{sid}: empty {{show}} target (reveals nothing)"))
+                from pipeline.narration import malformed_show_markers
+                for bad in malformed_show_markers(say):
+                    issues.append(("error", f"{sid}: malformed {{show}} marker {bad!r} -- "
+                                            f"narration.parse_say does not read it, so it cuts "
+                                            f"no beat and TTS would speak it; write "
+                                            f"{{show <block id>}}"))
             issues += _pause_issues(sid, scene, scene.get("say"))
             issues += _focus_issues(sid, scene, scene.get("say"))
             issues += _paced_issues(sid, scene, scene.get("say"))
@@ -756,7 +789,7 @@ def main(argv: "list[str] | None" = None) -> int:
     if args.list and not errors:
         print(f"[schema] {args.storyboard.name}: reveal targets per content scene")
         for sid, targets in enumerate_reveals(data):
-            shown = ", ".join(t or "(empty)" for t in targets) or "(none -- all at scene start)"
+            shown = ", ".join(targets) or "(none -- all at scene start)"
             print(f"  {sid}: {shown}")
 
     return 1 if errors else 0
