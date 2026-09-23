@@ -52,7 +52,8 @@ latex/
 
 ## 驗收閘（源時代）
 
-1. **編譯閘**：`latexmk -lualatex` 0 error／0 missing character（build.py 內建）。
+1. **編譯閘**：`latexmk -lualatex` 0 error／0 missing character／0 undefined reference／
+   0 multiply-defined label（build.py 內建；命中即 FAIL 並列出 key）。
 2. **版面閘**：overfull hbox 逐條列出待裁決（build.py 印出）。
 3. **字形閘**：`check_glyphs.py`——嵌入字形輪廓＝其宣稱的字（build.py 內建）。
 4. **人眼閘**：改版面級的變更後抽頁過目（首轉單元的首次人眼閘由使用者 GO）。
