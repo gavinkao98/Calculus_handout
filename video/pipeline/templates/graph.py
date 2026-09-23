@@ -722,10 +722,13 @@ def _inset_block(spec: dict[str, Any], axes: Axes, plot_blocks: list[Block], gro
                 # structure (and z_index) stable across every redraw.
                 return Dot(centre, radius=1e-3, fill_opacity=0.0, stroke_width=0.0)
 
+            # every closure below is redrawn each frame, long after this loop has moved on:
+            # bind THIS sweep's values as defaults, or a later plot's colour / tracker leaks in
             if gap:
                 top_fn, bot_fn = gap
 
-                def band():
+                def band(x_of=x_of, x_from=x_from, top_fn=top_fn, bot_fn=bot_fn, col=col,
+                         opacity=float(plot.get("opacity", 0.16))):
                     x = x_of()
                     if x is None:
                         return nothing()
@@ -739,10 +742,10 @@ def _inset_block(spec: dict[str, Any], axes: Axes, plot_blocks: list[Block], gro
                     pts = ([lens.c2p(t, clamp_y(top_fn(t))) for t in xs]
                            + [lens.c2p(t, clamp_y(bot_fn(t))) for t in reversed(xs)])
                     return Polygon(*pts, stroke_width=0, color=col, fill_color=col,
-                                   fill_opacity=float(plot.get("opacity", 0.16)))
+                                   fill_opacity=opacity)
                 pieces.append(live(band))
 
-            def rule():
+            def rule(x_of=x_of, col=col):
                 x = x_of()
                 if x is None or not x0 <= x <= x1:
                     return nothing()
@@ -751,7 +754,7 @@ def _inset_block(spec: dict[str, Any], axes: Axes, plot_blocks: list[Block], gro
             pieces.append(live(rule))
 
             for fn in follow_fns:
-                def dot(f=fn):
+                def dot(f=fn, x_of=x_of, col=col):
                     x = x_of()
                     if x is not None and _finite(f, x) and inside(x, f(x)):
                         return Dot(lens.c2p(x, f(x)), color=col, radius=0.07)
