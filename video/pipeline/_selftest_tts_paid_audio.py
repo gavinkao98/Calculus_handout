@@ -124,8 +124,124 @@ def test_beat_reuse_rewrite_then_move_then_revert():
         _assert_takes(entry2, [1.0, estimate_seconds("Q said here.")])
 
 
+# ---- A-03: a missing aligner is an environment fault, not a per-take alignment failure ----
+
+def _write_deck(path: Path, scenes) -> Path:
+    import yaml
+    path.write_text(yaml.safe_dump({"meta": {"id": "demo", "section": "9.9", "title": "t"},
+                                    "scenes": scenes}), encoding="utf-8")
+    return path
+
+
+def _run_main(argv, *, backend=None):
+    """tts.main() with `argv`; build_backend is swapped for `backend` (a mock, possibly
+    budgeted). Returns (exit: int | str, stdout, backend)."""
+    backend = backend or tts.MockTTSBackend(0.4)
+    saved_bb, saved_argv, buf = tts.build_backend, sys.argv, io.StringIO()
+    tts.build_backend = lambda a: backend
+    sys.argv = ["tts.py", *argv]
+    try:
+        with redirect_stdout(buf):
+            code = tts.main()
+    except SystemExit as exc:
+        code = f"SystemExit: {exc}"
+    finally:
+        tts.build_backend, sys.argv = saved_bb, saved_argv
+    return code, buf.getvalue(), backend
+
+
+class _NoStableTs:
+    """Make `import stable_whisper` raise ImportError, whatever this interpreter has."""
+    def __enter__(self):
+        self._saved = sys.modules.get("stable_whisper", "absent")
+        sys.modules["stable_whisper"] = None
+        return self
+
+    def __exit__(self, *exc):
+        if self._saved == "absent":
+            sys.modules.pop("stable_whisper", None)
+        else:
+            sys.modules["stable_whisper"] = self._saved
+
+
+_THREE_BEAT_SCENE = {"id": "s1", "kind": "content", "template": "derivation",
+                     "say": "First sentence here. {show a} Second sentence here. "
+                            "{show b} Third sentence here."}
+
+
+def test_missing_stable_ts_fails_closed_before_any_call():
+    """Without stable-ts every scene-unit scene used to 'fail alignment', walk the ladder
+    (resynth billed) and bill every beat at the terminal: 5 calls for a 3-beat scene here,
+    ~120 for a 21-scene deck under MiMo. It must stop before the first call instead."""
+    with tempfile.TemporaryDirectory() as d, _NoStableTs():
+        root = Path(d)
+        deck = _write_deck(root / "d.yml", [_THREE_BEAT_SCENE])
+        code, out, backend = _run_main(["--storyboard", str(deck), "--backend", "mock",
+                                        "--unit", "auto", "--skip-qa",
+                                        "--output-dir", str(root / "audio")])
+        assert isinstance(code, str) and "stable-ts" in code, (code, out[-600:])
+        assert "--unit beat" in code, "the message must name the way out"
+        assert backend.stats["calls"] == 0, f"billed {backend.stats['calls']} calls first"
+        assert not (root / "audio" / "manifest.json").exists()
+
+
+def test_missing_stable_ts_is_flagged_by_dry_run():
+    """The quote must say a real run would abort, instead of pricing it at 1 call/scene."""
+    with tempfile.TemporaryDirectory() as d, _NoStableTs():
+        root = Path(d)
+        deck = _write_deck(root / "d.yml", [_THREE_BEAT_SCENE])
+        code, out, _ = _run_main(["--storyboard", str(deck), "--backend", "mock", "--unit", "auto",
+                                  "--output-dir", str(root / "audio"), "--dry-run"])
+        assert code == 0, code
+        assert "WOULD abort" in out and "stable-ts" in out, out
+
+
+def test_beat_unit_needs_no_aligner():
+    """The preflight is scoped to scene-unit scenes: --unit beat never aligns anything."""
+    with tempfile.TemporaryDirectory() as d, _NoStableTs():
+        root = Path(d)
+        deck = _write_deck(root / "d.yml", [_THREE_BEAT_SCENE])
+        code, out, backend = _run_main(["--storyboard", str(deck), "--backend", "mock",
+                                        "--unit", "beat", "--output-dir", str(root / "audio")])
+        assert code == 0, (code, out[-600:])
+        assert backend.stats["calls"] == 3
+
+
+def test_ladder_history_records_the_root_cause():
+    """A rung that fails on an aligner abort must say WHY in fallback_history: the reason used
+    to be a fixed string per rung, so the manifest showed four failed rungs and no cause."""
+    from pipeline import scene_align as SA
+
+    def _abort(wav_path, plan, **kw):
+        raise SA.AlignmentError("simulated root cause XYZ")
+
+    saved = SA.align_scene
+    SA.align_scene = _abort
+    try:
+        with tempfile.TemporaryDirectory() as d, redirect_stdout(io.StringIO()):
+            entry = tts.synthesize_scene(
+                backend=tts.MockTTSBackend(0.4), meta={}, scene=_THREE_BEAT_SCENE, scene_number=1,
+                output_dir=Path(d), reuse_index={}, scene_reuse_index={},
+                args=argparse.Namespace(model="m", style="", voice="Dean", unit="scene",
+                                        skip_qa=True, aligner_model="base.en",
+                                        aligner_device="cpu", fallback_budget=2,
+                                        empty_beat_seconds=0.4, reuse_existing=False))
+    finally:
+        SA.align_scene = saved
+    history = entry["fallback_history"]
+    failed = [h for h in history if h.get("status") == "fail"]
+    assert failed, history
+    for h in failed:
+        if h["rung"] in ("arbiter", "resynth"):
+            assert "simulated root cause XYZ" in h["reason"], h
+
+
 if __name__ == "__main__":
     test_beat_reuse_swap_keeps_both_takes()
     test_beat_reuse_prepend_keeps_every_take_and_bills_once()
     test_beat_reuse_rewrite_then_move_then_revert()
+    test_missing_stable_ts_fails_closed_before_any_call()
+    test_missing_stable_ts_is_flagged_by_dry_run()
+    test_beat_unit_needs_no_aligner()
+    test_ladder_history_records_the_root_cause()
     print("OK tts paid-audio self-test (code review 2026-09-23 batch T)")

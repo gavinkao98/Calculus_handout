@@ -1138,13 +1138,20 @@ def _build_fallback_rungs(backend, meta, scene, scene_number, output_dir, args, 
                 "validation": {"status": "fail", "warnings": [], "metrics": {}, "error": error},
                 "fallback_history": []}
 
+    def _why(what, entry):
+        # the root cause (e.g. "alignment aborted: ...") lives in the rung's own entry, which
+        # the ladder discards; run_ladder records only `reason`, so it has to ride along there
+        # or the manifest shows failed rungs with no cause (code review 2026-09-23, A-03).
+        error = entry["validation"].get("error")
+        return f"{what}: {error}" if error else what
+
     def arbiter(ctx):
         # re-align the SAME primary WAV with small.en (no re-synthesis, no billing)
         entry = _align_and_gate(plan, ctx["primary_wav"], scene_number, words_file, aligned_file,
                                 args, audio_file=scene_wav, promote_from=ctx["primary_wav"],
                                 aligner_model="small.en")
         return {"status": "pass" if _ok(entry) else "fail", "entry": entry,
-                "reason": "small.en arbiter re-align"}
+                "reason": _why("small.en arbiter re-align", entry)}
 
     def resynth(ctx):
         tmp = scene_wav.with_name(scene_wav.name + ".resynth.tmp")
@@ -1154,7 +1161,7 @@ def _build_fallback_rungs(backend, meta, scene, scene_number, output_dir, args, 
         if not _ok(entry):
             tmp.unlink(missing_ok=True)
         return {"status": "pass" if _ok(entry) else "fail", "entry": entry,
-                "reason": "resynthesize scene once"}
+                "reason": _why("resynthesize scene once", entry)}
 
     def chunk(ctx):
         # split the scene into sentences; a scene with no interior break has nothing to gain
@@ -1260,6 +1267,22 @@ def write_manifest(path: Path, manifest: dict[str, Any]) -> None:
     atomic_write_json(path, manifest)
 
 
+def _scene_aligner_missing() -> str | None:
+    """None when the scene-unit aligner (stable-ts) imports, else why it does not.
+
+    main() asks BEFORE any synthesis (code review 2026-09-23, A-03). align_scene turns a failed
+    import into AlignmentError -- the same exception as a take that genuinely will not align --
+    so a missing package used to walk every scene down the ladder: resynth (billed), then the
+    beats terminal (billed once per beat), every scene ending up in beats mode. A missing
+    package is known before the first call, so it fails closed instead. A function so the
+    offline selftests, which stub the aligner seam, can monkeypatch it."""
+    try:
+        import stable_whisper  # noqa: F401
+    except ImportError as exc:
+        return f"stable-ts (stable_whisper) is not importable: {exc}"
+    return None
+
+
 def main() -> int:
     args = parse_args()
     if args.fallback_budget < 0:                       # NA2: unconditional, not just in dry-run
@@ -1307,11 +1330,20 @@ def main() -> int:
     beat_count = sum(len(scene_beats(scene)) for scene in scenes if scene.get("kind", "content") == "content")
     all_scenes = data["scenes"]
     scene_numbers = {scene["id"]: index for index, scene in enumerate(all_scenes, start=1)}
+    scene_unit_ids = [scene["id"] for scene in scenes if scene.get("kind", "content") == "content"
+                      and resolve_unit(args.unit, scene) == "scene"]
+    missing = _scene_aligner_missing() if scene_unit_ids else None
+    no_aligner = (f"{len(scene_unit_ids)} scene(s) resolve to the scene unit "
+                  f"({', '.join(scene_unit_ids[:3])}{', ...' if len(scene_unit_ids) > 3 else ''}) "
+                  f"but {missing}. Install it (ENVIRONMENT.md 5c) or pass --unit beat."
+                  if missing else None)
     if args.dry_run:
         # dry-run is read-only: never enforce the guard (R3-A1 -- the quote flow needs
         # dry-run to still print an estimate), but surface that a real run WOULD abort.
         if abort:
             print(f"[dry-run] NOTE: a real run WOULD abort -> {abort}")
+        if no_aligner:
+            print(f"[dry-run] NOTE: a real run WOULD abort -> {no_aligner}")
         # `plan` = first-round calls, reuse APPLIED: the reuse test is now content-addressed
         # (scene_id + text hash + identity), so "I only moved a {show} marker / reordered
         # scenes" shows up here as 0 before any money moves. `reuse` = billable units the
@@ -1380,6 +1412,8 @@ def main() -> int:
         return 0
     if abort:
         raise SystemExit(f"[tts] {abort}")
+    if no_aligner:
+        raise SystemExit(f"[tts] {no_aligner}")
 
     backend = build_backend(args)
     output_dir.mkdir(parents=True, exist_ok=True)
