@@ -1,6 +1,7 @@
 """Self-test: graph single mode -- regressions from the 2026-09-23 code review
 (D1-09 default axes, D1-07 label_x on a y_clip curve, D1-10 title clamp width) and its
-regression round (RG3-01 label_x on a y_clip curve's clipped-off stretch). Run from video/:
+regression round (RG3-01 label_x on a y_clip curve's clipped-off stretch, judged by the
+curve's own clip bounds -- y_range or an explicit [lo, hi]). Run from video/:
     python -m pipeline._selftest_graph_single
 """
 from pipeline import _bootstrap
@@ -139,6 +140,31 @@ def test_label_x_on_the_visible_stretch_of_a_clipped_curve_is_honoured():
     lab = by["label.0"].mobject
     assert not warned, warned
     assert abs(float(lab.get_center()[0]) - float(anchor[0])) < 1e-3, (lab.get_center(), anchor)
+
+
+def test_label_x_guard_uses_an_explicit_y_clip_narrower_than_y_range():
+    """y_clip: [0, 4] cuts the curve at y=4, inside y_range [0,6]. f(0.45)=4.94 is on the cut
+    stretch, but the guard used to test y_range, so it let the label through: it sat where no
+    curve is drawn, with no warning. It must warn and fall back, as for y_clip: true."""
+    by, warned = _build_clipped(y_clip=[0, 4], label_x=0.45)
+    base, _ = _build_clipped(y_clip=[0, 4])
+    assert warned and "label_x" in warned[0], warned
+    for bid in ("axes", "label.0"):
+        assert _bbox(by[bid].mobject) == _bbox(base[bid].mobject), (bid, _bbox(by[bid].mobject),
+                                                                   _bbox(base[bid].mobject))
+
+
+def test_label_x_guard_uses_an_explicit_y_clip_wider_than_y_range():
+    """y_clip: [-1, 10] draws the curve up to y=10, past y_range [0,6]. f(0.35)=8.16 is on the
+    drawn curve, but the guard used to test y_range, so it blocked the label and printed a false
+    'clipped off' warning. It must be placed beside the curve at x=0.35, with no warning."""
+    by, warned = _build_clipped(y_clip=[-1, 10], label_x=0.35)
+    anchor = by["axes"].mobject.c2p(0.35, 1 / 0.35 ** 2)
+    lab = by["label.0"].mobject
+    assert not warned, warned
+    assert abs(float(lab.get_center()[0]) - float(anchor[0])) < 1e-3, (lab.get_center(), anchor)
+    gap = float(lab.get_bottom()[1]) - float(anchor[1])   # label_side up: sits just above
+    assert 0 < gap < 0.3, (gap, lab.get_center(), anchor)
 
 
 # -- D1-10: a clamped long title stays inside the gutter it is anchored to ----------------
