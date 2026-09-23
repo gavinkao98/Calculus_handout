@@ -142,7 +142,12 @@ def _answer_box(spec: dict[str, Any], ground: str):
     box.move_to([SPINE_X + CONTENT_W / 2, cy, 0])
     eq.move_to([SPINE_X + ANSWER_PAD_X, cy, 0], aligned_edge=LEFT)
     tag.move_to([SPINE_X + CONTENT_W - ANSWER_PAD_X, cy, 0], aligned_edge=RIGHT)
-    return VGroup(box, eq, tag)
+    band = VGroup(box, eq, tag)
+    # `paced: [result]` walks the answer, then the tag; the frame is chrome and rides in
+    # with the answer (pacing.chrome_of) instead of fading in empty and holding the screen.
+    band._paced_chrome = box
+    band._paced_parts = [eq, tag]
+    return band
 
 
 def capacity_meta(spec: dict[str, Any]) -> list[ColumnPlan]:
