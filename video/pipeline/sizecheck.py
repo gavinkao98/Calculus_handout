@@ -114,8 +114,10 @@ def _overflow_issues(scene: dict, blocks) -> "list[tuple[str, str]]":
         # runs off the right edge; full-frame grounds, ghost numerals, corner motifs),
         # so they are not "content clipped off-frame". Mirrors the layer exemption in
         # _overlap_issues -- but keep "graph" checked: graph / sign_chart rely on this
-        # guard for their reactive overflow (DESIGN.md, capacity contract).
-        if getattr(b, "layer", "content") in ("decoration", "background"):
+        # guard for their reactive overflow (DESIGN.md, capacity contract). The rail
+        # `aside` card is decoration only to stay out of the overlap/capacity checks; it is
+        # AUTHOR text that must stay on screen, so it is frame-checked like content.
+        if getattr(b, "layer", "content") in ("decoration", "background") and str(b.id) != "aside":
             continue
         try:
             w, h = float(mob.width), float(mob.height)
@@ -216,6 +218,50 @@ def _overlap_issues(scene: dict, blocks) -> "list[tuple[str, str]]":
                     f"{sid}: blocks '{id_a}' and '{id_b}' overlap "
                     f"({frac * 100:.0f}% of the smaller) -- they may collide on "
                     f"screen; reposition or split them."))
+    return out
+
+
+def _line_boxes(mob) -> list:
+    """AABBs of *mob* line by line: a plain VGroup (a wrapped prose block, a math stack)
+    is split into its members, recursively; anything else (one Tex line, a panel) is one
+    box -- so a block is not judged by the width of its widest line alone."""
+    from manim import VGroup
+
+    if type(mob) is VGroup and mob.submobjects:
+        return [bx for sub in mob.submobjects for bx in _line_boxes(sub)]
+    box = _aabb(mob)
+    return [box] if box is not None else []
+
+
+def _aside_collision_issues(scene: dict, blocks) -> "list[tuple[str, str]]":
+    """The right-rail `aside` card (definition_math / theorem_proof) is layer="decoration",
+    so _overlap_issues never sees it -- yet it is an OPAQUE panel drawn after the content,
+    so a content line it intersects is hidden, not merely crowded (an error, like a block
+    clipped by the frame). Checked line by line against every content block: the title
+    band, a scaffold motive, the statement, the math."""
+    sid = scene.get("id")
+    tol = 0.02
+    asides = [b for b in blocks if str(b.id) == "aside" and getattr(b, "mobject", None) is not None]
+    out: list[tuple[str, str]] = []
+    for a in asides:
+        abox = _aabb(a.mobject)
+        if abox is None:
+            continue
+        for b in blocks:
+            if b is a or getattr(b, "layer", "content") != "content":
+                continue
+            mob = getattr(b, "mobject", None)
+            if mob is None:
+                continue
+            for box in _line_boxes(mob):
+                ix = min(abox[1], box[1]) - max(abox[0], box[0])
+                iy = min(abox[3], box[3]) - max(abox[2], box[2])
+                if ix > tol and iy > tol:
+                    out.append(("error",
+                        f"{sid}: the rail 'aside' card covers part of block '{b.id}' "
+                        f"({ix:.2f}u x {iy:.2f}u) -- the opaque card hides it; shorten the "
+                        f"aside or the content, or drop the aside."))
+                    break
     return out
 
 
@@ -1072,6 +1118,10 @@ def _check_scenes_locked(meta: dict, scenes: list[dict], deck: "list[dict] | Non
         # the union of revealed blocks is the fullest frame; screen-space layout
         # layer only (graph/decoration/background exempt by Block.layer). --
         issues += _overlap_issues(scene, blocks)
+
+        # -- error: content hidden under the opaque rail aside card (decoration, so the
+        # overlap check above skips it) --
+        issues += _aside_collision_issues(scene, blocks)
 
         # -- warn: two graph equation labels stacked (the one collision the graph
         # layer exemption above deliberately lets through). --

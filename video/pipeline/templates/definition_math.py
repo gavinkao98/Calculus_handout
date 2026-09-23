@@ -35,6 +35,9 @@ LABEL = {
 }
 
 MIN_PITCH = 0.36  # tightest inter-line gap (the math stack arrange buff); sizecheck capacity trigger
+# aside mode: clear air between the primary column's wrap width and the rail card at RAIL_X
+# (= SPINE_X + PRIMARY_W). Absorbs the usual char-estimate error on a wrapped statement line.
+ASIDE_GUTTER = 0.3
 
 
 def capacity_meta(spec: dict[str, Any]) -> list[ColumnPlan]:
@@ -113,16 +116,21 @@ def build(spec: dict[str, Any], ctx: dict[str, Any]) -> list[Block]:
 
     # Optional right-rail enrichment aside (L3): a sparse definition can opt a supporting
     # note / key-idea into the rail. When present, narrow the prose to the primary column
-    # and place the aside at RAIL_X; collapse back to a full-width single column (no aside)
-    # if the narrowed primary would overflow the zone or a math line is too wide for it --
-    # the aside never crowds real content (it is enrichment, not a competing stream).
+    # (less a gutter) and place the aside at RAIL_X; collapse back to a full-width single
+    # column (no aside) if the narrowed primary or the card itself would overflow the zone,
+    # or a MEASURED statement/math line would reach the rail -- the char estimate can
+    # under-measure an inline-math line by more than the gutter, and the opaque card is
+    # drawn after the content. The aside never crowds real content (it is enrichment, not
+    # a competing stream).
     aside_spec = spec.get("aside")
     use_aside = bool(aside_spec)
     if use_aside:
-        content, statement = assemble(PRIMARY_W)
+        content, statement = assemble(PRIMARY_W - ASIDE_GUTTER)
+        aside = build_aside(aside_spec, ground, max_width=RAIL_W)
         zt, zb = body_zone(title)
-        too_tall = content is not None and content.height > (zt - zb)
-        too_wide = any(m.width > PRIMARY_W + 0.05 for m in math_mobs)
+        too_tall = (content is not None and content.height > (zt - zb)) or aside.height > (zt - zb)
+        primary = math_mobs + ([statement] if statement is not None else [])
+        too_wide = any(m.width > PRIMARY_W for m in primary)
         if too_tall or too_wide:
             use_aside = False
     if not use_aside:
@@ -145,8 +153,11 @@ def build(spec: dict[str, Any], ctx: dict[str, Any]) -> list[Block]:
         blocks.append(Block(f"math.{i}", mob, anim=anim, static=False))
 
     if use_aside and content is not None:
-        aside = build_aside(aside_spec, ground, max_width=RAIL_W)
-        aside.move_to([RAIL_X, content.get_center()[1], 0], aligned_edge=LEFT)
+        # centred on the content, clamped into the body zone: a card taller than the content
+        # must not ride up into the title / scaffold band (or off the frame)
+        half = aside.height / 2
+        y = min(max(content.get_center()[1], zb + half), zt - half)
+        aside.move_to([RAIL_X, y, 0], aligned_edge=LEFT)
         blocks.append(Block("aside", aside, anim="fade", static=True, layer="decoration"))
 
     blocks.append(motif_corner(ground))

@@ -745,7 +745,7 @@ fixture 的六個場把**每一條規則的違反與乾淨兩側都釘住**（EX
 |---|---|---|---|
 | **L1 容量契約** | 每縱向模板宣告 `capacity_meta(spec)→list[ColumnPlan]`（`row_heights, min_pitch, extra_bottom, x_bucket`）；`stack_layout` 的 LIGHT/FIT/OVERFLOW 三分支抽成共用 `classify_regime()` | V1/V2/V4 | 骨幹，多為重構 |
 | **L2 預測式拆分守門** | `sizecheck._capacity_issues` 把 `getattr(mod,"MIN_PITCH")` 換成先讀 `capacity_meta`（保留舊分支相容），**自動覆蓋 theorem/procedure/recap/callout** | V1 溢出 | 小擴充、關掉最大缺口 |
-| **L3 稀疏出口** | 可選 `aside` 欄（key-idea 卡/mini-example），snap 既有 `RAIL_X`、用 `accent_panel`、`layer="decoration"` 豁免檢查；primary 密集時 silently 收合 | V6 | 純加法 opt-in |
+| **L3 稀疏出口** | 可選 `aside` 欄（key-idea 卡/mini-example），snap 既有 `RAIL_X`、用 `accent_panel`、`layer="decoration"` 豁免容量/overlap 檢查（出框與「卡片蓋住 content」仍檢查，見下方 `aside` 契約）；primary 密集時 silently 收合 | V6 | 純加法 opt-in |
 | ~~auto-fit~~ | **否決**（理由見統御原則） | — | 不落地 |
 
 **四 regime 是一條連續決策**（由 `r = natural_min/zone_h` 驅動），不是離散斷點——regime 內仍跑既有
@@ -787,9 +787,14 @@ figure 三模板與 **callout（置中單面板、無 masthead zone）不加 `ca
 2026-06-21 workflow 紀錄（task wgpvk07nd）。
 
 **`aside` 欄位契約（L3）：** 可選 `aside`：`{label?, body, accent?}`（或裸 body 字串），`build_aside` 走
-`accent_panel`、`layer="decoration"` 豁免容量/overlap 檢查。**`definition_math`**：有 `aside` 時 primary 收窄
-到 `PRIMARY_W`、卡片 snap `RAIL_X`；primary 收窄後若會溢出 zone 或某 math 列寬過 `PRIMARY_W` 則**自動收合**
-（丟 aside、回滿寬單欄）。**`theorem_proof`（2026-06-21 擴充）**：僅 statement-only 命題（無 `proof`／`qed`）吃
+`accent_panel`、`layer="decoration"` 豁免容量/overlap 檢查——但**不豁免出框**：`sizecheck._overflow_issues`
+對 id=`aside` 照 content 規則查（出 frame＝error、進 safe margin＝warn），另有 `_aside_collision_issues` 逐行檢查
+卡片與每個 content block（title／scaffold／statement／math）的交疊，交疊即 **error**（卡片不透明、畫在 content
+之後，交疊＝字被蓋掉）。以上 definition_math 與 theorem_proof 的 aside 都適用（2026-09-23 code review D2-02）。
+**`definition_math`**：有 `aside` 時 statement 以 `PRIMARY_W − ASIDE_GUTTER`（0.3u）包行、卡片 snap `RAIL_X`，
+垂直置中於 content 但**夾在 body zone 內**（不上壓標題帶／scaffold）；下列任一成立則**自動收合**（丟 aside、回滿寬
+單欄）：primary 收窄後溢出 zone、**卡片本身高過 zone**、或**實測** statement／某 math 列寬超過 `PRIMARY_W`
+（字元估寬對含 inline math 的行可低估一成以上，gutter 吸收不了時寧可收合也不伸進卡片底下）。**`theorem_proof`（2026-06-21 擴充）**：僅 statement-only 命題（無 `proof`／`qed`）吃
 aside——card 收窄＋rail aside、兩者置中（Lectern bias）；有 proof 時 aside 收合（proof 即內容）。**`callout`
 不開 aside**——它本身就是置中單一 boxed aside、無 masthead/rail，再塞 rail aside 自相矛盾。**author-authored、
 純可選——框架絕不自動生成內容填空**（否則退化成被否決的 auto-fit 投機）。
