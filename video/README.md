@@ -224,7 +224,7 @@ python tools\doctor.py --smoke                                # 環境健檢＋�
 
 > 為何兩支都要：doctor 原本只驗工具鏈，2026-08-10 佈局重構後正典 deck 過不了自己的 provenance 閘、一個 selftest 同因變紅，doctor 卻仍報影片線 ✅（[`_audit/REVIEW-pipeline-assessment-2026-09-07.html`](_audit/REVIEW-pipeline-assessment-2026-09-07.html) F1／F4）。`--smoke` 抓 deck 級閘、runner 抓模組級回歸；兩者都綠才算「產線綠」。
 
-**看片評審（REWATCH，2026-09-12 首用；2026-09-13 起＝里程碑審，一節收斂時跑一次，見 [`REVIEW_GATES.md`](REVIEW_GATES.md) §六）**——render 後、以觀眾的方式審成片品質（時間、停留、畫面有沒有動、跟不跟得上）：`python video/pipeline/rewatch_pack.py --deck <deck>` 先把成片翻成模型讀得了的 pack（`output/<ch>/<sec>/rewatch_pack/`）——**同一支腳本帶 12 s 最長靜止硬閘**：`--gate-still <seconds>`（預設 12.0）只審 content 場、用 0.05% 細門檻的最長靜止，超線印 `[still-gate] FAIL` 並 exit 1、全過印 `[still-gate] PASS`；新舊 A/B 要比對時加 `--baseline <pack dir>`，兩包 pack 的來源 mp4 fps／畫面尺寸不同就拒絕、exit 2（不同 fps 會得出假結論）。再依 [`content_scripts/_audit/REWATCH-REVIEW-RUBRIC.md`](content_scripts/_audit/REWATCH-REVIEW-RUBRIC.md) 派五鏡（初學者×2／動畫導演／教學設計／節奏剪輯／講師，跨 Gemini／Claude 模型家族，agy＋subagent）獨立盲審，合成為 standalone HTML 供裁決。**五鏡評審本身 advisory、永不 blocking**（會擋的是上述確定性的 `--gate-still`）。
+**看片評審（REWATCH，2026-09-12 首用；2026-09-13 起＝里程碑審，一節收斂時跑一次，見 [`REVIEW_GATES.md`](REVIEW_GATES.md) §六）**——render 後、以觀眾的方式審成片品質（時間、停留、畫面有沒有動、跟不跟得上）：`python video/pipeline/rewatch_pack.py --deck <deck>` 先把成片翻成模型讀得了的 pack（`output/<ch>/<sec>/rewatch_pack/`）——**同一支腳本帶 12 s 最長靜止硬閘**：`--gate-still <seconds>`（預設 12.0）只審 content 場、用 0.05% 細門檻的最長靜止，超線印 `[still-gate] FAIL` 並 exit 1、全過印 `[still-gate] PASS`；新舊 A/B 要比對時加 `--baseline <pack dir>`，兩包 pack 的來源 mp4 fps／畫面尺寸不同就拒絕、exit 2（不同 fps 會得出假結論）。**只讀該 deck 自己的音檔子目錄**——deck 以 `_mimo` 結尾才讀 `audio_mimo/`，否則讀 `audio/`，不會跨目錄回退（避免拿 mock 的時序去對真人聲 beats）；讀到的 manifest 若 `deck_id` 跟 `--deck` 對不上也拒絕、exit 2。再依 [`content_scripts/_audit/REWATCH-REVIEW-RUBRIC.md`](content_scripts/_audit/REWATCH-REVIEW-RUBRIC.md) 派五鏡（初學者×2／動畫導演／教學設計／節奏剪輯／講師，跨 Gemini／Claude 模型家族，agy＋subagent）獨立盲審，合成為 standalone HTML 供裁決。**五鏡評審本身 advisory、永不 blocking**（會擋的是上述確定性的 `--gate-still`）。
 
 **解析度慣例**：測試／預覽用 1080p（`make.py --quality high`，預設），正式交付才 4K（`--quality 4k`，依 `meta.video`，未設預設 4K60）。版面與解析度無關，1080p 測試與 4K master 構圖逐像素相同。（agent 預設一律 1080p、除非使用者要求，見根 [`CLAUDE.md`](../CLAUDE.md)；§3.1 真 4K final 另議見 [`REBUILD_STATUS.md`](REBUILD_STATUS.md)。）
 
@@ -295,6 +295,7 @@ python video\pipeline\critic.py --storyboard video\storyboards\<deck>.yml --scen
 - **`--per scene`（預設）** 每場景抽**最滿幀**；`--per beat` 每 beat 一張（看漸進、較貴）。
 - **`--out <dir>`** 指定輸出目錄（預設仍是 `output/ch<NN>/s<X.Y>/critic`／`critic_mimo`）；`--dry-run`／`--confirm` 都寫到該目錄。**開跑前一律先清空該目錄的 `frames/`**——留底＝一次完整輸出，不會跟前一輪的舊幀混在一起；要保留某一輪的結果就換一個 `--out` 路徑另存，不要在同一個目錄上疊加。**同一個輸出目錄同一時間只能一人跑**，兩個 session 平行測同一節時各自給 `--out` 分開。「逐輪隔離留底」已列進輪次協定的開工清單（[`REVIEW_GATES.md`](REVIEW_GATES.md) §六 6.4）。
 - **MiMo-V2.5 公測免費（估值＝$0）**，但仍屬外部 API，依 [CLAUDE.md](../CLAUDE.md) 批次前須先報量徵同意；`--dry-run` 看幀數＋token 量（不送請求）。
+- **退出碼：** 任一規劃好的幀抽不到（`extract_frames` 沒寫出 `frame_path`）一律 exit 1，`--dry-run`／`--confirm`／不帶旗標皆同；`--confirm` 下只要有任何一次 VLM 呼叫失敗，也 exit 1。
 - provider＝小米官方 `api.xiaomimimo.com/v1`（OpenAI 相容、model `mimo-v2.5`、auth header `api-key`）。
 - **A1 Element Layout / V2 相撞** 要特別看 graph label：`$y=f(x)$`、`$y=x$`、座標標籤等不可壓在線、點、空心點或 guide marker 上（蓋住資訊＝V2 blocking）；這類圖內 label collision 即使 `sizecheck` 不一定自動抓到。
 

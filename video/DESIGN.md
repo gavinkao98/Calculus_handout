@@ -309,7 +309,7 @@ video 保 `-c:v copy`（不破壞 T8 單次編碼）、linear gain 保 A/V 同�
 | `value_table` | **不放 BGM**。表格讀值時保持安靜。 | 不放每列／每欄音效。 |
 | `sign_chart` | **不放 BGM**。符號區間判讀需要低干擾。 | 不放每個 mark 音效。 |
 | `graph` | **不放 BGM**。圖形講解以旁白和動畫承擔節奏。 | 只有大型視覺轉換（例如整張圖切入、反射、domain restriction）可用極淡 whoosh；單一曲線、點、標籤 reveal 不加。 |
-| `callout` | **不放 BGM**。Remark/Caution/Note 是教學語氣的轉折，不是音樂段落。 | `type: caution` 可用裁決出的 caution ping；`remark` 預設不加。 |
+| `callout` | **不放 BGM**。Remark/Caution/Note 是教學語氣的轉折，不是音樂段落。 | 不加音效：`caution` ping 已於 2026-07-07 隨落選候選集一併刪除，且 compose 沒有「旁白＋cue」的 amix 路徑——有旁白的場一律走純旁白 mux（見 `house_audio.py` docstring）。 |
 | `recap_cards` | **不放 BGM**。Key Takeaways 仍是 narrated content；音樂留給後面的 `outro`。 | 可在第一張 recap 卡出現時用一次短 chime；不要每點都加。 |
 
 **授權與來源規則。**
@@ -1058,18 +1058,22 @@ hook 佔 11.5 秒拍的前 ~5 秒）實測速度列到拍中才暗。`indicate` 
 **還原一定用 `save_state()`/`restore()`，絕不可用 `set_opacity(1.0)`**——manim 的
 `set_opacity` 會把整個 family 的 fill 與 stroke 一律設成該值，於是「刻意透明」的部分
 （`fill_opacity=0` 的空心編號環）會被填成實心色塊。`schema._focus_issues` 擋 `at` 指到
-`say` 沒揭示過的 id 與重複的 `at`；`sizecheck` 擋 `dim` 裡不存在的 block id。
+`say` 沒揭示過的 id 與重複的 `at`；`sizecheck` 擋 `dim` 裡不存在的 block id。**`dim`／`indicate`
+也不可指到本場「較晚的 beat 才 `{show}` 出來」的 block（C-08）**——fade／`Indicate` 不是
+引入動畫，manim 一律照樣把它加進畫面，於是提早壓暗或閃爍等於把該 block 提前顯示；
+`schema._focus_issues` 對此報 error。
 **壓暗集合真的改變的那一拍，`_play_content` 也會把 `focus.apply` 的 FADE_SECONDS 存進
 `scene.beat_reserved_seconds`（比照下面 `indicate` 的做法，用 `apply` 同一套 by_id 過濾判斷
 「有沒有變」），讓填滿整拍的 reveal 自己少要求 0.4 s 的預算（2026-09-13 六輪，dim 對稱擴充
 indicate-budget）。**已知限制：這個預算只覆蓋「同一拍宣告、同一拍的 reveal 要讓路」的情況——
 一個**最後一拍**才壓暗、且沒有下一拍能寫 `dim: []` 收回的壓暗，只能靠 `_play_content` 迴圈
 **結束後**的場末 sweep-up（`focus.apply(self, by_id, [], dimmed)`）還原，那筆 FADE_SECONDS
-落在迴圈之外，不吃這個預算，會直接疊進 `_tail` 的 SCENE_TAIL_SECONDS 額度裡；`exit:` 的淡出
-已經先佔掉 EXIT_FADE_SECONDS，剩下的餘裕通常不夠再吸收一次 0.4 s，MIN_HOLD 地板一頂就整場
-超時（06 `evenness` 拍實測：改宣告式 `dim` 後 `[sync]` 報 82.599 s vs 預期 82.410 s，超出
-0.189 s，遠超 1 影格；已還原，storyboard `focus:`／hook `_evenness_anim` 皆未變動，維持 hook
-自己壓暗＋還原）。
+落在迴圈之外，不吃這個預算，會直接疊進 `_tail` 的 SCENE_TAIL_SECONDS 額度裡，和 `exit:` 的
+淡出一起由場尾吸收。`_tail` 現行算法（code-review-2026-09-23 F-03）沒有 MIN_HOLD 地板：`exit`
+淡出以「淡出前剩下的場尾時間」為上限（至少 1 影格），hold 再吃掉淡出之後剩下的餘裕，所以
+上述 sweep-up 還原與 `exit` 淡出不會再讓整場超時——除非兩者合計超過 SCENE_TAIL_SECONDS 本身
+（06 `evenness` 拍舊版地板疊加在淡出之上時實測超時 0.189 s，已還原成 hook 自己壓暗＋還原；
+`_tail` 改法後同一情境不再超時，storyboard `focus:`／hook `_evenness_anim` 皆未再變動）。
 
 **`color_role`（derivation 的 `steps[i]` / `result`）——跨場延續。** 圖已經用顏色替各部分
 命名了（`graph` 的 plot 一直有 `color_role`），推導列寫同一個 role，讀者就看得出這一行講的
@@ -1284,10 +1288,14 @@ make.py／sizecheck／scratch_frames／critic 都已佈線），缺了而場有 
 
 **`exit: [<block id>…]`（場級）——切場前把不帶走的東西退場。**
 場尾 `SCENE_TAIL_SECONDS` 內先 `FadeOut` 0.5 s（`timing.EXIT_FADE_SECONDS`）再等剩餘，
-總長不變（render/audio sync 閘看不到差異）。**注意：`critic.py --dry-run` 與 `scratch_frames.py`
-抽的是最後一幀，有 `exit` 的場拿到的是 exit 之後的幀、不是最滿幀。**
+總長不變（render/audio sync 閘看不到差異）。**注意：`scratch_frames.py` 抽的仍是最後一幀，
+有 `exit` 的場拿到的是 exit 之後的幀、不是最滿幀；`critic.py`（含 `--dry-run`）已改抽「已定格」
+的最滿幀——候選是各拍套 `pauses` 後的定格時間點加上末幀，取墨量（ink）最高者（code review
+2026-09-23 C-02，見 `critic.py` 的 `_fullest_frame_ts`），不受 `exit` 影響。**
 `schema._carry_issues`／`_exit_issues` 擋形狀與幕／相鄰規則；`sizecheck` 擋 `exit` 不存在的 id，
-`carry.block` 不存在／`as` 撞 id 以「could not build scene」報 error。回歸樣本
+`carry.block` 不存在／`as` 撞 id 以「could not build scene」報 error。**下一場 `carry.block`
+裡的任何 id，不得同時出現在上一場的 `exit` 清單（F-05）**——否則帶過來的複本會在切場那一刻
+先淡出、又在下一場開頭原地彈回來；`schema._carry_issues` 對此報 error。回歸樣本
 `storyboards/_demo_carry.yml`（graph → derivation 飛角落 → callout keep）。
 
 ### Reveal 的耗時回報契約（`_elapsed`／`_spent`；前提＝`disable_caching`）
@@ -1770,7 +1778,8 @@ MiMo（`mimo-v2.5-tts`，唯一 TTS 路線）不讀 inline LaTeX，需「數學�
 - **原子寫入＋verify-before-overwrite：** words／aligned／manifest 一律 `.tmp`＋rename（`pipeline/atomicio.py`）；scene WAV 先寫 temp、gates 過才 promote 到正檔，杜絕「舊 words.json 配新 WAV」與「壞 re-synth 蓋掉好 WAV」。
 - **reuse 以內容定址、不以輸出路徑定址（2026-09-13 修）：** beat 級 reuse index 的 key＝`(scene_id, beat text_hash, 同場同 hash 的第幾個)`＋頂層 backend/model/voice/style（`build_reuse_index`）；scene 級仍以 `scene_id` 為 key（`build_scene_reuse_index`），另把 `alignment` 的 `words_file`／`aligned_file` 一併帶進 index。**理由：** 兩層的輸出路徑都把場序嵌進檔名——beat 是 `beats/<場號>_<scene_id>/<序>_<reveal>.wav`，scene 是 `scenes/<場號>_<scene_id>.wav` 與 `align/<場號>_<scene_id>.{words,aligned}.json`——所以「搬場」或「加／移一個 `{show}` marker」會讓路徑全部位移。beat 層是路徑 key 直接判「無先前紀錄」；scene 層是 key 本來就對（`scene_id`），但 `scene_reuse_ok` 被餵「今天的場號」去找檔案、那裡是空的。兩者都導致整場重合成，即使一個字都沒改（2026-09-13 兩次踩到）。
   **修法：** beat 路徑命中後若新舊路徑不同就把 WAV **搬**到新路徑再登記；scene 路徑則在 freshness 檢查**之前**用 `adopt_prior_scene_artifacts` 把舊 scene WAV＋兩個 sidecar 搬到今天的號（scene 層的搬檔是**無條件**的：re-synth 走 temp＋gates 過才 promote，搬過去的檔在有好替代品前不會消失，而不搬就在舊場號下留孤兒）。兩層共用同一個 `_relocate`（copy→驗大小→刪舊→空目錄剪掉；log `reused … (moved from …)`），舊路徑不留孤兒 WAV 去絆 `overwrite_guard`。同場同文字的兩拍依 index 配對、同一份 take 只登記一次。
-- **`scene_number` 由當前 storyboard 全 deck 序號重算（`renumber_scenes`，manifest 寫出前）：** `--scene` 子集會把沒重跑的 prior 條目原封併回，那些條目帶的是「上次合成時的 deck 長相」；2026-09-13 因此出現同一份 manifest 裡兩場都叫 17（critic 抽幀撞號）。現在每個條目都重新蓋今天的號（intro／divider 也佔號，與 `rewatch_pack.py`／`critic.py` 同一套數法），換號者的 scene WAV／`alignment` sidecar／beat WAV 一併搬到新號。scene_id 進每個檔名，故重新編號永遠不會讓兩場撞到同一路徑。
+- **交易與計費安全（code review 2026-09-23 A-01～A-04）：** ⑴ 一整場 beats 是一筆交易——`_synthesize_scene_beats` 先把每拍的 reuse 來源查完（不動硬碟），所有 take（複製自 reuse 或現場合成）先放進 `.staging/`，全部備妥才 promote 到正式路徑，不會覆寫還沒被自己 owner 取用的舊 take（避免兩拍互換文字時把對方已付費的 take 蓋掉）。⑵ `main()` 每完成一場就把「prior manifest ＋ 這場新結果」寫一次 checkpoint manifest，被搬走的來源要等 checkpoint 記下新位置後才刪除；中止（`--max-billed-calls`、斷網）後重試不會對已完成的場重複計費。⑶ 只要待合成的場裡有任何一個解析成 scene unit，`main()` 在**任何合成呼叫之前**就先檢查 `stable-ts`（`_scene_aligner_missing`）；缺件直接中止，不會讓每個 scene-unit 場各自付費跌到 resynth／beats 終點。⑷ scene-level reuse 命中但重新對位失敗時，付費重新合成前先免費用 `small.en` 對**同一份**既有 WAV 重跑一次對位（`_synthesize_scene_aligned`），只有那一輪仍失敗才進入計費的 fallback ladder。
+- **`scene_number` 由當前 storyboard 全 deck 序號重算（`renumber_scenes`，manifest 寫出前）：** `--scene` 子集會把沒重跑的 prior 條目原封併回，那些條目帶的是「上次合成時的 deck 長相」；2026-09-13 因此出現同一份 manifest 裡兩場都叫 17（critic 抽幀撞號）。現在每個條目都重新蓋今天的號（intro／divider 也佔號，與 `rewatch_pack.py`／`critic.py` 同一套數法），換號者的 scene WAV／`alignment` sidecar／beat WAV 一併搬到新號。scene_id 進每個檔名，故重新編號永遠不會讓兩場撞到同一路徑。`make.py --backend mock` 搭配 `--scene` 子集時也照同一套規則併回既有 manifest（`_merge_mock_subset`）：identity（`_IDENTITY_KEYS`）相同才 merge＋renumber，不同則沿用舊行為整份取代，並印 WARN。
 - **`--dry-run` 把 reuse 算進 `plan`：** 多一個 `reuse` 欄（既有音檔覆蓋的計費單位），TOTAL 行另印 `(no-reuse: N)` 保留悲觀報價；`plan` 只有在真的下了 `--reuse-existing` 時才成立，沒下就多印一行 NOTE 講明會 billed 幾次。`worst` 對 scene-level 仍 reuse-blind（reuse 的 WAV 仍可能重對齊失敗而掉 ladder）。
 - **模組：** 核心 `pipeline/scene_align.py`（純函式＋單一 aligner seam `align_scene`，換 aligner 只改這函式；另含 `split_sentence_chunks`／`merge_chunk_alignments` 供 rung 3）；fallback ladder `pipeline/scene_fallback.py`；`tts.py --unit beat|scene|auto`（auto 依 template allowlist；**batch-2（2026-07-06）已含全部 content template**）。**ladder＝arbiter(small.en 免費)→resynth(計費 1 call)→chunk(sentence-chunk，N 個 billed sub-synth)→beats(budget-exempt 終點——不佔 rungs 2–3 budget，但 MiMo 下每非空 beat 仍一次 call，非免費)**——rung 3 sentence-chunk 於 2026-07-06 batch-2 落地：切句、逐句合成＋對位、concat＋merge 回同一時間軸（`verify_plan_index` 自檢 token tiling）。**計費紀律：chunk fan-out＝N call，故對 `run_ladder` 宣告 `billed=False`、自檢 `RetryBudget`——reserve N、`need > 剩餘 budget` 即 decline 退 beats**；預設 `--fallback-budget 2` 只夠 resynth，chunk 要靠調高 budget（併入報價）才啟用。
 
