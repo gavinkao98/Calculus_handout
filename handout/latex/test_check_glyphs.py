@@ -12,20 +12,24 @@
 `?`／`!`／`.`／`:`／`;`／`·` 等 68 個字形的圓點都是這樣畫的；ch07 是全書第一個把 `?`
 帶進圖面板的單元，於是字形閘直接 crash（而不是回報 finding）。
 
-2026-09-23 程式碼審查另補：
+2026-09-23 程式碼審查另補兩組：
   - E-01（`FontIdentityTest`）：Type 3 字型與沒嵌入的字型不得落在閘的視野外——Type 3 只准
     `FIG_TYPE3_OK` 具名白名單內的家族，名單外與沒嵌入的非 Type 3 字型一律 FAIL 並指名。
+  - E-05（`FindOriginalTest`）：kpsewhich 的輸出以 UTF-8 解碼；TeX 樹路徑含中文時不得崩潰。
 """
+import shutil
 import subprocess
 import sys
 import tempfile
 import unittest
 from pathlib import Path
+from unittest import mock
 
 import fitz
 
 HERE = Path(__file__).resolve().parent
 sys.path.insert(0, str(HERE))
+import check_glyphs  # noqa: E402
 from check_glyphs import _glyf_outline  # noqa: E402
 
 
@@ -155,6 +159,36 @@ class FontIdentityTest(unittest.TestCase):
                              ("Type3", "ABCDEF+mjx-ncm-zero-Regular")])
         self.assertEqual(rc, 0, out)
         self.assertIn("字形閘 PASS", out)
+
+
+class FindOriginalTest(unittest.TestCase):
+    """E-05：kpsewhich 的輸出是 UTF-8；用 locale（Windows 的 cp950）解碼，中文路徑就崩。"""
+
+    def test_stdout_none_means_not_found(self):
+        """解碼失敗時 subprocess 的 stdout 會是 None：當成找不到，不得 AttributeError。"""
+        fake = subprocess.CompletedProcess(["kpsewhich"], 0, stdout=None, stderr=None)
+        with mock.patch.object(check_glyphs.subprocess, "run", return_value=fake):
+            self.assertIsNone(check_glyphs.find_original("ABCDEF+NoSuchFont-Regular"))
+
+    @unittest.skipUnless(shutil.which("kpsewhich"), "需要 kpsewhich（MiKTeX）")
+    def test_cjk_texmf_path_is_found(self):
+        """TeX 樹在中文路徑下（使用者名稱含中文的 per-user MiKTeX）時仍找得到原始字型。"""
+        real_run = subprocess.run
+        with tempfile.TemporaryDirectory() as tmp:
+            d = Path(tmp) / "字型測試"
+            d.mkdir()
+            shutil.copy(HERE / "template" / "fonts" / "inter" / "Inter-Regular.otf", d / "ZZTest-Regular.otf")
+
+            def run(args, **kw):             # 讓 kpsewhich 在中文資料夾裡找；其餘沿用 check_glyphs 的 kwargs
+                if args and args[0] == "kpsewhich":
+                    args = ["kpsewhich", f"-path={d}"] + args[1:]
+                return real_run(args, **kw)
+
+            with mock.patch.object(check_glyphs.subprocess, "run", run):
+                found = check_glyphs.find_original("ABCDEF+ZZTest-Regular")
+            self.assertIsNotNone(found)
+            self.assertTrue(found.exists())
+            self.assertEqual(found.resolve(), (d / "ZZTest-Regular.otf").resolve())
 
 
 if __name__ == "__main__":

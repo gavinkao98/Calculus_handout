@@ -120,8 +120,12 @@ def find_original(basefont):
     web = VENDORED_WEB / f"{name}.woff2"       # 圖裡的 web 字型（見 template/fonts/webcm/README.md）
     if web.exists():
         return web
-    out = subprocess.run(["kpsewhich", f"{name}.otf"], capture_output=True, text=True)
-    found = Path(out.stdout.strip()) if out.stdout.strip() else None
+    # MiKTeX 的 kpsewhich 輸出 UTF-8；不指定就用 locale（Windows 的 cp950）解碼，TeX 樹在中文
+    # 路徑下（per-user MiKTeX＋中文使用者名稱）時 reader thread 解碼失敗、stdout 變 None。
+    out = subprocess.run(["kpsewhich", f"{name}.otf"], capture_output=True, text=True,
+                         encoding="utf-8", errors="replace")
+    hit = (out.stdout or "").strip()
+    found = Path(hit) if hit else None
     return found if found and found.exists() else None
 
 
