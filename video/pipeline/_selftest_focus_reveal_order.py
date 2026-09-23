@@ -46,6 +46,40 @@ def test_blocks_already_on_screen_are_fine():
                           {"at": "result", "dim": [], "indicate": ["result", "step.0"]}])) == []
 
 
+# A corner `carry` is the one block a later {show} does NOT introduce: templates._apply_carry
+# gives it pre_play=restore, scene._stage adds it at t=0 where the previous scene left it, and
+# its {show <as>} is the flight to the corner (RG2-01). The algebra enters first here.
+_CARRY_SAY = ("The curve is still here. {show step.0} Meanwhile the algebra. "
+              "{show carried.curve} Now it flies. {show result} And lands.")
+
+
+def _carry_deck(focus):
+    src = {"id": "src", "kind": "content", "template": "graph", "mode": "single",
+           "title": "Src", "say": "A curve. {show plot.0} There.",
+           "plots": [{"kind": "function", "expression": "sin(x)", "x_range": [0, 3]}]}
+    scene = {"id": "fly", "kind": "content", "template": "derivation", "title": "Fly",
+             "carry": [{"from": "src", "block": "plot.0", "as": "carried.curve",
+                        "to": {"corner": "top_right", "scale": 0.35}}],
+             "say": _CARRY_SAY, "steps": [{"math": "a = b"}], "result": {"math": "a = c"},
+             "focus": focus}
+    return {"meta": {"id": "_t", "section": "0.0"}, "scenes": [src, scene]}
+
+
+def test_dimming_a_corner_carry_before_its_flight_is_fine():
+    assert _errors(_carry_deck([{"at": "step.0", "dim": ["carried.curve"]},
+                                {"at": "carried.curve", "dim": []}])) == []
+
+
+def test_indicating_a_corner_carry_before_its_flight_is_fine():
+    assert _errors(_carry_deck([{"at": "step.0", "dim": [],
+                                 "indicate": ["carried.curve"]}])) == []
+
+
+def test_a_normal_later_reveal_in_a_carry_scene_is_still_an_error():
+    errs = _errors(_carry_deck([{"at": "step.0", "dim": ["carried.curve", "result"]}]))
+    assert len(errs) == 1 and "fly.focus[0].dim 'result'" in errs[0], errs
+
+
 if __name__ == "__main__":
     for name in sorted(n for n in dir() if n.startswith("test_")):
         globals()[name]()

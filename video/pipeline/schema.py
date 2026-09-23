@@ -56,6 +56,13 @@ def _focus_issues(sid: str, scene: dict, say) -> "list[tuple[str, str]]":
     beat_of: dict[str, int] = {}          # reveal id -> the beat that first reveals it
     for pos, target in enumerate(order):
         beat_of.setdefault(target, pos)
+    # A corner carry (`to: {corner, scale}`) is on screen from t=0 at its carried-in place
+    # (templates._apply_carry's pre_play=restore, added by scene._stage); its {show <as>} is
+    # the flight to the corner, not an entrance -- so C-08 below does not apply to it (RG2-01).
+    carry = scene.get("carry")
+    corner_carried = {c.get("as") for c in (carry if isinstance(carry, list) else [])
+                      if isinstance(c, dict) and isinstance(c.get("as"), str)
+                      and isinstance(c.get("to"), dict)}
     issues: list[tuple[str, str]] = []
     seen: set[str] = set()
     for j, item in enumerate(entries):
@@ -108,7 +115,8 @@ def _focus_issues(sid: str, scene: dict, say) -> "list[tuple[str, str]]":
             ind = item.get("indicate")
             touched += [("indicate", i) for i in (ind if isinstance(ind, list) else [])]
             for field, bid in touched:
-                if isinstance(bid, str) and beat_of.get(bid, -1) > beat_of[at]:
+                if (isinstance(bid, str) and bid not in corner_carried
+                        and beat_of.get(bid, -1) > beat_of[at]):
                     issues.append(("error", f"{where}.{field} {bid!r}: revealed by a later beat "
                                             f"({{show {bid}}}), so it is not on screen at {at!r} "
                                             f"-- the {field} would bring it in early (drop it here)"))
