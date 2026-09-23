@@ -33,6 +33,11 @@ CID／ToUnicode／charset 卻全對——四閘全綠。修法是模板給 Inter
     註解）：那是圖 PDF 帶進來、本機沒有原始檔可比對的字型，只能問「是不是預期中的那幾套」。
     ch04 rollout 把 WebCM 的原始 woff2 vendored 進來之後，它已升級成真的比對輪廓；
     白名單自此是 **fallback 而非 shortcut**——能驗的一定要驗。**白名單外仍是硬 FAIL 並指名**。
+  - **Type 3 只驗字型身分、不驗輪廓**（2026-09-23 程式碼審查 E-01 補上）。Chrome（Skia）把
+    CFF 型 OTF、variable font 等嵌成 Type 3：字形是 PDF 內容串流畫的，沒有 FontFile、沒有可比對
+    的原始輪廓。本閘對它只問「是不是 `FIG_TYPE3_OK` 裡那幾個家族」，名單外一律 FAIL 並指名；
+    沒嵌入的非 Type 3 字型（沒有 FontFile）也一律 FAIL 並指名。在此之前 embedded_fonts() 只看
+    帶 FontFile 的字型，Type 3 整類落在閘的視野外——圖裡的字若退到 variable 系統字型會無聲 PASS。
 """
 import io
 import re
@@ -73,8 +78,31 @@ FIG_IMPORTED_OK = (
                          # `.paper .fig-lyr { font-family: var(--serif) }` 讓圖上的文字
                          # 標註走正文同一個字體家族——與內文一致，是設計如此。
 )
+
+# ── 圖 PDF 帶進來的 Type 3 字型：具名 allow-list（2026-09-23，程式碼審查 E-01）────────
+#
+# Chrome（Skia）嵌不了 CFF，會把 CFF 型 OTF、variable font 輸出成 Type 3：字形直接寫成內容
+# 串流，沒有 FontFile，也就沒有可比對的原始輪廓。所以對 Type 3 只能問**字型身分**，同
+# FIG_IMPORTED_OK 的判準；名單外一律 FAIL 並指名（退到系統字型正是要抓的缺陷，見上）。
+#
+# 比對的是**家族**：名稱去掉子集前綴後，本身等於條目、或以「條目-」開頭才算——`Inter` 放行
+# `Inter`、`Inter-Regular`，但不放行 `InterDisplay-Regular` 這種別的家族。
+#
+# 2026-09-23 盤點 12 份 dist PDF 的全部 Type 3（512 個字型物件），名稱只有這兩個家族：
+FIG_TYPE3_OK = (
+    "Inter",     # 圖面板的 UI 字（figkit harness 的 `--ui: "Inter"`）。export_figs.mjs 自 2026-07-26
+                 # （e443070）起供 template/fonts/inter/ 的 static CFF OTF → `Inter-Regular`／
+                 # `-Italic`／`-Medium`／`-SemiBold`；在那之前匯出的圖（ch01、ch02 的 figs/ 為
+                 # 2026-07-25～26 匯出）用的是 Google Fonts 的 Inter，Chrome 嵌成不帶字重的 `Inter`。
+    "mjx-ncm",   # MathJax 4 的 mathjax-newcm 數學字型（圖面板上的數學標籤，`mjx-ncm-n-Regular`、
+                 # `mjx-ncm-zero-Regular`、`-v-`、`-s-`、`-lo-` 等變體）；與內文 NewCM 同一字體設計。
+)
 FONTNAME_RE = re.compile(r"/FontName\s*/([^\s/\[\]<>]+)")
 FONTFILE_RE = re.compile(r"/FontFile(\d?)\s+(\d+)\s+0\s+R")
+FONT_DICT_RE = re.compile(r"/Type\s*/Font\b")
+SUBTYPE_RE = re.compile(r"/Subtype\s*/(\w+)")
+BASEFONT_RE = re.compile(r"/BaseFont\s*/([^\s/\[\]<>]+)")
+FONTDESC_RE = re.compile(r"/FontDescriptor\s+(\d+)\s+0\s+R")
 
 _orig_cache = {}
 
@@ -92,8 +120,12 @@ def find_original(basefont):
     web = VENDORED_WEB / f"{name}.woff2"       # 圖裡的 web 字型（見 template/fonts/webcm/README.md）
     if web.exists():
         return web
-    out = subprocess.run(["kpsewhich", f"{name}.otf"], capture_output=True, text=True)
-    found = Path(out.stdout.strip()) if out.stdout.strip() else None
+    # MiKTeX 的 kpsewhich 輸出 UTF-8；不指定就用 locale（Windows 的 cp950）解碼，TeX 樹在中文
+    # 路徑下（per-user MiKTeX＋中文使用者名稱）時 reader thread 解碼失敗、stdout 變 None。
+    out = subprocess.run(["kpsewhich", f"{name}.otf"], capture_output=True, text=True,
+                         encoding="utf-8", errors="replace")
+    hit = (out.stdout or "").strip()
+    found = Path(hit) if hit else None
     return found if found and found.exists() else None
 
 
@@ -126,6 +158,30 @@ def embedded_fonts(doc):
         name, ff = FONTNAME_RE.search(obj), FONTFILE_RE.search(obj)
         if name and ff:
             yield name.group(1), ff.group(1), int(ff.group(2))
+
+
+def fonts_without_fontfile(doc):
+    """PDF 裡沒有 FontFile 的字型 → (名稱, Subtype)。embedded_fonts() 看不到的就是這些：
+    Type 3（字形畫在內容串流裡，本來就沒有 FontFile）與沒嵌入的字型。
+
+    Type0 略過——它是組合字型的外殼，真正的字型（及其 FontDescriptor）在 DescendantFonts 的
+    CIDFont 上，那個 CIDFont 本身也是一個 /Type /Font，會在這裡被掃到。
+    名稱取 FontDescriptor 的 FontName，其次 BaseFont；兩者都沒有就用 xref 指名，不略過。
+    """
+    for xref in range(1, doc.xref_length()):
+        obj = doc.xref_object(xref)
+        if not FONT_DICT_RE.search(obj):
+            continue
+        sub = SUBTYPE_RE.search(obj)
+        subtype = sub.group(1) if sub else "?"
+        if subtype == "Type0":
+            continue
+        fd = FONTDESC_RE.search(obj)
+        desc = doc.xref_object(int(fd.group(1))) if fd else obj   # 無間接 descriptor：看字型字典本身
+        if subtype != "Type3" and FONTFILE_RE.search(desc):
+            continue                             # 有嵌入：歸 embedded_fonts() 管
+        name = FONTNAME_RE.search(desc) or BASEFONT_RE.search(obj)
+        yield (name.group(1) if name else f"(xref {xref}，無名稱)"), subtype
 
 
 def audit(doc, basefont, data):
@@ -258,8 +314,20 @@ def main():
         print(f"  {SUBSET_TAG.sub('', basefont):22s} {n:3d} 字形 → {len(bad)} 個輪廓不符")
         failures += [(basefont, *b) for b in bad]
 
+    type3 = Counter()
+    for basefont, subtype in fonts_without_fontfile(doc):
+        name = SUBSET_TAG.sub("", basefont)
+        if subtype == "Type3" and (name + "-").startswith(tuple(f + "-" for f in FIG_TYPE3_OK)):
+            type3[name] += 1
+        elif subtype == "Type3":
+            unchecked.append(f"{basefont}：Type 3 字型，不在 FIG_TYPE3_OK 白名單內（Type 3 只能驗字型身分）")
+        else:
+            unchecked.append(f"{basefont}：{subtype} 字型沒有嵌入（無 FontFile）")
+
     for name, n in sorted(imported.items()):
         print(f"  [圖匯入] {name:22s} {n} 個子集（白名單內，不驗輪廓）")
+    for name, n in sorted(type3.items()):
+        print(f"  [圖匯入 Type 3] {name:22s} {n} 個（FIG_TYPE3_OK 白名單內，只驗字型身分、不驗輪廓）")
     for u in unchecked:
         print(f"  [未驗] {u}")
     for basefont, cid, claims, looks in failures[:20]:
@@ -272,11 +340,13 @@ def main():
         if failures:
             why.append(f"{len(failures)} 個字形的輪廓不是它宣稱的字")
         if unchecked:
-            why.append(f"{len(unchecked)} 個嵌入字型無法驗")
+            why.append(f"{len(unchecked)} 個字型無法驗")
         print(f"\n字形閘 FAIL：{'；'.join(why)}")
         sys.exit(1)
     tail = (f"；另有 {sum(imported.values())} 個圖匯入子集在 FIG_IMPORTED_OK 白名單內"
             if imported else "")
+    if type3:
+        tail += f"；{sum(type3.values())} 個圖匯入 Type 3 字型在 FIG_TYPE3_OK 白名單內"
     print(f"\n字形閘 PASS：{total} 個嵌入字形的輪廓全數符合其 CID{tail}")
 
 

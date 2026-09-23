@@ -5,7 +5,8 @@ r"""build.py —— LaTeX 統一（U1）後的日常編譯入口：src/<ch>/*.te
     python build.py all           # 編譯全部 12 單元
 
 每單元流程：latexmk -lualatex（aux 進 build/aux-<ch>/）→ log 閘（0 error／
-0 missing character；overfull 逐條列出供裁決）→ 字形閘（check_glyphs.py）→
+0 missing character／0 undefined reference／0 multiply-defined label；overfull 逐條列出
+供裁決）→ 字形閘（check_glyphs.py）→
 成品 PDF 移入 dist/<ch>/。任何一閘不過即以非零退出碼停下。
 
 沿革：取代 make_dist.py（fragment→轉換→內嵌 的產線，隨 HTML 撰稿線於 P1 退役；
@@ -27,6 +28,15 @@ UNITS = {
 }
 
 
+def print_tail(label, text, n=6):
+    """FAIL 時印子程序輸出的最後 n 行（capture 起來的輸出，不印就沒人看得到）。"""
+    lines = (text or "").strip().splitlines()[-n:]
+    if lines:
+        print(f"    ── {label}（最後 {len(lines)} 行）")
+        for ln in lines:
+            print("   ", ln)
+
+
 def build(ch):
     name = UNITS[ch]
     srcdir = HERE / "src" / ch
@@ -34,9 +44,13 @@ def build(ch):
     if not tex.exists():
         sys.exit(f"{ch}: 找不到源 {tex}")
 
+    # nonstopmode＋halt-on-error：不指定時 lualatex 是 errorstopmode，錯誤會停在 `?` 提示等 stdin
+    # （提示寫進被 capture 的 stdout，人看不到）；stdin 接 DEVNULL 是第二道保險。
     r = subprocess.run(
-        ["latexmk", "-lualatex", f"-auxdir=../../build/aux-{ch}", f"{name}.tex"],
-        cwd=srcdir, capture_output=True, text=True, encoding="utf-8", errors="replace")
+        ["latexmk", "-lualatex", "-interaction=nonstopmode", "-halt-on-error",
+         f"-auxdir=../../build/aux-{ch}", f"{name}.tex"],
+        cwd=srcdir, stdin=subprocess.DEVNULL, capture_output=True, text=True, encoding="utf-8",
+        errors="replace")
     log_path = HERE / "build" / f"aux-{ch}" / f"{name}.log"
     log = log_path.read_text(encoding="utf-8", errors="replace") if log_path.exists() else ""
 
@@ -44,18 +58,38 @@ def build(ch):
     missing = log.count("Missing character")
     overfull = [ln for ln in log.splitlines() if ln.startswith("Overfull")]
     pdf = srcdir / f"{name}.pdf"
+    # \ref 解析不了、label 重複定義：latexmk 照樣 rc=0，PDF 印著 ?? 或錯號（CONTRACT 要求 log 無
+    # undefined reference）。TeX 在 79 字元處硬斷行，長 key 的 warning 會被切開——先接回再抓 key；
+    # 抓不到 key 時，LaTeX 的摘要行本身仍算數。
+    flat = re.sub(r"^(.{79})\n", r"\1", log, flags=re.M)
+    undefined = sorted(set(re.findall(r"Reference `(.+?)' on page \S+ undefined", flat)))
+    multiply = sorted(set(re.findall(r"Label `(.+?)' multiply defined", flat)))
+    refs_bad = (undefined or multiply or "There were undefined references" in log
+                or "There were multiply-defined labels" in log)
 
-    if r.returncode != 0 or errors or missing or not pdf.exists():
-        print(f"{ch}: FAIL  latexmk rc={r.returncode} error={errors} missing-char={missing}")
+    if r.returncode != 0 or errors or missing or refs_bad or not pdf.exists():
+        print(f"{ch}: FAIL  latexmk rc={r.returncode} error={errors} missing-char={missing}"
+              f" undefined-ref={len(undefined)} multiply-defined={len(multiply)}")
         for ln in re.findall(r"^!.*", log, re.M)[:5]:
             print("   ", ln)
+        for key in undefined:
+            print("    undefined reference:", key)
+        for key in multiply:
+            print("    multiply defined label:", key)
+        if refs_bad and not (undefined or multiply):
+            print(f"    log 有 undefined／multiply-defined 摘要但抓不到 key，見 {log_path}")
+        if not errors and not (undefined or multiply):
+            # log 沒有 `!` 也沒有 key 可列（例如 latexmk 自己出錯、沒跑到 TeX）：原因只在它的輸出裡
+            print_tail("latexmk stdout", r.stdout)
+            print_tail("latexmk stderr", r.stderr)
         sys.exit(1)
 
     g = subprocess.run([sys.executable, "check_glyphs.py", f"src/{ch}/{name}.pdf"],
                        cwd=HERE, capture_output=True, text=True, encoding="utf-8", errors="replace")
-    if "字形閘 PASS" not in g.stdout:
-        print(f"{ch}: FAIL  字形閘——")
+    if g.returncode != 0 or "字形閘 PASS" not in g.stdout:
+        print(f"{ch}: FAIL  字形閘 rc={g.returncode}——")
         print("\n".join(g.stdout.strip().splitlines()[-6:]))
+        print_tail("check_glyphs stderr", g.stderr)     # 閘本身崩潰時 traceback 只在這裡
         sys.exit(1)
 
     dist = HERE / "dist" / ch

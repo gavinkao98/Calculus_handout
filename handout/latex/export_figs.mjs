@@ -23,7 +23,7 @@ import { spawn } from "node:child_process";
 import { writeFileSync, readFileSync, mkdirSync, existsSync } from "node:fs";
 import { createServer } from "node:http";
 import { resolve, join, basename } from "node:path";
-import { pathToFileURL } from "node:url";
+import { pathToFileURL, fileURLToPath } from "node:url";
 
 const CHROME = process.env.CHROME ?? [
   "C:\\Program Files\\Google\\Chrome\\Application\\chrome.exe",
@@ -64,7 +64,9 @@ const sleep = (ms) => new Promise((r) => setTimeout(r, ms));
 // subresource and a file:// page is an opaque origin, so both fail with
 // "NetworkError: A network error occurred." even under --allow-file-access-from-files
 // (all three measured). http://127.0.0.1 is a normal origin, so the fonts just load.
-const INTER_DIR = resolve(new URL(".", import.meta.url).pathname.replace(/^\//, ""), "template/fonts/inter");
+// fileURLToPath, not URL.pathname: .pathname stays percent-encoded (space -> %20, CJK -> %E4%B8%AD…),
+// so a repo under such a path made route() report "font not found" for fonts that are there.
+const INTER_DIR = resolve(fileURLToPath(new URL(".", import.meta.url)), "template/fonts/inter");
 const FONT_ROUTES = new Map();
 
 function route(file, abs) {
