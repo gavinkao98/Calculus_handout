@@ -25,6 +25,31 @@ def _av_clip(path: Path, seconds: int = 4) -> Path:
     return path
 
 
+def _top_level_boxes(path: Path) -> list[str]:
+    data = path.read_bytes()
+    i, order = 0, []
+    while i + 8 <= len(data):
+        size = int.from_bytes(data[i:i + 4], "big")
+        order.append(data[i + 4:i + 8].decode("latin1"))
+        if size == 1:
+            size = int.from_bytes(data[i + 8:i + 16], "big")
+        if size < 8:
+            break
+        i += size
+    return order
+
+
+def test_loudnorm_final_output_is_faststart():
+    # C-04 (code review 2026-09-23): on --reuse-audio the DELIVERED file is pass 2's own mux,
+    # so it must carry T8's +faststart (moov ahead of mdat) just like _concat's output.
+    with tempfile.TemporaryDirectory() as d:
+        src = _av_clip(Path(d) / "concat.mp4")
+        out = Path(d) / "final.mp4"
+        make._loudnorm_final(src, out, "192k", make.HOUSE_LUFS)
+        boxes = _top_level_boxes(out)
+        assert boxes.index("moov") < boxes.index("mdat"), boxes
+
+
 def test_loudnorm_final_in_non_ascii_dir():
     # A-05 (code review 2026-09-23): pass 1 decoded ffmpeg's stderr with the locale codec
     # (cp950); the UTF-8 input path in it blanked stderr, so a repo under a Chinese folder

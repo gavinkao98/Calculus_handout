@@ -791,9 +791,10 @@ def _loudnorm_final(src: Path, out: Path, abr: str, target_i: float,
           f"measured_I={meas['input_i']}:measured_TP={meas['input_tp']}:"
           f"measured_LRA={meas['input_lra']}:measured_thresh={meas['input_thresh']}:"
           f"offset={meas['target_offset']}")
+    # this mux IS the delivered file on the real-audio path, so it carries T8's +faststart too
     _ffmpeg(["ffmpeg", "-y", "-i", str(src), "-map", "0:v:0", "-map", "0:a:0",
              "-c:v", "copy", "-af", af, "-c:a", "aac", "-b:a", abr,
-             "-ar", "48000", "-ac", "2", str(out)])
+             "-ar", "48000", "-ac", "2", "-movflags", "+faststart", str(out)])
     return measure_loudness(out)
 
 
