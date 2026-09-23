@@ -173,11 +173,11 @@ Demo storyboard 在 `storyboards/_demo_*.yml`。
 | `procedure_steps` | 01/02 藍數字步驟 + 底部圓角 worked strip | `steps[{text,math}]`、`worked[]` | `math.N`、`worked` |
 | `derivation` ★ | **統一數學系統**：式子左欄 + reason rail（dotted leader）+ amber ∴ result + 綠 ✓ check | `steps[{math, reason?, anim?}]`、`result:{math, reason?, anim?}`、`check:{math, reason?}`；**或** back-compat `lines[]`（`anim: highlight` → result）、`statement`。`anim: transform` ＝原地改寫（見下方 motion primitive 節） | `step.N`/`result`/`check`（或 `line.N`）、`statement`（寫了 `{show statement}` 才動態） |
 | `worked_example` ★ | **例＋解**（講義的 `workedexample` 容器）：題目當 masthead ＋ `SOLUTION` 步驟鏈 ＋ 右 rail（策略／notes）＋ 釘在下三分之一的**答案框**（62 px，畫面最重）。列文法＝`derivation` 逐字相同但**不收 `reason`**（rail 給了 strategy／notes）。詳見下方專節 | `prompt`(必填)、`result:{math, reason?}`(必填,續頁除外)、`steps[{math, anim?, frame?, cancel?, seg_roles?, color_role?, mark?}]`、`check`、`number`、`title`(tagline)、`strategy`、`notes[{math, text?, ref?}]`、`notes_label` | `step.N`／`result`／`check`／`strategy`／`note.N`（`strategy`／`note.N` 寫了 `{show …}` 才動態；`result` 恆動態） |
-| `callout` ★ | Remark / Caution / Note：eyebrow `[ TYPE n.n ]`＋title masthead，body 文字置於標題下方（色隨 type：remark 藍／caution 紅／note 琥珀）；`body` 字串→散文、list→條列（同色圓點）。同 `definition_math` 走 `scene_head`＋`place_body`（2026-06-29 改版，見下） | `type: remark\|caution\|note`、`number`(opt)、`title`、`body`(字串或 list) | `body` |
+| `callout` ★ | Remark / Caution / Note：eyebrow `[ TYPE n.n ]`＋title masthead，body 文字置於標題下方（色隨 type：caution 紅（`caution`）／remark、note 灰（`aside`，slate））；`body` 字串→散文、list→條列（同色圓點）。同 `definition_math` 走 `scene_head`＋`place_body`（2026-06-29 改版，見下） | `type: remark\|caution\|note`、`number`(opt)、`title`、`body`(字串或 list) | `body` |
 | `graph` ★ | **統一 graph 引擎**：`mode: single`（一張全幅 plot）或 `mode: 2up`（兩張並排比較） | single：`axes`、`plots[]`、`annotations[]`；2up：`left`/`right` `{axes, plots, caption, verdict}`、`annotations[]`。plot kind＝`function`／`line`／`band`／`point`／`sweep`（游標掃描，見下方 motion primitive 節） | single：`annotation.N`、`plot.N`(`reveal:true`；`sweep` 恆為動態)；2up：`caption.left/right`、`left.plot.N`/`right.plot.N`、`annotation.N` |
 | `value_table` | 數值 limit 表 / formula grid（punchline 欄／列鋪 scene accent 同色 tint + 抬升 ink） | `header[]`、`rows[][]`、`reveal: rows\|cols`、`accent_col`/`accent_row`、`statement` | `row.N` 或 `col.N` |
 | `sign_chart` | number line + signed interval rows（+綠/−紅 glow、↗/↘） | `points[]`（`excluded: true` 表示 break）、`rows[{label, marks}]`、`statement` | `mark.R.I`（row R, interval I） |
-| `recap_cards` | key point（amber 發光編號當 marker）+ blue-bar remember-formula cards | `points[]`、`formulas[]` | `point.N`、`formula.N` |
+| `recap_cards` | 單欄全幅 key point（scene accent 色的 01/02… 編號當 marker；右欄 formula 卡已於 2026-06-29 移除，公式寫進 points） | `points[]` | `point.N` |
 | ~~`example_walkthrough`~~ | **deprecated → 用 `derivation`**（其 reason rail 取代並列推理欄；舊 scene 仍可渲） | — | — |
 | ~~`graph_focus` / `graph_compare`~~ | **deprecated alias → `graph` + `mode: single`/`2up`**（payload 不變；舊 scene 仍可渲） | — | — |
 
@@ -745,7 +745,7 @@ fixture 的六個場把**每一條規則的違反與乾淨兩側都釘住**（EX
 |---|---|---|---|
 | **L1 容量契約** | 每縱向模板宣告 `capacity_meta(spec)→list[ColumnPlan]`（`row_heights, min_pitch, extra_bottom, x_bucket`）；`stack_layout` 的 LIGHT/FIT/OVERFLOW 三分支抽成共用 `classify_regime()` | V1/V2/V4 | 骨幹，多為重構 |
 | **L2 預測式拆分守門** | `sizecheck._capacity_issues` 把 `getattr(mod,"MIN_PITCH")` 換成先讀 `capacity_meta`（保留舊分支相容），**自動覆蓋 theorem/procedure/recap/callout** | V1 溢出 | 小擴充、關掉最大缺口 |
-| **L3 稀疏出口** | 可選 `aside` 欄（key-idea 卡/mini-example），snap 既有 `RAIL_X`、用 `accent_panel`、`layer="decoration"` 豁免檢查；primary 密集時 silently 收合 | V6 | 純加法 opt-in |
+| **L3 稀疏出口** | 可選 `aside` 欄（key-idea 卡/mini-example），snap 既有 `RAIL_X`、用 `accent_panel`、`layer="decoration"` 豁免容量/overlap 檢查（出框與「卡片蓋住 content」仍檢查，見下方 `aside` 契約）；primary 密集時 silently 收合 | V6 | 純加法 opt-in |
 | ~~auto-fit~~ | **否決**（理由見統御原則） | — | 不落地 |
 
 **四 regime 是一條連續決策**（由 `r = natural_min/zone_h` 驅動），不是離散斷點——regime 內仍跑既有
@@ -787,9 +787,14 @@ figure 三模板與 **callout（置中單面板、無 masthead zone）不加 `ca
 2026-06-21 workflow 紀錄（task wgpvk07nd）。
 
 **`aside` 欄位契約（L3）：** 可選 `aside`：`{label?, body, accent?}`（或裸 body 字串），`build_aside` 走
-`accent_panel`、`layer="decoration"` 豁免容量/overlap 檢查。**`definition_math`**：有 `aside` 時 primary 收窄
-到 `PRIMARY_W`、卡片 snap `RAIL_X`；primary 收窄後若會溢出 zone 或某 math 列寬過 `PRIMARY_W` 則**自動收合**
-（丟 aside、回滿寬單欄）。**`theorem_proof`（2026-06-21 擴充）**：僅 statement-only 命題（無 `proof`／`qed`）吃
+`accent_panel`、`layer="decoration"` 豁免容量/overlap 檢查——但**不豁免出框**：`sizecheck._overflow_issues`
+對 id=`aside` 照 content 規則查（出 frame＝error、進 safe margin＝warn），另有 `_aside_collision_issues` 逐行檢查
+卡片與每個 content block（title／scaffold／statement／math）的交疊，交疊即 **error**（卡片不透明、畫在 content
+之後，交疊＝字被蓋掉）。以上 definition_math 與 theorem_proof 的 aside 都適用（2026-09-23 code review D2-02）。
+**`definition_math`**：有 `aside` 時 statement 以 `PRIMARY_W − ASIDE_GUTTER`（0.3u）包行、卡片 snap `RAIL_X`，
+垂直置中於 content 但**夾在 body zone 內**（不上壓標題帶／scaffold）；下列任一成立則**自動收合**（丟 aside、回滿寬
+單欄）：primary 收窄後溢出 zone、**卡片本身高過 zone**、或**實測** statement／某 math 列寬超過 `PRIMARY_W`
+（字元估寬對含 inline math 的行可低估一成以上，gutter 吸收不了時寧可收合也不伸進卡片底下）。**`theorem_proof`（2026-06-21 擴充）**：僅 statement-only 命題（無 `proof`／`qed`）吃
 aside——card 收窄＋rail aside、兩者置中（Lectern bias）；有 proof 時 aside 收合（proof 即內容）。**`callout`
 不開 aside**——它本身就是置中單一 boxed aside、無 masthead/rail，再塞 rail aside 自相矛盾。**author-authored、
 純可選——框架絕不自動生成內容填空**（否則退化成被否決的 auto-fit 投機）。

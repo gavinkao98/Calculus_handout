@@ -2,7 +2,7 @@
 
 The recurring named aside the handouts use constantly ((fg)'!=f'g', f^{-1}!=1/f,
 power-rule domain, ...). One template, colour-swapped by `type`:
-  remark -> blue, caution -> red, note -> amber.
+  caution -> red (role caution); remark, note -> slate grey (role aside).
 
 REDESIGN (2026-06-29): dropped the centred card panel + glyph box. A callout now
 reads like every other teaching frame -- the shared `scene_head` masthead (eyebrow

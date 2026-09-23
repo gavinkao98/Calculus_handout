@@ -14,9 +14,10 @@ Layout:
   body `rows`; column widths follow the widest cell per column; the
   statement + table centre vertically as one group (definition_math rule).
 
-Cells route like every author field: `$...$` / pure-math -> Tex/MathTex
-(`brand.math_line`), plain words -> Text (`brand.prose`) -- so "does not
-exist" never renders as run-together math italics. Keep cells one line;
+Cells route like every author field: a whole-cell `$...$` -> display MathTex
+(`brand.math_line`), plain words and words with inline `$math$` -> text-scale Tex
+(`brand.prose`) -- so "does not exist" never renders as run-together math italics
+and "exists at $x=2$" sits at the same size as "exists". Keep cells one line;
 an over-wide table is an authoring error sizecheck catches (a table cannot
 wrap -- shorten cells or split the scene).
 
@@ -62,17 +63,14 @@ def capacity_meta(spec: dict[str, Any]) -> list[ColumnPlan]:
     over-wide table) stays an authoring error caught reactively by _overflow_issues."""
     return [ColumnPlan(min_pitch=0.0, model="group", extra_bottom=0.45)]
 
-# accent role (blue/amber/green/red) -> its lifted ink tint for the punchline cells,
-# so the accent column/row echoes the SCENE's accent instead of always blue.
-_ACCENT_INK = {"secondary": "blue_ink", "accent": "amber_ink",
-               "success": "green_ink", "warning": "red_ink"}
-
 
 def _cell(text: str, ground: str, *, role: str, size):
-    """One table cell. Routed on content like every author field: math (or
-    text with inline $math$) -> math_line, plain words -> prose (Text)."""
+    """One table cell. Routed on content like every author field: a whole-cell single
+    `$...$` -> math_line (display math at the math anchor), everything else -- plain words
+    AND words with inline $math$ -- -> prose (text scale, prose-tagged). Sending a mixed
+    cell to math_line set its words at the math anchor, ~78% of a plain-word cell."""
     s = str(text).strip()
-    if "$" in s:
+    if s.startswith("$") and s.endswith("$") and s.count("$") == 2:
         return brand.math_line(s, ground, role=role, size=size)
     return brand.prose(s, ground, role=role, size=size)
 
@@ -97,7 +95,10 @@ def build(spec: dict[str, Any], ctx: dict[str, Any]) -> list[Block]:
     accent_col = spec.get("accent_col")
     accent_row = spec.get("accent_row")
 
-    accent_ink = _ACCENT_INK.get(role, "blue_ink")
+    # the accent role's lifted ink tint for the punchline cells, so the accent column/row
+    # echoes the SCENE's accent (same hue as col_tint below). Every semantic role
+    # accent_role() returns has a `<role>_ink` in both palettes (_selftest_semantic_palette).
+    accent_ink = f"{role}_ink"
 
     def cell_role(r: int | None, c: int) -> str:
         # r is None for the header row. The punchline (accent) column/row is the
