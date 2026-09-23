@@ -30,8 +30,10 @@ and REWATCH R4 is the subjective one (DESIGN.md).
 
 Reads (all local, no API): storyboards/<deck>.yml (+ the base canonical deck for the
 written-math form of each beat), the deck's audio manifest (audio_mimo/ for an `_mimo` deck,
-else audio/ -- never the other one) for beat timings + forced-alignment word timings, and output/_av/<deck>/<scene>.mp4 -- the per-scene
-A/V files compose concatenated, so their durations give exact global scene starts.
+else audio/ -- never the other one) for beat timings + forced-alignment word timings, with
+the storyboard's `pauses:` folded in as make.py rendered them, and
+output/_av/<deck>/<scene>.mp4 -- the per-scene A/V files compose concatenated, so their
+durations give exact global scene starts.
 
 Writes output/ch<NN>/s<X.Y>/rewatch_pack/ (gitignored, regenerable):
     INDEX.md            viewer-facing table of all scenes (times, reveals, motion) + how to read
