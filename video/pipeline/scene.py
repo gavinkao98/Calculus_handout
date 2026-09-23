@@ -15,7 +15,7 @@ from __future__ import annotations
 
 from typing import Any
 
-from manim import DOWN, UP, FadeIn, FadeOut, Rectangle, Scene
+from manim import DOWN, UP, FadeIn, FadeOut, Rectangle, Scene, config
 
 from . import _bootstrap
 from . import floorprobe
@@ -164,21 +164,34 @@ class LessonScene(Scene):
         *narration_end* (content scenes on a real render) is the renderer clock the last
         beat was aligned to, so the hold can end SCENE_TAIL_SECONDS after the NARRATION --
         which is exactly what the sync audit measures -- instead of adding a flat second to
-        wherever the scene happened to get to. Two things land between the last beat and
-        here and neither is narration time: `_play_content`'s closing focus restore
-        (FADE_SECONDS, on any scene that dimmed something) and a final beat that overran
-        and fell back on MIN_HOLD. Both used to push the whole clip long; they are absorbed
-        by the hold now, the same way the `exit` fade already is."""
+        wherever the scene happened to get to. Things land between the last beat and here
+        that are not narration time: `_play_content`'s closing focus restore (FADE_SECONDS,
+        on any scene that dimmed something), the end-of-scene sweep-up of unrevealed blocks
+        (a corner `carry` with no `{show}` flies there), and a final beat that overran and
+        fell back on MIN_HOLD. All of them, and the `exit` fade, come out of what is left of
+        the hold: the fade is measured against that remainder BEFORE it plays (never longer
+        than it, never shorter than one frame -- manim's shortest play) and the hold is only
+        what the fade did not use, with no MIN_HOLD floor. The floor used to be charged on
+        top of the fade and pushed such clips 3-6 frames past the [sync] hard gate
+        (code-review-2026-09-23 F-03); when the remainder covers fade + MIN_HOLD, as it does
+        in the usual scene, the plays and waits are exactly what they were."""
         run_floorprobe(self, by_id, "tail")   # the finished frame, before anything exits
         exits = (self.spec.get("exit") or []) if kind == "content" else []
         mobs = [by_id[i].mobject for i in exits if i in by_id]
-        if mobs:
-            self.play(*[FadeOut(m) for m in mobs], run_time=EXIT_FADE_SECONDS)
         now = elapsed(self)
         if narration_end is None or now is None:
+            if mobs:
+                self.play(*[FadeOut(m) for m in mobs], run_time=EXIT_FADE_SECONDS)
             self.wait(SCENE_TAIL_SECONDS - (EXIT_FADE_SECONDS if mobs else 0.0))
-        else:
-            self.wait(max(narration_end + SCENE_TAIL_SECONDS - now, MIN_HOLD))
+            return
+        end = narration_end + SCENE_TAIL_SECONDS
+        frame = 1 / config.frame_rate
+        if mobs:
+            self.play(*[FadeOut(m) for m in mobs],
+                      run_time=min(EXIT_FADE_SECONDS, max(end - now, frame)))
+            now = elapsed(self)
+        if end - now >= frame / 2:    # under half a frame is float dust, not a frame to hold
+            self.wait(end - now)
 
     def _play_content(self, blocks, by_id, ground) -> "float | None":
         """Play the beats; returns the renderer clock the narration ends on (None off a
