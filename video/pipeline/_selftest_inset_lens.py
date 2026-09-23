@@ -1,5 +1,6 @@
 """Self-test: graph `inset:` lens -- the pieces the 2026-09-23 code review found wrong
-(D1-01 late-bound sweep closures). Run from video/:
+(D1-01 late-bound sweep closures, D1-06 color_map default role, D1-02 panel over the
+title / annotation bands). Run from video/:
     python -m pipeline._selftest_inset_lens
 
 The base contract (panel in its corner, clipping, follow: true riding the main tracker) is
@@ -137,6 +138,81 @@ def test_lens_curve_takes_the_color_map_default_role():
     assert main_curve.get_stroke_color().to_hex().upper() == want, main_curve.get_stroke_color()
     lens_curve = by["inset"].mobject._inset_panel[2][1]   # panel: border, lens, VGroup(glow, curve)
     assert _drawn_colours(lens_curve) == {want}, (_drawn_colours(lens_curve), "want", want)
+
+
+# -- D1-02: the opaque panel keeps off the title band and the annotation band -------------
+
+_SQUEEZE_AXES = {"x_range": [-1.85, 1.85, 0.5], "y_range": [0, 1.18, 0.5],
+                 "x_length": 7.5, "y_length": 4.0}
+_RATIO = {"kind": "function", "expression": "sin(x)/x", "x_range": [-1.72, 1.72], "reveal": True}
+_LONG_ANN = "Trapped between $\\cos\\theta$ and $1$: forced to $1$, undefined at $\\theta=0$."
+
+
+def _squeeze(corner, title="The Squeeze, Drawn", annotations=None):
+    spec = _spec([_RATIO], inset={"x": [-0.4, 0.4], "y": [0.9, 1.04], "corner": corner},
+                 title=title, axes=dict(_SQUEEZE_AXES),
+                 say="Look. {show plot.0} curve. {show inset} closer."
+                     + "".join(f" {{show annotation.{i}}} so." for i in range(len(annotations or []))))
+    if annotations:
+        spec["annotations"] = list(annotations)
+    return spec
+
+
+def _box(mob):
+    return (float(mob.get_left()[0]), float(mob.get_right()[0]),
+            float(mob.get_bottom()[1]), float(mob.get_top()[1]))
+
+
+def _overlap(a, b):
+    return min(a[1], b[1]) > max(a[0], b[0]) and min(a[3], b[3]) > max(a[2], b[2])
+
+
+def _panel_and(by, bid):
+    return _box(by["inset"].mobject._inset_panel), _box(by[bid].mobject)
+
+
+def test_top_left_panel_clears_the_title():
+    """The title starts at the spine, so a top_left panel in the frame corner always covered
+    its first 3.2 u -- the panel drops below the title band instead."""
+    from pipeline.templates import graph as G
+    panel, title = _panel_and(_by_id(_squeeze("top_left")), "title")
+    assert not _overlap(panel, title), (panel, title)
+    assert abs(panel[3] - (title[2] - G._TITLE_GRAPH_GAP)) < 0.06, (panel, title)
+
+
+def test_top_right_panel_clears_a_long_title():
+    """A title running past x=3.17 reaches under a top_right panel."""
+    long_title = "Why the Ratio Is Forced Up to One Near Zero"
+    panel, title = _panel_and(_by_id(_squeeze("top_right", title=long_title)), "title")
+    assert title[1] > panel[0], "fixture: the title must reach under the panel's x span"
+    assert not _overlap(panel, title), (panel, title)
+
+
+def test_bottom_panels_clear_a_full_width_annotation():
+    from pipeline.templates import graph as G
+    for corner in ("bottom_left", "bottom_right"):
+        panel, ann = _panel_and(_by_id(_squeeze(corner, annotations=[_LONG_ANN])), "annotation.0")
+        assert not _overlap(panel, ann), (corner, panel, ann)
+        assert abs(panel[2] - (ann[3] + G._GRAPH_ANNOTATION_GAP)) < 0.06, (corner, panel, ann)
+
+
+def test_panel_that_clears_both_bands_stays_in_the_frame_corner():
+    """Control (the live decks): short title + full-width annotation + top_right -> the panel
+    is exactly where it always was."""
+    right, top = T.FRAME_W / 2 - T.SIDE_GUTTER, T.FRAME_H / 2 - T.SAFE_MARGIN
+    panel, _ = _panel_and(_by_id(_squeeze("top_right", annotations=[_LONG_ANN])), "title")
+    assert abs(panel[1] - right) < 0.06 and abs(panel[3] - top) < 0.06, panel
+
+
+def test_no_room_between_title_and_annotations_raises():
+    """Enough annotation lines under a top_left panel leave no 2 u band below the title: a
+    build error (sizecheck reports it), never a panel drawn over the text."""
+    try:
+        _by_id(_squeeze("top_left", annotations=[_LONG_ANN] * 12))
+    except ValueError as exc:
+        assert "inset" in str(exc) and "corner" in str(exc), exc
+    else:
+        raise AssertionError("an inset with no room must not build silently")
 
 
 if __name__ == "__main__":

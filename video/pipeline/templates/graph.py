@@ -575,7 +575,9 @@ def _plot_blocks(spec: dict[str, Any], axes: Axes, ground: str) -> tuple[list[Bl
 #
 # A second Axes over that rectangle at a fixed 3.2 x 2.0 u panel in the corner, holding the
 # same plots CLIPPED to the rectangle (no labels); a hairline frame on the main axes marks
-# the region and two dashed guides lead to the panel. The main graph is not scaled or moved
+# the region and two dashed guides lead to the panel. Where the title (top corners) or the
+# annotations (bottom corners) run under the panel, it moves clear of them, and a corner with
+# no room between the two is a build error. The main graph is not scaled or moved
 # (the block is built AFTER _fit_graph_to_safe_zone and never joins its group). The panel
 # sits above everything (z_index) so a plot revealed later cannot draw over the lens.
 _INSET_W, _INSET_H = 3.2, 2.0
@@ -608,7 +610,8 @@ def _clip_segment(p, q, x0, x1, y0, y1):
     return (px + t0 * dx, py + t0 * dy), (px + t1 * dx, py + t1 * dy)
 
 
-def _inset_block(spec: dict[str, Any], axes: Axes, plot_blocks: list[Block], ground: str) -> Block:
+def _inset_block(spec: dict[str, Any], axes: Axes, plot_blocks: list[Block], ground: str,
+                 title, annotation_group) -> Block:
     ins = spec["inset"]
     if not isinstance(ins, dict):
         raise ValueError("inset: must be a mapping {x, y, corner, follow}")
@@ -632,6 +635,24 @@ def _inset_block(spec: dict[str, Any], axes: Axes, plot_blocks: list[Block], gro
     sx, sy = _INSET_CORNERS[corner]
     centre = [sx * (T.FRAME_W / 2 - T.SIDE_GUTTER - _INSET_W / 2),
               sy * (T.FRAME_H / 2 - T.SAFE_MARGIN - _INSET_H / 2), 0]
+
+    # the panel is opaque and above everything, and sizecheck exempts the graph layer: keep it
+    # off the title band (top) and the annotation band (bottom) wherever one of them runs under
+    # its x span. A panel that clears both stays exactly in the frame corner.
+    def runs_under(mob) -> bool:
+        return (mob is not None and mob.get_left()[0] < centre[0] + _INSET_W / 2
+                and mob.get_right()[0] > centre[0] - _INSET_W / 2)
+
+    top = T.FRAME_H / 2 - T.SAFE_MARGIN
+    bottom = -top
+    if runs_under(title):
+        top = min(top, title.get_bottom()[1] - _TITLE_GRAPH_GAP)
+    if runs_under(annotation_group):
+        bottom = max(bottom, annotation_group.get_top()[1] + _GRAPH_ANNOTATION_GAP)
+    if top - bottom < _INSET_H:
+        raise ValueError(f"inset.corner: {corner!r} has no room for the {_INSET_W} x {_INSET_H} u "
+                         f"panel between the title and the annotations -- pick another corner")
+    centre[1] = min(centre[1], top - _INSET_H / 2) if sy > 0 else max(centre[1], bottom + _INSET_H / 2)
     lens.shift(centre - (lens.c2p(x0, y0) + lens.c2p(x1, y1)) / 2)
     border = Rectangle(width=_INSET_W, height=_INSET_H, stroke_color=T.color(ground, "ink_1"),
                        stroke_width=2.0, fill_color=T.color(ground, "bg"), fill_opacity=1.0)
@@ -887,7 +908,7 @@ def _build_single(spec: dict[str, Any], ctx: dict[str, Any]) -> list[Block]:
     # after the fit: the inset's frame reads the main axes' FINAL position, and the
     # panel is outside graph_group so the main plot is never scaled to make room for it.
     if "inset" in spec:
-        blocks.append(_inset_block(merged, axes, plot_blocks, ground))
+        blocks.append(_inset_block(merged, axes, plot_blocks, ground, title, group))
 
     if group is not None:
         for i, ann in enumerate(annotations):
