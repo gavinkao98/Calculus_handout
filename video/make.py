@@ -503,7 +503,7 @@ def render(meta: dict, scenes: list[dict], manifest: dict, out_dir: Path, qualit
 # ---- compose (ffmpeg) ---------------------------------------------------
 
 def _ffmpeg(cmd: list[str]) -> None:
-    result = subprocess.run(cmd, capture_output=True, text=True)
+    result = subprocess.run(cmd, capture_output=True, text=True, encoding="utf-8", errors="replace")
     if result.returncode != 0:
         raise RuntimeError("ffmpeg failed:\n" + " ".join(cmd) + "\n" + result.stderr[-1500:])
 
@@ -513,7 +513,7 @@ def _probe_duration(path: Path) -> float:
     result = subprocess.run(
         ["ffprobe", "-v", "error", "-show_entries", "format=duration",
          "-of", "default=noprint_wrappers=1:nokey=1", str(path)],
-        capture_output=True, text=True,
+        capture_output=True, text=True, encoding="utf-8", errors="replace",
     )
     try:
         return float(result.stdout.strip())
@@ -531,7 +531,7 @@ def _probe_duration_fps(path: Path) -> tuple[float, float]:
         ["ffprobe", "-v", "error", "-select_streams", "v:0",
          "-show_entries", "format=duration:stream=r_frame_rate",
          "-of", "default=noprint_wrappers=1", str(path)],
-        capture_output=True, text=True,
+        capture_output=True, text=True, encoding="utf-8", errors="replace",
     )
     fields = dict(ln.split("=", 1) for ln in result.stdout.splitlines() if "=" in ln)
     try:
@@ -783,7 +783,7 @@ def _loudnorm_final(src: Path, out: Path, abr: str, target_i: float,
     p1 = subprocess.run(
         ["ffmpeg", "-hide_banner", "-i", str(src), "-vn",
          "-af", f"loudnorm=I={target_i}:TP={target_tp}:print_format=json", "-f", "null", "-"],
-        capture_output=True, text=True)
+        capture_output=True, text=True, encoding="utf-8", errors="replace")
     meas = _parse_loudnorm_json(p1.stderr or "")
     if not all(k in meas for k in ("input_i", "input_tp", "input_lra", "input_thresh", "target_offset")):
         return {"error": "loudnorm pass-1 measurement failed"}
