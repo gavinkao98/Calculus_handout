@@ -162,9 +162,10 @@ def test_parser_keeps_examples_and_preserves_fold_lines():
 
 
 def test_examples_for_deck_resolves_a_real_tree_and_is_not_silently_empty():
-    """`examples_for_deck` is the one function here that fails SILENTLY: if meta.chapter
-    or meta.section ever changes shape (`section: "§3.1"`, say) it returns [] and the
-    gate waves everything through, indistinguishable from "all declared". The other
+    """`examples_for_deck` is the one function here that used to fail SILENTLY: if
+    meta.chapter or meta.section ever changes shape (`section: "§3.1"`, say) it returned []
+    and the gate waved everything through, indistinguishable from "all declared" -- it
+    returns None now, which example_issues reports (B-05). The other
     failure mode (an unregistered _FIELD_KEYS entry) at least fires EX1 loudly. Pin the
     happy path against a real directory layout so a shape change breaks here."""
     with tempfile.TemporaryDirectory() as d:
@@ -175,11 +176,39 @@ def test_examples_for_deck_resolves_a_real_tree_and_is_not_silently_empty():
         meta = {"chapter": "Chapter 3", "section": "3.1"}
         assert EC.examples_for_deck(meta, root) == ["ex:3.1", "ex:3.2", "ex:3.3"]
         assert EC.examples_for_deck({"chapter": "Chapter 3", "section": "3.2"}, root) == ["ex:3.4"]
-        # a section the handout does not have, and a deck with no chapter -> empty, no raise
-        assert EC.examples_for_deck({"chapter": "Chapter 3", "section": "9.9"}, root) == []
-        assert EC.examples_for_deck({"chapter": "", "section": "3.1"}, root) == []
+        # a section the handout does not have, and a deck with no chapter -> None (not [],
+        # which would read as "all declared" -- B-05), no raise
+        assert EC.examples_for_deck({"chapter": "Chapter 3", "section": "9.9"}, root) is None
+        assert EC.examples_for_deck({"chapter": "", "section": "3.1"}, root) is None
         # a missing tree must not raise either
-        assert EC.examples_for_deck(meta, root / "nope") == []
+        assert EC.examples_for_deck(meta, root / "nope") is None
+
+
+def test_an_unresolvable_section_is_said_not_silently_passed():
+    """code-review-2026-09-23 B-05. A deck whose meta.chapter is missing, whose section is
+    not a \\sechead of the handout, or whose handout source moved, used to get [] -- the
+    same answer as "every example declared" -- so with no declarations at all the gate
+    printed nothing and exited 0, enforce or not. Unresolvable is now None, and
+    example_issues says so: a warn, an error under enforce. A section that IS found and
+    simply holds no worked example stays a quiet []."""
+    with tempfile.TemporaryDirectory() as d:
+        root = Path(d)
+        src = root / "handout" / "latex" / "src" / "ch03"
+        src.mkdir(parents=True)
+        (src / "chapter3.tex").write_text(
+            TEX + "\\sechead{3.3}{Prose Only}\nNo worked example here.\n", encoding="utf-8")
+        assert EC.examples_for_deck({"chapter": "Chapter 3", "section": "3.3"}, root) == []
+        for meta in ({"section": "3.1"},                             # no chapter
+                     {"chapter": "Chapter 3", "section": "3.10"}):   # no such \sechead
+            assert EC.examples_for_deck(meta, root) is None, meta
+        assert EC.examples_for_deck({"chapter": "Chapter 3", "section": "3.1"},
+                                    root / "moved") is None           # source not there
+    for enforce, sev in ((False, "warn"), (True, "error")):
+        issues = EC.example_issues("3.10", None, [], enforce=enforce)
+        assert len(issues) == 1 and issues[0][0] == sev, issues
+        assert "[EX] cannot resolve handout section" in issues[0][1], issues
+    # the resolved-but-empty section is not the unresolved one
+    assert EC.example_issues("3.3", [], [], enforce=True) == []
 
 
 def test_a_malformed_fold_line_is_reported_as_ex2():
@@ -221,6 +250,7 @@ if __name__ == "__main__":
     test_a_reason_containing_an_ex_token_stays_one_entry()
     test_parser_keeps_examples_and_preserves_fold_lines()
     test_examples_for_deck_resolves_a_real_tree_and_is_not_silently_empty()
+    test_an_unresolvable_section_is_said_not_silently_passed()
     test_a_malformed_fold_line_is_reported_as_ex2()
     test_no_units_fires_ex1_per_example_so_the_caller_must_skip_deckless_decks()
     test_missing_fields_are_simply_no_declarations()
