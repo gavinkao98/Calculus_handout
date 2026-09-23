@@ -42,15 +42,20 @@ def reveal_targets(say: str) -> list[str]:
 def _focus_issues(sid: str, scene: dict, say) -> "list[tuple[str, str]]":
     """`focus:` dims everything the narration is not on right now (pipeline/focus.py).
     `at` must name a reveal this scene makes -- same reasoning as `pauses.after`: a focus
-    keyed to a beat that never happens is invisible with no other symptom. The `dim` ids
-    are NOT checked here (block ids only exist once the template has built; sizecheck
-    catches a typo'd one, exactly as it does for `{show}` targets)."""
+    keyed to a beat that never happens is invisible with no other symptom. Whether the `dim`
+    ids EXIST is not checked here (block ids only exist once the template has built; sizecheck
+    catches a typo'd one, exactly as it does for `{show}` targets) -- only that none of them
+    is a reveal a later beat makes (C-08, below)."""
     if "focus" not in scene:
         return []
     entries = scene.get("focus")
     if not isinstance(entries, list):
         return [("error", f"{sid}.focus: must be a list of {{at, dim}}")]
-    revealed = set(reveal_targets(say) if isinstance(say, str) else [])
+    order = reveal_targets(say) if isinstance(say, str) else []
+    revealed = set(order)
+    beat_of: dict[str, int] = {}          # reveal id -> the beat that first reveals it
+    for pos, target in enumerate(order):
+        beat_of.setdefault(target, pos)
     issues: list[tuple[str, str]] = []
     seen: set[str] = set()
     for j, item in enumerate(entries):
@@ -94,6 +99,19 @@ def _focus_issues(sid: str, scene: dict, say) -> "list[tuple[str, str]]":
                 for both in [i for i in ind if i in dim]:
                     issues.append(("error", f"{where}.indicate {both!r}: also in this entry's "
                                             f"dim (cannot flash and dim one block in one beat)"))
+        # A block a LATER beat reveals is not on screen yet either (C-08) -- the same trap as
+        # dimming `at` itself, one beat further on. A fade / Indicate is not an introducer, so
+        # manim ADDS whatever it touches: a dim shows the block early at DIM_OPACITY (and it
+        # fades in again, still dimmed, on its own beat); an indicate leaves it lit.
+        if isinstance(at, str) and at in beat_of:
+            touched = [("dim", d) for d in (dim if isinstance(dim, list) else [])]
+            ind = item.get("indicate")
+            touched += [("indicate", i) for i in (ind if isinstance(ind, list) else [])]
+            for field, bid in touched:
+                if isinstance(bid, str) and beat_of.get(bid, -1) > beat_of[at]:
+                    issues.append(("error", f"{where}.{field} {bid!r}: revealed by a later beat "
+                                            f"({{show {bid}}}), so it is not on screen at {at!r} "
+                                            f"-- the {field} would bring it in early (drop it here)"))
     return issues
 
 
