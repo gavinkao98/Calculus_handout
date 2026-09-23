@@ -45,6 +45,7 @@ from pipeline import captions  # noqa: E402
 from pipeline.derived_check import check_derived_freshness, text_sha256  # noqa: E402
 from pipeline.narration import estimate_seconds, parse_say  # noqa: E402
 from pipeline.tts import read_manifest_status, _has_audio  # noqa: E402 (manim-free fail-closed guard reuse)
+from pipeline.tts import _IDENTITY_KEYS, merged_manifest, renumber_scenes  # noqa: E402 (F5 subset merge)
 from pipeline import house_audio  # noqa: E402
 from pipeline import pauses  # noqa: E402
 from pipeline.stillness import UNDECLARED_STILL_SECONDS, undeclared_still_beats  # noqa: E402
@@ -165,6 +166,25 @@ def synth(meta: dict, scenes: list[dict], scene_numbers: dict[str, int],
             synth_scene(scene, scene_numbers[scene["id"]], audio_dir, empty_seconds=empty_seconds)
         )
     return manifest
+
+
+def _merge_mock_subset(existing: dict | None, fresh: dict, all_scenes: list[dict],
+                       scene_numbers: dict[str, int]) -> dict:
+    """F5 for make.py's own mock writer (C-06): a --scene subset merges INTO the prior
+    manifest, exactly as tts.py does -- critic's `--scene all` and rewatch_pack plan off the
+    manifest, so an entry dropped here silently shrinks their coverage. Carried-over entries
+    get today's full-deck scene numbers (tts.renumber_scenes). Merges only when the identity
+    matches; a prior manifest of another identity (a tts.py mock, or a real one under
+    --force-clobber) is replaced by the subset as before, but no longer silently."""
+    if existing is None:
+        return fresh
+    mismatch = [k for k in _IDENTITY_KEYS if existing.get(k) != fresh.get(k)]
+    if mismatch:
+        print(f"[synth] WARN existing manifest differs on {mismatch}; this --scene subset replaces "
+              f"it whole (every other scene's entry is dropped) -- re-run --scene all", flush=True)
+        return fresh
+    merged = merged_manifest(existing, fresh, [s["id"] for s in all_scenes])
+    return renumber_scenes(merged, scene_numbers)
 
 
 # ---- render -------------------------------------------------------------
@@ -1121,6 +1141,8 @@ def main() -> int:
             raise SystemExit(f"[synth] {abort}")
         manifest = synth(meta, scenes, scene_numbers, audio_dir, args.backend,
                          empty_seconds=args.empty_beat_seconds)
+        if args.scene != "all":
+            manifest = _merge_mock_subset(existing, manifest, all_scenes, scene_numbers)
         manifest_path.write_text(json.dumps(manifest, indent=2, ensure_ascii=False) + "\n", encoding="utf-8")
         print(f"[synth] manifest -> {manifest_path}", flush=True)
 
