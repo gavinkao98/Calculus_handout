@@ -1,5 +1,6 @@
 """Self-test: graph single mode -- regressions from the 2026-09-23 code review
-(D1-09 default axes, D1-07 label_x on a y_clip curve, D1-10 title clamp width). Run from video/:
+(D1-09 default axes, D1-07 label_x on a y_clip curve, D1-10 title clamp width) and its
+regression round (RG3-01 label_x on a y_clip curve's clipped-off stretch). Run from video/:
     python -m pipeline._selftest_graph_single
 """
 from pipeline import _bootstrap
@@ -101,6 +102,43 @@ def test_label_x_with_no_point_on_the_curve_warns():
                      plots=[dict(_BLOWUP, y_clip=True, label_x=0)]))
     out = [ln for ln in buf.getvalue().splitlines() if ln.startswith("[graph]")]
     assert out and "label_x" in out[0], buf.getvalue()[-500:]
+
+
+# -- RG3-01: label_x on a y_clip curve's clipped-off stretch falls back, it does not shrink ---
+
+_CLIPPED = {"kind": "function", "expression": "1/x**2", "x_range": [0.3, 2.2], "y_clip": True,
+            "label": "$y=1/x^2$"}
+_CLIPPED_AXES = {"x_range": [-0.2, 2.4, 0.5], "y_range": [0, 6, 1]}
+
+
+def _build_clipped(**plot_over):
+    import contextlib, io
+    buf = io.StringIO()
+    with contextlib.redirect_stdout(buf):
+        by = _by_id(_spec(axes=dict(_CLIPPED_AXES), say="x", plots=[dict(_CLIPPED, **plot_over)]))
+    return by, [ln for ln in buf.getvalue().splitlines() if ln.startswith("[graph]")]
+
+
+def test_label_x_on_the_clipped_off_stretch_falls_back_with_a_warning():
+    """f(0.35)=8.16 is above y_range [0,6]: that stretch of a y_clip curve is not drawn, so the
+    label used to hang ~1.3u above the axes top and _fit_graph_to_safe_zone shrank the whole
+    figure to hold it (axes 8.06u -> 5.86u wide), silently -- the very squash y_clip exists
+    to prevent. It must warn and take the default placement: same figure as no label_x."""
+    by, warned = _build_clipped(label_x=0.35)
+    base, _ = _build_clipped()
+    assert warned and "label_x" in warned[0], warned
+    for bid in ("axes", "label.0"):
+        assert _bbox(by[bid].mobject) == _bbox(base[bid].mobject), (bid, _bbox(by[bid].mobject),
+                                                                   _bbox(base[bid].mobject))
+
+
+def test_label_x_on_the_visible_stretch_of_a_clipped_curve_is_honoured():
+    """Control for the guard above: f(0.6)=2.78 is inside y_range -- placed there, no warning."""
+    by, warned = _build_clipped(label_x=0.6)
+    anchor = by["axes"].mobject.c2p(0.6, 1 / 0.6 ** 2)
+    lab = by["label.0"].mobject
+    assert not warned, warned
+    assert abs(float(lab.get_center()[0]) - float(anchor[0])) < 1e-3, (lab.get_center(), anchor)
 
 
 # -- D1-10: a clamped long title stays inside the gutter it is anchored to ----------------
