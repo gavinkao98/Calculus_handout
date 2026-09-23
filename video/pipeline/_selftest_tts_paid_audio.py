@@ -14,6 +14,7 @@ import sys
 import tempfile
 from contextlib import redirect_stdout
 from pathlib import Path
+from unittest import mock
 
 sys.path.insert(0, str(Path(__file__).resolve().parent.parent))
 from pipeline import tts  # noqa: E402
@@ -421,6 +422,112 @@ def test_budget_abort_never_pays_for_half_a_beats_scene():
         assert code == 0 and backend.stats["calls"] == 3, (code, backend.stats)
 
 
+# ---- RG1-01: a beats scene that dies after promoting (some of) its takes but before the manifest
+# records them keeps every staged take, and the retry never binds a take to the wrong beat ----
+
+def _deck_a(say):
+    return [{"id": "A", "kind": "content", "template": "derivation", "say": say}]
+
+
+def _takes_on_disk(out: Path):
+    """Duration of every audio file under beats/ -- final beat WAVs and kept staged takes."""
+    return [round(wav_duration(p), 3) for p in sorted((out / "beats").rglob("*")) if p.is_file()]
+
+
+def _swap_with_fault(root: Path, out: Path, fault):
+    """v1 records P then Q; v2 swaps the two sentences and runs --reuse-existing while `fault`
+    (a context manager) makes it die. Returns (the v2 deck, the error v2 died of)."""
+    common = ["--backend", "mock", "--unit", "beat", "--output-dir", str(out)]
+    v1 = _write_deck(root / "v1.yml", _deck_a(_say("{show a}", P5, "{show b}", Q8)))
+    assert _run_main(["--storyboard", str(v1), *common])[0] == 0
+    v2 = _write_deck(root / "v2.yml", _deck_a(_say("{show a}", Q8, "{show b}", P5)))
+    try:
+        with fault:
+            code, log, _ = _run_main(["--storyboard", str(v2), *common, "--reuse-existing"])
+    except OSError as exc:
+        return v2, exc
+    raise AssertionError(f"the injected fault never fired: {code}\n{log[-600:]}")
+
+
+def _retry(v2: Path, out: Path):
+    code, log, backend = _run_main(["--storyboard", str(v2), "--backend", "mock", "--unit", "beat",
+                                    "--output-dir", str(out), "--reuse-existing"])
+    assert code == 0, (code, log[-800:])
+    return {e["scene_id"]: e for e in _manifest(out)["scenes"]}["A"], log, backend
+
+
+def test_promote_failure_keeps_the_staged_take_and_the_retry_never_misbinds():
+    """Q's take is promoted onto 01_a (overwriting P's original there), then promoting P's
+    staged copy onto 02_b fails (the file is held open). The finally used to delete that
+    staged copy -- P's only one -- and the retry, trusting the old manifest (01_a=P), handed
+    Q's take to P: exit 0, 0 calls, Q's voice under P's words."""
+    from pipeline import atomicio
+    real, seen = atomicio.promote, []
+
+    def promote(src, dst):
+        seen.append(dst)
+        if len(seen) == 2:
+            raise PermissionError(13, "file in use (simulated)", str(dst))
+        return real(src, dst)
+
+    with tempfile.TemporaryDirectory() as d:
+        root, out = Path(d), Path(d) / "audio"
+        v2, err = _swap_with_fault(root, out, mock.patch.object(atomicio, "promote", promote))
+        assert isinstance(err, PermissionError), err
+        assert any(abs(s - 2.0) <= TOL for s in _takes_on_disk(out)), \
+            f"P's paid take (2.0 s) is gone from disk: {_takes_on_disk(out)}"
+        a, log, backend = _retry(v2, out)
+        _assert_takes(a, [3.2, 2.0])
+        assert backend.stats["calls"] == 1, "only P's take was overwritten; Q's is still intact"
+        assert "content changed" in log, log[-800:]
+        assert _disk_disagrees(_manifest(out)) == []
+        assert not list((out / "beats").rglob(".staging")), "a successful retry clears staging"
+
+
+def test_concat_failure_after_promotion_never_misbinds_on_retry():
+    """Every take was promoted (01_a=Q, 02_b=P) and then concat failed, so the manifest still
+    said 01_a=P / 02_b=Q. The retry swapped the two takes wholesale -- and make.py
+    --reuse-audio accepted the result, since each beat's recorded duration was re-measured."""
+    def concat(paths, out_path):
+        raise OSError(28, "No space left on device (simulated)")
+
+    with tempfile.TemporaryDirectory() as d:
+        root, out = Path(d), Path(d) / "audio"
+        v2, err = _swap_with_fault(root, out, mock.patch.object(tts, "concat_wavs", concat))
+        assert err.errno == 28, err
+        a, log, backend = _retry(v2, out)
+        _assert_takes(a, [3.2, 2.0])
+        # neither recorded WAV still holds the take the manifest recorded for it: both re-billed
+        assert backend.stats["calls"] == 2, backend.stats
+        assert _disk_disagrees(_manifest(out)) == []
+
+
+def test_kept_staged_takes_never_trip_the_overwrite_guard():
+    """A first run that dies mid-scene (the network, on the 2nd beat) keeps the paid take it
+    had already staged -- under a name no `*.wav` scan matches, so the rerun is not refused
+    as "no valid manifest but WAVs already exist"."""
+    class _DiesOnSecondCall(tts.MockTTSBackend):
+        def synthesize(self, request):
+            if self.stats["calls"] == 1:
+                raise ConnectionError("network down (simulated)")
+            return super().synthesize(request)
+
+    with tempfile.TemporaryDirectory() as d:
+        root, out = Path(d), Path(d) / "audio"
+        common = ["--backend", "mock", "--unit", "beat", "--output-dir", str(out)]
+        v1 = _write_deck(root / "v1.yml", _deck_a(_say("{show a}", P5, "{show b}", Q8)))
+        try:
+            _run_main(["--storyboard", str(v1), *common], backend=_DiesOnSecondCall(0.4))
+            raise AssertionError("the injected network fault never fired")
+        except ConnectionError:
+            pass
+        assert not (out / "manifest.json").exists()
+        assert _takes_on_disk(out) == [2.0], f"P's paid take must survive: {_takes_on_disk(out)}"
+        code, log, _ = _run_main(["--storyboard", str(v1), *common])
+        assert code == 0, (code, log[-800:])
+        _assert_takes({e["scene_id"]: e for e in _manifest(out)["scenes"]}["A"], [2.0, 3.2])
+
+
 # ---- A-04: a take the small.en arbiter accepted is reused without paying for a new one ----
 
 class _NamedMock(tts.MockTTSBackend):
@@ -509,5 +616,8 @@ if __name__ == "__main__":
     test_beats_abort_then_revert_binds_each_beat_to_its_own_take()
     test_no_billing_abort_after_a_moved_beats_scene_retries_free()
     test_budget_abort_never_pays_for_half_a_beats_scene()
+    test_promote_failure_keeps_the_staged_take_and_the_retry_never_misbinds()
+    test_concat_failure_after_promotion_never_misbinds_on_retry()
+    test_kept_staged_takes_never_trip_the_overwrite_guard()
     test_arbiter_rescued_scene_is_reused_for_free()
     print("OK tts paid-audio self-test (code review 2026-09-23 batch T)")
