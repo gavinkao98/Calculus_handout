@@ -1064,8 +1064,9 @@ hook 佔 11.5 秒拍的前 ~5 秒）實測速度列到拍中才暗。`indicate` 
 `schema._focus_issues` 對此報 error。**例外：本場 `carry` 中 `to: {corner, scale}` 的 `as`
 block**（RG2-01）——它開場就在上一場留下的位置（`pre_play` restore 後由 `scene._stage` 加進
 畫面），它的 `{show}` 是飛去角落而非進場，所以飛行前壓暗或閃爍都合法；壓暗的話要在飛行那拍
-（或更早）把它移出壓暗集合（例如 `dim: []`），否則場末 sweep-up 的 `restore()` 會把它拉回壓暗前的原位（此點
-schema 不擋）。
+（或更早）把它移出壓暗集合（例如 `dim: []`），否則它帶著壓暗飛到角落後，之後任一拍的還原（`dim`
+集合拿掉它）或場末 sweep-up 的 `restore()` 都會把它從角落拉回壓暗前的原位與原尺寸——`focus.apply`
+壓暗時 `save_state()` 存的是飛行前的狀態（此點 schema 不擋）。
 **壓暗集合真的改變的那一拍，`_play_content` 也會把 `focus.apply` 的 FADE_SECONDS 存進
 `scene.beat_reserved_seconds`（比照下面 `indicate` 的做法，用 `apply` 同一套 by_id 過濾判斷
 「有沒有變」），讓填滿整拍的 reveal 自己少要求 0.4 s 的預算（2026-09-13 六輪，dim 對稱擴充
