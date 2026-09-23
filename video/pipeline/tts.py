@@ -415,7 +415,8 @@ def read_manifest_status(path: Path) -> tuple[dict | None, str]:
       - audio_seconds (scene_aligned only, if present): a real number   (scene_reuse_ok float())
     Anything else -- truncation, non-dict JSON, a wrong type above -- is 'corrupt'
     (fail CLOSED). Beat text/hash/timing are NOT validated (nothing keys on their
-    type). Keep this in sync if a consumer starts dereferencing a new field."""
+    type; reusable_existing_beat type-checks the beat audio_seconds it measures against
+    itself). Keep this in sync if a consumer starts dereferencing a new field."""
     if not path.exists():
         return None, "absent"
     try:
@@ -633,6 +634,10 @@ def build_reuse_index(manifest: dict[str, Any] | None) -> dict[BeatReuseKey, dic
     ``occurrence`` settles the rare case of two beats with identical text inside one scene:
     prior beats are numbered in manifest order, new ones in storyboard order, so the n-th
     such beat pairs with the n-th prior one and no WAV is handed out twice.
+
+    Each entry also carries the beat's recorded ``audio_seconds``: a key says which take
+    the manifest RECORDED at that path, not what the path holds now (RG1-01), so
+    reusable_existing_beat measures the WAV against it before handing it out.
     """
     if not manifest:
         return {}
@@ -647,7 +652,8 @@ def build_reuse_index(manifest: dict[str, Any] | None) -> dict[BeatReuseKey, dic
                 continue
             occurrence = seen.get(beat_hash, 0)
             seen[beat_hash] = occurrence + 1
-            index[(scene_id, beat_hash, occurrence)] = {**shared, "audio_file": audio_file}
+            index[(scene_id, beat_hash, occurrence)] = {**shared, "audio_file": audio_file,
+                                                        "audio_seconds": beat.get("audio_seconds")}
     return index
 
 
@@ -740,6 +746,12 @@ def scene_reuse_ok(prior: dict[str, Any] | None, plan: dict[str, Any], scene_wav
     return abs(wav_duration(scene_wav) - float(prior.get("audio_seconds") or 0.0)) <= SYNC_TOLERANCE_SECONDS
 
 
+# A beat's recorded audio_seconds is its WAV's measured duration rounded to the ms, so the take
+# it describes matches it to within rounding. (SYNC_TOLERANCE_SECONDS, 0.12 s, is a sync budget:
+# far too loose to tell two takes apart.)
+BEAT_TAKE_TOLERANCE_SECONDS = 0.001
+
+
 def reusable_existing_beat(
     request: TTSRequest,
     *,
@@ -749,7 +761,8 @@ def reusable_existing_beat(
 ) -> tuple[Path | None, str]:
     """(prior WAV this beat can adopt, "") or (None, reason). The text hash is IN the key,
     so a hit already means "same scene, same words"; what is left to check is the synthesis
-    identity and that the file is still on disk. Where that WAV must end up is the caller's
+    identity, that the file is still on disk, and that it still holds the take the manifest
+    recorded (its duration, RG1-01). Where that WAV must end up is the caller's
     business -- reuse no longer depends on it already being at the right path."""
     prior = reuse_index.get(key)
     if prior is None:
@@ -766,6 +779,18 @@ def reusable_existing_beat(
     src = Path(prior["audio_file"])
     if not src.exists():
         return None, f"prior WAV is gone ({src})"
+    # The path is only where the manifest RECORDED this take: a beats scene that died between
+    # promoting its takes and the manifest checkpoint leaves ANOTHER beat's take there, and
+    # adopting it would put that voice under this beat's words. A prior entry with no recorded
+    # duration keeps the old presence-only test.
+    recorded = prior.get("audio_seconds")
+    if recorded is not None:
+        if isinstance(recorded, bool) or not isinstance(recorded, (int, float)):
+            return None, f"prior manifest records no usable duration for this beat ({recorded!r})"
+        seconds = wav_duration(src)
+        if abs(seconds - recorded) > BEAT_TAKE_TOLERANCE_SECONDS:
+            return None, (f"prior WAV content changed ({src.name} is {seconds:.3f}s, the "
+                          f"manifest recorded {recorded:.3f}s for this beat)")
     return src, ""
 
 
@@ -917,7 +942,14 @@ def _synthesize_scene_beats(
     # vanished file. So: (1) look up every beat's reuse source first, without touching disk;
     # (2) put every take -- a copy of the reused WAV, or a fresh synthesis -- into staging;
     # (3) only then promote staging onto the final paths, and retire the moved-away sources
-    # that no final path covers. Every prior take keeps at least one copy at every instant.
+    # that no final path covers. Every prior take a beat adopts keeps at least one copy at
+    # every instant -- also when the scene dies partway (RG1-01): staging is cleared only once
+    # every promote went through, so a staged copy that never reached its path stays behind.
+    # Staged takes are named `<beat>.wav.staged`, not `.wav`: a kept one is not a managed
+    # beat, and overwrite_guard's `*.wav` scan must not refuse the rerun over it. Until the
+    # manifest checkpoint, the final paths may already hold takes the ON-DISK manifest records
+    # elsewhere; reusable_existing_beat measures every prior WAV against its recorded duration,
+    # so the retry re-synthesizes such a beat instead of adopting a take that is not its own.
     todo: list[tuple[dict[str, Any], Path, str, TTSRequest, BeatReuseKey, bool, Path]] = []
     seen_hashes: dict[str, int] = {}
     billable = 0
@@ -936,7 +968,7 @@ def _synthesize_scene_beats(
                 print(f"[tts] not reusing {beat_path.name}: {reason}; synthesizing", flush=True)
         in_place = src is not None and src.resolve() == beat_path.resolve()
         todo.append((beat, beat_path, beat_hash, request, key, src is not None,
-                     beat_path if in_place else staging / beat_path.name))
+                     beat_path if in_place else staging / (beat_path.name + ".staged")))
         billable += src is None and bool(beat["text"])
     # A cap (--max-billed-calls) that cannot cover this scene stops it BEFORE its first call:
     # the takes of a half-synthesized scene are never recorded, so the retry would pay again.
@@ -946,6 +978,7 @@ def _synthesize_scene_beats(
 
     synths: list[SynthesizedBeat] = []
     moved: list[Path] = []
+    promoted = False
     try:
         for beat, beat_path, beat_hash, request, key, hit, target in todo:     # (2)
             synths.append(synthesize_beat(
@@ -960,10 +993,19 @@ def _synthesize_scene_beats(
         for beat, beat_path, *_, target in todo:     # (3)
             if target != beat_path:
                 atomicio.promote(target, beat_path)
+        promoted = True
     finally:
-        for leftover in staging.glob("*") if staging.is_dir() else ():
-            leftover.unlink(missing_ok=True)
-        _prune_empty_dir(staging)
+        kept = sorted(staging.glob("*")) if staging.is_dir() else []
+        if promoted:
+            for leftover in kept:
+                leftover.unlink(missing_ok=True)
+            _prune_empty_dir(staging)
+        elif kept:
+            print(f"[tts] {scene_id}: stopped before every take reached its beat path; kept "
+                  f"{len(kept)} staged take(s) in {staging} ({', '.join(p.name for p in kept)}). "
+                  f"They are not in the manifest and may be the only copy of a paid take -- copy "
+                  f"them out (drop the .staged suffix) before re-running if you want them: the "
+                  f"next run of this scene writes into this folder and clears it.", flush=True)
     finals = {beat_path.resolve() for _, beat_path, *_ in todo}
     _retire([src for src in moved if src.resolve() not in finals], retired)
 
