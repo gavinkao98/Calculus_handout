@@ -492,7 +492,18 @@ def _prune_empty_dir(directory: Path) -> None:
         pass
 
 
-def _relocate(src: Path, dst: Path) -> bool:
+def _retire(paths: list[Path], retired: list[Path] | None) -> None:
+    """Delete superseded source artifacts (pruning a directory they leave empty) -- or, when
+    the caller passes a ``retired`` list, only record them there for the caller to delete."""
+    if retired is not None:
+        retired.extend(paths)
+        return
+    for path in paths:
+        path.unlink(missing_ok=True)
+        _prune_empty_dir(path.parent)
+
+
+def _relocate(src: Path, dst: Path, retired: list[Path] | None = None) -> bool:
     """Move one audio artifact onto the path today's deck wants. True iff it moved.
 
     Copy-then-delete rather than ``os.replace``: the copy is what protects BILLED audio
@@ -500,7 +511,8 @@ def _relocate(src: Path, dst: Path) -> bool:
     is what keeps the old scene-number directory from lingering as unmanaged audio --
     an orphan WAV under a stale ``NN_`` prefix is exactly what ``overwrite_guard``'s
     "WAVs exist but no manifest accounts for them" branch refuses to run over. The delete
-    only happens once the copy is on disk at the same size.
+    only happens once the copy is on disk at the same size, and not at all here when a
+    ``retired`` list is passed (see ``_retire``).
 
     A missing source is a no-op: the recorded path is still rewritten so the manifest stays
     internally consistent, and ``make.py --reuse-audio``'s freshness check reports the
@@ -510,8 +522,7 @@ def _relocate(src: Path, dst: Path) -> bool:
     dst.parent.mkdir(parents=True, exist_ok=True)
     shutil.copy2(src, dst)
     if dst.exists() and dst.stat().st_size == src.stat().st_size:
-        src.unlink()
-        _prune_empty_dir(src.parent)
+        _retire([src], retired)
     return True
 
 
@@ -775,6 +786,7 @@ def synthesize_beat(
     backend_name: str,
     reuse_index: dict[BeatReuseKey, dict[str, Any]],
     reuse_key: BeatReuseKey | None = None,
+    retired: list[Path] | None = None,
 ) -> SynthesizedBeat:
     if reuse_existing and reuse_key is not None:
         src, reason = reusable_existing_beat(
@@ -784,7 +796,7 @@ def synthesize_beat(
             key=reuse_key,
         )
         if src is not None:
-            moved = _relocate(src, output_path)
+            moved = _relocate(src, output_path, retired)
             # consume the entry: one prior WAV is handed out at most once, so two beats
             # with identical text in a scene pair off by index instead of sharing a take.
             reuse_index.pop(reuse_key, None)
@@ -855,6 +867,7 @@ def _synthesize_scene_beats(
     args: argparse.Namespace,
     reuse_index: dict[BeatReuseKey, dict[str, Any]],
 ) -> dict[str, Any]:
+    from pipeline import atomicio
     voice = args.voice or default_voice_for_model(meta)
     scene_id = scene["id"]
     entry: dict[str, Any] = {
@@ -866,31 +879,61 @@ def _synthesize_scene_beats(
     beats = scene_beats(scene)
     beat_dir = output_dir / "beats" / f"{scene_number:02d}_{scene_id}"
     scene_audio = output_dir / "scenes" / f"{scene_number:02d}_{scene_id}.wav"
+    staging = beat_dir / ".staging"
     beat_paths: list[Path] = []
     manifest_beats: list[dict[str, Any]] = []
     timeline = 0.0
 
+    # The scene is one transaction (code review 2026-09-23, A-01). With content-addressed
+    # reuse, a beat's final path can be exactly where ANOTHER beat's prior take still sits
+    # (two beats swap text; a new opening beat pushes the rest down; a rewritten beat lands
+    # where a kept one used to be). Writing beat by beat onto final paths overwrote that take
+    # before its owner adopted it -- the paid take was lost and concat crashed on the
+    # vanished file. So: (1) look up every beat's reuse source first, without touching disk;
+    # (2) put every take -- a copy of the reused WAV, or a fresh synthesis -- into staging;
+    # (3) only then promote staging onto the final paths, and retire the moved-away sources
+    # that no final path covers. Every prior take keeps at least one copy at every instant.
+    todo: list[tuple[dict[str, Any], Path, str, TTSRequest, BeatReuseKey, Path]] = []
     seen_hashes: dict[str, int] = {}
     for beat in beats:
         beat_path = beat_dir / f"{beat['index']:02d}_{safe_stem(beat['reveal'] or beat['id'])}.wav"
         beat_hash = text_hash(beat["text"])
         occurrence = seen_hashes.get(beat_hash, 0)
         seen_hashes[beat_hash] = occurrence + 1
-        synth = synthesize_beat(
-            backend,
-            TTSRequest(
-                text=beat["text"],
-                model=args.model,
-                voice=voice,
-                style=args.style,
-            ),
-            beat_path,
-            reuse_existing=args.reuse_existing,
-            empty_seconds=args.empty_beat_seconds,
-            backend_name=backend.name,
-            reuse_index=reuse_index,
-            reuse_key=(scene_id, beat_hash, occurrence),
-        )
+        request = TTSRequest(text=beat["text"], model=args.model, voice=voice, style=args.style)
+        key = (scene_id, beat_hash, occurrence)
+        src = None
+        if args.reuse_existing:   # (1) a peek; synthesize_beat consumes the entry in (2)
+            src, _ = reusable_existing_beat(request, backend_name=backend.name,
+                                            reuse_index=reuse_index, key=key)
+        in_place = src is not None and src.resolve() == beat_path.resolve()
+        todo.append((beat, beat_path, beat_hash, request, key,
+                     beat_path if in_place else staging / beat_path.name))
+
+    synths: list[SynthesizedBeat] = []
+    moved: list[Path] = []
+    try:
+        for beat, beat_path, beat_hash, request, key, target in todo:     # (2)
+            synths.append(synthesize_beat(
+                backend, request, target,
+                reuse_existing=args.reuse_existing,
+                empty_seconds=args.empty_beat_seconds,
+                backend_name=backend.name,
+                reuse_index=reuse_index,
+                reuse_key=key,
+                retired=moved,      # a staged copy never deletes its source
+            ))
+        for beat, beat_path, beat_hash, request, key, target in todo:     # (3)
+            if target != beat_path:
+                atomicio.promote(target, beat_path)
+    finally:
+        for leftover in staging.glob("*") if staging.is_dir() else ():
+            leftover.unlink(missing_ok=True)
+        _prune_empty_dir(staging)
+    finals = {beat_path.resolve() for _, beat_path, *_ in todo}
+    _retire([src for src in moved if src.resolve() not in finals], None)
+
+    for (beat, beat_path, beat_hash, *_), synth in zip(todo, synths):
         duration = synth.duration
         beat_paths.append(beat_path)
         beat_entry = {
