@@ -12,6 +12,10 @@ repo (synthesised mp4s, hand-written manifests; nothing under video/output is to
         falling back to whichever subdir exists. The two decks of a section share one output
         dir, so the fallback timed a mock render against the real-voice beats. A manifest
         whose `deck_id` names another deck is refused (exit 2, nothing written).
+  B-01  every run extracts its frames afresh. Frames used to be grabbed only when the file
+        was missing, and the name is just (index, sample time) -- so re-packing a re-render
+        whose timing had not changed (`--reuse-audio`, or an unchanged mock estimate) into
+        the same dir kept the PREVIOUS render's pictures beside this render's motion numbers.
 """
 from pipeline import _bootstrap
 
@@ -23,6 +27,8 @@ import subprocess
 import sys
 import tempfile
 from pathlib import Path
+
+from PIL import Image
 
 from pipeline import rewatch_pack as RP
 
@@ -123,6 +129,40 @@ def test_a_manifest_naming_another_deck_is_refused_before_anything_is_written():
         rc = run("demo_deck")
         wrote = (sec / "rewatch_pack").exists()
     assert rc == 2 and not wrote, (rc, wrote)
+
+
+# ---- B-01: a re-pack shows this render, not the last one -----------------------------
+
+def _frames(sec: Path) -> list[Path]:
+    return sorted((sec / "rewatch_pack" / "01_s1").glob("*.jpg"))
+
+
+def test_a_repack_into_the_same_dir_extracts_the_new_renders_frames():
+    with fake_repo("demo_deck") as (root, sec):
+        write_manifest(sec, "audio", "demo_deck", 2.0)
+        render(root, "demo_deck", "red")
+        assert run("demo_deck") == 0
+        first = [Image.open(p).convert("RGB").getpixel((5, 5)) for p in _frames(sec)]
+        render(root, "demo_deck", "blue")      # same timing, different picture
+        assert run("demo_deck") == 0
+        second = [Image.open(p).convert("RGB").getpixel((5, 5)) for p in _frames(sec)]
+    assert first and all(r > 200 and b < 60 for r, _g, b in first), first
+    assert second and all(b > 200 and r < 60 for r, _g, b in second), second
+
+
+def test_the_scene_folder_holds_exactly_the_frames_this_pack_lists():
+    """A frame left over from an earlier pack (other sample times) must not sit among this
+    pack's close-reading frames looking like one of them."""
+    with fake_repo("demo_deck") as (root, sec):
+        write_manifest(sec, "audio", "demo_deck", 2.0)
+        render(root, "demo_deck")
+        fdir = sec / "rewatch_pack" / "01_s1"
+        fdir.mkdir(parents=True)
+        (fdir / "f_07_+099.9s.jpg").write_bytes(b"left over from an older pack")
+        assert run("demo_deck") == 0
+        listed = {s["file"] for s in pack(sec)["scenes"][0]["samples"]}
+        on_disk = {p.name for p in fdir.iterdir()}
+    assert on_disk == listed, (sorted(on_disk), sorted(listed))
 
 
 if __name__ == "__main__":

@@ -51,6 +51,7 @@ from __future__ import annotations
 import argparse
 import json
 import re
+import shutil
 import subprocess
 import sys
 from pathlib import Path
@@ -561,16 +562,19 @@ def main() -> int:
         reveal_times = [SCENE_LEAD_SECONDS + b["start_seconds"] for b in beats if b.get("reveal")]
         print(f"[rewatch_pack] {stem}  {fmt(g0)}–{fmt(_goff(g0, dur))}  ({dur:.1f}s, {mode}, {len(beats)} beats)", flush=True)
 
-        # frames
+        # frames -- always this render's: a frame's name is only (k, sample time), so a
+        # re-render with unchanged timing packed into the same dir would otherwise keep the
+        # last render's pictures (and frames of other sample times would linger beside them)
         fdir = out / stem
-        fdir.mkdir(exist_ok=True)
+        if fdir.exists():
+            shutil.rmtree(fdir)
+        fdir.mkdir()
         samples = sample_times(dur, beats)
         frames: list[tuple[Path, str]] = []
         sample_rows = []
         for k, (tv, why) in enumerate(samples, 1):
             dst = fdir / f"f_{k:02d}_+{tv:05.1f}s.jpg"
-            if not dst.exists():
-                extract_frame(av, tv, dst)
+            extract_frame(av, tv, dst)
             snippet, bi = words_at(tv, beats, words)
             gt = _goff(g0, tv)
             label = f"#{k:02d}  +{tv:5.1f}s  ({fmt(gt)})  {why}  │  {snippet}"
