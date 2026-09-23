@@ -160,7 +160,9 @@ def _title(text: str, ground: str):
                                  size=T.fs("h1") * 0.88 / T.PX_TO_FS)
     else:
         mob = brand.heading(text, ground, role="primary", size="h1")
-    max_w = T.FRAME_W - 2 * T.SAFE_MARGIN
+    # the title is left-anchored at SIDE_GUTTER (both modes), so it may span CONTENT_W -- the
+    # old FRAME_W - 2*SAFE_MARGIN let a clamped title run ~0.19u past the right safe margin
+    max_w = T.FRAME_W - 2 * T.SIDE_GUTTER
     size_px = T._SCALE_PX['h1'] * 0.88 if '$' in text else T._SCALE_PX['h1']
     if mob.width > max_w:
         brand._clamp_shrink(mob, max_w, size_px)
@@ -210,11 +212,18 @@ def _place_function_label(label, graph, axes: Axes, plot: dict[str, Any],
     side = _SIDE.get(str(plot.get("label_side", "up")).lower(), UP)
     label_x = plot.get("label_x")
     if label_x is not None:
+        # from the expression, like the tail default below: input_to_graph_point needs a
+        # ParametricFunction, and a y_clip curve is a VGroup of segments (it threw, swallowed)
         try:
-            label.next_to(axes.input_to_graph_point(float(label_x), graph), side, buff=0.18)
+            lx = float(label_x)
+            ly = safe_eval_expression(plot["expression"], lx)
+            if not math.isfinite(ly):
+                raise ValueError(f"y={ly}")
+            label.next_to(axes.c2p(lx, ly), side, buff=0.18)
             return
-        except Exception:
-            pass
+        except Exception as exc:
+            print(f"[graph] label_x={label_x!r} on {plot['expression']!r}: no point on the curve "
+                  f"({type(exc).__name__}: {exc}); label falls back to the default placement")
     # Default: place near the tail end of the curve
     x_end = float(xr[1])
     y_span = yr[1] - yr[0]
@@ -397,6 +406,18 @@ def _sweep_block(plot: dict[str, Any], index: int, prior: list[dict[str, Any]],
     return Block(f"plot.{index}", group, anim=anim, anim_seconds=seconds, static=False)
 
 
+def _effective_plot(plot: dict[str, Any]) -> dict[str, Any]:
+    """A plot with no colour of its own whose label names a colour-mapped token takes that
+    token's role (meta.color_map; SPEC rule 5): the sine curve is drawn in sine's colour.
+    Only the DEFAULT is affected -- an explicit color / color_role is the author's. Both the
+    main plot and the inset lens read colours through this, so one curve is one colour."""
+    if "color" not in plot and "color_role" not in plot and plot.get("label"):
+        role = brand.mapped_role(str(plot["label"]))
+        if role:
+            return dict(plot, color_role=role)
+    return plot
+
+
 def _plot_blocks(spec: dict[str, Any], axes: Axes, ground: str) -> tuple[list[Block], list[Any]]:
     blocks: list[Block] = []
     labels = []
@@ -408,13 +429,7 @@ def _plot_blocks(spec: dict[str, Any], axes: Axes, ground: str) -> tuple[list[Bl
     all_plots = spec.get("plots", [])
     for i, plot in enumerate(all_plots):
         kind = plot.get("kind")
-        # A plot with no colour of its own whose label names a colour-mapped token takes that
-        # token's role (meta.color_map; SPEC rule 5): the sine curve is drawn in sine's colour.
-        # Only the DEFAULT is affected -- an explicit color / color_role is the author's.
-        if "color" not in plot and "color_role" not in plot and plot.get("label"):
-            role = brand.mapped_role(str(plot["label"]))
-            if role:
-                plot = dict(plot, color_role=role)
+        plot = _effective_plot(plot)
         col = _role_color(ground, plot, "secondary")
         # reveal: true -> dynamic block, waits for {show plot.N}; its label is
         # folded into the same block so one marker reveals both (see docstring).
@@ -445,8 +460,8 @@ def _plot_blocks(spec: dict[str, Any], axes: Axes, ground: str) -> tuple[list[Bl
                     color=col,
                     stroke_width=sw,
                 )
-            # keep the solid curve as the geometry reference for label placement (it is a
-            # ParametricFunction; the dashed wrapper is not, and input_to_graph_point needs one)
+            # keep the solid curve as the geometry reference for label placement (the label's
+            # last-resort fallback sits next to it; the dashed wrapper is only a copy of it)
             curve = graph
             if plot.get("dashed"):
                 graph = _dashed_curve(graph)
@@ -562,7 +577,9 @@ def _plot_blocks(spec: dict[str, Any], axes: Axes, ground: str) -> tuple[list[Bl
 #
 # A second Axes over that rectangle at a fixed 3.2 x 2.0 u panel in the corner, holding the
 # same plots CLIPPED to the rectangle (no labels); a hairline frame on the main axes marks
-# the region and two dashed guides lead to the panel. The main graph is not scaled or moved
+# the region and two dashed guides lead to the panel. Where the title (top corners) or the
+# annotations (bottom corners) run under the panel, it moves clear of them, and a corner with
+# no room between the two is a build error. The main graph is not scaled or moved
 # (the block is built AFTER _fit_graph_to_safe_zone and never joins its group). The panel
 # sits above everything (z_index) so a plot revealed later cannot draw over the lens.
 _INSET_W, _INSET_H = 3.2, 2.0
@@ -595,7 +612,8 @@ def _clip_segment(p, q, x0, x1, y0, y1):
     return (px + t0 * dx, py + t0 * dy), (px + t1 * dx, py + t1 * dy)
 
 
-def _inset_block(spec: dict[str, Any], axes: Axes, plot_blocks: list[Block], ground: str) -> Block:
+def _inset_block(spec: dict[str, Any], axes: Axes, plot_blocks: list[Block], ground: str,
+                 title, annotation_group) -> Block:
     ins = spec["inset"]
     if not isinstance(ins, dict):
         raise ValueError("inset: must be a mapping {x, y, corner, follow}")
@@ -619,6 +637,24 @@ def _inset_block(spec: dict[str, Any], axes: Axes, plot_blocks: list[Block], gro
     sx, sy = _INSET_CORNERS[corner]
     centre = [sx * (T.FRAME_W / 2 - T.SIDE_GUTTER - _INSET_W / 2),
               sy * (T.FRAME_H / 2 - T.SAFE_MARGIN - _INSET_H / 2), 0]
+
+    # the panel is opaque and above everything, and sizecheck exempts the graph layer: keep it
+    # off the title band (top) and the annotation band (bottom) wherever one of them runs under
+    # its x span. A panel that clears both stays exactly in the frame corner.
+    def runs_under(mob) -> bool:
+        return (mob is not None and mob.get_left()[0] < centre[0] + _INSET_W / 2
+                and mob.get_right()[0] > centre[0] - _INSET_W / 2)
+
+    top = T.FRAME_H / 2 - T.SAFE_MARGIN
+    bottom = -top
+    if runs_under(title):
+        top = min(top, title.get_bottom()[1] - _TITLE_GRAPH_GAP)
+    if runs_under(annotation_group):
+        bottom = max(bottom, annotation_group.get_top()[1] + _GRAPH_ANNOTATION_GAP)
+    if top - bottom < _INSET_H:
+        raise ValueError(f"inset.corner: {corner!r} has no room for the {_INSET_W} x {_INSET_H} u "
+                         f"panel between the title and the annotations -- pick another corner")
+    centre[1] = min(centre[1], top - _INSET_H / 2) if sy > 0 else max(centre[1], bottom + _INSET_H / 2)
     lens.shift(centre - (lens.c2p(x0, y0) + lens.c2p(x1, y1)) / 2)
     border = Rectangle(width=_INSET_W, height=_INSET_H, stroke_color=T.color(ground, "ink_1"),
                        stroke_width=2.0, fill_color=T.color(ground, "bg"), fill_opacity=1.0)
@@ -640,6 +676,7 @@ def _inset_block(spec: dict[str, Any], axes: Axes, plot_blocks: list[Block], gro
     pieces: list[Any] = []
     for i, plot in enumerate(all_plots):
         kind = plot.get("kind")
+        plot = _effective_plot(plot)
         col = _role_color(ground, plot, "accent" if kind == "sweep" else "secondary")
 
         if kind == "function":
@@ -722,10 +759,13 @@ def _inset_block(spec: dict[str, Any], axes: Axes, plot_blocks: list[Block], gro
                 # structure (and z_index) stable across every redraw.
                 return Dot(centre, radius=1e-3, fill_opacity=0.0, stroke_width=0.0)
 
+            # every closure below is redrawn each frame, long after this loop has moved on:
+            # bind THIS sweep's values as defaults, or a later plot's colour / tracker leaks in
             if gap:
                 top_fn, bot_fn = gap
 
-                def band():
+                def band(x_of=x_of, x_from=x_from, top_fn=top_fn, bot_fn=bot_fn, col=col,
+                         opacity=float(plot.get("opacity", 0.16))):
                     x = x_of()
                     if x is None:
                         return nothing()
@@ -739,10 +779,10 @@ def _inset_block(spec: dict[str, Any], axes: Axes, plot_blocks: list[Block], gro
                     pts = ([lens.c2p(t, clamp_y(top_fn(t))) for t in xs]
                            + [lens.c2p(t, clamp_y(bot_fn(t))) for t in reversed(xs)])
                     return Polygon(*pts, stroke_width=0, color=col, fill_color=col,
-                                   fill_opacity=float(plot.get("opacity", 0.16)))
+                                   fill_opacity=opacity)
                 pieces.append(live(band))
 
-            def rule():
+            def rule(x_of=x_of, col=col):
                 x = x_of()
                 if x is None or not x0 <= x <= x1:
                     return nothing()
@@ -751,7 +791,7 @@ def _inset_block(spec: dict[str, Any], axes: Axes, plot_blocks: list[Block], gro
             pieces.append(live(rule))
 
             for fn in follow_fns:
-                def dot(f=fn):
+                def dot(f=fn, x_of=x_of, col=col):
                     x = x_of()
                     if x is not None and _finite(f, x) and inside(x, f(x)):
                         return Dot(lens.c2p(x, f(x)), color=col, radius=0.07)
@@ -829,7 +869,10 @@ def _build_single(spec: dict[str, Any], ctx: dict[str, Any]) -> list[Block]:
     _add_axis_labels(axes, ground, ac)
     blocks.append(Block("axes", axes, anim="create", static=True, layer="graph"))
 
-    plot_blocks, _ = _plot_blocks(spec, axes, ground)
+    # the plots (and the inset) read spec["axes"]: hand them the merged defaults drawn above,
+    # as _panel does for 2up -- an omitted axes / x_range was a bare KeyError here
+    merged = dict(spec, axes=ac)
+    plot_blocks, _ = _plot_blocks(merged, axes, ground)
     ticks = _axis_ticks(axes, ac, ground, spec.get("plots", []))
     if ticks is not None:
         plot_blocks.append(Block("ticks", ticks, anim="fade", static=True))
@@ -867,7 +910,7 @@ def _build_single(spec: dict[str, Any], ctx: dict[str, Any]) -> list[Block]:
     # after the fit: the inset's frame reads the main axes' FINAL position, and the
     # panel is outside graph_group so the main plot is never scaled to make room for it.
     if "inset" in spec:
-        blocks.append(_inset_block(spec, axes, plot_blocks, ground))
+        blocks.append(_inset_block(merged, axes, plot_blocks, ground, title, group))
 
     if group is not None:
         for i, ann in enumerate(annotations):
