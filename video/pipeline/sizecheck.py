@@ -52,11 +52,20 @@ def _prose_nodes(mob) -> list:
     return out
 
 
-def _norm_size(node, text_scale: float) -> float:
+def _has_no_size(node) -> bool:
+    """A zero-height node (value_table's blank cell -> `Tex("")`) has no font size: manim's
+    `font_size` getter divides by `initial_height` and would raise ZeroDivisionError."""
+    return node.height <= 0 or getattr(node, "initial_height", 0) <= 0
+
+
+def _norm_size(node, text_scale: float) -> "float | None":
     """font_size normalised to the canonical (math-anchored) scale so prose lines are
     comparable. brand renders text at fs(size) * theme.TEXT_SCALE, so divide a prose Tex's
-    font_size back out by TEXT_SCALE to recover the canonical size before comparing."""
+    font_size back out by TEXT_SCALE to recover the canonical size before comparing.
+    None for a zero-height node (nothing to compare; callers skip it)."""
     from manim import MathTex, Tex
+    if _has_no_size(node):
+        return None
     fs = float(node.font_size)
     return fs / text_scale if isinstance(node, (Tex, MathTex)) else fs
 
@@ -86,10 +95,11 @@ def _block_prose_size(block_mob, text_scale: float):
     # `MathTex(...)` (brand.math_line) is never also a `Tex` instance, so it is excluded
     # without the redundant (and broken) second check.
     carriers = [n for n in nodes if isinstance(n, Text) or isinstance(n, Tex)]
-    if not carriers:
+    sizes = [s for s in (_norm_size(n, text_scale) for n in carriers) if s is not None]
+    if not sizes:
         return None
     # all prose lines in a block share a size; max is robust to a stray tag
-    return max(_norm_size(n, text_scale) for n in carriers)
+    return max(sizes)
 
 
 def _overflow_issues(scene: dict, blocks) -> "list[tuple[str, str]]":
@@ -582,14 +592,17 @@ def _statement_regime_issues(scene: dict, blocks) -> "list[tuple[str, str]]":
         f"the band. (band promotion)")]
 
 
-def _effective_font_px(node) -> float:
+def _effective_font_px(node) -> "float | None":
     """The node's TRUE authored on-screen px, recovered from its manim font_size.
     text Tex renders at fs(px)*TEXT_SCALE; pure-math MathTex renders at fs(px)=px*PX_TO_FS.
     CRITICAL: in this manim `Tex` SUBCLASSES `MathTex` (.venv .../tex_mobject.py:227,607), so a
     text Tex IS-A MathTex -- you MUST test `Tex` FIRST, else every text node is mis-typed as
-    math (and Step-2's `Tex("x")` assert fails on first run)."""
+    math (and Step-2's `Tex("x")` assert fails on first run). None for a zero-height node
+    (nothing on screen to read; callers skip it), as floorprobe._effective_px does."""
     from manim import MathTex, Tex
     from pipeline.visuals import theme as T
+    if _has_no_size(node):
+        return None
     fs = float(node.font_size)
     if isinstance(node, Tex):                       # text prose (carries TEXT_SCALE) -- Tex FIRST!
         return fs / (T.TEXT_SCALE * T.PX_TO_FS)
@@ -625,7 +638,9 @@ def _floor_issues(scene: dict, blocks, enforce: bool) -> "list[tuple[str, str]]"
         if mob is None:
             continue
         for node in _prose_nodes(mob):
-            sizes.append((str(b.id), _effective_font_px(node)))
+            px = _effective_font_px(node)
+            if px is not None:
+                sizes.append((str(b.id), px))
     return _floor_findings(scene.get("id"), sizes, T.MIN_FONT_FLOOR, enforce)
 
 
