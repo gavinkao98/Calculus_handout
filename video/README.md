@@ -196,11 +196,13 @@ python video\make.py --storyboard video\storyboards\<deck>.yml --scene <scene_id
 
 > 真旁白路線是 **MiMo**（`tts.py --backend mimo` → `make.py --reuse-audio`），見下方專節。`make.py` 本身只跑 mock、刻意不接計費路徑（見 [`CLAUDE.md`](../CLAUDE.md)）。
 
-離線時序／manifest 檢查（寫出與 TTS 輸出同形狀的無聲 WAV，不計費）：
+離線 manifest／beats 時鐘檢查（寫出無聲 WAV，不計費）：
 
 ```powershell
-python video\pipeline\tts.py --storyboard video\storyboards\<deck>_mimo.yml --backend mock
+python video\pipeline\tts.py --storyboard video\storyboards\<deck>_mimo.yml --backend mock --unit beat
 ```
+
+> **`--unit beat` 必帶**（2026-09-23 程式碼審查 A-06）：預設 `--unit auto` 會把所有 content 場送去 scene-level，mock 的靜音得先過 stable-ts 對齊（對不上 → fallback ladder → 每場都落到 beats 終端；沒有 model cache 時還會下載 whisper，不是離線；缺 stable-ts 則直接中止）。這一步**只驗 beats 時鐘**（每 beat 長度＝估算時長），**不代表 scene_aligned 的 beat 時序**（真音檔逐字對位回推的 reveal 時點）；`[sync]`／short-beat 的判讀以真音檔版為準。
 
 產生的音訊／manifest 存於 `video/output/ch<NN>/s<X.Y>/audio_mimo/`。
 
@@ -380,7 +382,7 @@ python tools\doctor.py                                       # 確認全綠
 
 MiMo TTS（唯一旁白路線）預設使用 `mimo-v2.5-tts` 的 builtin voice `Dean`
 （voice-design/Calm Professor 已於 2026-07-05 退役）；key 走 env `MIMO_API_KEY` 或 repo-local `.env`（公測免費，仍屬外部 API，依
-CLAUDE.md 批次前徵同意）。TTS CLI 亦有 `--backend mock`，不需網路／API 金鑰，適合驗
+CLAUDE.md 批次前徵同意）。TTS CLI 亦有 `--backend mock`（配 `--unit beat`，理由見上方離線檢查一節），不需網路／API 金鑰，適合驗
 manifest 與改模板時的快速無聲預覽。
 
 **forced alignment 現為正式路線**：計時源＝`pipeline/scene_align.py` 的 `stable-ts`
