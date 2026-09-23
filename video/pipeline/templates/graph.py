@@ -204,7 +204,8 @@ def _label(text: str, ground: str, *, role: str = "text", size: str = "label"):
 
 
 def _place_function_label(label, graph, axes: Axes, plot: dict[str, Any],
-                          xr: list[float], yr: list[float]) -> None:
+                          xr: list[float], yr: list[float],
+                          clip: tuple[float, float] | None = None) -> None:
     if plot.get("label_point") is not None:
         point = plot["label_point"]
         label.move_to(axes.c2p(float(point[0]), float(point[1])), aligned_edge=LEFT)
@@ -219,10 +220,13 @@ def _place_function_label(label, graph, axes: Axes, plot: dict[str, Any],
             ly = safe_eval_expression(plot["expression"], lx)
             if not math.isfinite(ly):
                 raise ValueError(f"y={ly}")
-            # a y_clip curve is not drawn outside y_range: a label there hangs off the axes and
-            # _fit_graph_to_safe_zone shrinks the whole figure to hold it (RG3-01)
-            if plot.get("y_clip") and not yr[0] <= ly <= yr[1]:
-                raise ValueError(f"y={ly:g} is clipped off (y_range [{yr[0]:g}, {yr[1]:g}])")
+            # a y_clip curve is not drawn outside the [lo, hi] _plot_blocks cut it to (`clip`:
+            # y_range for y_clip: true, else the explicit bounds): a label there hangs where no
+            # curve is drawn, and past y_range _fit_graph_to_safe_zone shrinks the whole figure
+            # to hold it (RG3-01)
+            if clip is not None and not clip[0] <= ly <= clip[1]:
+                src = "y_range" if plot.get("y_clip") is True else "y_clip"
+                raise ValueError(f"y={ly:g} is clipped off ({src} [{clip[0]:g}, {clip[1]:g}])")
             label.next_to(axes.c2p(lx, ly), side, buff=0.18)
             return
         except Exception as exc:
@@ -450,11 +454,13 @@ def _plot_blocks(spec: dict[str, Any], axes: Axes, ground: str) -> tuple[list[Bl
             sw = float(plot.get("stroke_width", 5.0))
             samples = int(plot.get("samples", 900))
             y_clip = plot.get("y_clip")
+            clip = None   # the bounds the curve is cut to; label_x is guarded by the same pair
             if y_clip:
                 # asymptote / blow-up path: sample + break at poles and off-frame
                 # excursions (see _clipped_function_curve). y_clip: true -> axes
                 # y_range; y_clip: [lo, hi] -> explicit bound.
                 ylo, yhi = (y_range[0], y_range[1]) if y_clip is True else (float(y_clip[0]), float(y_clip[1]))
+                clip = (ylo, yhi)
                 graph = _clipped_function_curve(axes, plot["expression"], xr, ylo, yhi, col, sw, samples)
             else:
                 step = abs(xr[1] - xr[0]) / float(samples)
@@ -481,7 +487,7 @@ def _plot_blocks(spec: dict[str, Any], axes: Axes, ground: str) -> tuple[list[Bl
                 lab = _label(plot["label"], ground,
                              role=_carrier_label_role(plot),
                              size=plot.get("label_size", default_label_size))
-                _place_function_label(lab, curve, axes, plot, xr, y_range)
+                _place_function_label(lab, curve, axes, plot, xr, y_range, clip)
                 if static:
                     labels.append(lab)
                 else:
