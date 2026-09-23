@@ -23,6 +23,7 @@ from manim import DOWN, LEFT, VGroup
 
 from .. import brand
 from ..blocks import Block, accent_role
+from ..scene_roles import SCENE_ROLE_CHIP
 from ..visuals import theme as T
 from ._common import (scene_head, motif_corner, place_body, body_zone, build_aside,
                       render_scaffold, reveals, ColumnPlan, SPINE_X, CONTENT_W, PRIMARY_W,
@@ -30,9 +31,17 @@ from ._common import (scene_head, motif_corner, place_body, body_zone, build_asi
 
 LABEL = {
     "definition": "[ definition ]", "theorem": "[ theorem ]",
-    "proposition": "[ proposition ]", "example": "[ example ]",
+    "proposition": "[ proposition ]", "corollary": "[ corollary ]", "example": "[ example ]",
     "warning": "[ note ]", "procedure": "[ procedure ]", "recap": "[ recap ]",
 }
+
+
+def _default_label(accent: str) -> str:
+    """The eyebrow chip for *accent* when no scene_role / kicker / label overrides it. An
+    accent LABEL does not list (Direction B's caution / remark / note / derivation ...)
+    takes the chip scene_roles defines for that word, not "[ definition ]"."""
+    return LABEL.get(accent) or SCENE_ROLE_CHIP.get(accent) or "[ definition ]"
+
 
 MIN_PITCH = 0.36  # tightest inter-line gap (the math stack arrange buff); sizecheck capacity trigger
 # aside mode: clear air between the primary column's wrap width and the rail card at RAIL_X
@@ -82,7 +91,7 @@ def build(spec: dict[str, Any], ctx: dict[str, Any]) -> list[Block]:
     blocks: list[Block] = []
 
     head = scene_head(spec, ctx,
-                      label=LABEL.get(spec.get("accent", "definition"), "[ definition ]"))
+                      label=_default_label(spec.get("accent", "definition")))
     blocks += head
     title = head[1].mobject
 
