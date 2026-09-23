@@ -236,6 +236,189 @@ def test_ladder_history_records_the_root_cause():
             assert "simulated root cause XYZ" in h["reason"], h
 
 
+# ---- A-02: an abort never strands a paid take, and the retry never pays for it again ----
+
+def _fake_align(wav_path, plan, *, model="base.en", device="cpu", **_):
+    """Stub aligner: tokens spread over the WAV by character share (always passes the gates)."""
+    from pipeline import scene_align as SA
+    tokens = SA.tokenize(plan["transcript"])
+    dur = wav_duration(Path(wav_path)) * 0.95
+    total, acc, words = sum(len(t) for t in tokens) or 1, 0, []
+    for tok in tokens:
+        start = dur * acc / total
+        acc += len(tok)
+        words.append({"word": tok, "start": round(start, 3), "end": round(dur * acc / total, 3),
+                      "probability": 0.9})
+    return {"words": words, "multi": {}, "segments": [],
+            "summary": {"aligner": {"tool": "stub", "model": model}}}
+
+
+class _StubAligner:
+    """Swap in the stub aligner and tell main()'s preflight the aligner is installed."""
+    def __enter__(self):
+        from pipeline import scene_align as SA
+        self._saved = (SA.align_scene, tts._scene_aligner_missing)
+        SA.align_scene, tts._scene_aligner_missing = _fake_align, (lambda: None)
+        return self
+
+    def __exit__(self, *exc):
+        from pipeline import scene_align as SA
+        SA.align_scene, tts._scene_aligner_missing = self._saved
+
+
+def _manifest(out: Path):
+    import json
+    return json.loads((out / "manifest.json").read_text(encoding="utf-8"))
+
+
+def _disk_disagrees(manifest):
+    """Every way the manifest's promises about files on disk are broken (a manifest written
+    after an abort must still be one make.py --reuse-audio and a retry can trust)."""
+    bad = []
+    for e in manifest["scenes"]:
+        if e.get("kind", "content") != "content":
+            continue
+        files = [(e["audio_file"], e["audio_seconds"])]
+        files += [(b["audio_file"], b["audio_seconds"]) for b in e.get("beats", []) if b.get("audio_file")]
+        for f, secs in files:
+            if not Path(f).exists():
+                bad.append(f"{e['scene_id']}: {Path(f).name} missing")
+            elif abs(wav_duration(Path(f)) - secs) > TOL:
+                bad.append(f"{e['scene_id']}: {Path(f).name} is {wav_duration(Path(f)):.2f}s, "
+                           f"manifest says {secs}s")
+        for key in ("words_file", "aligned_file"):
+            f = (e.get("alignment") or {}).get(key)
+            if f and not Path(f).exists():
+                bad.append(f"{e['scene_id']}: {Path(f).name} missing")
+    return bad
+
+
+def _scene_deck(tag, *, divider=False):
+    scenes = [{"id": f"s{i}", "kind": "content", "template": "derivation",
+               "say": f"Scene {i} {tag} opening words here. {{show math.0}} "
+                      f"Then the rest of scene {i} {tag} follows."} for i in (1, 2, 3)]
+    return ([{"id": "div", "kind": "divider"}] if divider else []) + scenes
+
+
+def test_budget_abort_retry_bills_only_the_unfinished_scene():
+    """3 scenes all re-worded (and pushed down one slot by a new divider), cap 2: s1 and s2
+    finish, s3 aborts on call #3. Those two paid takes used to be promoted onto disk while the
+    manifest was only written at the very end -- so the retry could not see them and paid 3."""
+    with tempfile.TemporaryDirectory() as d, _StubAligner():
+        root, out = Path(d), Path(d) / "audio"
+        common = ["--backend", "mock", "--unit", "scene", "--skip-qa", "--output-dir", str(out)]
+        v1 = _write_deck(root / "v1.yml", _scene_deck("alpha"))
+        code, log, _ = _run_main(["--storyboard", str(v1), *common])
+        assert code == 0, log[-800:]
+        m1 = {e["scene_id"]: e for e in _manifest(out)["scenes"]}
+        v2 = _write_deck(root / "v2.yml", _scene_deck("beta gamma delta", divider=True))
+        code, log, _ = _run_main(["--storyboard", str(v2), *common, "--reuse-existing"],
+                                 backend=tts.BudgetedBackend(tts.MockTTSBackend(0.4), 2))
+        assert isinstance(code, str) and "call #3" in code, (code, log[-800:])
+        m2 = _manifest(out)
+        assert _disk_disagrees(m2) == [], _disk_disagrees(m2)
+        by_id = {e["scene_id"]: e for e in m2["scenes"]}
+        for sid in ("s1", "s2"):
+            assert by_id[sid]["scene_text_hash"] != m1[sid]["scene_text_hash"], \
+                f"{sid}'s paid take is on disk but not in the manifest"
+        assert by_id["s3"] == m1["s3"], "the interrupted scene keeps its prior entry"
+        code, log, backend = _run_main(["--storyboard", str(v2), *common, "--reuse-existing"],
+                                       backend=tts.BudgetedBackend(tts.MockTTSBackend(0.4), 10))
+        assert code == 0, log[-800:]
+        assert backend.stats["calls"] == 1, f"retry paid {backend.stats['calls']} calls, 1 was left"
+        assert _disk_disagrees(_manifest(out)) == []
+        assert sorted(p.name for p in (out / "scenes").glob("*.wav")) == \
+            ["02_s1.wav", "03_s2.wav", "04_s3.wav"], "no WAV may linger under a stale number"
+
+
+def _say(*parts):
+    return " ".join(parts)
+
+
+P5 = "Pee has five words here."                      # 5 words -> 2.0 s
+Q8 = "Queue has eight words in this one here."        # 8 words -> 3.2 s
+N10 = "En has ten words so it is longest of all."      # 10 words -> 4.0 s
+R6 = "Are has six words right here."                  # 6 words -> 2.4 s
+R7 = "Are has seven words right here now."            # 7 words -> 2.8 s
+
+
+def _beats_deck(a_say, b_say, *, divider=False):
+    scenes = [{"id": "A", "kind": "content", "template": "derivation", "say": a_say},
+              {"id": "B", "kind": "content", "template": "derivation", "say": b_say}]
+    return ([{"id": "div", "kind": "divider"}] if divider else []) + scenes
+
+
+def test_beats_abort_then_revert_binds_each_beat_to_its_own_take():
+    """A: N is written where P was and P moves to where Q was; B then aborts on the cap. The
+    manifest still said 01_a=P / 02_b=Q while the disk held N / P, so reverting the edit
+    silently bound N's voice to P's words (and P's to Q's) -- make.py's check accepted it."""
+    with tempfile.TemporaryDirectory() as d:
+        root, out = Path(d), Path(d) / "audio"
+        common = ["--backend", "mock", "--unit", "beat", "--output-dir", str(out)]
+        v1 = _write_deck(root / "v1.yml", _beats_deck(_say("{show a}", P5, "{show b}", Q8),
+                                                      _say("{show c}", R6)))
+        assert _run_main(["--storyboard", str(v1), *common])[0] == 0
+        v2 = _write_deck(root / "v2.yml", _beats_deck(_say("{show a}", N10, "{show b}", P5),
+                                                      _say("{show c}", R7)))
+        code, log, backend = _run_main(["--storyboard", str(v2), *common, "--reuse-existing"],
+                                       backend=tts.BudgetedBackend(tts.MockTTSBackend(0.4), 1))
+        assert isinstance(code, str) and "--max-billed-calls 1" in code, (code, log[-800:])
+        assert _disk_disagrees(_manifest(out)) == [], _disk_disagrees(_manifest(out))
+        code, log, backend = _run_main(["--storyboard", str(v1), *common, "--reuse-existing"],
+                                       backend=tts.BudgetedBackend(tts.MockTTSBackend(0.4), 5))
+        assert code == 0, log[-800:]
+        a = {e["scene_id"]: e for e in _manifest(out)["scenes"]}["A"]
+        _assert_takes(a, [2.0, 3.2])
+        assert backend.stats["calls"] == 1, "only Q's take was gone (Q left the deck in v2)"
+
+
+def test_no_billing_abort_after_a_moved_beats_scene_retries_free():
+    """A new divider moves A 01 -> 02 (text unchanged, reused for free) and B's text changed,
+    so --no-billing aborts at B. A's old files were already deleted and the manifest still
+    pointed at them: make.py --reuse-audio refused, and even after reverting B the free retry
+    aborted with "prior WAV is gone" although A's take was sitting at its new path."""
+    with tempfile.TemporaryDirectory() as d:
+        root, out = Path(d), Path(d) / "audio"
+        common = ["--backend", "mock", "--unit", "beat", "--output-dir", str(out)]
+        a_say, b_say = _say("{show a}", P5, "{show b}", Q8), _say("{show c}", R6)
+        v1 = _write_deck(root / "v1.yml", _beats_deck(a_say, b_say))
+        assert _run_main(["--storyboard", str(v1), *common])[0] == 0
+        v2 = _write_deck(root / "v2.yml", _beats_deck(a_say, _say("{show c}", R7), divider=True))
+        code, log, _ = _run_main(["--storyboard", str(v2), *common, "--reuse-existing", "--no-billing"],
+                                 backend=tts.BudgetedBackend(tts.MockTTSBackend(0.4), 0))
+        assert isinstance(code, str) and "--max-billed-calls 0" in code, (code, log[-800:])
+        assert _disk_disagrees(_manifest(out)) == [], _disk_disagrees(_manifest(out))
+        v3 = _write_deck(root / "v3.yml", _beats_deck(a_say, b_say, divider=True))
+        code, log, backend = _run_main(["--storyboard", str(v3), *common, "--reuse-existing",
+                                        "--no-billing"],
+                                       backend=tts.BudgetedBackend(tts.MockTTSBackend(0.4), 0))
+        assert code == 0, (code, log[-800:])
+        assert backend.stats["calls"] == 0
+        assert _disk_disagrees(_manifest(out)) == []
+        assert not (out / "beats" / "01_A").exists(), "A's stale-number directory must be gone"
+
+
+def test_budget_abort_never_pays_for_half_a_beats_scene():
+    """A beats scene whose three beats all changed, cap 2: it used to pay 2 calls and then
+    abort, and those two takes -- never recorded -- were paid for again by the retry. The
+    scene's calls are known before the first one, so it now stops before spending any."""
+    with tempfile.TemporaryDirectory() as d:
+        root, out = Path(d), Path(d) / "audio"
+        common = ["--backend", "mock", "--unit", "beat", "--output-dir", str(out)]
+        v1 = _write_deck(root / "v1.yml", [{"id": "A", "kind": "content", "template": "derivation",
+                                            "say": _say(P5, "{show a}", Q8, "{show b}", R6)}])
+        assert _run_main(["--storyboard", str(v1), *common])[0] == 0
+        v2 = _write_deck(root / "v2.yml", [{"id": "A", "kind": "content", "template": "derivation",
+                                            "say": _say(N10, "{show a}", R7, "{show b}", Q8 + " Too.")}])
+        code, log, backend = _run_main(["--storyboard", str(v2), *common, "--reuse-existing"],
+                                       backend=tts.BudgetedBackend(tts.MockTTSBackend(0.4), 2))
+        assert isinstance(code, str) and "--max-billed-calls 2" in code, (code, log[-800:])
+        assert backend.stats["calls"] == 0, f"paid {backend.stats['calls']} calls, then threw them away"
+        code, log, backend = _run_main(["--storyboard", str(v2), *common, "--reuse-existing"],
+                                       backend=tts.BudgetedBackend(tts.MockTTSBackend(0.4), 3))
+        assert code == 0 and backend.stats["calls"] == 3, (code, backend.stats)
+
+
 if __name__ == "__main__":
     test_beat_reuse_swap_keeps_both_takes()
     test_beat_reuse_prepend_keeps_every_take_and_bills_once()
@@ -244,4 +427,8 @@ if __name__ == "__main__":
     test_missing_stable_ts_is_flagged_by_dry_run()
     test_beat_unit_needs_no_aligner()
     test_ladder_history_records_the_root_cause()
+    test_budget_abort_retry_bills_only_the_unfinished_scene()
+    test_beats_abort_then_revert_binds_each_beat_to_its_own_take()
+    test_no_billing_abort_after_a_moved_beats_scene_retries_free()
+    test_budget_abort_never_pays_for_half_a_beats_scene()
     print("OK tts paid-audio self-test (code review 2026-09-23 batch T)")

@@ -84,8 +84,11 @@ DECK: <填，如 ch01_precise_limit>      SECTION: <填，如 §1.6>
   `tts.py --backend mimo --reuse-existing --scene <ids> --no-billing`——補上 `--reuse-existing` 後
   同一個 deck 實測 `backend_calls: 0`。
 - **`--no-billing` / `--max-billed-calls N`（2026-09-12 新增）＝把「這次應該不花錢」變成保證而非預期。**
-  上限涵蓋整個 run（含 beats 終端）；超過的那一次呼叫直接中止。因為 WAV 要等該場閘全過才 promote，
-  中止時 manifest 與既有音檔原封不動，可以安全重試。
+  上限涵蓋整個 run（含 beats 終端）；超過的那一次呼叫在打出去之前中止（beats 模式的場在第一次呼叫前
+  就先核對整場要幾次，放不下就整場不開工，不會付了一半再丟掉）。**中止後的保證（2026-09-23 程式碼審查
+  A-02 訂正；原寫「manifest 與既有音檔原封不動」，reuse 會搬檔之後就不成立）：** `tts.py` 每做完一場就把
+  該場寫進 manifest，所以中止前已完成的場都已記錄、重試時零成本重用；被中斷的那一場什麼都沒 promote，
+  它的舊音檔仍在 manifest 記錄的路徑上（搬走的來源要等 manifest 記下新位置後才刪）。修好原因、原指令重跑即可。
 - **ASR QA 探針對「逐字母唸讀」會誤報。** `sector_inequality` 把點唸成 `O A B`／`O A C`，ASR 轉成
   `OAB`／`OAC`（另有 `disc`→`disk`、`one`→`1`），`qa_diff` 讀成 3-token replace ⇒ verdict `fail` ⇒
   整場被判 fail 而去重合成。該場需要 `--skip-qa`（manifest 會誠實記成 `qa.status=skipped,

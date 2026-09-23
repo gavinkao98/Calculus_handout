@@ -149,8 +149,15 @@ class BudgetedBackend:
     was empty and `scene_reuse_ok` was never even consulted; one scene then demoted to the
     beats terminal, which `--fallback-budget` does not bound (it bounds ladder rungs 2-3
     only). A cap bounds the WHOLE run, terminal included: the call that would exceed it
-    aborts, and since a scene's WAV is only promoted after its gates pass, an abort leaves
-    the prior manifest and audio untouched, so the run can be fixed and retried.
+    aborts -- a beats-mode scene, whose calls are all known up front, aborts before its
+    first one (``reserve``) instead of paying for some beats and discarding them.
+
+    What an abort leaves behind (code review 2026-09-23, A-02; this used to say "untouched",
+    which stopped being true once reuse started moving WAVs): every scene that FINISHED is
+    already in the manifest -- main() writes it after each scene -- so the retry reuses those
+    for free; the interrupted scene promoted nothing and its prior audio is still at the paths
+    the manifest records (a moved-away source is only deleted once the manifest records where
+    its audio lives now). Fix the cause and re-run the same command.
     """
 
     def __init__(self, inner, limit: int) -> None:
@@ -160,17 +167,26 @@ class BudgetedBackend:
         self.name = inner.name
         self.stats = inner.stats
 
+    def _abort(self) -> SystemExit:
+        return SystemExit(
+            f"[tts] --max-billed-calls {self._limit}: this run needed synthesis call "
+            f"#{self._limit + 1} and stopped before making it. Either the existing "
+            f"audio could not be reused / re-aligned against the current beat "
+            f"boundaries (typically a {{show ...}} marker that now splits a beat "
+            f"mid-phrase -- move it to a boundary the aligner can place), or the cap "
+            f"is simply lower than this run needs. Scenes finished before this one are "
+            f"already recorded in the manifest (a retry reuses them for free); this scene "
+            f"promoted nothing, so its prior audio is where the manifest says."
+        )
+
+    def reserve(self, calls: int) -> None:
+        """Abort now, before any of them is made, if `calls` more calls would exceed the cap."""
+        if self._spent + calls > self._limit:
+            raise self._abort()
+
     def synthesize(self, request: "TTSRequest") -> "TTSResult":
         if self._spent >= self._limit:
-            raise SystemExit(
-                f"[tts] --max-billed-calls {self._limit}: this run needed synthesis call "
-                f"#{self._spent + 1} and stopped before making it. Either the existing "
-                f"audio could not be reused / re-aligned against the current beat "
-                f"boundaries (typically a {{show ...}} marker that now splits a beat "
-                f"mid-phrase -- move it to a boundary the aligner can place), or the cap "
-                f"is simply lower than this run needs. Nothing was promoted, so the prior "
-                f"manifest and WAVs are untouched."
-            )
+            raise self._abort()
         self._spent += 1
         return self._inner.synthesize(request)
 
@@ -337,7 +353,8 @@ def parse_args() -> argparse.Namespace:
                         help="hard cap on synthesis calls for the WHOLE run, beats "
                              "terminal included (--fallback-budget bounds only ladder "
                              "rungs 2-3). The call that would exceed it aborts before it "
-                             "is made; nothing is promoted, so prior audio is untouched")
+                             "is made; scenes finished by then are already in the manifest "
+                             "(the retry reuses them), the interrupted one promoted nothing")
     parser.add_argument("--fallback-budget", type=int, default=2,
                         help="max extra BILLED retries per scene across ladder rungs 2-3 "
                              "(design §7; the consent quote pre-approves this)")
@@ -666,6 +683,7 @@ def build_scene_reuse_index(manifest: dict[str, Any] | None) -> dict[str, dict[s
 
 def adopt_prior_scene_artifacts(
     prior: dict[str, Any] | None, *, scene_wav: Path, words_file: Path, aligned_file: Path,
+    retired: list[Path] | None = None,
 ) -> tuple[dict[str, Any] | None, str | None]:
     """Move a prior scene_aligned scene's artifacts onto TODAY's scene number.
     Returns (prior with its recorded paths rewritten, the WAV's old path or None).
@@ -681,9 +699,12 @@ def adopt_prior_scene_artifacts(
     re-synthesized to a temp and promoted onto scene_wav only after gates pass, so the
     moved file is never lost before a good replacement exists -- and moving it means no
     orphan WAV is left behind under the stale number. Same copy -> verify size -> delete ->
-    prune rule as the beat path. Paths that are not non-empty strings are skipped (the
-    manifest's own output, but an alignment block is not type-validated by
-    read_manifest_status, so this stays defensive)."""
+    prune rule as the beat path, except that with a ``retired`` list (main() passes one) the
+    old copies are only recorded there and deleted after the manifest records the new paths:
+    this runs BEFORE the billing decision, and an abort in between used to leave the prior
+    manifest pointing at files that were gone (code review 2026-09-23, A-02). Paths that are
+    not non-empty strings are skipped (the manifest's own output, but an alignment block is
+    not type-validated by read_manifest_status, so this stays defensive)."""
     if not prior:
         return prior, None
     updated, moved_from = dict(prior), None
@@ -692,7 +713,7 @@ def adopt_prior_scene_artifacts(
         src = prior.get(key)
         if not isinstance(src, str) or not src:
             continue
-        if _relocate(Path(src), dst) and key == "audio_file":
+        if _relocate(Path(src), dst, retired) and key == "audio_file":
             moved_from = src
         updated[key] = str(dst)
     return updated, moved_from
@@ -834,9 +855,12 @@ def synthesize_scene(
     args: argparse.Namespace,
     reuse_index: dict[BeatReuseKey, dict[str, Any]],
     scene_reuse_index: dict[str, dict[str, Any]] | None = None,
+    retired: list[Path] | None = None,
 ) -> dict[str, Any]:
     """Dispatch a content scene to the beat- or scene-level synthesis path (--unit).
-    Non-content scenes stay silent. The beat path ignores scene_reuse_index."""
+    Non-content scenes stay silent. The beat path ignores scene_reuse_index. Prior artifacts
+    this scene moved away from are appended to `retired` for the caller to delete once its
+    manifest records the new paths (None: delete them as soon as the scene is done)."""
     scene_id = scene["id"]
     kind = scene.get("kind", "content")
     if kind != "content":
@@ -850,11 +874,11 @@ def synthesize_scene(
     if unit == "beat":
         return _synthesize_scene_beats(
             backend=backend, meta=meta, scene=scene, scene_number=scene_number,
-            output_dir=output_dir, args=args, reuse_index=reuse_index)
+            output_dir=output_dir, args=args, reuse_index=reuse_index, retired=retired)
     return _synthesize_scene_aligned(
         backend=backend, meta=meta, scene=scene, scene_number=scene_number,
         output_dir=output_dir, args=args, reuse_index=reuse_index,
-        scene_reuse_index=scene_reuse_index or {})
+        scene_reuse_index=scene_reuse_index or {}, retired=retired)
 
 
 def _synthesize_scene_beats(
@@ -866,6 +890,7 @@ def _synthesize_scene_beats(
     output_dir: Path,
     args: argparse.Namespace,
     reuse_index: dict[BeatReuseKey, dict[str, Any]],
+    retired: list[Path] | None = None,
 ) -> dict[str, Any]:
     from pipeline import atomicio
     voice = args.voice or default_voice_for_model(meta)
@@ -893,8 +918,9 @@ def _synthesize_scene_beats(
     # (2) put every take -- a copy of the reused WAV, or a fresh synthesis -- into staging;
     # (3) only then promote staging onto the final paths, and retire the moved-away sources
     # that no final path covers. Every prior take keeps at least one copy at every instant.
-    todo: list[tuple[dict[str, Any], Path, str, TTSRequest, BeatReuseKey, Path]] = []
+    todo: list[tuple[dict[str, Any], Path, str, TTSRequest, BeatReuseKey, bool, Path]] = []
     seen_hashes: dict[str, int] = {}
+    billable = 0
     for beat in beats:
         beat_path = beat_dir / f"{beat['index']:02d}_{safe_stem(beat['reveal'] or beat['id'])}.wav"
         beat_hash = text_hash(beat["text"])
@@ -904,26 +930,34 @@ def _synthesize_scene_beats(
         key = (scene_id, beat_hash, occurrence)
         src = None
         if args.reuse_existing:   # (1) a peek; synthesize_beat consumes the entry in (2)
-            src, _ = reusable_existing_beat(request, backend_name=backend.name,
-                                            reuse_index=reuse_index, key=key)
+            src, reason = reusable_existing_beat(request, backend_name=backend.name,
+                                                 reuse_index=reuse_index, key=key)
+            if src is None:
+                print(f"[tts] not reusing {beat_path.name}: {reason}; synthesizing", flush=True)
         in_place = src is not None and src.resolve() == beat_path.resolve()
-        todo.append((beat, beat_path, beat_hash, request, key,
+        todo.append((beat, beat_path, beat_hash, request, key, src is not None,
                      beat_path if in_place else staging / beat_path.name))
+        billable += src is None and bool(beat["text"])
+    # A cap (--max-billed-calls) that cannot cover this scene stops it BEFORE its first call:
+    # the takes of a half-synthesized scene are never recorded, so the retry would pay again.
+    reserve = getattr(backend, "reserve", None)
+    if reserve is not None:
+        reserve(billable)
 
     synths: list[SynthesizedBeat] = []
     moved: list[Path] = []
     try:
-        for beat, beat_path, beat_hash, request, key, target in todo:     # (2)
+        for beat, beat_path, beat_hash, request, key, hit, target in todo:     # (2)
             synths.append(synthesize_beat(
                 backend, request, target,
-                reuse_existing=args.reuse_existing,
+                reuse_existing=hit,
                 empty_seconds=args.empty_beat_seconds,
                 backend_name=backend.name,
                 reuse_index=reuse_index,
                 reuse_key=key,
                 retired=moved,      # a staged copy never deletes its source
             ))
-        for beat, beat_path, beat_hash, request, key, target in todo:     # (3)
+        for beat, beat_path, *_, target in todo:     # (3)
             if target != beat_path:
                 atomicio.promote(target, beat_path)
     finally:
@@ -931,7 +965,7 @@ def _synthesize_scene_beats(
             leftover.unlink(missing_ok=True)
         _prune_empty_dir(staging)
     finals = {beat_path.resolve() for _, beat_path, *_ in todo}
-    _retire([src for src in moved if src.resolve() not in finals], None)
+    _retire([src for src in moved if src.resolve() not in finals], retired)
 
     for (beat, beat_path, beat_hash, *_), synth in zip(todo, synths):
         duration = synth.duration
@@ -1111,7 +1145,8 @@ def _cleanup_chunk_temps(chunk_dir: Path, concat_tmp: Path) -> None:
             pass
 
 
-def _build_fallback_rungs(backend, meta, scene, scene_number, output_dir, args, plan, reuse_index):
+def _build_fallback_rungs(backend, meta, scene, scene_number, output_dir, args, plan, reuse_index,
+                          retired=None):
     """Design §7 ladder rungs for one failed scene: arbiter (free small.en re-align) ->
     resynth (1 billed call) -> chunk (sentence-chunk resynth+merge) -> beats (budget-exempt
     terminal -- still bills once per non-empty beat under MiMo, NOT free).
@@ -1202,7 +1237,8 @@ def _build_fallback_rungs(backend, meta, scene, scene_number, output_dir, args, 
 
     def beats(ctx):
         entry = _synthesize_scene_beats(backend=backend, meta=meta, scene=scene,
-            scene_number=scene_number, output_dir=output_dir, args=args, reuse_index=reuse_index)
+            scene_number=scene_number, output_dir=output_dir, args=args, reuse_index=reuse_index,
+            retired=retired)
         return {"status": "pass", "entry": entry, "reason": "beat-level fallback (terminal)"}
 
     return [("arbiter", False, arbiter), ("resynth", True, resynth),
@@ -1210,7 +1246,7 @@ def _build_fallback_rungs(backend, meta, scene, scene_number, output_dir, args, 
 
 
 def _synthesize_scene_aligned(*, backend, meta, scene, scene_number, output_dir, args,
-                              reuse_index, scene_reuse_index):
+                              reuse_index, scene_reuse_index, retired=None):
     """Scene-level path (design §3 storage + verify-before-overwrite + §7 ladder). The
     WAV is synthesized to a temp path and promoted onto the canonical path ONLY after
     gates pass, so a prior good WAV is never clobbered by a bad re-synth."""
@@ -1229,7 +1265,7 @@ def _synthesize_scene_aligned(*, backend, meta, scene, scene_number, output_dir,
     # empty path and re-bill a scene whose words never changed.
     prior_scene, moved_from = adopt_prior_scene_artifacts(
         scene_reuse_index.get(scene_id), scene_wav=scene_wav,
-        words_file=words_file, aligned_file=aligned_file)
+        words_file=words_file, aligned_file=aligned_file, retired=retired)
 
     # (§3) reuse: if the existing WAV is fresh, skip TTS and just re-map+re-validate (free).
     if scene_reuse_ok(prior_scene, plan, scene_wav,
@@ -1256,7 +1292,8 @@ def _synthesize_scene_aligned(*, backend, meta, scene, scene_number, output_dir,
     # THIS audio with small.en (rung 1 does not re-synthesize). scene_wav stays untouched.
     budget = FB.RetryBudget(max_billed=getattr(args, "fallback_budget", 2))
     ctx = {"plan": plan, "primary_wav": tmp_wav, "scene_wav": scene_wav, "budget": budget}
-    rungs = _build_fallback_rungs(backend, meta, scene, scene_number, output_dir, args, plan, reuse_index)
+    rungs = _build_fallback_rungs(backend, meta, scene, scene_number, output_dir, args, plan,
+                                  reuse_index, retired)
     result = FB.run_ladder(scene_id=scene_id, rungs=rungs, budget=budget, ctx=ctx)
     tmp_wav.unlink(missing_ok=True)   # clean the primary temp after the ladder settles
     return result["entry"]
@@ -1265,6 +1302,18 @@ def _synthesize_scene_aligned(*, backend, meta, scene, scene_number, output_dir,
 def write_manifest(path: Path, manifest: dict[str, Any]) -> None:
     from pipeline.atomicio import atomic_write_json
     atomic_write_json(path, manifest)
+
+
+def _receipt(backend: TTSBackend, entries: list[dict[str, Any]]) -> dict[str, Any]:
+    """This run's billing receipt over the scene entries it has produced so far."""
+    stats = getattr(backend, "stats", {})
+    return {
+        "backend_calls": stats.get("calls", 0),
+        "backend_retries": stats.get("retries", 0),
+        "modes": {m: sum(1 for e in entries if e.get("narration_mode") == m)
+                  for m in ("scene_aligned", "beats", "silent")},
+        "fallback_scenes": [e["scene_id"] for e in entries if e.get("fallback_history")],
+    }
 
 
 def _scene_aligner_missing() -> str | None:
@@ -1437,6 +1486,16 @@ def main() -> int:
         f"with backend={backend.name}, model={args.model}, voice={voice}",
         flush=True,
     )
+    # Checkpoint after EVERY scene (code review 2026-09-23, A-02): the manifest used to be
+    # written once, at the very end, while each scene promoted its WAVs as soon as it passed.
+    # An abort (--max-billed-calls, a network error) then left finished, PAID scenes on disk
+    # but not in the manifest, and the retry re-billed them. Each checkpoint is the prior
+    # manifest with this run's finished scenes merged over it (scenes not reached yet keep
+    # their prior entries -- and their prior paths: renumbering waits for the final write,
+    # because the reuse indexes still point there); an identity change (only possible with
+    # --scene all) has no prior worth keeping. Sources a scene moved away from are deleted
+    # only after the checkpoint that records where their audio lives now.
+    retired: list[Path] = []
     for scene in scenes:
         print(f"[tts] {scene['id']} ...", flush=True)
         manifest["scenes"].append(
@@ -1449,19 +1508,19 @@ def main() -> int:
                 args=args,
                 reuse_index=reuse_index,
                 scene_reuse_index=scene_reuse_index,
+                retired=retired,
             )
         )
+        manifest["receipt"] = _receipt(backend, manifest["scenes"])
+        write_manifest(manifest_path, manifest if identity_diff else
+                       merged_manifest(existing, manifest, [s["id"] for s in all_scenes]))
+        _retire(retired, None)
+        retired.clear()
 
     # Billing receipt for THIS run (added to the fresh manifest BEFORE any merge, so
     # merged_manifest's fresh-top-level-wins keeps this run's numbers). beat mode:
     # backend_calls == non-empty beats (empty beats never reach the backend).
-    manifest["receipt"] = {
-        "backend_calls": getattr(backend, "stats", {}).get("calls", 0),
-        "backend_retries": getattr(backend, "stats", {}).get("retries", 0),
-        "modes": {m: sum(1 for e in manifest["scenes"] if e.get("narration_mode") == m)
-                  for m in ("scene_aligned", "beats", "silent")},
-        "fallback_scenes": [e["scene_id"] for e in manifest["scenes"] if e.get("fallback_history")],
-    }
+    manifest["receipt"] = _receipt(backend, manifest["scenes"])
     print(f"[tts] receipt: {json.dumps(manifest['receipt'], ensure_ascii=False)}", flush=True)
 
     if args.scene != "all":
