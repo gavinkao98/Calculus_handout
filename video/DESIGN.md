@@ -1061,7 +1061,11 @@ hook 佔 11.5 秒拍的前 ~5 秒）實測速度列到拍中才暗。`indicate` 
 `say` 沒揭示過的 id 與重複的 `at`；`sizecheck` 擋 `dim` 裡不存在的 block id。**`dim`／`indicate`
 也不可指到本場「較晚的 beat 才 `{show}` 出來」的 block（C-08）**——fade／`Indicate` 不是
 引入動畫，manim 一律照樣把它加進畫面，於是提早壓暗或閃爍等於把該 block 提前顯示；
-`schema._focus_issues` 對此報 error。
+`schema._focus_issues` 對此報 error。**例外：本場 `carry` 中 `to: {corner, scale}` 的 `as`
+block**（RG2-01）——它開場就在上一場留下的位置（`pre_play` restore 後由 `scene._stage` 加進
+畫面），它的 `{show}` 是飛去角落而非進場，所以飛行前壓暗或閃爍都合法；壓暗的話要在飛行那拍
+（或更早）把它移出壓暗集合（例如 `dim: []`），否則場末 sweep-up 的 `restore()` 會把它拉回壓暗前的原位（此點
+schema 不擋）。
 **壓暗集合真的改變的那一拍，`_play_content` 也會把 `focus.apply` 的 FADE_SECONDS 存進
 `scene.beat_reserved_seconds`（比照下面 `indicate` 的做法，用 `apply` 同一套 by_id 過濾判斷
 「有沒有變」），讓填滿整拍的 reveal 自己少要求 0.4 s 的預算（2026-09-13 六輪，dim 對稱擴充
@@ -1073,7 +1077,8 @@ indicate-budget）。**已知限制：這個預算只覆蓋「同一拍宣告、
 淡出以「淡出前剩下的場尾時間」為上限（至少 1 影格），hold 再吃掉淡出之後剩下的餘裕，所以
 上述 sweep-up 還原與 `exit` 淡出不會再讓整場超時——除非兩者合計超過 SCENE_TAIL_SECONDS 本身
 （06 `evenness` 拍舊版地板疊加在淡出之上時實測超時 0.189 s，已還原成 hook 自己壓暗＋還原；
-`_tail` 改法後同一情境不再超時，storyboard `focus:`／hook `_evenness_anim` 皆未再變動）。
+依 `_tail` 現行算術，同一情境的場末 restore 0.4 s＋`exit` 淡出 0.5 s＋剩餘 hold 0.1 s 恰好落在
+1.0 s 場尾內；未重新 render 驗證，storyboard `focus:`／hook `_evenness_anim` 皆未再變動）。
 
 **`color_role`（derivation 的 `steps[i]` / `result`）——跨場延續。** 圖已經用顏色替各部分
 命名了（`graph` 的 plot 一直有 `color_role`），推導列寫同一個 role，讀者就看得出這一行講的
