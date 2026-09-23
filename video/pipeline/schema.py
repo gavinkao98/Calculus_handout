@@ -22,22 +22,21 @@ Run standalone:
 """
 from __future__ import annotations
 
-import re
 import sys
 from pathlib import Path
 
 SCENE_KINDS = ("intro", "content", "outro", "divider")
 
 # A reveal marker: {show <target>} embedded in a content scene's `say`. The target
-# is dotted (e.g. math.0, step.2, plot.0, takeaway). `_SHOW_OPEN` finds every
-# opener so an unclosed `{show` (missing `}`) can be caught.
-_SHOW = re.compile(r"\{show\b([^}]*)\}")
-_SHOW_OPEN = re.compile(r"\{show\b")
+# is dotted (e.g. math.0, step.2, plot.0, takeaway). The grammar is narration.py's -- the
+# one the player splits beats with -- and is not re-derived here: a second regex used to
+# warn on a bare `{show}` the player never reads, and miss a `{ show x}` it does (B-04).
 
 
 def reveal_targets(say: str) -> list[str]:
-    """Every {show <target>} target in order (stripped); empty string for {show}."""
-    return [m.group(1).strip().replace("[", ".").replace("]", "") for m in _SHOW.finditer(say)]
+    """Every {show <target>} target in order, exactly as the player reads them."""
+    from pipeline.narration import list_reveal_targets
+    return list_reveal_targets(say)
 
 
 def _focus_issues(sid: str, scene: dict, say) -> "list[tuple[str, str]]":
@@ -570,11 +569,12 @@ def schema_storyboard(data) -> "list[tuple[str, str]]":
             if not isinstance(say, str) or not say.strip():
                 issues.append(("error", f"{sid}: content scene needs a non-empty 'say'"))
             else:
-                if len(_SHOW_OPEN.findall(say)) != len(_SHOW.findall(say)):
-                    issues.append(("error", f"{sid}: malformed {{show}} marker (unclosed '}}')"))
-                for t in reveal_targets(say):
-                    if not t:
-                        issues.append(("warn", f"{sid}: empty {{show}} target (reveals nothing)"))
+                from pipeline.narration import malformed_show_markers
+                for bad in malformed_show_markers(say):
+                    issues.append(("error", f"{sid}: malformed {{show}} marker {bad!r} -- "
+                                            f"narration.parse_say does not read it, so it cuts "
+                                            f"no beat and TTS would speak it; write "
+                                            f"{{show <block id>}}"))
             issues += _pause_issues(sid, scene, scene.get("say"))
             issues += _focus_issues(sid, scene, scene.get("say"))
             issues += _paced_issues(sid, scene, scene.get("say"))
@@ -756,7 +756,7 @@ def main(argv: "list[str] | None" = None) -> int:
     if args.list and not errors:
         print(f"[schema] {args.storyboard.name}: reveal targets per content scene")
         for sid, targets in enumerate_reveals(data):
-            shown = ", ".join(t or "(empty)" for t in targets) or "(none -- all at scene start)"
+            shown = ", ".join(targets) or "(none -- all at scene start)"
             print(f"  {sid}: {shown}")
 
     return 1 if errors else 0

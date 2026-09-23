@@ -1023,7 +1023,7 @@ def _check_scenes_locked(meta: dict, scenes: list[dict], deck: "list[dict] | Non
     """check_scenes' body; separated only so the lock wraps it (see check_scenes)."""
     from pipeline.templates import build_blocks
     from pipeline.visuals import theme as T
-    from pipeline.schema import reveal_targets
+    from pipeline.narration import list_reveal_targets
 
     muted_hex = str(T.color("dark", "muted")).lower()
     scenes_by_id = {s["id"]: s for s in (scenes if deck is None else deck)
@@ -1045,10 +1045,12 @@ def _check_scenes_locked(meta: dict, scenes: list[dict], deck: "list[dict] | Non
         # -- error (F9): a {show <target>} naming no built block. schema.py checks
         # {show} SYNTAX only (target existence is explicitly out of its scope); here
         # the blocks are built, so a typo'd target -- silently skipped by the player,
-        # then back-filled at scene end (wrong timing, no crash) -- is caught. --
+        # then back-filled at scene end (wrong timing, no crash) -- is caught. The targets are
+        # the player's own (narration.list_reveal_targets); a `{show`-looking run the player
+        # does not read (a bare `{show}` included) is a schema.py error, not a beat split. --
         ids = {str(b.id) for b in blocks}
-        for t in reveal_targets(scene.get("say", "")):
-            if t and t not in ids:   # bare {show} is a pure beat split -- skip
+        for t in list_reveal_targets(scene.get("say", "")):
+            if t not in ids:
                 issues.append(("error", f"{scene.get('id')}: {{show {t}}} has no matching "
                                         f"block (built ids: {sorted(ids)})"))
 

@@ -27,6 +27,7 @@ from pathlib import Path
 sys.path.insert(0, str(Path(__file__).resolve().parents[1]))
 from pipeline import _bootstrap  # noqa: E402
 from pipeline.derived_check import stamp_for  # noqa: E402
+from pipeline.narration import list_reveal_targets  # noqa: E402
 
 _bootstrap.bootstrap()
 import yaml  # noqa: E402
@@ -81,7 +82,9 @@ def load(path: Path) -> dict:
 
 
 def show_markers(say: str) -> list[str]:
-    return _SHOW.findall(say or "")
+    """The {show} targets as the player splits beats on them -- narration's grammar, not a
+    third regex (B-04): `{ show x}` counts, a bare `{show}` (schema errors on it) does not."""
+    return list_reveal_targets(say or "")
 
 
 def check(canon: dict, spoken: dict) -> list[str]:
