@@ -158,6 +158,20 @@ def _ffprobe_duration(video: Path) -> float | None:
         return None
 
 
+def _ffprobe_fps(video: Path) -> float | None:
+    """The video stream's frame rate (`r_frame_rate`, e.g. "30/1"), or None."""
+    try:
+        out = subprocess.run(
+            ["ffprobe", "-v", "error", "-select_streams", "v:0", "-show_entries",
+             "stream=r_frame_rate", "-of", "default=noprint_wrappers=1:nokey=1", str(video)],
+            capture_output=True, text=True,
+        )
+        num, _, den = out.stdout.strip().partition("/")
+        return float(num) / float(den or 1) if out.returncode == 0 else None
+    except Exception:  # noqa: BLE001
+        return None
+
+
 def _fullest_frame_ts(video: Path) -> "tuple[float, float | None] | None":
     """(ts_seconds, ink_ratio_vs_last) of the frame with the most "ink" in the whole
     scene video, or None if it can't be decoded (caller falls back to the old
@@ -255,8 +269,7 @@ def plan_frames(storyboard: dict, manifest: dict, selector: str, per: str = "sce
             if per == "scene":
                 item = {**common, "beat_index": 0, "final": True,
                         # sentinel: extract_frames() resolves this to the fullest-ink ts
-                        # (or, under --dry-run / a missing mp4, clamps it to duration -
-                        # 0.05 -- the last held frame, the old behaviour).
+                        # (or, if that decode fails, clamps it to the last frame).
                         "ts": 1e9,
                         "fullest_ts": None, "ink_ratio_vs_last": None,
                         "narration": entry.get("script", ""), "reveal": None,
@@ -292,18 +305,17 @@ def reset_frames_dir(out_dir: Path) -> None:
         shutil.rmtree(frames_dir)
 
 
-def extract_frames(deck_id: str, plan: list[dict], out_dir: Path, *,
-                   compute_fullest: bool = True) -> list[dict]:
+def extract_frames(deck_id: str, plan: list[dict], out_dir: Path) -> list[dict]:
     """ffmpeg-grab one PNG per planned frame. Offline, free. Returns the plan
     with `frame_path` filled (or None on miss).
 
-    compute_fullest: for a `final` (per=="scene") item, decode the whole scene
-    video once to find the fullest-ink frame (see `_fullest_frame_ts`) before
-    grabbing it -- this is the one part of extraction that is NOT cheap (it reads
-    every frame, not just one), so --dry-run passes False to stay free and to keep
-    working with no mp4 rendered yet; the item's `ts` sentinel then falls through
-    to the existing duration-0.05 clamp below (the old end-of-scene behaviour)."""
-    durations: dict[str, float | None] = {}
+    A `final` (per=="scene") item first decodes the whole scene video once to find
+    the fullest-ink frame (see `_fullest_frame_ts`). That is local work and no API
+    call, so `--dry-run` -- gate 1's documented invocation -- does it too: skipping it
+    there handed gate 1 the cleared end frame of every `exit:` scene (code review
+    2026-09-23, C-01). If the decode fails, the item's `ts` sentinel falls through to
+    the end-of-scene clamp below."""
+    probes: dict[str, tuple[float | None, float | None]] = {}
     for item in plan:
         sid = item["scene_id"]
         video = find_scene_video(deck_id, sid)
@@ -311,15 +323,18 @@ def extract_frames(deck_id: str, plan: list[dict], out_dir: Path, *,
             print(f"[critic] no rendered mp4 for scene '{sid}' -- skipping", flush=True)
             item["frame_path"] = None
             continue
-        if sid not in durations:
-            durations[sid] = _ffprobe_duration(video)
-        dur = durations[sid]
-        if item.get("final") and compute_fullest:
+        if sid not in probes:
+            probes[sid] = (_ffprobe_duration(video), _ffprobe_fps(video))
+        dur, fps = probes[sid]
+        # the last frame starts one frame interval before the end: aim half a frame
+        # before it, so `-ss` lands on it at any fps (`dur - 0.05` fell past it < 20 fps)
+        end = None if dur is None or not fps else dur - 1.5 / fps
+        if item.get("final"):
             found = _fullest_frame_ts(video)
             if found is not None:
                 item["ts"], item["ink_ratio_vs_last"] = found
                 item["fullest_ts"] = item["ts"]
-        ts = item["ts"] if dur is None else min(item["ts"], dur - 0.05)
+        ts = item["ts"] if end is None else min(item["ts"], end)
         frame_dir = out_dir / "frames" / f"{item['scene_number']:02d}_{sid}"
         frame_dir.mkdir(parents=True, exist_ok=True)
         name = "final.png" if item.get("final") else f"beat_{item['beat_index']:02d}.png"
@@ -625,7 +640,10 @@ def dry_run(plan: list[dict], rubric: str) -> None:
     for p in plan:
         tag = p.get("frame_path") or "(no frame)"
         lab = "final" if p.get("final") else f"beat {p['beat_index']:02d}"
-        ts = "end" if p.get("final") else f"{p['ts']:.2f}s"
+        if p.get("final"):
+            ts = "end" if p.get("fullest_ts") is None else f"{p['fullest_ts']:.2f}s (fullest)"
+        else:
+            ts = f"{p['ts']:.2f}s"
         print(f"  {p['scene_number']:02d} {p['scene_id']} {lab} @ {ts} -> {tag}", flush=True)
     if have:
         print("\n  --- example prompt (first extracted frame) ---", flush=True)
@@ -687,7 +705,7 @@ def main() -> int:
     print(f"[critic] output dir: {out_dir}", flush=True)
     rubric = load_rubric()
     reset_frames_dir(out_dir)
-    plan = extract_frames(deck_id, plan, out_dir, compute_fullest=not args.dry_run)
+    plan = extract_frames(deck_id, plan, out_dir)
     (out_dir / "frame_plan.json").write_text(
         json.dumps(plan, indent=2, ensure_ascii=False) + "\n", encoding="utf-8")
 
@@ -700,13 +718,21 @@ def main() -> int:
         res = run_critique(plan, base_url=args.base_url, api_key=api_key,
                            model=args.model, out_dir=out_dir, rubric=rubric,
                            smoke=args.smoke)
-        return 0 if res else 1
-    if args.dry_run:
+        if not res:
+            return 1
+    elif args.dry_run:
         dry_run(plan, rubric)
     else:
         print("[critic] frames extracted. Re-run with --dry-run for the send plan + "
               "estimate, or --confirm to run the billed critique (env MIMO_API_KEY).",
               flush=True)
+    # a gate that audits fewer frames than it planned must not pass as if it had audited them
+    missed = [p for p in plan if not p.get("frame_path")]
+    if missed:
+        print(f"[critic] {len(missed)}/{len(plan)} planned frame(s) not extracted: "
+              + ", ".join(f"{p['scene_id']} beat {p['beat_index']:02d}" for p in missed)
+              + " -- exit 1", flush=True)
+        return 1
     return 0
 
 
