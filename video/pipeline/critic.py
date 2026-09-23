@@ -550,6 +550,9 @@ def _write_md(results: list[dict], path: Path) -> None:
         lab = "final frame" if r.get("final") else f"beat {r['beat_index']:02d}"
         out.append(f"## {r['scene_number']:02d} {r['scene_id']} -- {lab}")
         out.append(f"*{r['title']}*  \n`{r['frame_path']}`\n")
+        if r.get("error"):           # the call itself failed: say why, not "bad JSON"
+            out.append(f"> call failed, no critique: {r['error']}\n")
+            continue
         c = r.get("critique")
         if not c:
             out.append("> could not parse JSON; raw model output:\n")
@@ -734,6 +737,10 @@ def main() -> int:
                            model=args.model, out_dir=out_dir, rubric=rubric,
                            smoke=args.smoke)
         if not res:
+            return 1
+        failed = [r for r in res if r.get("error")]
+        if failed:           # recorded and skipped so the batch goes on -- not a pass
+            print(f"[critic] {len(failed)}/{len(res)} VLM call(s) failed -- exit 1", flush=True)
             return 1
     elif args.dry_run:
         dry_run(plan, rubric)
