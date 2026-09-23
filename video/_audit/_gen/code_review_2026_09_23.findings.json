@@ -1,0 +1,1605 @@
+[
+ {
+  "slice": "A 音訊／TTS／時序",
+  "files_reviewed": [
+   {
+    "path": "video/pipeline/tts.py",
+    "depth": "full"
+   },
+   {
+    "path": "video/pipeline/audio.py",
+    "depth": "full"
+   },
+   {
+    "path": "video/pipeline/timing.py",
+    "depth": "full"
+   },
+   {
+    "path": "video/pipeline/pauses.py",
+    "depth": "full"
+   },
+   {
+    "path": "video/pipeline/pacing.py",
+    "depth": "full"
+   },
+   {
+    "path": "video/pipeline/scene_align.py",
+    "depth": "full"
+   },
+   {
+    "path": "video/pipeline/_regression_scene_align.py",
+    "depth": "full"
+   },
+   {
+    "path": "video/pipeline/house_audio.py",
+    "depth": "full"
+   },
+   {
+    "path": "video/pipeline/assets/audio/house/generate_house_cues.py",
+    "depth": "full"
+   },
+   {
+    "path": "video/pipeline/loudness_ab.py",
+    "depth": "full"
+   },
+   {
+    "path": "video/pipeline/mimo_preview.py",
+    "depth": "full"
+   },
+   {
+    "path": "video/pipeline/listening_pack.py",
+    "depth": "full"
+   },
+   {
+    "path": "video/pipeline/captions.py",
+    "depth": "full"
+   },
+   {
+    "path": "video/pipeline/narration.py",
+    "depth": "full"
+   },
+   {
+    "path": "video/pipeline/derive_spoken.py",
+    "depth": "full"
+   },
+   {
+    "path": "video/pipeline/floorprobe.py",
+    "depth": "full"
+   },
+   {
+    "path": "video/make.py",
+    "depth": "skim"
+   },
+   {
+    "path": "video/pipeline/schema.py",
+    "depth": "skim"
+   },
+   {
+    "path": "video/pipeline/scene_fallback.py",
+    "depth": "skim"
+   },
+   {
+    "path": "video/pipeline/atomicio.py",
+    "depth": "skim"
+   },
+   {
+    "path": "video/pipeline/_selftest_tts_unit.py",
+    "depth": "skim"
+   }
+  ],
+  "health_summary": "純函式層（audio／timing／pauses／captions／narration／scene_align 的 map/gate）邏輯乾淨，相關 selftest 全綠，秒／毫秒／frame 的單位和四捨五入都沒找到錯。問題集中在 tts.py 的「重用與中止」路徑，全部都會多計費或弄丟已付費的音檔：2026-09-13 改成內容定址後引入的 `_relocate` 會把還沒被取用的舊 take 蓋掉（已實測）；`--max-billed-calls` 宣稱中止不會動到任何東西，但中止前已經 promote 的場和已經搬走的檔會變成孤兒，重試時要重新計費；少裝 stable-ts 被當成單一 take 對不上，照樣觸發計費的 ladder；arbiter 救回的場每次 reuse 都會被 base.en 判失敗，接著重新合成。另有一條 cp950 解碼問題：路徑含非 ASCII 字元時，響度量測會靜默失效。",
+  "not_covered": "這個 venv 沒裝 stable-ts 和 whisper_timestamped（ENVIRONMENT 寫的是全域安裝），所以沒跑真的 forced alignment：mock 靜音 WAV 在有 stable-ts 時實際會對出什麼、base.en 在同一支 WAV 上是否每次都失敗，這兩點都是推論（依據是 `_regression_scene_align.py` 以 TOL 1e-6 視為可重現）。repro 4 與 6 的 aligner seam 用 stub 代替。沒呼叫 MiMo，所以 MimoTTSBackend 的 retry、trim 和 HTTP 例外路徑只讀了 code。make.py 的 compose／loudnorm／mux、`scene_fallback.run_ladder` 只看接口，沒有深審。floorprobe 與音訊無關，只讀過，沒有深挖。video/output 是 gitignored，快照裡沒有真的 manifest，所以沒辦法確認現行 §3.1／§3.2 manifest 裡是否還有 arbiter 救回的場，或 beats 模式的場。",
+  "findings": [
+   {
+    "id": "A-01",
+    "level": 1,
+    "severity": "high",
+    "category": "correctness",
+    "file": "video/pipeline/tts.py",
+    "line": 787,
+    "title": "beat 級內容定址 reuse 的 `_relocate` 會覆寫另一個還沒被取用的舊 take：付費音檔被毀、concat 崩潰，還原 storyboard 後錯的 take 會被靜默綁到 beat 上",
+    "description": "`synthesize_beat` 命中 reuse 後呼叫 `_relocate(src, output_path)`，裡面用 `shutil.copy2(src, dst)` 直接覆寫 dst；新文字的 beat 則用 `write_pcm_wav(output_path)` 直接寫到最終路徑。兩者都沒檢查 dst 是否正好是 reuse index 裡另一筆還沒被取用的舊 take 的 `audio_file`。beat 路徑是 `beats/NN_<scene>/<index>_<reveal>.wav`：只要某個 (index, reveal) 位置換成新的或別處搬來的文字，而這個位置原本的文字在同一場後面被保留下來，先處理的 beat 就會把後者的舊 take 蓋掉；輪到後者時，它的 `audio_file` 仍然存在（裡面已經是別的內容），被搬走並刪除來源，前一個 beat 的檔案因此消失。這違反了 `_relocate` docstring 的保證（there is no instant at which zero copies exist）。beats 模式的場（fallback 終端，或按規定一律 `--unit beat` 的場）都會走這條路。",
+    "failure_scenario": "(a) 在 beats 模式的場前面加一個新的開場 beat：舊 say 為 `P {show b} Q`，新 say 為 `N {show x} P {show b} Q` → N 合成後寫到 `01_beat_01.wav`（蓋掉 P 的付費 take），P 命中 reuse 後把 01（內容已是 N）搬到 `02_x.wav` 並刪掉 01，Q 搬到 03。接著 `concat_wavs` 讀 `01_beat_01.wav` 時 FileNotFoundError，tts 崩潰，P 的 take 永久遺失；之後每次重跑都一樣：重新合成 N（計費），再崩潰。(b) 舊 say `{show a} P {show b} Q` 改成 `{show a} N {show b} P` 後崩潰；此時 `02_b.wav` 的內容已被 N 覆寫，但磁碟上的 manifest 仍記為 Q。使用者把 storyboard 還原、帶 `--reuse-existing` 重跑時，Q 會在原地命中 `02_b.wav`，把 N 的聲音當成 Q 寫進新 manifest。`make._validate_reuse_manifest` 照樣接受（hash 相符、檔案存在、時長一致），成片就在 Q 的字幕與 reveal 下播出 N 的旁白。",
+    "evidence": "tts.py:508-515 `if not src.exists() or src.resolve() == dst.resolve(): return False` / `shutil.copy2(src, dst)` / `src.unlink()`；tts.py:786-793 `src, reason = reusable_existing_beat(...)` → `moved = _relocate(src, output_path)` → `reuse_index.pop(reuse_key)`；tts.py:796-806 `result = backend.synthesize(request)` → `write_pcm_wav(output_path, ...)`（直接寫最終路徑）；tts.py:913 `scene_seconds = concat_wavs(beat_paths, scene_audio)`；tts.py:734-736 reuse 只檢查 `Path(prior['audio_file']).exists()`（不檢查內容）。",
+    "repro": "scratchpad/review-work/A/repro_collision.py 與 repro_collision2.py（mock backend，直接呼叫 `tts._synthesize_scene_beats`，舊 take 用不同時長區分 P=1.0s／Q=2.0s）。swap：`CRASH: FileNotFoundError ... 01_a.wav`，backend calls=0，磁碟只剩 `02_b.wav 2.0`（P 已遺失）。prepend：`FileNotFoundError: 01_beat_01.wav`，calls=1，磁碟為 `02_x.wav 2.4`（N 的 take 被標成 P）＋`03_b.wav 2.0`。revert：第二次跑成功，beat 2 text='Q said here.' manifest_secs=1.6（N 的時長；Q 應為 2.0），`make._validate_reuse_manifest: ACCEPTED`。",
+    "confidence": "confirmed",
+    "known_ref": "",
+    "suggested_fix": "每場分兩階段處理：先解析全部 beat 的 reuse 來源，把所有命中的舊 take 移到本場暫存名（例如 `<beat_dir>/.reuse/<hash>_<occ>.wav`）；接著把新合成寫到 `.tmp`；全部完成後再依序放到最終路徑。最低限度的修法是在覆寫 dst 前檢查它是否是其他未取用 index 條目的 `audio_file`，是就先改名。補 swap／prepend／rewrite-then-move 三支 selftest。"
+   },
+   {
+    "id": "A-02",
+    "level": 1,
+    "severity": "medium",
+    "category": "error-handling",
+    "file": "video/pipeline/tts.py",
+    "line": 1399,
+    "title": "`--max-billed-calls`／`--no-billing`（以及任何中途中止）並非無副作用：已 promote 的場變孤兒、舊 WAV 已被搬走，重試要重新計費",
+    "description": "文件寫「中止時 manifest 與音檔原封不動、可安全重試」，實際不成立，機制有兩個：(1) manifest 只在 `main()` 結尾寫一次，但 scene 路徑每場過閘就 `atomicio.promote` 蓋掉正式 WAV（也重寫 words/aligned）。中止時，同一個 run 裡先完成的場的新 take 已落地，manifest 卻還是舊的。重試時 `scene_reuse_ok` 以舊 `scene_text_hash` 判定不能重用，這些場全部重新計費，已付費的 take 被丟掉。(2) 重用搬檔早於計費決定：beats 路徑的 `_relocate` 會刪掉舊路徑，scene 路徑的 `adopt_prior_scene_artifacts` 在任何計費判斷之前就無條件搬檔。中止後，舊 manifest 記錄的路徑已不存在：`make.py --reuse-audio` 因此拒絕（beat audio file missing）；beats 路徑上，即使還原 storyboard 再帶 `--no-billing` 重試，也會因 `prior WAV is gone` 必須計費（take 其實就躺在新路徑上）。BudgetedBackend 在 relocate 之前（`3fcbf6a`）就已加入，內容定址搬檔（`0dc1c3b`／`dd722ee`）上線後，這個保證就失效了。",
+    "failure_scenario": "情境一：3 場都改了字，跑 `--reuse-existing --max-billed-calls 2`。s1、s2 合成並 promote 後，s3 需要第 3 次 call，於是中止。manifest 與 run 前逐字相同（s1、s2 記 5.6s，磁碟上已是 7.2s 的新 take）。上限調高重跑，backend_calls=3，而不是 1。情境二：beats 場搬場（03→04）加上移動 marker，帶 `--no-billing`。beat 1 被搬到 `04_sceneA/` 後，beat 2 需要合成，於是中止。舊 manifest 用舊 storyboard 做 `--reuse-audio` 會被拒（`03_sceneA/01_beat_01.wav` missing）；還原 marker 再跑 `--no-billing`，印出 `not reusing 01_beat_01.wav: prior WAV is gone` 後再次中止。",
+    "evidence": "tts.py:150-153 docstring「since a scene's WAV is only promoted after its gates pass, an abort leaves the prior manifest and audio untouched」；tts.py:336-340 help「nothing is promoted, so prior audio is untouched」；tts.py:999-1000 `atomicio.promote(promote_from, Path(audio_file))`（逐場）；tts.py:1363-1399 迴圈跑完才 `write_manifest(manifest_path, manifest)`；tts.py:1180-1182 adopt 早於 1185 的 `scene_reuse_ok`；tts.py:512-513 `src.unlink()`；KICKOFF-s32-chain-rule.md A5 第 3 點與 REBUILD_STATUS ⑬「中止時 manifest 與音檔原封不動、可安全重試」。",
+    "repro": "scratchpad/review-work/A/repro_abort_e2e.py（走 `tts.main()` 端到端；mock＋`--unit scene`＋stub aligner；run 2 用 BudgetedBackend cap=2）：`SystemExit([tts] --max-billed-calls 2: this run needed synthesis call #3...)`；`manifest unchanged since run 1? True`；`s1: manifest audio_seconds=5.6  WAV on disk now=7.2`（s2 同）；run 3 receipt `backend_calls: 3`。repro_budget_abort.py（beats 路徑，BudgetedBackend(Mock,0)）：`prior-manifest beat files still present? [('03_sceneA/01_beat_01.wav', False), ...]`；`after abort: ... REFUSED: beat audio file missing`；`revert + retry --no-billing: ABORTED`，log 為 `prior WAV is gone`。",
+    "confidence": "confirmed",
+    "known_ref": "",
+    "suggested_fix": "每場完成後，把 fresh 與 prior 合併，原子寫入 manifest（或至少在 SystemExit／例外時的 finally 裡寫一份部分合併的 manifest）。relocate 改成先 copy，舊路徑延到 manifest 寫出後再刪；或讓 `reusable_existing_beat` 在 src 不見時，接受內容可驗證的 dst（例如 manifest 記 WAV 的 sha）。修好之前，至少把 docstring、help、KICKOFF 與 REBUILD_STATUS 的「原封不動」說法改正。"
+   },
+   {
+    "id": "A-03",
+    "level": 1,
+    "severity": "medium",
+    "category": "error-handling",
+    "file": "video/pipeline/tts.py",
+    "line": 1020,
+    "title": "少裝 stable-ts 被吞成單一 take 對齊失敗：每場照樣走計費的 resynth 與 beats 終端，最後全部降級成 beats，原因也不會記下來",
+    "description": "`align_scene` 在 `import stable_whisper` 失敗時丟出 `AlignmentError('stable-ts not installed')`，和真正的單一 take 對不上是同一個例外類別。`_align_and_gate` 全部接住並回傳 fail entry，fallback ladder 於是照跑：arbiter（再失敗）→ resynth（MiMo 下計費 1 次）→ chunk（多半因 budget 被拒）→ beats 終端（每個非空 beat 計費 1 次）。這是在合成前就能判定的環境缺件，`tts.main()` 卻沒有 preflight；dry-run 的 planned 仍報每場 1 次。更糟的是，根因只存在被丟棄的中間 entry 的 `validation.error` 裡：arbiter rung 回傳固定字串 reason，`run_ladder` 只記 reason，所以 receipt 和 manifest 只看得到 `fallback_scenes` 全列、四個 rung fail，看不出原因。本 repo 的 .venv 就沒裝 stable-ts（ENVIRONMENT 規定全域安裝，doctor 只給 WARN），換機或用錯 python 就會踩到。",
+    "failure_scenario": "在沒有 stable-ts 的直譯器上跑 `tts.py --backend mimo --unit auto`（例如新機只跑了 doctor 看到 WARN）。21 場的 deck dry-run 報價 planned=21，實際約 21 primary＋21 resynth＋約 80 個 beat，總計約 120 次計費 call，而且每場都是 beats 模式，不是 scene_aligned。有下 `--max-billed-calls` 會在上限處中止，但依 A-02，已完成的場會變孤兒。",
+    "evidence": "scene_align.py:391-394 `except ImportError as exc: raise AlignmentError(\"stable-ts not installed; ...\")`；tts.py:1019-1024 `except SA.AlignmentError as exc: return {... \"error\": f\"alignment aborted: {exc}\"}`；tts.py:1103-1104 arbiter 回傳 `\"reason\": \"small.en arbiter re-align\"`（固定字串）；tts.py:1106-1114 resynth 呼叫 `_synth_scene_wav`（billed）；scene_fallback.py `history.append({... \"reason\": result.get(\"reason\")})`。",
+    "repro": "scratchpad/review-work/A/repro_missing_aligner.py（本 venv 缺 stable_whisper；mock、1 場、3 個 beat、`--unit auto --skip-qa`）：dry-run 為 `planned first-round calls=1 ... worst-case=6`；實跑 receipt 為 `{\"backend_calls\": 5, ... \"modes\": {\"scene_aligned\": 0, \"beats\": 1}, \"fallback_scenes\": [\"s1\"]}`；`fallback_history` 四個 rung 的 reason 都沒有提到 not installed。",
+    "confidence": "confirmed",
+    "known_ref": "",
+    "suggested_fix": "在 `tts.main()` 合成前，只要有任何場 resolve 成 scene unit，就先試 `import stable_whisper`（`--skip-qa` 以外再檢查 whisper_timestamped 並給 WARN），缺件直接 fail-closed。或者把環境缺件改丟非 AlignmentError 的例外，讓它直接中止。同時讓 rung 的 reason 帶上 `entry['validation'].get('error')`，根因才會進 manifest。"
+   },
+   {
+    "id": "A-04",
+    "level": 1,
+    "severity": "medium",
+    "category": "cache-staleness",
+    "file": "video/pipeline/tts.py",
+    "line": 1189,
+    "title": "arbiter（small.en）救回的場在 reuse 時用 base.en 重新對齊，必定再失敗，接著重新合成計費，`--no-billing` 下根本無法重新對映",
+    "description": "`scene_reuse_ok` 刻意不看 aligner，判定 WAV 可重用；但接下來的重新驗證 `_align_and_gate(plan, scene_wav, ...)` 沒帶 `aligner_model`，於是用 `args.aligner_model`（base.en）。arbiter 救回的場，正是 base.en 在這支 WAV 上過不了閘的場；stable-ts 對同一個模型和同一支 WAV 是可重現的（`_regression_scene_align.py` 以 1e-6 比對），所以會再失敗。reuse 路徑失敗後不會先試免費的 small.en，直接進 `_synth_scene_wav` 計費，並用新 take 蓋掉已驗收的 take。archive 教訓 ② 明說不要讓 arbiter-small.en 的場「誤觸 resynth」，所以才把 `scene_reuse_ok` 的 aligner 檢查拿掉，但 reuse 的重新對齊這一步沒有跟上。§3.1 過去就有 `fundamental_limit`／`recap` 兩場是這種情況。",
+    "failure_scenario": "arbiter 救回的場（manifest 記 `alignment.aligner.model=small.en`、`fallback_history=[arbiter pass]`），在只搬場、只改 marker 或 `--scene` 子集重跑時帶 `--reuse-existing`：base.en 重新對齊失敗 → 合成新 take（計費 1 次）→ 新 take 若再過不了 base.en 就進 ladder。帶 `--no-billing` 則直接中止，這種場永遠做不到零成本的重新對映。",
+    "evidence": "tts.py:1185-1192 `if scene_reuse_ok(...): entry = _align_and_gate(plan, scene_wav, ..., promote_from=None)`（沒傳 aligner_model）→ 沒過就往下走到 1199 `_synth_scene_wav(...)  # 1 TTS call (billed for mimo)`；tts.py:1017 `model = aligner_model or args.aligner_model`；tts.py:690-697 docstring「an aligner change reuses the WAV and only re-aligns ... for free」；_archive/REBUILD_LOG-2026-05-to-07.md:91 教訓 ②。",
+    "repro": "scratchpad/review-work/A/repro_arbiter_reuse.py（stub aligner：base.en 在這個 take 上丟 AlignmentError、small.en 通過，模擬實際的確定性失敗；prior 為 arbiter 救回的 scene_aligned entry）：`scene_reuse_ok says reusable? True`；uncapped 時 aligner calls 為 `[('26_recap.wav','base.en'), ('26_recap.wav.tmp','base.en'), ('26_recap.wav.tmp','small.en')]`，`backend synth calls: 1`（重用的 WAV 從未交給 small.en）；`--no-billing` 時 `ABORTED: --max-billed-calls 0 ... call #1`。code path 為實跑；「base.en 對同一支 WAV 必再失敗」是依可重現性推論。",
+    "confidence": "confirmed",
+    "known_ref": "_archive/REBUILD_LOG-2026-05-to-07.md:91（教訓 ② 只修了 scene_reuse_ok，這裡是 reuse 重新對齊這條沒跟上的新缺口）",
+    "suggested_fix": "reuse 路徑用 prior entry 記錄的 aligner（`prior_scene['alignment']['aligner']['model']`，需在 `build_scene_reuse_index` 帶上）重新對齊；或者 base.en 失敗時，先在 scene_wav 上跑免費的 arbiter（small.en、promote_from=None），都失敗才進計費合成。補一支 selftest：arbiter 救回的場做 reuse 時 backend_calls 必須為 0。"
+   },
+   {
+    "id": "A-05",
+    "level": 1,
+    "severity": "low",
+    "category": "windows-encoding",
+    "file": "video/pipeline/listening_pack.py",
+    "line": 96,
+    "title": "ffmpeg stderr 用 cp950 解碼：路徑含非 ASCII 字元時響度量測靜默失效，compose 只印 WARN 就交出沒做 loudnorm 的成片",
+    "description": "`measure_loudness`（`make._loudnorm_final` 也 import 它）與 `loudness_ab.loudnorm_2pass` 用 `subprocess.run(..., capture_output=True, text=True)` 讀 ffmpeg stderr，沒指定 encoding，Windows 上就用 locale 的 cp950 解碼。ffmpeg 會把輸入路徑以 UTF-8 印進 stderr（`Input #0 ... from '<path>'`），只要路徑有中文，reader thread 就丟 UnicodeDecodeError，stderr 變成 None，函式回傳 `could not parse ebur128 summary`／`loudnorm pass-1 measurement failed`。make.py `_loudnorm_final` 的 pass-1 是同樣寫法（不在本片），失敗時 compose 印 `[loudness] WARN loudnorm failed ...; shipping un-normalized concat`，exit 0，交出的成片不是 house −19 LUFS。使用者常換機，repo 放在含中文的使用者目錄或資料夾就會觸發。",
+    "failure_scenario": "repo clone 到 `C:\\Users\\<中文名>\\...` 或 `D:\\微積分\\...`，執行 `make.py --reuse-audio`：loudnorm 靜默跳過，成片響度不對；listening pack 的 LUFS 欄每場都是 error；loudness_ab 每個 target 都是 error。",
+    "evidence": "listening_pack.py:96-99 `proc = subprocess.run([\"ffmpeg\", ..., \"-i\", str(wav), \"-af\", \"ebur128=peak=true\", ...], capture_output=True, text=True, timeout=120)`；loudness_ab.py:56-59 同樣寫法；make.py:783-786（片外，同樣寫法）＋886-888 失敗後 fallback 到未正規化的 concat。",
+    "repro": "scratchpad/review-work/A/repro_cp950.py：`preferred encoding: cp950 utf8_mode: 0`；`ascii_dir -> {'I': -15.9, 'TP': -12.2}`；中文目錄 `旁白測試` 下同一支 WAV 的結果是 thread 印出 `UnicodeDecodeError: 'cp950' codec can't decode byte 0xe6`，函式回傳 `{'error': 'could not parse ebur128 summary'}`。",
+    "confidence": "confirmed",
+    "known_ref": "",
+    "suggested_fix": "上述三處 subprocess.run 都加 `encoding=\"utf-8\", errors=\"replace\"`（run_selftests.py:42 已是這個寫法）。或者在 compose 端把 loudnorm 失敗改成非零 exit，至少讓它不會靜默出片。"
+   },
+   {
+    "id": "A-06",
+    "level": 2,
+    "severity": "low",
+    "category": "docs",
+    "file": "video/README.md",
+    "line": 199,
+    "title": "README 與 §3.2 kickoff 把 `tts.py --backend mock`（預設 `--unit auto`）當成「與 TTS 輸出同形狀」的離線時序檢查，實際會走 scene 路徑去對齊靜音",
+    "description": "`--unit` 預設 auto，所有 content template 都會 resolve 成 scene unit。mock 產生的是整段靜音，接著要 stable-ts 對齊（缺件或對不上）→ arbiter → resynth → chunk → beats 終端。結果每場都是 beats 模式，帶 `fallback_history`，reveal-only beat 是 0.45 s，而真實 scene_aligned 大約是 0 s。這和真 TTS 的輸出形狀不同，而且只要 stable-ts 在就會載入 whisper（沒有 model cache 時就不是離線）。hardening kickoff 的 B5 已記「務必 `--unit beat`」，但給使用者看的 README 範例和 §3.2 A5-0（「在花錢之前把 `{show}` 對映、beat 切分、`[sync]` 全部弄乾淨」）都沒有加上。",
+    "failure_scenario": "照 KICKOFF-s32 A5-0 先跑 `tts.py --backend mock` 再跑 `make.py --reuse-audio`：驗到的是 beats 時鐘和 fallback 路徑，不是真 scene_aligned 的 beat 時序；`[sync]`／short-beat 的判讀和真音檔版不一致。",
+    "evidence": "video/README.md:199-203「離線時序／manifest 檢查（寫出與 TTS 輸出同形狀的無聲 WAV，不計費）」＋`tts.py ... --backend mock`；KICKOFF-s32-chain-rule.md:405-412 A5-0 同一指令；tts.py:325 `--unit ... default=\"auto\"`。",
+    "repro": "repro_missing_aligner.py 的 mock＋`--unit auto` 實跑：最終為 `narration_mode: beats`，`fallback_history` 四個 rung，backend_calls=5（mock）。",
+    "confidence": "confirmed",
+    "known_ref": "video/KICKOFF-pipeline-hardening.md:81（B5）與 :717（P1-END-1「務必 --unit beat」）",
+    "suggested_fix": "README 與 KICKOFF-s32 A5-0 的 mock 指令補上 `--unit beat`，並註明這只驗 beats 時鐘，不代表 scene_aligned 的時序；或讓 `tts.py` 在 `--backend mock` 時預設 unit=beat。"
+   },
+   {
+    "id": "A-07",
+    "level": 2,
+    "severity": "low",
+    "category": "docs",
+    "file": "video/pipeline/house_audio.py",
+    "line": 55,
+    "title": "house_audio 的 docstring 宣稱 caution ping「在 cue set 裡可用、compose 會 amix 到旁白下」，兩者都不成立",
+    "description": "docstring 說 ping「available in the set but OFF」，並教人在 `cue_for_scene` 加一個 callout／caution 分支，說「compose would then amix the ping under the narration」。實際上 `*_caution_ping.wav` 已在 2026-07-07 刪除（house README），而且 compose 對有旁白的 content 場永遠走 `_mux_content` 分支，cue 只在沒有旁白時才用，根本沒有 amix 路徑。照 docstring 啟用只會得到沒有任何警告的 no-op。另外 `generate_house_cues.py` 的 `main()` 仍會把已刪除的 9 支 A／C 套組和 ping 重新寫回追蹤中的資產目錄。",
+    "failure_scenario": "某 deck 依 DESIGN／docstring 為 notation trap 啟用 caution ping：在 `cue_for_scene` 加分支後，content 場有 narration，compose 走 narration 分支，ping 不會出現；檔案也不存在，但因為 narration 分支優先，連「house cue file missing」都不會印。",
+    "evidence": "house_audio.py:12-14「The caution ping is available in the set but OFF by default」；house_audio.py:55-57「compose would then amix the ping under the narration」；make.py:858-864 `if narration and narration.exists(): _mux_content(...)` 優先於 `elif cue is not None`；assets/audio/house/README.md「所有 `*_caution_ping.wav` 已於 2026-07-07 刪除」；generate_house_cues.py:307-322 仍產 12 支。",
+    "repro": "none：純文件與 code 路徑對照；`ls` 確認資產目錄只有 3 支 candidate_b WAV（48 kHz／2ch）。",
+    "confidence": "confirmed",
+    "known_ref": "",
+    "suggested_fix": "docstring 改成「ping 已刪除，要啟用需先重生檔案，並在 compose 新增 narration＋cue 的 amix 路徑」；`generate_house_cues.main()` 只產 candidate_b 的三支（或把輸出目錄參數化）。"
+   }
+  ]
+ },
+ {
+  "slice": "E 講義 LaTeX 建置（build.py／check_glyphs.py／test_check_glyphs.py／export_figs.mjs／semanticize_numbering.py／verify_numbering.py）",
+  "files_reviewed": [
+   {
+    "path": "handout/latex/build.py",
+    "depth": "full"
+   },
+   {
+    "path": "handout/latex/check_glyphs.py",
+    "depth": "full"
+   },
+   {
+    "path": "handout/latex/test_check_glyphs.py",
+    "depth": "full"
+   },
+   {
+    "path": "handout/latex/export_figs.mjs",
+    "depth": "full"
+   },
+   {
+    "path": "handout/latex/semanticize_numbering.py",
+    "depth": "full"
+   },
+   {
+    "path": "handout/latex/verify_numbering.py",
+    "depth": "full"
+   },
+   {
+    "path": "handout/latex/README.md",
+    "depth": "skim"
+   },
+   {
+    "path": "handout/latex/CONTRACT-latex-writing.md",
+    "depth": "skim"
+   },
+   {
+    "path": "handout/PIPELINE.md",
+    "depth": "skim"
+   },
+   {
+    "path": "handout/CLAUDE.md",
+    "depth": "skim"
+   },
+   {
+    "path": "handout/figkit/README.md",
+    "depth": "skim"
+   },
+   {
+    "path": "handout/figkit/shot.mjs",
+    "depth": "skim"
+   },
+   {
+    "path": "handout/latex/template/calcbook.sty",
+    "depth": "skim"
+   },
+   {
+    "path": "handout/latex/src/ch03/chapter3.tex",
+    "depth": "skim"
+   },
+   {
+    "path": "handout/latex/chapters/ch02/DIALECT-ch02.md",
+    "depth": "skim"
+   },
+   {
+    "path": "handout/latex/chapters/ch06/DIALECT-ch06.md",
+    "depth": "skim"
+   },
+   {
+    "path": ".gitignore",
+    "depth": "skim"
+   },
+   {
+    "path": ".github/workflows/handout-checks.yml",
+    "depth": "skim"
+   }
+  ],
+  "health_summary": "主幹大致健全：latexmk 失敗的 rc、log 裡的 `!` 錯誤與 Missing character 都會正確擋下並回傳非零退出碼；12 份已提交的 dist PDF 字形閘實跑 PASS，現行 src 沒有懸空的 \\ref，也沒有語意化轉換漏掉的字面編號。問題集中在幾個地方：(1) 字形閘完全看不到 Type 3 字型（圖裡的 Inter／MathJax 字型都是 Type 3，已提交的 PDF 共 512 個字型物件），白名單「名單外一律 FAIL」的承諾在這條路徑上不成立；(2) build.py 不檢查 undefined reference，但契約明定日常改稿要靠它；(3) 沒有指定 interaction 模式，在互動終端機一遇到 TeX 錯誤就無聲卡住；(4) 幾個 Windows 非 ASCII 路徑的崩潰，加上 build.py 把子程序的 stderr 整個丟掉，使用者看不到崩潰原因。另外回答分派時問的 xpdf 疑慮：check_glyphs 完全不走 pdftotext（它用 PyMuPDF＋fontTools），所以 xpdf 4.06 與 poppler 的差異影響不到它；pdftotext 只有遷移期工具 verify_numbering 在用，本機 xpdf 4.06 實測抽得出 token（ch03 46 個）。",
+  "not_covered": "沒跑任何一章的完整 LaTeX 建置，也沒拿真實 figkit harness 跑 export_figs（只做了 scratch 的小型重現：迷你 tex、headless Chrome 印一頁 fallback 測試頁）。export_figs 的幾何裁切（ink box、offset、fx-neutral）與 CDP 的時序（sleep 250ms、document.fonts.check 對未宣告字族會回 true）只讀了 code、沒實測；這些路徑出錯時大多會被後面的字形閘或 location.href 斷言大聲擋下，所以沒列為 finding。Win11 的 DirectWrite 對哪些符號會退到 variable／彩色字型（因而變成 Type 3）沒辦法在本機驗，只驗了 Win10 的 Bahnschrift。semanticize_numbering／verify_numbering 依 CONTRACT:104 屬遷移期工具，遷移已在 2026-08-09 完成，以下弱點只記在這裡、不列 finding：semanticize 的 residual 檢查抓不到 `~`／`--`／牛津逗號／or 連接的漏網字面號（已掃現行 src，零殘留）；verify_numbering 比 token 時沒有正規化空白（xpdf 會吐出 'Figure\\n\\n3.1'，只會造成大聲的誤報），也沒檢查 pdftotext 的 rc，兩邊都抽不到 token 時會以 0 token 判相同而放行（需要 pdftotext 對有效 PDF 吐空才會發生，屬理論情境）；`undef` 是沒用到的變數。本機缺 poppler，沒做 poppler 對照。",
+  "findings": [
+   {
+    "id": "E-01",
+    "level": 1,
+    "severity": "medium",
+    "category": "false-negative-gate",
+    "file": "handout/latex/check_glyphs.py",
+    "line": 127,
+    "title": "字形閘完全略過 Type 3 字型：圖裡退到非預期字型時可以無聲通過，白名單在這條路徑上形同虛設",
+    "description": "embedded_fonts() 只列出同時有 /FontName 與 /FontFile{,2,3} 的 FontDescriptor。Type 3 字型（以及任何沒有嵌入的字型）沒有 /FontFile，所以既不會比對輪廓，也不經過 FIG_IMPORTED_OK 白名單，連 [未驗] 都不列。這和 docstring「其餘格式，一律 FAIL 並指名，不默默略過」、白名單註解「白名單外一律 FAIL 並指名」直接矛盾。Chrome（Skia）會把 CFF 型 OTF、variable font 等輸出成 Type 3：已提交的 9 份 PDF 共有 512 個 Type 3 字型物件（圖裡的 Inter-*、mjx-ncm-*），全部落在閘的視野外。一旦圖的某個字退到 Type 3 類的系統字型（例如 variable font），閘會 PASS。",
+    "failure_scenario": "圖面板用到 Inter／NCM 缺的字元，Chrome 退到 Windows 的 variable 系統字型（Win10 的 Bahnschrift 已實測會被嵌成 Type 3），匯出 PDF 後跑 build.py：字形閘 PASS，而且輸出完全沒提到這套字型；同一個字若退到 TrueType 字型（例如 ch02 的 JhengHei）就會被擋。等於白名單只擋得住退到 TrueType 的情況。",
+    "evidence": "check_glyphs.py:122-128\n  for xref in range(1, doc.xref_length()):\n      obj = doc.xref_object(xref)\n      name, ff = FONTNAME_RE.search(obj), FONTFILE_RE.search(obj)\n      if name and ff:\n          yield ...\ndocstring:30-31「其餘格式，一律 FAIL 並指名，不默默略過」；:64「這不是 silent skip——白名單外一律 FAIL 並指名」。已提交 PDF 的 Type 3 名稱統計：mjx-ncm-n-Regular×306、Inter-Regular×111、mjx-ncm-zero×51、Inter×22…",
+    "repro": "(1) scratch/E/type3_repro.py：把 appA.pdf 副本裡一個 Type 3 FontDescriptor 的 FontName 改成 AAAAAA+MicrosoftJhengHeiUIRegular，跑快照的 check_glyphs.py → rc=0，輸出 PASS，全文不含 JhengHei。(2) scratch/E/fb_fonts.py：用 headless Chrome 印一張 HTML（Bahnschrift／Segoe UI Emoji／JhengHei／Times 各一行）→ Bahnschrift 以 Type3 AAAAAA+Bahnschrift 嵌入；check_glyphs rc=1，但原因只有 Emoji（FontFile2 那一份）、JhengHei、Times，輸出完全沒提到 Bahnschrift。(3) scratch/E/type3_names.py：列出 12 份 dist PDF 的 Type 3 字型名稱。",
+    "confidence": "confirmed",
+    "known_ref": "handout/latex/chapters/ch02/DIALECT-ch02.md:63（§5.1 以事實記載「閘 4 的 embedded_fonts() 根本掃不到它們」）；chapters/ch06/DIALECT-ch06.md:54。兩處都只拿來解釋先前的章為何沒踩到，沒有收進 check_glyphs 的已知極限，也沒有補上檢查",
+    "suggested_fix": "main() 另外列出 /Subtype /Type3 字型（取其 FontDescriptor 的 FontName），以及沒有 FontFile 的非 Type 3 字型；Type 3 套用具名白名單（例如 Inter-、mjx-ncm- 前綴，理由寫進常數註解），名單外的 FAIL 並指名、沒嵌入的字型一律 FAIL；同時在 docstring 的已知極限寫明「Type 3 只驗字型身分、不驗輪廓」。"
+   },
+   {
+    "id": "E-02",
+    "level": 1,
+    "severity": "medium",
+    "category": "false-negative-gate",
+    "file": "handout/latex/build.py",
+    "line": 48,
+    "title": "build.py 不擋 undefined／重複定義的 reference，帶 ?? 的 PDF 會以 PASS 進 dist",
+    "description": "log 閘只數 `^!` 與 Missing character。latexmk 4.88 碰到 undefined reference 時 rc=0，所以 \\ref 寫錯或 label 刪掉時，build.py 照樣印 PASS，並把印著 ?? 的 PDF 移進版控中的 dist/。但 CONTRACT-latex-writing.md:104-105 明定日常驗證就是「`python build.py <ch>` 的 log 無 undefined reference 即可」，PIPELINE.md:75 與 handout/CLAUDE.md 也要求 log 不得有 undefined reference。U3 語意化之後，章內引用全靠 \\ref，這正是新編號系統最主要的失效模式。重複定義的 label（印出錯號）同樣不會被擋。CI 沒有 TeX，所以沒有別的關卡補位。",
+    "failure_scenario": "作者把 \\label key 改名（或刪掉一個環境），忘了改對應的 `Theorem \\ref{thm:x}`，跑 python build.py ch05 → 印出「PASS 0 err／0 missing-char／字形閘綠」，dist/ch05/chapter5.pdf 裡印著 Theorem ??，然後被 commit。",
+    "evidence": "build.py:43-48\n  errors = len(re.findall(r\"^!\", log, re.M))\n  missing = log.count(\"Missing character\")\n  ...\n  if r.returncode != 0 or errors or missing or not pdf.exists():\n整個檔案沒有任何 undefined／multiply defined 的檢查。",
+    "repro": "scratch/E/undef_repro.py：import 快照的 build，把 HERE／UNITS 指到 scratch，對一份含 \\ref{thm:nope} 的三行 tex 跑 build.build('x') → 印出「x: PASS 0 err／0 missing-char／字形閘綠 → dist/x/x.pdf」並正常返回（exit 0）；log 含 'There were undefined references'，PDF 也進了 dist。另外單獨跑 latexmk 確認 rc=0。",
+    "confidence": "confirmed",
+    "known_ref": "",
+    "suggested_fix": "latexmk 之後掃 log：`Reference .* undefined|There were undefined references|multiply defined|multiply-defined labels`，命中就 FAIL 並列出 key（可比照 verify_numbering.py:67 的 regex）。這條檢查只是把 CONTRACT 已經要求的東西自動化，不需要改契約。"
+   },
+   {
+    "id": "E-03",
+    "level": 1,
+    "severity": "medium",
+    "category": "error-handling",
+    "file": "handout/latex/build.py",
+    "line": 37,
+    "title": "latexmk 沒指定 interaction 模式、stdin 沿用父程序：在互動終端機遇到 TeX 錯誤會無聲卡死",
+    "description": "build.py 呼叫 latexmk 時沒給 -interaction=nonstopmode／-halt-on-error，subprocess.run 也沒設 stdin。latexmk 的實際命令列是 `lualatex -recorder -output-directory=... x.tex`，也就是 errorstopmode。遇到錯誤時 TeX 會把 `?` 提示寫進被 capture 的 stdout（使用者看不到），然後等 stdin 輸入。從 PowerShell 直接跑時 stdin 是主控台，建置就在沒有任何輸出的情況下停住，直到使用者盲按 Enter 或 Ctrl+C。代理（stdin 是 EOF）不受影響，但人工日常改稿正是這個路徑。",
+    "failure_scenario": "使用者改 chapter8.tex 時打錯一個巨集名，在 PowerShell 跑 python build.py ch08 → 終端機沒有任何輸出、永遠不結束；Ctrl+C 後只看到 KeyboardInterrupt traceback，看不到 TeX 的錯誤訊息。",
+    "evidence": "build.py:37-39\n  r = subprocess.run(\n      [\"latexmk\", \"-lualatex\", f\"-auxdir=../../build/aux-{ch}\", f\"{name}.tex\"],\n      cwd=srcdir, capture_output=True, text=True, encoding=\"utf-8\", errors=\"replace\")\nlatexmk 輸出：Running 'lualatex  -recorder -output-directory=\"...\"  \"x.tex\"'（沒有 -interaction）",
+    "repro": "scratch/E/hang_repro.py 照抄 build.py 的 subprocess.run 參數，對一份含 \\undefinedmacro 的迷你 tex 跑：stdin=/dev/null → 1.2s 返回 rc=12；stdin 換成一條一直開著的 pipe（`(sleep 25) | python hang_repro.py 15`，模擬沒人輸入的主控台）→ 一直卡到 pipe 關閉（25.1s）才 TimeoutExpired，證實 TeX 停在錯誤提示等 stdin。",
+    "confidence": "confirmed",
+    "known_ref": "",
+    "suggested_fix": "latexmk 參數加 `-interaction=nonstopmode -halt-on-error`（latexmk 會轉給 lualatex），subprocess.run 加 `stdin=subprocess.DEVNULL` 作第二道保險；失敗時讓 E-04 印出錯誤上下文。"
+   },
+   {
+    "id": "E-04",
+    "level": 1,
+    "severity": "low",
+    "category": "error-handling",
+    "file": "handout/latex/build.py",
+    "line": 56,
+    "title": "build.py 丟掉 check_glyphs 與 latexmk 的 stderr：閘崩潰時只剩一行 FAIL，看不到原因",
+    "description": "字形閘那段只看 stdout 有沒有「字形閘 PASS」，失敗時只印 stdout 最後 6 行。check_glyphs 的任何例外（kpsewhich 找不到、E-05 的編碼崩潰、fontTools 解析錯誤、PDF 打不開）traceback 都在 stderr，被 capture 之後沒有印出來。latexmk 那段也一樣：只印 log 中以 `!` 開頭的前 5 行，latexmk 自己的 stdout／stderr 全部丟掉，所以 log 裡沒有 `!` 的失敗（例如 latexmk 本身出錯）只剩 rc。exit code 仍是 1，但使用者無從診斷，只能手動重跑 check_glyphs.py。",
+    "failure_scenario": "換機後 MiKTeX 的 bin 沒進 PATH（或碰到 E-05），跑 python build.py ch03：latexmk 那段若由其他途徑找到可以通過，到字形閘時 check_glyphs 在 find_original 丟出 FileNotFoundError，build.py 只印「ch03: FAIL  字形閘——」加一行空白。",
+    "evidence": "build.py:54-58\n  g = subprocess.run([sys.executable, \"check_glyphs.py\", ...], cwd=HERE, capture_output=True, ...)\n  if \"字形閘 PASS\" not in g.stdout:\n      print(f\"{ch}: FAIL  字形閘——\")\n      print(\"\\n\".join(g.stdout.strip().splitlines()[-6:]))\n      sys.exit(1)\ng.stderr 從頭到尾沒被讀過；r.stdout／r.stderr 也一樣。",
+    "repro": "scratch/E/swallow_repro.py：照抄 build.py:54-58，但把 PATH 限縮到只剩 python（沒有 kpsewhich），對 dist/appB/appendixB.pdf 跑 → rc=1；build.py 會顯示的內容＝(nothing)；被丟掉的 stderr 最後一行是「FileNotFoundError: [WinError 2] 系統找不到指定的檔案。」",
+    "confidence": "confirmed",
+    "known_ref": "",
+    "suggested_fix": "FAIL 分支加印 `g.stderr` 的最後幾行（latexmk 那段同理，至少在 log 沒有 `!` 時印 r.stdout／r.stderr 的最後幾行）；判斷條件也可以一併看 g.returncode。"
+   },
+   {
+    "id": "E-05",
+    "level": 1,
+    "severity": "low",
+    "category": "windows-encoding",
+    "file": "handout/latex/check_glyphs.py",
+    "line": 95,
+    "title": "kpsewhich 的輸出用 cp950 解碼：TeX 樹路徑含中文時 find_original 直接 AttributeError 崩潰",
+    "description": "find_original 以 `subprocess.run([\"kpsewhich\", ...], capture_output=True, text=True)` 呼叫，沒有指定 encoding，Windows 上會用 locale 的 cp950 解碼。MiKTeX 的 kpsewhich 輸出 UTF-8；路徑含中日文時，reader thread 丟出 UnicodeDecodeError，out.stdout 變成 None，接著 `.strip()` 丟出 AttributeError。這個例外不是 LookupError，會一路讓 check_glyphs 崩潰（再經 E-04 被 build.py 吞掉原因）。本機的 MiKTeX 是 per-user 安裝（C:\\Users\\<名>\\AppData\\Local\\Programs\\MiKTeX），所以 Windows 使用者名稱含中文的機器上，每個 NewCM 字型都會觸發。",
+    "failure_scenario": "使用者名稱含中文的另一台 Windows 機器（MiKTeX per-user）跑 build.py ch01：編譯通過，字形閘在第一個 NewCM 字型就 AttributeError 崩潰，build.py 只印「FAIL 字形閘——」。換機是 CLAUDE.md 明言的常態。",
+    "evidence": "check_glyphs.py:95-96\n  out = subprocess.run([\"kpsewhich\", f\"{name}.otf\"], capture_output=True, text=True)\n  found = Path(out.stdout.strip()) if out.stdout.strip() else None",
+    "repro": "scratch/E/kpse_enc2.py：把 Inter 複製成 scratch/E/字型測試/ZZTest-Regular.otf，monkeypatch 快照 check_glyphs 模組裡的 subprocess.run，在 kpsewhich 參數前插 `-path=<中文資料夾>`，其餘沿用 check_glyphs 原本的 kwargs，然後呼叫 find_original('ABCDEF+ZZTest-Regular') → reader thread 丟出 UnicodeDecodeError: 'cp950' codec can't decode byte 0x97，find_original 接著丟出 AttributeError: 'NoneType' object has no attribute 'strip'；同一份輸出改用 utf-8 解碼，Path.exists() 為 True。",
+    "confidence": "confirmed",
+    "known_ref": "",
+    "suggested_fix": "改成 `subprocess.run([...], capture_output=True, text=True, encoding=\"utf-8\", errors=\"replace\")`（MiKTeX 輸出 UTF-8），並對 out.stdout 為 None 的情況做防呆。"
+   },
+   {
+    "id": "E-06",
+    "level": 1,
+    "severity": "low",
+    "category": "windows-encoding",
+    "file": "handout/latex/export_figs.mjs",
+    "line": 67,
+    "title": "INTER_DIR 用 URL.pathname 組路徑：repo 路徑含空白或中文時被百分比編碼，圖匯出誤報 font not found",
+    "description": "`new URL(\".\", import.meta.url).pathname` 回傳的是百分比編碼過的 URL 路徑（空白變 %20，中文變 %E4%B8%AD…），直接去掉開頭的斜線後丟給 resolve，就得到一個不存在的路徑。route() 因此判定 Inter OTF 不存在，印出「font not found … see TYPESETTING_GUIDE §9.1」後 exit 1：錯誤會大聲擋下，但訊息把人引去排查字型安裝，真正原因是路徑編碼。正確做法是 fileURLToPath。",
+    "failure_scenario": "repo clone 在含空白（例如 OneDrive 的「Calculus handout」）或中文的路徑下，跑 node latex/export_figs.mjs figkit/figs-ch05.html latex/chapters/ch05/figs → 立即 exit 1，訊息是 font not found: …\\with%20space\\template\\fonts\\inter\\Inter-Regular.otf；整條圖匯出線在那台機器上不能用。",
+    "evidence": "export_figs.mjs:67\n  const INTER_DIR = resolve(new URL(\".\", import.meta.url).pathname.replace(/^\\//, \"\"), \"template/fonts/inter\");\nexport_figs.mjs:71-74 route() 在 !existsSync(abs) 時 process.exit(1)",
+    "repro": "把 export_figs.mjs 與 template/fonts/inter 複製到 scratch/E 的三個資料夾，設 CHROME 指向任一個存在的 exe，讓它通過 Chrome 檢查（字型檢查發生在 spawn 之前）：'nospace' 通過字型階段；'with space' → font not found: …\\with%20space\\…，exit=1；'中文路徑' → font not found: …\\%E4%B8%AD%E6%96%87%E8%B7%AF%E5%BE%91\\…，exit=1。",
+    "confidence": "confirmed",
+    "known_ref": "",
+    "suggested_fix": "`import { fileURLToPath } from \"node:url\"; const INTER_DIR = resolve(fileURLToPath(new URL(\".\", import.meta.url)), \"template/fonts/inter\");`"
+   },
+   {
+    "id": "E-07",
+    "level": 2,
+    "severity": "low",
+    "category": "cache-staleness",
+    "file": "handout/latex/build.py",
+    "line": 37,
+    "title": "build.py 不檢查 gitignored 的圖匯出品是否比 figkit harness 舊：舊圖會被編進有版控的 dist PDF",
+    "description": "`\\includegraphics{<ch>/figs/<stem>}` 讀的是 chapters/<ch>/figs/*.pdf，這些檔 gitignored、由 figkit/figs-<ch>.html 經 export_figs 產生；dist PDF 卻有進版控。build.py（以及 figures.json）完全沒有記錄或比對圖匯出品與 harness 的新鮮度。文件只寫「換機後重匯」（figkit/README.md:34-35、latex/README.md:19），沒寫「pull 進別台改過的 harness 後要重匯」。使用者常在多台機器間切換，這個情境很實際。",
+    "failure_scenario": "A 機改了 figs-ch05.html、重匯、build，commit harness 與 dist PDF。B 機早先匯出過 ch05 的圖，pull 之後只改 chapter5.tex 的散文就跑 build.py ch05 → 所有閘 PASS，dist/ch05/chapter5.pdf 內嵌的是舊圖 → commit，已發布 PDF 的圖被退回舊版，沒有任何閘察覺。",
+    "evidence": "build.py:30-66 全檔沒有提到 figkit 或 figs 的新鮮度；export_figs.mjs:373-374 的 figures.json 只存 colWidthPx／panels，沒有 harness 的 hash 或 mtime；.gitignore:136 `handout/latex/chapters/*/figs/`。",
+    "repro": "none——需要兩台機器或偽造舊匯出品的情境才能端到端重現；「build.py 與圖匯出品之間沒有任何新鮮度比對」可以直接從 code 確認。",
+    "confidence": "likely",
+    "known_ref": "handout/figkit/README.md:34-35「換機後用上述指令重匯即可」（只記載換機這一步手動操作，沒涵蓋 pull 帶進 harness 變更的情況）",
+    "suggested_fix": "最小做法是在 build.py 編譯前比 mtime：figkit/figs-<ch>.html 若比 chapters/<ch>/figs/ 裡最舊的 PDF 還新（git checkout 會更新 mtime），就印 WARNING（或 FAIL）提示重匯；或者在 README／PIPELINE 補一句「pull 後 harness 有變動就要重匯」。"
+   },
+   {
+    "id": "E-08",
+    "level": 2,
+    "severity": "low",
+    "category": "docs",
+    "file": "handout/figkit/README.md",
+    "line": 35,
+    "title": "figkit README 說 figures.json 進版控，但 .gitignore 把整個 figs/ 擋掉，實際沒有任何 figures.json 被追蹤",
+    "description": "README 寫「`figures.json` 進版控」，但 export_figs 把 figures.json 寫在 OUTDIR（chapters/<ch>/figs/）裡，而 .gitignore:136 忽略整個 `handout/latex/chapters/*/figs/`，其註解（:133-135）還明言 figures.json 不進版控。`git ls-files` 查不到任何 figures.json。讀者照 README 會以為它該在 git 裡，PIPELINE.md:73 就記過把 figs/ 未提交誤報成缺口的前例。",
+    "failure_scenario": "代理照 figkit README 檢查 ch05 的 figures.json 是否已 commit，發現沒有，就把它回報成缺口，或用 git add -f 強加，和 .gitignore 的決策衝突。",
+    "evidence": "figkit/README.md:34-35「匯出圖 PDF 不進版控（.gitignore 的 handout/latex/chapters/*/figs/）… `figures.json` 進版控。」；.gitignore:133-136「export_figs.mjs 產的向量 PDF、wrapper 頁與 figures.json … 不進版控」；`git check-ignore -v handout/latex/chapters/ch03/figs/figures.json` → .gitignore:136。",
+    "repro": "git ls-files | grep figures.json → 無輸出；git check-ignore -v 命中 .gitignore:136。",
+    "confidence": "confirmed",
+    "known_ref": "",
+    "suggested_fix": "把 figkit/README.md:35 改成「figures.json 同在 figs/ 下、一併不進版控（mm 僅供新圖初值，隨重匯重生）」。"
+   }
+  ]
+ },
+ {
+  "slice": "B 內容契約閘（schema／lint／provenance）",
+  "files_reviewed": [
+   {
+    "path": "video/pipeline/schema.py",
+    "depth": "full"
+   },
+   {
+    "path": "video/pipeline/lint.py",
+    "depth": "full"
+   },
+   {
+    "path": "video/pipeline/provenance.py",
+    "depth": "full"
+   },
+   {
+    "path": "video/pipeline/source_rev.py",
+    "depth": "full"
+   },
+   {
+    "path": "video/pipeline/texlock.py",
+    "depth": "full"
+   },
+   {
+    "path": "video/pipeline/step_coverage.py",
+    "depth": "full"
+   },
+   {
+    "path": "video/pipeline/example_coverage.py",
+    "depth": "full"
+   },
+   {
+    "path": "video/pipeline/pedagogy.py",
+    "depth": "full"
+   },
+   {
+    "path": "video/pipeline/derived_check.py",
+    "depth": "full"
+   },
+   {
+    "path": "video/pipeline/narration_review.py",
+    "depth": "full"
+   },
+   {
+    "path": "video/pipeline/review_pack.py",
+    "depth": "full"
+   },
+   {
+    "path": "video/pipeline/rewatch_pack.py",
+    "depth": "full"
+   },
+   {
+    "path": "video/pipeline/blocks.py",
+    "depth": "full"
+   },
+   {
+    "path": "video/pipeline/scene_roles.py",
+    "depth": "full"
+   },
+   {
+    "path": "video/pipeline/_screen_contract.py",
+    "depth": "full"
+   },
+   {
+    "path": "video/pipeline/template_names.py",
+    "depth": "full"
+   },
+   {
+    "path": "video/pipeline/derive_spoken.py",
+    "depth": "full"
+   },
+   {
+    "path": "video/pipeline/narration.py",
+    "depth": "full"
+   },
+   {
+    "path": "video/pipeline/pauses.py",
+    "depth": "full"
+   },
+   {
+    "path": "video/make.py",
+    "depth": "skim"
+   },
+   {
+    "path": "video/pipeline/brand.py",
+    "depth": "skim"
+   },
+   {
+    "path": "video/pipeline/sizecheck.py",
+    "depth": "skim"
+   },
+   {
+    "path": "video/pipeline/texparts.py",
+    "depth": "skim"
+   },
+   {
+    "path": "video/pipeline/templates/__init__.py",
+    "depth": "skim"
+   },
+   {
+    "path": "video/pipeline/scene.py",
+    "depth": "skim"
+   },
+   {
+    "path": "video/README.md",
+    "depth": "skim"
+   },
+   {
+    "path": "video/REVIEW_GATES.md",
+    "depth": "skim"
+   },
+   {
+    "path": "video/KICKOFF-toolline-backlog-r2.md",
+    "depth": "skim"
+   },
+   {
+    "path": "video/_audit/REVIEW-pipeline-assessment-2026-09-07.html",
+    "depth": "skim"
+   },
+   {
+    "path": "video/content_scripts/_audit/PEDAGOGY-FIRSTLEARNER-RUBRIC.md",
+    "depth": "skim"
+   }
+  ],
+  "health_summary": "這一片的確定性內容閘（schema／lint／provenance／source_rev／SC／EX／PD／derived_check）整體健康：遇到畸形輸入都不會崩，ERROR 有反映在 exit code，列出的相關 selftest 全綠，四份正典 deck 在 schema.py 上 0 error；provenance 和 example_coverage 的 .tex regex 也實際對過 ch01–ch08 全部來源，沒有漏配。問題集中在兩處。第一處是 rewatch_pack 這個稽核 packet 產生器，有 3 個已實跑重現的證據正確性 bug：同一個輸出目錄會沿用舊幀、`pauses:` 讓時間軸錯位、非 _mimo deck 讀到 audio_mimo 的 manifest。這 3 個 bug 都會讓多鏡盲審拿到錯的證據，但 12 s 硬閘本身的判定不受影響。第二處是 schema.py 解析 `{show}` 的 regex 和 runtime 的 narration.parse_say 不一致，有兩種寫法會被閘放行，render 出來卻是錯的。",
+  "not_covered": "1) 依規定只讀快照、不讀主工作樹，所以沒有去看 output/ch03/s3.1/ 底下實際的 audio_mimo 和 rewatch_pack 目錄；B-01、B-02、B-03 對實際 pack 的影響，是從 REBUILD_STATUS、README 和 kickoff 記載的用法推論的，重現都是在 scratchpad 的假 repo 上做。2) critic.py 不在本片範圍，但它也讀磁碟上的 manifest；它的 per-beat 抽幀很可能有和 B-02 同型的 pauses 錯位，建議負責 critic 的分片複查。3) texlock 的多行程競態（stale 回收的 TOCTOU、Windows 上 delete-pending 時 os.open 會拋 PermissionError）只讀 code 判斷，沒做真並行實測；機率極低，所以沒列為 finding。4) 沒有跑整份 deck 的 make.py 或 Manim render，也沒呼叫任何外部 API。5) review_pack.main 對 _mimo storyboard 用的是沒剝後綴的 stem，會找不到 .md，但這個失敗會直接報錯（SystemExit），不會靜默，所以沒列。6) provenance 的 _present_text_fields 沒掃 theorem_proof 的 proof[] 和 qed；因為同一場的 statement 一定要有 scene ref，實際漏網只剩「對這兩欄寫 refs 覆寫卻打錯字」，而且和 TEACHING_TEXT_FIELDS 同步議題（r3 已記）同源，所以沒另列。",
+  "findings": [
+   {
+    "id": "B-01",
+    "level": 1,
+    "severity": "high",
+    "category": "cache-staleness",
+    "file": "video/pipeline/rewatch_pack.py",
+    "line": 562,
+    "title": "rewatch_pack 只在幀檔不存在時才抽幀，重跑同一輸出目錄會把舊 render 的幀當成新證據",
+    "description": "抽樣幀的檔名只由序號 k 和取樣時間 tv（取到 0.1 s）決定，而且只有檔案不存在時才呼叫 ffmpeg 抽幀。只改畫面、沒改時序的迭代（沿用真音檔的 --reuse-audio 路線，或是文字沒變、mock 估時也就不變的情況）重跑到同一個目錄時，取樣時間完全相同，所有幀都直接沿用上一版 render。contact sheet 和 NN_<scene>/ 的圖是舊片，motion 統計卻是新片算的，兩者對不上。這份 pack 是 REWATCH 五鏡盲審共用的唯一證據，README 教的里程碑用法正是預設目錄 output/<ch>/<sec>/rewatch_pack/。critic.py 同類問題在 README 有「開跑前清空 frames/」的規則，rewatch_pack 沒有。",
+    "failure_scenario": "第 N 輪 render 後跑 `rewatch_pack.py --deck ch03_trig_derivatives_mimo`；改一個 hook 的動畫、用 --reuse-audio 重 render，再跑同一條指令。pack.json 的 motion 數字更新了，但每一張 contact sheet 和 f_XX 圖仍是第 N 輪的畫面，盲審評的是舊片。同一個 subset --out 重跑（scene_subset_verdict 允許覆寫 subset pack）也一樣。",
+    "evidence": "rewatch_pack.py:561-563\n  dst = fdir / f\"f_{k:02d}_+{tv:05.1f}s.jpg\"\n  if not dst.exists():\n      extract_frame(av, tv, dst)\n（extract_frame 本身帶 -y，但被這個 guard 擋掉了）；build_sheet 在 :580 直接貼這些檔。",
+    "repro": "scratchpad/review-work/B/repro_rewatch.py：在假 repo 用 ffmpeg 產一支 4 s 紅色 _av/demo_deck/s1.mp4 跑 rewatch_pack.main()，再把同一支檔換成藍色重跑。輸出：`[issue1] first run frame pixel (red render): (254, 0, 0)`／`[issue1] second run frame pixel (after BLUE re-render): (254, 0, 0) -> STALE`。",
+    "confidence": "confirmed",
+    "known_ref": "",
+    "suggested_fix": "拿掉 `if not dst.exists()`，每次都抽幀（extract_frame 已帶 -y）；或者開跑時先清空每個 scene 的 fdir。另補一支 selftest：同一個 --out 跑兩次、換過來源，斷言幀已更新。"
+   },
+   {
+    "id": "B-02",
+    "level": 1,
+    "severity": "medium",
+    "category": "correctness",
+    "file": "video/pipeline/rewatch_pack.py",
+    "line": 441,
+    "title": "rewatch_pack 讀磁碟上的 manifest，沒套 pauses:，有停頓的場景拍點全部錯位",
+    "description": "make.py 把 `pauses:` 折進記憶體裡的 manifest 後才 render（pauses.py 註明「磁碟上的 manifest 永不改寫」），所以成片裡停頓之後的每個 beat 都晚了 hold 秒。rewatch_pack 的 load_manifest 直接讀磁碟上的 manifest.json，reveal_times、sample_times、words_at、_beat_at、tail 列全用沒有停頓的時間。結果是「beat N reveal -> X」那張樣張在 reveal 真正發生之前就取了，畫面上還看不到該 block；tail 被多算了 hold 秒；still-gate FAIL 行指的拍也可能錯。§3.1 正典 deck 就有兩場受影響：difference_quotient_for_sine（after step.2，1.5 s）和 continuity_statement_sin_limit（after proof.1，1.2 s）。",
+    "failure_scenario": "對 ch03_trig_derivatives_mimo 產 pack：difference_quotient_for_sine 的 step.3 以後的樣張都早了 1.5 s，標著「reveal -> step.3」的格子其實還沒出現 step.3；時間軸 md 的 tail 列多出 1.5 s 的「畫面停住」。盲審的 R4 節奏鏡、R2 導演鏡可能因此回報不存在的「reveal 遲到／尾端死區」。",
+    "evidence": "rewatch_pack.py:441-446 load_manifest 讀 `section_dir/sub/manifest.json`；:545 beats、:551 reveal_times = LEAD + b['start_seconds']；:557 sample_times(dur, beats)。pauses.py:15-17：「The ON-DISK manifest is never rewritten ... applied to the in-memory copy make.py renders」；make.py:1118 `manifest = pauses.apply_pauses(scenes, manifest, audio_dir / \"paused\")`。ch03_trig_derivatives_mimo.yml:195-197、:444-446 各有一條 pauses。",
+    "repro": "scratchpad/review-work/B/repro_pauses_rewatch.py：假 repo 一個場景，beats a[0,2]、b[2,4]，pauses after a 1.5 s；合成的 A/V 在 make.py 會 reveal b 的時間點 LEAD+3.5=4.5 s 才出現白框。輸出：`make.py (in-memory, paused) beat b start: 3.5 | on-disk: 2.0`／`pack reveal_times: [1.0, 3.0] | true reveal of b at 4.5`／`tile 'beat 2 reveal -> b' at +3.7s -> centre pixel (0, 0, 0) (block b NOT on screen yet)`。",
+    "confidence": "confirmed",
+    "known_ref": "",
+    "suggested_fix": "load_manifest 之後，用 storyboard 場景的 pauses 對 beats 做和 pauses._apply_to_entry 相同的時間平移（抽一個不寫 WAV 的純函式，make.py 和 rewatch_pack 共用）；或改讀 make.py 產的 timeline.json。補一支含 pauses 的 selftest。"
+   },
+   {
+    "id": "B-03",
+    "level": 1,
+    "severity": "medium",
+    "category": "integration",
+    "file": "video/pipeline/rewatch_pack.py",
+    "line": 442,
+    "title": "rewatch_pack 選 manifest 不看 deck id，非 _mimo deck 只要 audio_mimo 存在就讀錯音檔的拍點",
+    "description": "load_manifest 固定先找 audio_mimo/ 再找 audio/。make.py:1086、critic.py:128、tts.py:1231 都依 meta.id 是否以 _mimo 結尾決定子目錄，而兩個 deck 共用同一個 section 輸出目錄。所以對 canonical deck（例如 ch03_trig_derivatives 或 ch03_chain_rule 的 mock render）產 pack 時，只要該節跑過真 TTS，就會讀到 Dean 的 manifest：拍數、拍點、FA 字詞全部屬於另一條音軌，影片卻是 audio/ 的 mock 時序。manifest 本身帶有 deck_id，但沒有被核對。",
+    "failure_scenario": "§3.1 整節重做試點用 canonical deck 做 mock render 迭代時，output/ch03/s3.1/audio_mimo 仍留著成片的 Dean manifest；跑 `rewatch_pack.py --deck ch03_trig_derivatives`（KICKOFF-s32 對 ch03_chain_rule 就是這樣下指令），pack 的樣張時間、字幕詞、reveal 標示全部對到 Dean 版時序，與這支 mock 片不符。",
+    "evidence": "rewatch_pack.py:441-446\n  for sub in (\"audio_mimo\", \"audio\"):\n      p = section_dir / sub / \"manifest.json\"\n      if p.exists(): return ...\n對照 make.py:1086 `audio_dir = sec_dir / \"audio\" if not meta[\"id\"].endswith(\"_mimo\") else sec_dir / \"audio_mimo\"`、critic.py:128、tts.py:1231；make.py:158 manifest 寫入 \"deck_id\"。",
+    "repro": "scratchpad/review-work/B/repro_rewatch.py：假 repo 同時寫 audio/manifest.json（deck_id=demo_deck，拍長 2.0）和 audio_mimo/manifest.json（deck_id=demo_deck_mimo，拍長 0.5），跑 `--deck demo_deck`。輸出：`[issue2] deck=demo_deck; beats read: beat from demo_deck_mimo end 0.5`。",
+    "confidence": "confirmed",
+    "known_ref": "",
+    "suggested_fix": "比照 make.py／critic.py：`sub = \"audio_mimo\" if args.deck.endswith(\"_mimo\") else \"audio\"`，只讀那一個；再核對 manifest.get(\"deck_id\") == args.deck，不符就 exit 2。"
+   },
+   {
+    "id": "B-04",
+    "level": 1,
+    "severity": "low",
+    "category": "false-negative-gate",
+    "file": "video/pipeline/schema.py",
+    "line": 34,
+    "title": "schema／sizecheck 的 {show} 解析與 runtime 的 parse_say 不一致，兩種寫法會被閘放行",
+    "description": "schema.reveal_targets 用 `\\{show\\b([^}]*)\\}`，sizecheck 的 F9 target 存在性檢查也吃它；scene.py、make.py、tts.py 分拍用的是 narration.parse_say 的 `\\{\\s*show\\s+([A-Za-z0-9_.\\[\\]]+)\\s*\\}`。兩個 regex 不等價：(a) 單獨的 `{show}`：schema 只給 warn「reveals nothing」，sizecheck 註解把它當「pure beat split」跳過；但 runtime 根本不認它，字面上的 \"{show}\" 會留在該拍文字裡，送去 TTS 和 mock 估時，也不會切拍。(b) `{ show typo}`（左大括號後有空白）：schema 和 sizecheck 都看不到這個 marker，typo 的 target 完全沒被檢查；runtime 卻把它當 reveal，因為 target 不在 by_id 裡而靜默跳過，block 只會在場末補揭示。另外 derive_spoken 的 parity 檢查是第三種 regex（`\\{show\\s+`），這兩種寫法它兩邊都不計，所以 parity 也照樣通過。目前所有 deck 都沒用到這兩種寫法，屬潛在漏網。",
+    "failure_scenario": "作者在 say 寫「... {show} ...」想切一個純停頓拍：閘只 warn，成片旁白卻把「show」念出來（MiMo 收到字面文字），也沒有切拍。或者寫成 `{ show step.3}`：schema、sizecheck 都 0 error，render 時 step.3 沒在該拍出現、場末才補上。",
+    "evidence": "schema.py:34-35 `_SHOW = re.compile(r\"\\{show\\b([^}]*)\\}\")`、`_SHOW_OPEN = re.compile(r\"\\{show\\b\")`；schema.py:575-577 空 target 只 warn；sizecheck.py:1035-1036 `for t in reveal_targets(...): if t and t not in ids:   # bare {show} is a pure beat split -- skip`；narration.py:25 `_SHOW = re.compile(r\"\\{\\s*show\\s+([A-Za-z0-9_.\\[\\]]+)\\s*\\}\")`；scene.py:249 `will_reveal = bool(target) and target in by_id ...`。",
+    "repro": "scratchpad/review-work/B/repro_show_regex.py 輸出：\n'Hello {show} world {show body} end.' → schema issues [('warn','s1: empty {show} target (reveals nothing)')]；reveal_targets ['', 'body']；parse_say [('Hello {show} world', None), ('end.', 'body')]\n'Hello { show bodyy} world.' → schema issues []；reveal_targets []（sizecheck 沒有東西可查）；parse_say [('Hello', None), ('world.', 'bodyy')]",
+    "confidence": "confirmed",
+    "known_ref": "",
+    "suggested_fix": "讓 schema.reveal_targets 和 _SHOW_OPEN 直接改用 narration 的 regex（或 narration.list_reveal_targets），單一來源；另把 `\\{\\s*show\\b` 但不符合 runtime 文法的寫法（含單獨的 {show}）升成 schema error。sizecheck 的「pure beat split」註解要一併更正。"
+   },
+   {
+    "id": "B-05",
+    "level": 3,
+    "severity": "low",
+    "category": "false-negative-gate",
+    "file": "video/pipeline/example_coverage.py",
+    "line": 73,
+    "title": "EX 閘在講義章節或來源解析不到時回傳空集合，被當成「全部已宣告」而靜默通過",
+    "description": "examples_for_deck 在 meta.chapter 缺漏（schema 只強制 id 和 section）、section 對不到任何 \\sechead、或 handout/latex/src/ch<NN>/ 被搬走時，一律回 []。schema.py main 只在「deck 沒有 .md」時才跳過 EX 閘（這是文件記載的行為），有 .md 但講義解析不到時，EX1 一條都不會發，看起來和「每題都有宣告」一模一樣。F1 那次，provenance 遇到來源搬家是大聲失敗；EX 閘遇到同型漂移卻會靜默空跑。",
+    "failure_scenario": "新 deck 的 meta 漏寫 chapter，或者 section 寫成講義沒有的節號，或者日後講義源再度搬目錄（2026-08-10 佈局重構就發生過）。內容稿一個 examples:／folds: 都沒寫，即使開了 example_coverage_enforce，schema.py 仍然什麼都不印、exit 0。",
+    "evidence": "example_coverage.py:77-87\n  m = re.search(r\"(\\d+)\", str(meta.get(\"chapter\", \"\")))\n  if not m or not section: return []\n  for tex in sorted(src_dir.glob(\"*.tex\")): ...\n  return []\nschema.py:743-746 `ex_issues = [] if not deck_md.exists() else _ex.example_issues(..., _ex.examples_for_deck(meta, repo_root), md_units, enforce=ex_enforce)`",
+    "repro": "scratchpad/review-work/B/repro_ex_vacuous.py（units 不宣告任何例題，enforce=True）：{'chapter':'Chapter 3','section':'3.1'} → keys ['ex:3.1','ex:3.2','ex:3.3']、findings 3（對照組）；{'section':'3.1'} → keys []、findings 0；{'chapter':'Chapter 3','section':'3.10'} → keys []、findings 0；來源目錄搬走 → []。",
+    "confidence": "confirmed",
+    "known_ref": "",
+    "suggested_fix": "deck 有 .md、但 examples_for_deck 解析不到章、找不到 .tex、或 section 不在任何 \\sechead 時，回一條 `[EX] cannot resolve handout section ...` warn（enforce 時升 error），讓空集合和「全部已宣告」可以分辨。"
+   }
+  ]
+ },
+ {
+  "slice": "F 跨模組整合（82eeea3..7b9e97c）",
+  "files_reviewed": [
+   {
+    "path": "video/make.py",
+    "depth": "full"
+   },
+   {
+    "path": "video/pipeline/scene.py",
+    "depth": "full"
+   },
+   {
+    "path": "video/pipeline/templates/__init__.py",
+    "depth": "full"
+   },
+   {
+    "path": "video/pipeline/pauses.py",
+    "depth": "full"
+   },
+   {
+    "path": "video/pipeline/stillness.py",
+    "depth": "full"
+   },
+   {
+    "path": "video/pipeline/timing.py",
+    "depth": "full"
+   },
+   {
+    "path": "video/pipeline/texlock.py",
+    "depth": "full"
+   },
+   {
+    "path": "video/pipeline/source_rev.py",
+    "depth": "full"
+   },
+   {
+    "path": "video/pipeline/schema.py",
+    "depth": "full"
+   },
+   {
+    "path": "video/pipeline/blocks.py",
+    "depth": "full"
+   },
+   {
+    "path": "video/pipeline/captions.py",
+    "depth": "full"
+   },
+   {
+    "path": "video/pipeline/rewatch_pack.py",
+    "depth": "full"
+   },
+   {
+    "path": "video/pipeline/run_selftests.py",
+    "depth": "full"
+   },
+   {
+    "path": "video/scratch_frames.py",
+    "depth": "full"
+   },
+   {
+    "path": "video/pipeline/critic.py",
+    "depth": "skim"
+   },
+   {
+    "path": "video/pipeline/tts.py",
+    "depth": "skim"
+   },
+   {
+    "path": "video/pipeline/scene_align.py",
+    "depth": "skim"
+   },
+   {
+    "path": "video/pipeline/sizecheck.py",
+    "depth": "skim"
+   },
+   {
+    "path": "video/pipeline/provenance.py",
+    "depth": "skim"
+   },
+   {
+    "path": "video/pipeline/derive_spoken.py",
+    "depth": "skim"
+   },
+   {
+    "path": "video/pipeline/_screen_contract.py",
+    "depth": "skim"
+   },
+   {
+    "path": "video/pipeline/step_coverage.py",
+    "depth": "skim"
+   },
+   {
+    "path": "video/pipeline/review_pack.py",
+    "depth": "skim"
+   },
+   {
+    "path": "video/pipeline/lint.py",
+    "depth": "skim"
+   },
+   {
+    "path": "video/pipeline/floorprobe.py",
+    "depth": "skim"
+   },
+   {
+    "path": "video/pipeline/templates/derivation.py",
+    "depth": "skim"
+   },
+   {
+    "path": "video/pipeline/templates/graph.py",
+    "depth": "skim"
+   },
+   {
+    "path": "video/pipeline/templates/theorem_proof.py",
+    "depth": "skim"
+   },
+   {
+    "path": "video/pipeline/templates/worked_example.py",
+    "depth": "skim"
+   },
+   {
+    "path": "tools/doctor.py",
+    "depth": "skim"
+   },
+   {
+    "path": "video/storyboards/ch03_trig_derivatives.yml",
+    "depth": "skim"
+   },
+   {
+    "path": "video/storyboards/_demo_carry.yml",
+    "depth": "skim"
+   },
+   {
+    "path": "video/DESIGN.md",
+    "depth": "skim"
+   },
+   {
+    "path": "video/KICKOFF-s32-chain-rule.md",
+    "depth": "skim"
+   },
+   {
+    "path": "video/KICKOFF-toolline-backlog-r2.md",
+    "depth": "skim"
+   },
+   {
+    "path": "video/REBUILD_STATUS.md",
+    "depth": "skim"
+   },
+   {
+    "path": "video/_audit/REVIEW-pipeline-assessment-2026-09-07.html",
+    "depth": "skim"
+   }
+  ],
+  "health_summary": "大部分接口是對得上的：carry/exit 在 schema、make.py 的 _carry_boundaries、templates._apply_carry 三方規則一致；scene_aligned 的欄位名與單位（start/end/audio_seconds、text_hash）在 tts→scene_align→make→captions 之間一致；把全 repo 336 個呼叫點拿去對現行簽名做 bind，0 個不符；兩個有手動解衝突的 merge（4391e45、f9ffd65）沒有弄丟或重複 hunk，也沒掃到重複定義。真正的問題集中在「新功能只在一條路徑落地，其他消費端沒跟上」：一是 pauses 只折進 make.py 的記憶體 manifest，rewatch_pack 和 critic --per beat 讀的是磁碟版；二是 scene._tail 保留的 MIN_HOLD 下限，跟新的 2 影格 sync 硬閘互相衝突；三是 rewatch_pack 選 manifest 的規則跟 make/critic 不同。另外還有一個 tts 內容定址 reuse 的路徑碰撞 bug，會毀掉已計費的音檔，嚴重度最高。",
+  "not_covered": "沒有跑任何真正的 Manim render 或整份 deck render，所以 F-03 是用帶逐影格進位時鐘的 FakeScene，驅動 scene.py 的真實 _stage/_play_content/_tail 算出來的，真 manim 的影格數可能再多 1 格，方向不變。沒有讀 video/output 下的實際產物（快照不含），F-02/F-04 對 §3.1/§3.2 的實際影響是從 storyboard 推的。以下只做到淺層：hook 模組（ch03_trig_derivatives_hooks.py，2964 行）只查了它呼叫的 pipeline API 簽名，沒審編舞；sizecheck 各規則與模板內部；texlock 的 stale/逾時策略。house_audio、loudness_ab、listening_pack 在這段區間沒有改動，只確認了 compose 端接線。merge 審查只看 --cc 手動解衝突的 hunk，加上重複定義/重複 dict key 掃描；沒有逐一重放每個無衝突 merge 的語義交互（沒有 pyflakes 之類工具，也不安裝）。selftest 只跑了 make_scene_aligned、make_transition、pauses、sync_gate、stillness、carry_schema，全綠。",
+  "findings": [
+   {
+    "id": "F-01",
+    "level": 1,
+    "severity": "high",
+    "category": "correctness",
+    "file": "video/pipeline/tts.py",
+    "line": 787,
+    "title": "beat reuse 改成內容定址後，新合成或搬檔會覆寫「稍後另一拍要 reuse 的來源檔」，毀掉已計費的 take 並在 concat 崩潰",
+    "description": "0dc1c3b 把 beat reuse index 改成以 (scene_id, text_hash, occurrence) 為 key，命中後用 _relocate(src, output_path) 把舊 WAV 複製到今天的路徑再刪掉來源。但 _synthesize_scene_beats 是逐拍依序處理：前面某拍的輸出路徑，可能正好是後面某拍在 reuse index 裡記的來源路徑。有兩種情形：(a) 前一拍是新文字，fresh synth 直接寫進那個路徑（write_pcm_wav(output_path…)），把舊 take 蓋掉；(b) 前一拍是 reuse，_relocate 用 copy2 覆寫那個路徑。之後輪到後面那拍，reusable_existing_beat 只檢查 src.exists()，就把已被覆寫的檔當成自己的 take 搬走並刪除，結果前一拍的檔不見，迴圈結束時 concat_wavs 拋 FileNotFoundError。這違反 _relocate docstring 的保證（「there is no instant at which zero copies exist」），DESIGN.md:1766-1767 也沒考慮碰撞。改版前是以路徑為 key，同樣的編輯只會重新合成（多計費），不會崩潰也不會丟檔。註：這屬 tts.py 內部，可能與 TTS 分片重複；因為會毀掉計費音檔，仍在此列出。",
+    "failure_scenario": "原稿 say=\"Alpha beta gamma delta. {show x} Epsilon …\"，beats 為 [01_beat_01.wav(Alpha), 02_x.wav(Epsilon)]，已有 MiMo 真音檔。作者在開頭加一句新旁白並補一個 marker：\"A brand new … {show w} Alpha beta gamma delta. {show x} Epsilon …\"，然後跑 tts.py --backend mimo --reuse-existing。beat1 是新文字，合成後寫進 01_beat_01.wav，蓋掉 Alpha 的舊 take。beat2 命中 Alpha，把 01_beat_01.wav（其實已是新句）搬到 02_w.wav 並刪掉 01_beat_01.wav。beat3 把 02_x.wav 搬到 03_x.wav。最後 concat 找不到 01_beat_01.wav 而崩潰。結果：Alpha 的計費 take 永久遺失，剛計費的新句被錯配到 beat2，舊 manifest 指向已刪除或已搬走的檔，make.py --reuse-audio 只能拒絕，整場得重新付費合成。dry-run 對這次編輯只會報 planned=1，看不出會崩。",
+    "evidence": "tts.py:785-791\n  if src is not None:\n      moved = _relocate(src, output_path)\n      reuse_index.pop(reuse_key, None)\ntts.py:508-514 _relocate: shutil.copy2(src, dst); ... src.unlink()\ntts.py:796-802 fresh synth: write_pcm_wav(output_path, result.pcm, ...)（沒有檢查 output_path 是否仍是 pending reuse 來源）\ntts.py:912-913 scene_seconds = concat_wavs(beat_paths, scene_audio)\ntts.py:733-735 reusable_existing_beat: src = Path(prior['audio_file']); if not src.exists(): ...（只看存在，不看內容）",
+    "repro": "草稿資料夾 repro_tts_reuse_collision.py：用 MockTTSBackend 呼叫 tts._synthesize_scene_beats 兩次（先建 prior，再以 build_reuse_index(prior)+reuse_existing=True 跑新 say）。輸出：prior beats [('01_beat_01.wav','Alpha…',1.6), ('02_x.wav','Epsilon…',2.8)] → CRASH: FileNotFoundError(2, 'No such file or directory')；synth calls this run: 1；磁碟剩 {'02_w.wav': 4.8, '03_x.wav': 2.8}。02_w.wav 本該是 Alpha 的 1.6 s take，實際卻是新句的 4.8 s take；01_beat_01.wav 已被刪。",
+    "confidence": "confirmed",
+    "known_ref": "",
+    "suggested_fix": "一場分兩階段處理：先把本場所有命中 reuse 的來源 WAV 複製到 staging（例如 beat_dir/.reuse/<hash>_<occ>.wav，或整批先改名），再進入合成／搬檔迴圈，都從 staging 取檔。fresh synth 一律先寫 temp，整場成功後才 promote。或者至少讓 _relocate 與 fresh synth 在 dst 仍是 reuse_index 中其他 key 的 audio_file 時拒寫。補一支 selftest：「開頭插一句新句＋marker」與「兩拍互換文字」兩種情形都必須 0 崩潰、每個 take 都在。"
+   },
+   {
+    "id": "F-02",
+    "level": 1,
+    "severity": "medium",
+    "category": "integration",
+    "file": "video/pipeline/rewatch_pack.py",
+    "line": 545,
+    "title": "`pauses:` 只折進 make.py 的記憶體 manifest，rewatch_pack 與 critic --per beat 讀磁碟 manifest，停頓之後的拍時序全部偏早",
+    "description": "make.py:1118 呼叫 pauses.apply_pauses，只改記憶體裡的 manifest（pauses.py 的 docstring 明言「ON-DISK manifest is never rewritten」）。render、compose、timeline.json、.vtt 都讀這份，所以成片裡確實含停頓。但另外兩個消費端從磁碟重讀 manifest：rewatch_pack.load_manifest（:441-446）和 critic.load_manifest。拿到的 beat start/end_seconds、FA word 時間都沒有加停頓，因此該場停頓點之後的每一拍，在 rewatch pack 與 critic 裡都比實際影片早 hold 秒。受影響的輸出包括：rewatch 的取樣 tile（「beat N reveal」在 reveal 發生前就抽幀）、words_at 文字、_beat_at 死區定位（kickoff 指定「定位死區看這一行」，也就是 still-gate FAIL 行的 where）、non_reveal_events 的分類，以及 critic --per beat 的抽幀時間點。§3.1 正典 deck 有兩場觸發：difference_quotient_for_sine（step.2 +1.5 s，其後還有 result 拍）與 continuity_statement_sin_limit（proof.1 +1.2 s，其後還有 qed 拍）。still-gate 的秒數由影片直接量，判定本身不受影響，錯的是它指到哪一拍。",
+    "failure_scenario": "對 ch03_trig_derivatives_mimo 跑 rewatch_pack：場 04 裡落在 result 拍的死區，會被 _beat_at 指到前一拍；標著「beat 6 reveal → result」的 tile 在 result 實際進場前 1.5 s 抽幀。盲審鏡據此判斷「result 沒上畫面」或去改錯拍（§3.1 已經有「看錯拍連改兩輪」的前例）。critic --per beat 在場 04/08 停頓之後各拍的幀也提早 hold 秒抽，短拍可能抽到上一拍的畫面。",
+    "evidence": "make.py:1114-1118（記憶體折入）\n  manifest = pauses.apply_pauses(scenes, manifest, audio_dir / \"paused\")\npauses.py:15-17 'The ON-DISK manifest is never rewritten'\nrewatch_pack.py:442 for sub in (\"audio_mimo\", \"audio\"): ... json.loads(p.read_text())\nrewatch_pack.py:545 beats = [b for b in entry.get(\"beats\", []) ...]（磁碟版 start_seconds）\nrewatch_pack.py:571 still_where = _beat_at(mot[\"fine_longest_still_span\"], beats)\ncritic.py:276 \"ts\": max(LEAD_SECONDS + float(beat[\"end_seconds\"]) - BEAT_BACKOFF, 0.05)",
+    "repro": "草稿資料夾 repro_pauses_disk.py：用 3 拍假 manifest＋pauses {after: step.1, seconds: 1.5}，把磁碟版與 apply_pauses 後的版本分別餵給 rewatch_pack 與 critic 的函式。輸出：beat starts 磁碟 [0.0, 4.0, 9.0]、記憶體（＝成片）[0.0, 4.0, 10.5]；_beat_at 同一個死區，磁碟版答 (beat 3, step.2)、記憶體版答 (beat 2, step.1)；sample 'beat 3 reveal' 磁碟 10.7 s、實際 12.2 s；critic --per beat ts 磁碟 [4.8, 9.8, 15.8]、實際 [4.8, 11.3, 17.3]。",
+    "confidence": "confirmed",
+    "known_ref": "",
+    "suggested_fix": "讓 make.py 在 compose 時把已折入停頓的每拍時間寫成 sidecar（例如在 timeline.json 的每個 scene 加 beats[{index,reveal,start,end}]，或另寫 <stem>.beats.json），rewatch_pack 與 critic 改讀這份。替代做法：給 pauses 加一個只改時序、不寫 WAV 的 apply_pauses_timing(scenes, manifest)，兩支工具讀完磁碟 manifest 後都先套用它，FA words 也按同樣的 splice 位移。"
+   },
+   {
+    "id": "F-03",
+    "level": 1,
+    "severity": "medium",
+    "category": "integration",
+    "file": "video/pipeline/scene.py",
+    "line": 181,
+    "title": "scene._tail 的 MIN_HOLD 下限疊在 exit 淡出／場末補揭示之後，片長超出 2 影格 sync 硬閘，render 在 compose 前中止",
+    "description": "4de8839 讓 _tail 改成對齊「旁白結束＋SCENE_TAIL_SECONDS」，但 wait 保留 max(…, MIN_HOLD=0.3) 下限，而且 exit 淡出（0.5 s）在 wait 之前先播。所以 _play_content 迴圈之後，能吸收的額外耗時只剩 TAIL−exit−MIN_HOLD：有 exit 時 0.2 s，沒有 exit 時 0.7 s，超過的部分直接讓片子變長。25ad17d 又把 render/audio 審計改成 2 影格硬閘。以下三種合法輸入會因此在 render 完成後被 abort：(1) `carry: to:{corner}` 沒寫 {show <as>}。schema 對此只給 WARN（schema.py:262「flight … runs at scene end」），_apply_carry 的 docstring 與 DESIGN.md:1276-1277 也把它列為正式支援的路徑，但 0.8 s 飛行＋0.3 s 下限＝1.1 s，多 3 影格。(2) 最後一拍仍有 focus dim，同時宣告 exit：還原 0.4＋exit 0.5＋下限 0.3，多 6 影格。(3) 宣告 exit 的場，最後一拍 hook 超時超過 0.2 s。DESIGN.md:1281-1282 對 exit 的契約寫「總長不變（render/audio sync 閘看不到差異）」，與此不符。目前正典 deck 沒有觸發（各 corner carry 都有 marker，exit 場在最後一拍前都已還原 dim），屬潛在問題，但發作時要等整份 deck render 完才中止。",
+    "failure_scenario": "作者依 schema WARN 的字面理解，讓 corner carry 在場末自己飛（不寫 marker），或在最後一拍 dim 了某塊的場補上 exit:。make.py --quality high 跑完 15–25 分鐘的整份 render 後，[sync] 印出 video=…、expected=…、delta=+3.0/+6.0 frames，接著 abort before compose，錯誤訊息只說片子太長，指不到真正原因。",
+    "evidence": "scene.py:173-181\n  if mobs:\n      self.play(*[FadeOut(m) for m in mobs], run_time=EXIT_FADE_SECONDS)\n  now = elapsed(self)\n  ...\n      self.wait(max(narration_end + SCENE_TAIL_SECONDS - now, MIN_HOLD))\nscene.py:296-299 迴圈後的 focus 還原＋未揭示 block 的場末補揭示\nschema.py:260-262 corner carry 無 marker 只給 warn\nmake.py:616-629 abs(actual-expected) > SYNC_HARD_GATE_FRAMES/fps 判 fatal\nDESIGN.md:1281-1282「總長不變（render/audio sync 閘看不到差異）」",
+    "repro": "草稿資料夾 repro_tail_overrun.py：用 30 fps、逐影格進位的時鐘 FakeScene，照 selftest 的 unbound 方式驅動真實的 LessonScene._stage/_play_content/_tail；carry 的 flight Block 由真實的 templates._apply_carry 產生（只把來源場的 build_blocks 換成替身）。輸出：schema 對 A 只回 warn；A「carry corner 無 marker」video=9.100s expected=9.000s delta=+3.0 frames，FAIL；B「最後一拍 dim＋exit」delta=+6.0 frames，FAIL；對照組 C「dim 無 exit」delta=+0.0，ok。未做真 manim render（真 manim 的 0.8 s 可能是 25 格，只會更差）。",
+    "confidence": "confirmed",
+    "known_ref": "",
+    "suggested_fix": "narration_end 已知時，在 _tail 內先算 remaining = narration_end + TAIL − now，exit 淡出用 run_time=min(EXIT_FADE_SECONDS, remaining)（至少 1 影格），之後 wait(max(remaining − fade, 0))，去掉 MIN_HOLD 下限（它的用途是避免負 wait，不需要 0.3）。另外，schema 對「corner carry 無 marker」改為 error，或讓 make 的 [sync] 預檢在 render 前估算場末補揭示＋還原＋exit 是否超出 tail。補一支帶時鐘 FakeScene 的 selftest。"
+   },
+   {
+    "id": "F-04",
+    "level": 1,
+    "severity": "medium",
+    "category": "integration",
+    "file": "video/pipeline/rewatch_pack.py",
+    "line": 442,
+    "title": "rewatch_pack 不看 deck 就先選 audio_mimo，與 make/critic 以 deck id 選音檔目錄的規則不一致；§3.2 kickoff 的硬閘指令又給了錯的 deck",
+    "description": "make.py:1086 與 critic.load_manifest 的規則都是：deck id 以 _mimo 結尾才用 audio_mimo/，否則用 audio/。而正典 deck 與 _mimo deck 共用同一個 section_output_dir（實測 ch03_trig_derivatives 與 _mimo 都是 output/ch03/s3.1）。rewatch_pack.load_manifest 不管 --deck，只要 audio_mimo/ 存在就先用它；但 _av 目錄又是依 --deck 選（:488）。所以對非 _mimo deck 出 pack 時，會拿 mock render 的 _av 影片去配 Dean 真音檔的 manifest 與 FA words，reveal 時間、取樣點、字幕文字全部對不上影片，而且不會報錯。另一方面，KICKOFF-s32-chain-rule.md §5 B2 的硬閘 ② 與 §6.2 里程碑審都寫 `rewatch_pack.py --deck ch03_chain_rule`，但 B2 render 的是 ch03_chain_rule_mimo.yml（輸出到 _av/ch03_chain_rule_mimo/）。照文件執行時，如果沒有 canonical render，會直接 SystemExit「missing per-scene A/V file」；如果有早先開發時留下的 canonical mock render，硬閘就量了一份過時的 mock 影片，量錯對象的判定可能錯放行也可能錯擋。",
+    "failure_scenario": "§3.2 session 照 kickoff B2 先跑 make.py --storyboard ch03_chain_rule_mimo.yml --reuse-audio，接著跑 rewatch_pack.py --deck ch03_chain_rule --out <round>。_av/ch03_chain_rule/ 裡留有 Phase B 早期的 mock render，所以 still-gate 印出的 PASS/FAIL 是量那份舊 mock 片得出的，搭配的卻是 audio_mimo 的真音檔時序；本輪真正的 render 完全沒被硬閘量到。",
+    "evidence": "rewatch_pack.py:441-446\n  for sub in (\"audio_mimo\", \"audio\"):\n      p = section_dir / sub / \"manifest.json\"\n      if p.exists(): return ...\nrewatch_pack.py:488 av_dir = REPO / \"video\" / \"output\" / \"_av\" / args.deck\nmake.py:1086 audio_dir = sec_dir / \"audio\" if not meta[\"id\"].endswith(\"_mimo\") else sec_dir / \"audio_mimo\"\ncritic.py:128 audio_subdir = \"audio_mimo\" if deck_id.endswith(\"_mimo\") else \"audio\"\nKICKOFF-s32-chain-rule.md:501-512（render _mimo，但 rewatch --deck ch03_chain_rule）、:564",
+    "repro": "草稿資料夾 repro_rewatch_manifest_pick.py：在暫存 section 目錄同時放 audio/ 與 audio_mimo/ 的 manifest。輸出：rewatch_pack (any deck) reads: audio_mimo backend= mimo；make.py for deck ch03_trig_derivatives writes/reads: audio；same section_output_dir for both decks: True。kickoff 指令不符是讀文件確認的，未實跑。",
+    "confidence": "confirmed",
+    "known_ref": "",
+    "suggested_fix": "rewatch_pack.load_manifest 改收 deck id，比照 make/critic 的規則（audio_mimo iff deck 以 _mimo 結尾）。找不到時報錯，不要退回另一個目錄。同時把 KICKOFF-s32-chain-rule.md §5 B2／§6.2 的指令改成 --deck ch03_chain_rule_mimo。可選：在 pack.json 的 source 記下 manifest 路徑與 backend，並檢查 manifest 的 deck_id 等於 --deck。"
+   },
+   {
+    "id": "F-05",
+    "level": 3,
+    "severity": "low",
+    "category": "integration",
+    "file": "video/pipeline/sizecheck.py",
+    "line": 1062,
+    "title": "來源場的 `exit:` 與下一場 `carry.block` 沒有交叉檢查，被攜帶物件可能先淡出再在硬切後跳回",
+    "description": "schema._carry_issues 只驗 carry 的形狀與相鄰規則，sizecheck 也只分別驗 exit id 存在、carry.block 可建。沒有任何一道閘檢查「上一場的 exit 清單包含下一場要 carry 的 block」這種矛盾。發生時，來源場會在 tail 內把該物件淡出 0.5 s，make.py 又對 carry 邊界硬切（fade 0），下一場開場時物件原位出現，畫面上是一次淡出後跳回的閃動，正好違反 SPEC 規則 1「物件跨切點持續」。critic 看的是最滿幀，rewatch 只看動態量，都不會標出來。目前正典 deck 沒有觸發（06/11/23 的 exit 都避開了被攜帶的 block），但 exit 清單是作者手動維護，改場時很容易誤加。",
+    "failure_scenario": "作者把 squeeze_graph 的 exit 改成 [axes, ticks, plot.0, plot.4, inset, annotation.0]（想清空畫面），而下一場 limit_not_identity 仍 carry [axes, ticks, plot.0…]。成片裡曲線在場尾淡出，切場瞬間又整組跳回，所有閘都綠。",
+    "evidence": "schema.py:201-265 _carry_issues 不讀來源場的 exit\nsizecheck.py:1058-1065 只檢查 exit id 是否存在\nmake.py:664-675 _carry_boundaries 對 carry 邊界 fade=0（硬切）\nscene.py:173-176 exit 在 tail 內 FadeOut",
+    "repro": "none：屬潛在情境，現行 deck 無觸發，只靠讀 code 與列舉現行 exit/carry 組合確認（草稿 list_exit.py）。",
+    "confidence": "likely",
+    "known_ref": "",
+    "suggested_fix": "在 schema.schema_storyboard 的 carry 檢查中，對每個 carry entry 讀 scenes[i-1].exit：若 block（或 list 內任一 id）出現在其中就報 error（或 warn）。可順手把 DESIGN.md「exit：切場前把不帶走的東西退場」補一句反向規則。"
+   }
+  ]
+ },
+ {
+  "slice": "C 建置編排（make.py／scene／critic）",
+  "files_reviewed": [
+   {
+    "path": "video/make.py",
+    "depth": "full"
+   },
+   {
+    "path": "video/pipeline/scene.py",
+    "depth": "full"
+   },
+   {
+    "path": "video/pipeline/critic.py",
+    "depth": "full"
+   },
+   {
+    "path": "video/pipeline/scene_fallback.py",
+    "depth": "full"
+   },
+   {
+    "path": "video/pipeline/stillness.py",
+    "depth": "full"
+   },
+   {
+    "path": "video/pipeline/atomicio.py",
+    "depth": "full"
+   },
+   {
+    "path": "video/pipeline/_bootstrap.py",
+    "depth": "full"
+   },
+   {
+    "path": "video/pipeline/focus.py",
+    "depth": "full"
+   },
+   {
+    "path": "video/pipeline/texparts.py",
+    "depth": "full"
+   },
+   {
+    "path": "video/pipeline/__init__.py",
+    "depth": "full"
+   },
+   {
+    "path": "video/scratch_frames.py",
+    "depth": "full"
+   },
+   {
+    "path": "video/pipeline/pauses.py",
+    "depth": "full"
+   },
+   {
+    "path": "video/pipeline/timing.py",
+    "depth": "full"
+   },
+   {
+    "path": "video/pipeline/captions.py",
+    "depth": "full"
+   },
+   {
+    "path": "video/pipeline/house_audio.py",
+    "depth": "full"
+   },
+   {
+    "path": "video/pipeline/audio.py",
+    "depth": "full"
+   },
+   {
+    "path": "video/pipeline/tts.py",
+    "depth": "skim"
+   },
+   {
+    "path": "video/pipeline/scene_align.py",
+    "depth": "skim"
+   },
+   {
+    "path": "video/pipeline/schema.py",
+    "depth": "skim"
+   },
+   {
+    "path": "video/pipeline/listening_pack.py",
+    "depth": "skim"
+   },
+   {
+    "path": "video/pipeline/loudness_ab.py",
+    "depth": "skim"
+   },
+   {
+    "path": "video/pipeline/rewatch_pack.py",
+    "depth": "skim"
+   },
+   {
+    "path": "video/pipeline/sizecheck.py",
+    "depth": "skim"
+   },
+   {
+    "path": "video/pipeline/_selftest_critic_fullest.py",
+    "depth": "full"
+   },
+   {
+    "path": ".claude/agents/visual-frame-audit.md",
+    "depth": "skim"
+   },
+   {
+    "path": "video/_audit/REVIEW-pipeline-assessment-2026-09-07.html",
+    "depth": "skim"
+   },
+   {
+    "path": "video/KICKOFF-toolline-backlog-r2.md",
+    "depth": "full"
+   },
+   {
+    "path": "video/REBUILD_STATUS.md",
+    "depth": "skim"
+   }
+  ],
+  "health_summary": "make.py 的主幹結構紮實：schema/lint/sizecheck 前閘、mock 防覆寫真音檔的 guard、reuse freshness 檢查、以 frame 計的 [sync] 硬閘、單次編碼加 stream-copy concat，相關 selftest 也全綠。在 1080p 真音檔主線上，沒找到會讓 render 或 compose 產錯的問題。問題集中在兩處邊緣。第一是 critic 抽幀：gate 1 文件化的 `--dry-run` 路徑仍抽末幀，所以 r1 Task C 要修的「exit 場空跑」在 gate 1 其實沒修到；非 dry-run 路徑則會挑到 `indicate` 閃爍中的過渡幀。第二是 T10 loudnorm 收尾：成品寫出後若量測失敗，已正規化的成品會被丟掉；以本機速度推估，§3.1 4K final 必定觸發。另外交付檔少了 T8 規定的 faststart。其餘是低嚴重度的 exit code 與 manifest 覆寫問題，以及兩條 level 3 drift 風險。",
+  "not_covered": "沒有跑任何整份 deck 的 Manim render，也沒有用真 §3.1 成片實測 `indicate` 場的 ink 比值（C-02 的機制是用自寫的 manim 小場景重現的；§3.1 受影響場次是依 storyboard 的 `indicate` 位置推定）。C-03 的 4K 逾時是用合成的 4K60 片段量解碼速度、再外推到 1049 s，沒拿真 4K final 驗。沒有深審 `templates/__init__.py` 的 build_blocks、`blocks.play_block`、derivation transform 與 focus `save_state`/`restore` 的交互；也沒有深審 tts.py 中 ladder rung 拋例外時的整體行為（只確認 `run_ladder` 本身不攔例外）。Windows 方面只靜態掃過訊息字串的 cp950 可編碼性（literal 全部可編碼），沒有實測 `os.replace` 在目標檔被佔用時的行為，也沒有測含 `'` 的路徑對 concat list 的影響。另外，快照裡的 `video/media/` 與各處 `__pycache__/` 是 gitignored 目錄，由 selftest runner 或 import 產生（也可能是並行審查員產生的），沒有任何 tracked 檔案改動。",
+  "findings": [
+   {
+    "id": "C-01",
+    "level": 1,
+    "severity": "high",
+    "category": "false-negative-gate",
+    "file": "video/pipeline/critic.py",
+    "line": 687,
+    "title": "gate 1 文件化的 `critic.py --dry-run` 仍抽末幀：exit 場照樣空跑，480p15 更是一幀都抽不到",
+    "description": "r1 Task C（`53a0a72`）讓 `--per scene` 改抽 ink 最大幀，但 `main()` 以 `compute_fullest=not args.dry_run` 在 `--dry-run` 下關掉這一步，sentinel `ts=1e9` 於是退回 `min(ts, dur-0.05)`，也就是末幀。然而 gate 1 的正式呼叫就是 `--dry-run`：visual-frame-audit agent 提示第 21 行、REVIEW_GATES.md:96（「讀 `critic.py --dry-run` 抽出的最滿幀（ink 最大…`exit:` 清空畫面的場才不會抽到空幀）」）、VISUAL-FRAME-RUBRIC.md:4 都這樣寫。REBUILD_STATUS 記「exit 場 gate 1 不再空跑」，但對文件化路徑不成立。§3.1 的 06 `sector_inequality`、11 `squeeze_graph`、23 `shm_compute` 都有 `exit:`，gate 1 讀到的仍是清空後的幀。另有同一路徑的第二個失效：`dur-0.05` 的夾制在 fps<20 時落在最後一幀的 pts 之後，ffmpeg `-ss` 因此輸出空檔。README 推薦的 `--quality low`（manim 480p15）render，每場 `final.png` 都會 miss，印 `[dry-run] 0/N frames extracted` 後 exit 0。scratch_frames.py 的 `save_last_frame` 有同樣的末幀性質，只記在 scene.py `_tail` 的 docstring。",
+    "failure_scenario": "§3.1 render（1080p30）後照 agent 提示跑 `critic.py --storyboard ch03_trig_derivatives_mimo.yml --dry-run`，場 06／11／23 的 `final.png` 是 exit 淡出後的幀，gate 1 判 0 blocking，實際等於沒審。若 render 用 `--quality low`，每一場都 `ffmpeg miss`、0 幀，exit code 仍為 0。",
+    "evidence": "critic.py:687 `plan = extract_frames(deck_id, plan, out_dir, compute_fullest=not args.dry_run)`；critic.py:316-321 `if item.get(\"final\") and compute_fullest: ...` / `ts = item[\"ts\"] if dur is None else min(item[\"ts\"], dur - 0.05)`；critic.py:627 dry-run 印 `@ end`；.claude/agents/visual-frame-audit.md:21「那是 `python video/pipeline/critic.py --storyboard <yml> --dry-run`…抽出的**最滿幀**」；video/REVIEW_GATES.md:96；_selftest_critic_fullest.py 的 test_dry_run_skips_the_expensive_decode 把「dry-run 不算最滿幀」釘成契約",
+    "repro": "scratchpad/review-work/C/repro_critic_dryrun.py：合成 30 fps 片段（前 2 s 有 ink、後 1 s 清空，模擬 exit 場），對 critic.main() 只 monkeypatch 檔案查找，`--out` 指到 scratch。輸出 `--dry-run rc=0 plan.ts=1e9 fullest_ts=None frame_ink=0.000` 對 `(no flag) rc=0 plan.ts=1.75 fullest_ts=1.75 frame_ink=0.100`。repro_critic_lastframe.py：15 fps 下 compute_fullest=False 為 MISS，30／60 fps 為 OK。拿真 manim low_quality 片段（480p15、10.27 s）走 dry-run 路徑：`[critic] ffmpeg miss s beat 0 @ 10.22s`，frame_path=None。",
+    "confidence": "confirmed",
+    "known_ref": "",
+    "suggested_fix": "讓 `--dry-run` 也算最滿幀（完全離線、零 API，成本只有本地解碼；「dry-run」語意是不打 API），或把 gate 1 的正式呼叫改成不帶旗標的抽幀，並同步 agent 提示、REVIEW_GATES、VISUAL-FRAME-RUBRIC、README。末幀夾制改成 `dur - 1.5/fps`（fps 取自 ffprobe）或用 `-sseof`。任一規劃幀 miss 時回非 0。注意與 C-02 互動：dry-run 開始算最滿幀後，gate 1 也會吃到 C-02 的過渡幀問題。"
+   },
+   {
+    "id": "C-02",
+    "level": 1,
+    "severity": "medium",
+    "category": "correctness",
+    "file": "video/pipeline/critic.py",
+    "line": 194,
+    "title": "最滿幀挑到 `focus.indicate` 閃爍中的過渡幀：純累加場也會離開已定格的末幀",
+    "description": "`_fullest_frame_ts` 取整場 ink 的 argmax，只有在末幀 ink ≥ 峰值 99% 時才保留末幀。但 `focus.indicate` 用 manim `Indicate`，會把 block 放大 1.15 倍（面積 +32%）並換色約 0.8 s，那幾幀的 ink 很容易比定格末幀高出 1% 以上。結果純累加、無 `exit:` 的場也會把 `final.png` 換成閃爍中途的幀：主角 block 被染成 accent/amber 並放大，可能蓋到鄰近元素。這推翻了 Task C「純累加場與末幀逐幀相同」的保證。§3.1 在最後一個 reveal 帶 `indicate` 的場有 07 `squeeze_to_the_bound`（step.0）、10 `fundamental_limit`、16 `derivative_of_sine`、17 `derivative_of_cosine`（statement）、18、19，另有 11（exit 場，峰值也可能落在閃爍上）。受影響的是 `--confirm`（gate 2，外部 API，送出的就是這張幀）與任何不帶 `--dry-run` 的抽幀。",
+    "failure_scenario": "對 §3.1 跑 `critic.py --confirm` 或不帶旗標抽幀時，場 10／16／17 送出或存下的是 statement 被染色放大的過渡幀：MiMo 或 gate 1 可能報出假的 V10（語意色不一致）／V2（放大後相撞），也可能漏審定格構圖的真問題，而且浪費外部 API 呼叫。",
+    "evidence": "critic.py:189-195 `for i, v in enumerate(ink): if v >= best_val: ...` / `if last_val >= 0.99 * best_val: best_idx = n - 1`；focus.py:122-123 `scene.play(*[Indicate(m, scale_factor=INDICATE_SCALE, color=color) ...], run_time=INDICATE_SECONDS)`；storyboard 掃描：ch03_trig_derivatives_mimo.yml 的 07/10/16/17/18/19 在最後一個 reveal 有 `indicate`",
+    "repro": "scratchpad/review-work/C/repro_fullest_indicate.py：用 manim 真 `Indicate`（focus.INDICATE_SCALE／INDICATE_SECONDS）渲染一個 480p15 小場景：三個累加 reveal，最後一拍 indicate，接 1.5 s 持平加 1 s tail，無 exit。輸出 `indicate plays 7.00-7.80s; fullest_ts=7.25s ink_ratio_vs_last=1.28 -> MID-FLASH (transient) frame picked`。機制已確認；§3.1 各場的實際 ink 比值沒有用真成片量過。",
+    "confidence": "likely",
+    "known_ref": "",
+    "suggested_fix": "只在「定格」候選中取最大 ink，例如候選為每個 beat 的 `LEAD + end_seconds - BEAT_BACKOFF`（需套用 pauses，見 C-07）加上末幀。這些時間點依 scene.py 契約都在 reveal／indicate 之後、下一拍之前；或者排除與前後幀差異超過門檻的幀。並加一條 selftest：累加加 indicate 的合成片段必須選到末幀。"
+   },
+   {
+    "id": "C-03",
+    "level": 1,
+    "severity": "medium",
+    "category": "error-handling",
+    "file": "video/make.py",
+    "line": 884,
+    "title": "loudnorm 收尾把「量測失敗」當「正規化失敗」：丟掉已寫好的正規化成品，4K final 推估必觸發；pass-2 失敗則直接崩潰",
+    "description": "`_loudnorm_final` 的 docstring 寫「回 {'error'} 時 out 未寫出」，但它是在 pass 2 已成功寫出 `out` 之後才呼叫 `measure_loudness(out)`。後者一出錯（timeout 120 s、解析失敗）就回 {'error'}，compose 看到後印 `WARN loudnorm failed … shipping un-normalized concat`，用未正規化的 concat 覆蓋掉剛做好的正規化成品，exit 0。`measure_loudness` 沒帶 `-vn`，會把整條視訊也解碼；4K60 的 1049 s 片在本機推估約 182 s，超過 120 s timeout。也就是 `--quality 4k --reuse-audio` 的 §3.1 4K final 路徑會靜靜交出未正規化的音訊。反方向也有問題：pass 2 的 `_ffmpeg` 若失敗（例如全靜音片的 measured_I=-inf），直接拋 RuntimeError，違反「失敗就退回未正規化 concat」的註解契約，而且 `_concat_preloudnorm.mp4` 會殘留。",
+    "failure_scenario": "(1) §3.1 4K final：`make.py --storyboard ch03_trig_derivatives_mimo.yml --reuse-audio --quality 4k`，pass 1／pass 2 成功，ebur128 量測解碼 4K 視訊超過 120 s 逾時，成片的 integrated loudness 停在原始值而不是 house −19 LUFS，只有一行 WARN，exit 0。(2) 用 `tts.py --backend mock` 的 manifest 加上只含 content 場的 `--scene` 子集跑 `--reuse-audio`：音訊全靜音，pass 2 報 `Value -inf for parameter 'measured_I'`，make.py 在 render 完成後以 traceback 結束。",
+    "evidence": "make.py:794-797 `_ffmpeg([... \"-af\", af, ... str(out)])` / `return measure_loudness(out)`；make.py:884-888 `loud = _loudnorm_final(concat_tmp, output, abr, loudness_target)` / `if \"error\" in loud: ... _concat(segments, output, abr)`；listening_pack.py:96-99 `[\"ffmpeg\", \"-hide_banner\", \"-nostats\", \"-i\", str(wav), \"-af\", \"ebur128=peak=true\", \"-f\", \"null\", \"-\"], ... timeout=120`（無 -vn）",
+    "repro": "scratchpad/review-work/C/repro_loudnorm.py：(b) 用合成 scene mp4 加上 tone WAV 跑真 `make.compose(apply_loudnorm=True)`，只把 measure_loudness 換成回 {'error': 'TimeoutExpired'}，輸出 `[loudness] WARN loudnorm failed …; shipping un-normalized concat`，成片實量 `{'I': -22.4, 'TP': -21.0}`（目標 −19.0）。(c) 合成 4K60 10 s 片段：含視訊解碼 1.73 s，外推 1049 s 片約 182 s，超過 120 s；`-vn` 0.10 s，外推約 11 s。全靜音片直接呼叫 `_loudnorm_final`：`RuntimeError … Value -inf for parameter 'measured_I' out of range`。",
+    "confidence": "likely",
+    "known_ref": "",
+    "suggested_fix": "`_loudnorm_final` 把「pass 2 是否成功」與「量測結果」分開回傳：pass 2 成功就保留成品，量測失敗只 WARN「normalized, unmeasured」。量測加 `-vn`（或另寫一支帶 -vn 的量測、放寬 timeout）。pass 2 的 `_ffmpeg` 包 try/except，失敗才退回 concat。`concat_tmp` 放在 finally 刪除。"
+   },
+   {
+    "id": "C-04",
+    "level": 1,
+    "severity": "low",
+    "category": "correctness",
+    "file": "video/make.py",
+    "line": 794,
+    "title": "真音檔交付檔（loudnorm pass 2 輸出）少了 T8 規定的 `+faststart`，moov 落在檔尾",
+    "description": "T8／F13 規定成片要 `-movflags +faststart`（moov 移到檔頭，供漸進播放），`_concat` 有照做。但 `--reuse-audio` 路徑真正交付的是 `_loudnorm_final` pass 2 另行 mux 的檔案（`-c:v copy -af loudnorm…`），這一步沒帶 `+faststart`，所以唯一會交付的真音檔成片反而失去 faststart。mock 路徑（直接用 `_concat` 的產物）則有 faststart。",
+    "failure_scenario": "§3.1 或 §3.2 的真音檔成片（`--reuse-audio`，預設會做 loudnorm）放到網頁或課程平台做漸進播放時，播放器要下載到檔尾才能開始播放。本機播放器與 YouTube 上傳不受影響。",
+    "evidence": "make.py:794-796 `_ffmpeg([\"ffmpeg\", \"-y\", \"-i\", str(src), \"-map\", \"0:v:0\", \"-map\", \"0:a:0\", \"-c:v\", \"copy\", \"-af\", af, \"-c:a\", \"aac\", \"-b:a\", abr, \"-ar\", \"48000\", \"-ac\", \"2\", str(out)])`；對照 make.py:810-813 `\"-c\", \"copy\", \"-movflags\", \"+faststart\"`；KICKOFF-pipeline-hardening.md:815 T8-2 faststart",
+    "repro": "scratchpad/review-work/C/repro_loudnorm.py (a)：兩段照 ENCODE_V 編碼的 1080p30 片段（含 AAC），`_concat` 輸出 `moov-before-mdat=True`，`_loudnorm_final` 輸出 `moov-before-mdat=False`（量得 I=-19.0）。",
+    "confidence": "confirmed",
+    "known_ref": "",
+    "suggested_fix": "pass 2 指令加 `-movflags +faststart`，並在既有 loudness selftest 補一條 moov 位置斷言。"
+   },
+   {
+    "id": "C-05",
+    "level": 1,
+    "severity": "low",
+    "category": "error-handling",
+    "file": "video/pipeline/critic.py",
+    "line": 700,
+    "title": "`critic.py --confirm` 整批呼叫全失敗仍 exit 0，critique.md 把 HTTP 錯誤寫成「could not parse JSON」",
+    "description": "`run_critique` 把每個失敗的呼叫都 append 進 results（帶 `error` 欄）。`main` 用 `return 0 if res else 1` 判斷，只要 results 非空就回 0，所以 N/N 全失敗也回 0。`_write_md` 忽略 `error` 欄，失敗項一律寫「could not parse JSON; raw model output」加一個空區塊，HTTP 401／5xx 的真正原因從人讀報告中消失。",
+    "failure_scenario": "MIMO_API_KEY 失效或過期時跑 gate 2：每幀都 HTTP 401，console 雖印 `done: 0/21 ok, 21 failed`，但 exit 0；以 exit code 判斷成敗的 orchestrator 或 subagent 會當成功。讀 critique.md 的人看到 21 條「could not parse JSON」，會以為是模型輸出格式問題。",
+    "evidence": "critic.py:697-700 `res = run_critique(...)` / `return 0 if res else 1`；critic.py:577-588 失敗仍 `results.append(fields | {... \"error\": ...})`；critic.py:522-526 `if not c: out.append(\"> could not parse JSON; raw model output:\\n\")`（未讀 `r['error']`）",
+    "repro": "離線：把 `critic.critique_frame` monkeypatch 成拋 HTTPError 401（不連網），3 幀跑 `run_critique`，輸出 `[critic] done: 0/3 ok, 3 failed`，`main() would return 0 | results: 3 | errors: 3`，`critique.md mentions 401: False | says 'could not parse JSON': 3`。",
+    "confidence": "confirmed",
+    "known_ref": "",
+    "suggested_fix": "`failures == len(results)` 時回 1（或只要有 failure 就回非 0，另給 exit 碼區分）；`_write_md` 在有 `error` 時印出錯誤原文，不要套用 parse-JSON 的文案。"
+   },
+   {
+    "id": "C-06",
+    "level": 1,
+    "severity": "low",
+    "category": "integration",
+    "file": "video/make.py",
+    "line": 1109,
+    "title": "make.py mock synth 在 `--scene` 子集下整份覆寫 manifest（F5 規則只修了 tts.py），critic `--scene all` 的覆蓋面因此靜默縮小",
+    "description": "F5（pipeline-hardening）定下的規則是「`--scene` 子集要併回既有 manifest，不可整份覆寫」，tts.py:1391 已經照辦。make.py 自己的 mock synth 卻只為選中的場景產生 entry，然後 `manifest_path.write_text` 整份覆寫，其餘場景的紀錄全部消失。critic 的 `--scene all` 以 manifest 的場景順序規劃（不是 storyboard），又在開跑前清空 `frames/`，結果只剩子集的幀，而且沒有任何警告。rewatch_pack（不在本片範圍）同樣以 manifest 取 beat 資料，其餘場會被當成 silent。",
+    "failure_scenario": "照 README 先跑 mock 全片，再跑 `make.py --scene difference_quotient_for_sine,continuity_statement_sin_limit --quality low --backend mock` 局部重做，接著跑 `critic.py --dry-run`（預設 all）：只規劃 2 場，另外 19 個 content 場的舊幀被 `reset_frames_dir` 清掉，gate 1 只看得到 2 場，console 只印「planning 2 frame(s)」。",
+    "evidence": "make.py:1109-1111 `manifest = synth(meta, scenes, scene_numbers, audio_dir, ...)` / `manifest_path.write_text(json.dumps(manifest, ...))`（scenes 是選中子集）；tts.py:1391-1394 `# F5: a subset run must merge into the prior manifest ... manifest = merged_manifest(existing, manifest, ...)`；critic.py:234-235 `if selector == \"all\": order = [s[\"scene_id\"] for s in manifest[\"scenes\"]]`；critic.py:686 `reset_frames_dir(out_dir)`",
+    "repro": "scratchpad/review-work/C/repro_pauses_critic.py 第 (2) 段：對 ch03_trig_derivatives_mimo 選 2 場，呼叫 `make.synth(backend mock)`（寫到 scratch 音訊目錄），輸出 `manifest scenes = ['difference_quotient_for_sine', 'continuity_statement_sin_limit']; critic --scene all ... would plan 2 of 21 content scenes`。",
+    "confidence": "confirmed",
+    "known_ref": "KICKOFF-pipeline-hardening.md:52 F5（當時只指 tts.py:882-919；make.py 的 mock 寫入端未列）",
+    "suggested_fix": "mock synth 在子集時比照 tts.py，以 `merged_manifest(existing, fresh, all_scene_ids)` 併回（identity 相同時）；或至少讓 critic 的 `all` 以 storyboard 場序規劃，並對 manifest 缺席的 content 場印 WARN。"
+   },
+   {
+    "id": "C-07",
+    "level": 3,
+    "severity": "low",
+    "category": "integration",
+    "file": "video/pipeline/critic.py",
+    "line": 276,
+    "title": "`pauses:` 只折進 make.py 記憶體中的 manifest；critic `--per beat`（與 rewatch_pack）讀磁碟 manifest，停頓拍之後的時間全部偏早 hold 秒",
+    "description": "pauses.py 與 REBUILD_STATUS 宣稱「render／compose／timeline.json／.vtt 全讀同一份已加停頓的記憶體 manifest，不可能各自漂移」。但 critic `--per beat` 的 `ts = LEAD + end_seconds - BEAT_BACKOFF` 讀的是磁碟 manifest（沒有停頓），所以停頓那一拍以及之後每一拍，都在實際拍尾前 hold+0.2 s 才抓幀，而不是 0.2 s。rewatch_pack 的 `reveal_times` 也同樣讀磁碟 manifest。以現行 §3.1 的時長（04 hold 1.5 s、08 hold 1.2 s，後續拍都遠長於 hold 加 reveal），抓幀仍落在正確的拍內，所以目前沒有實害，屬 drift 風險。",
+    "failure_scenario": "未來某場在 `pauses:` 之後接一個短拍（長度小於 hold 加 reveal 動畫，約 2.7 s）：`critic --per beat` 抓到的會是上一拍的構圖，或是 reveal 進行到一半的幀，卻標成「本拍已顯示 X」，gate 1／2 可能報出假的 V7（reveal 不同步）。",
+    "evidence": "critic.py:274-276 `\"ts\": max(LEAD_SECONDS + float(beat[\"end_seconds\"]) - BEAT_BACKOFF, 0.05)`（manifest 來自 critic.py:674 `load_manifest`＝磁碟檔）；make.py:1114-1118 `manifest = pauses.apply_pauses(scenes, manifest, audio_dir / \"paused\")`（僅記憶體）；rewatch_pack.py:486／524 `load_manifest(section_dir)`、`reveal_times = [SCENE_LEAD_SECONDS + b[\"start_seconds\"] ...]`",
+    "repro": "scratchpad/review-work/C/repro_pauses_critic.py 第 (1) 段：mock synth 場 04、08，加上 make.py 同款的 `apply_pauses`，再與 critic `plan_frames(per=\"beat\")` 比對。場 04 的 beat 01-04 抓在拍尾前 0.2 s；beat 05（step.2，停頓拍）`grab@93.20s` 對上 window `[69.00,94.90)`，beat 06 `grab@114.40s` 對上 `[94.90,116.10)`，都是拍尾前 1.7 s，仍在拍內。",
+    "confidence": "confirmed",
+    "known_ref": "",
+    "suggested_fix": "critic（及 rewatch_pack）在計算時間前比照 make.py 呼叫 `pauses.apply_pauses`（只讀 WAV，輸出目錄可指向暫存），或改讀 compose 產出的 `timeline.json`／in-memory 同款轉換。"
+   },
+   {
+    "id": "C-08",
+    "level": 3,
+    "severity": "low",
+    "category": "false-negative-gate",
+    "file": "video/pipeline/focus.py",
+    "line": 90,
+    "title": "`focus` 的 `dim`／`indicate` 指到「稍後才 reveal」的 block，會被 manim 提前加到畫面上；兩道防線都只擋了本拍自己的 target",
+    "description": "`focus.apply`（`.animate.fade`）與 `focus.indicate`（`Indicate`）都不是 introducer 動畫。manim 的 `Scene.add_mobjects_from_animations` 會把不在場上的 mobject 直接 `add` 進場，所以被 dim 或 indicate 的未 reveal block 會在該拍提前出現：dim 時以 35% 透明度出現，indicate 後則全亮留在畫面上。到它自己的 reveal 拍再做一次 FadeIn，若之前被 dim 過，reveal 後仍維持 dim 態。scene.py 的 `dim_ids` 與 schema `_focus_issues` 的註解推理是「還不在畫面上」，這對所有尚未 reveal 的 block 都成立，但兩者只排除本拍自己的 `at`；sizecheck 只查 id 存不存在。目前 24 份 storyboard 掃描結果為 0 例，屬 drift 風險。",
+    "failure_scenario": "作者寫 `focus: [{at: step.1, dim: [step.0, result]}]`，而 `result` 要到之後的拍才 `{show result}`：render 時 `result` 在 step.1 那拍就以淡色出現（劇透結論），到自己的 reveal 拍又淡入一次。所有閘都不報，只有看片才會發現。",
+    "evidence": "focus.py:79-93 `mob.save_state(); anims.append(mob.animate.fade(1.0 - DIM_OPACITY)) ... scene.play(*anims, run_time=FADE_SECONDS)`；focus.py:122 `Indicate(m, ...)`；scene.py:34-50 `dim_ids` 只排除 `block_id == target`；schema.py:79-86 只擋 `at in dim`；.venv manim/scene/scene.py:523-533 `if animation.is_introducer(): continue ... if mob is not None and mob not in curr_mobjects: self.add(mob)`",
+    "repro": "none：沒有 render（需要 Tex 與真模板）。已讀 manim 0.20.1 原始碼確認非 introducer 動畫會自動 add；另以腳本掃描全部 storyboard，dim／indicate 指向較晚 reveal 目標的 0 例。",
+    "confidence": "likely",
+    "known_ref": "",
+    "suggested_fix": "在 scene.py `_play_content` 以 `revealed ∪ static ∪ pre_play` 過濾 `wanted` 與 indicate 名單（比照 `dim_ids`，印 skip 訊息）；schema 或 sizecheck 加一條：dim／indicate 的 id 若是本場較晚 beat 的 reveal target 就報 error。"
+   }
+  ]
+ },
+ {
+  "slice": "D2 視覺系統＋其餘模板＋sizecheck",
+  "files_reviewed": [
+   {
+    "path": "video/pipeline/brand.py",
+    "depth": "full"
+   },
+   {
+    "path": "video/pipeline/visuals/theme.py",
+    "depth": "full"
+   },
+   {
+    "path": "video/pipeline/visuals/layout.py",
+    "depth": "full"
+   },
+   {
+    "path": "video/pipeline/visuals/graph_utils.py",
+    "depth": "full"
+   },
+   {
+    "path": "video/pipeline/visuals/__init__.py",
+    "depth": "full"
+   },
+   {
+    "path": "video/pipeline/sizecheck.py",
+    "depth": "full"
+   },
+   {
+    "path": "video/pipeline/assets/_outline_text.py",
+    "depth": "full"
+   },
+   {
+    "path": "video/pipeline/templates/intro.py",
+    "depth": "full"
+   },
+   {
+    "path": "video/pipeline/templates/value_table.py",
+    "depth": "full"
+   },
+   {
+    "path": "video/pipeline/templates/sign_chart.py",
+    "depth": "full"
+   },
+   {
+    "path": "video/pipeline/templates/definition_math.py",
+    "depth": "full"
+   },
+   {
+    "path": "video/pipeline/templates/procedure_steps.py",
+    "depth": "full"
+   },
+   {
+    "path": "video/pipeline/templates/divider.py",
+    "depth": "full"
+   },
+   {
+    "path": "video/pipeline/templates/outro.py",
+    "depth": "full"
+   },
+   {
+    "path": "video/pipeline/templates/callout.py",
+    "depth": "full"
+   },
+   {
+    "path": "video/pipeline/templates/recap_cards.py",
+    "depth": "full"
+   },
+   {
+    "path": "video/pipeline/templates/_common.py",
+    "depth": "full"
+   },
+   {
+    "path": "video/pipeline/templates/__init__.py",
+    "depth": "full"
+   },
+   {
+    "path": "video/make.py",
+    "depth": "skim"
+   },
+   {
+    "path": "video/pipeline/scene.py",
+    "depth": "skim"
+   },
+   {
+    "path": "video/pipeline/blocks.py",
+    "depth": "skim"
+   },
+   {
+    "path": "video/pipeline/floorprobe.py",
+    "depth": "skim"
+   },
+   {
+    "path": "video/pipeline/texparts.py",
+    "depth": "skim"
+   },
+   {
+    "path": "video/pipeline/scene_roles.py",
+    "depth": "skim"
+   },
+   {
+    "path": "video/pipeline/_bootstrap.py",
+    "depth": "skim"
+   },
+   {
+    "path": "video/pipeline/_selftest_semantic_palette.py",
+    "depth": "skim"
+   },
+   {
+    "path": "video/pipeline/templates/theorem_proof.py",
+    "depth": "skim"
+   }
+  ],
+  "health_summary": "這一片的 sizecheck 主體（overflow／overlap／capacity／floor 與 L1–L3、M1–M3）結構清楚，ground 與 ctx 跟 render 端一致，量的也是同一批 mobject；語意色 map 的 fallback 則有兩處靜默失效。最實質的問題有四個：一是 value_table 的 `_ACCENT_INK` 沒跟上 Direction B，所以 accent 欄／列的 cell 一律退成藍色；二是 definition_math 的 aside 放在 decoration layer，自己的高度沒有任何閘在量，collapse 判斷也不看它，於是可以靜默出框、蓋住 statement 或 motive；三是 `brand._wrap_mixed` 會在數學 span 與相鄰文字之間硬插空格，§3.1 的成片裡就有兩場出現；四是空白 table cell 會讓 sizecheck 丟出未捕捉的 ZeroDivisionError。其餘是 theme 別名色碼凍結在舊值、DESIGN 模板目錄沒同步、LABEL map 缺 key 這類 drift。",
+  "not_covered": "沒有對 24 份 deck 全跑 sizecheck，也沒有 render（依規則），所有重現都是在草稿資料夾 cwd 下 build_blocks 或直接呼叫 check_scenes。沒跑 run_selftests（避免在快照 video/ 下產生 media 快取），所以不知道現有 selftest 有沒有意外蓋到這些情境；不過 grep 看起來沒有。theorem_proof／graph／derivation 屬其他分片，只看了接口：theorem_proof 的 aside 同樣放在 decoration layer，暴露面相同（D2-02 有順帶提），但沒有重現。`_outline_text.py` 是一次性腳本，要 Windows 字型，沒執行。intro／outro 的實際長度與 house audio bed 的對應沒驗證。另有一條線索沒列成 finding：value_table／sign_chart 的 `statement`／`header` 沒有接 `_common.reveals()`，如果 say 寫了 `{show statement}`，會對已經在畫面上的 static block 再播一次 FadeIn（definition_math 註解說這是「無畫面差異的 reveal」）。目前沒有 deck 觸發，視覺效果（是否閃爍）也沒驗證。",
+  "findings": [
+   {
+    "id": "D2-01",
+    "level": 1,
+    "severity": "medium",
+    "category": "correctness",
+    "file": "video/pipeline/templates/value_table.py",
+    "line": 100,
+    "title": "value_table 的 accent 欄／列 cell 顏色永遠退成 blue_ink，不跟場景 accent（Direction B 後 map 缺 key、靜默 fallback）",
+    "description": "`_ACCENT_INK` 的 key 只有舊版 Direction-B 前的 role 名（secondary／accent／success／warning），但 2026-09-12 Direction B（de3004c）之後 `blocks.accent_role()` 只會回傳語意 role（concept／result／practice／strategy／caution／aside）。結果 `_ACCENT_INK.get(role, \"blue_ink\")` 對每一種 accent 都走 fallback，accent cell 一律上 blue_ink；同一欄後面的 `col_tint` 卻用 `T.color(ground, role)`，顏色是對的。同一次 commit 已經替 `_common._ASIDE_INK` 補上語意 key，value_table 這份重複的 map 漏改。DESIGN.md:178、:446–447 明文契約是「punchline 欄／列鋪 scene accent 同色 tint + 抬升 ink；映射 `_ACCENT_INK`」。",
+    "failure_scenario": "ch01_inverse_functions.yml 的 `when_inversion_fails`（accent: example → practice）：col 2 的 tint 是綠色 #3ebe7c，上面的 cell 卻是藍色 #79bfe8，應該是 practice_ink #66d19a。凡是有 accent_col／accent_row 的表，不論 accent 是 definition、theorem 還是 caution，cell 都是藍的。沒有任何閘會報。",
+    "evidence": "value_table.py:67-68 `_ACCENT_INK = {\"secondary\": \"blue_ink\", \"accent\": \"amber_ink\", \"success\": \"green_ink\", \"warning\": \"red_ink\"}`；:100 `accent_ink = _ACCENT_INK.get(role, \"blue_ink\")`；:170 tint 用 `T.color(ground, role)`。blocks.py:72-104 ACCENT_ROLE 只產語意 role。_common.py:414-419 `_ASIDE_INK` 已含 concept/result/... 對照；derivation.py:409、worked_example.py:130 直接用 `f\"{role}_ink\"`。",
+    "repro": "C:/Users/Kao/Downloads/Calculus_handout/.venv/Scripts/python.exe <scratch>/review-work/D2/repro_value_table_ink.py → `accent='example' -> accent_role='practice'`、`col_tint fill = #3ebe7c`、`row.0 accent cell colour = #79bfe8`（= blue_ink；practice_ink=#66d19a）；逐一列舉 7 種 accent，全部 → blue_ink。",
+    "confidence": "confirmed",
+    "known_ref": "",
+    "suggested_fix": "改成 `accent_ink = f\"{role}_ink\"`，與 derivation／worked_example 同一寫法；每個語意 role 在兩個 palette 都有 `_ink`，已由 _selftest_semantic_palette 保證。然後刪掉 `_ACCENT_INK`，或讓它跟 `_ASIDE_INK` 共用同一份。再補一條 selftest：value_table 的 accent cell 顏色要等於 `T.color(ground, f\"{accent_role}_ink\")`。"
+   },
+   {
+    "id": "D2-02",
+    "level": 1,
+    "severity": "medium",
+    "category": "false-negative-gate",
+    "file": "video/pipeline/templates/definition_math.py",
+    "line": 150,
+    "title": "definition_math 的 rail aside 幾何完全沒人檢查：collapse 不看 aside 高度，sizecheck 又因 decoration layer 全數豁免，aside 可以靜默出框、壓住標題帶、蓋住 statement／motive",
+    "description": "這是三個缺口疊在一起。(1) collapse 判斷（:121-127）只看 statement＋math 的高度和 math 列寬，完全不看 aside 本身的高度。RAIL_W≈5.31u，內寬≈4.21u，prose_sm 38px 一行大約只放得下 24 個字元，所以 22 字的 aside 就有 4.25u 高。aside 的垂直中心又對齊 content 中心，不做 clamp。(2) aside 是 `layer=\"decoration\"`。DESIGN.md:790 的契約是「豁免容量/overlap 檢查」，但 06-23 加進 `_overflow_issues` 的 decoration 豁免（:118-119，本意是給 hero curve、motif 這類刻意出血的裝飾）把 aside 的出框檢查也一起拿掉了，`_overlap_issues` 也只看 content layer（:188）。(3) aside 模式下，statement 包行的寬度是 PRIMARY_W，而 aside 左緣正好就在 SPINE_X+PRIMARY_W（=RAIL_X），中間零間距。字元估寬對含 inline math 的行實測可以低估 11.7%，遠超 `_selftest_text_metrics` 只對純文字保證的 6%，所以 statement 的第一行會直接伸進不透明的 aside panel 底下，panel 又比 statement 晚畫。theorem_proof.py:199-205 的 aside 同屬 decoration layer，暴露面相同（屬其他分片）。",
+    "failure_scenario": "① 43 字的 aside（三句話），panel 頂到 y=3.48，已經超過上安全線／masthead 頂 3.45；56 字的是 y[-3.72, 4.31]，頂端出框（frame ±4.0）。sizecheck 的 overflow／overlap finding 是 0 條，只報了一條 L2「bottom third 0% filled」，因為 aside 不算 body。② statement「Maximum and minimum values of $f$ on $[a,b]$ occur at critical numbers or endpoints.」配一個短 aside，第一行實寬 7.96u，PRIMARY_W 是 7.43u，伸進 aside panel 0.528u（71px），行尾被不透明 panel 蓋住，sizecheck 0 條相關 finding。③ ch01 `inverse_definition` 加一行 scaffold.motive（寬度是 CONTENT_W，橫跨 rail），aside 上緣與 motive 第二行重疊 4.40u×0.15u，同樣無 finding。現行 ch01 那一場目前沒事：與 statement 間距 0.235u，距標題 0.13u，但餘裕很小。",
+    "evidence": "definition_math.py:121-127 `too_tall = content is not None and content.height > (zt - zb)`／`too_wide = any(m.width > PRIMARY_W + 0.05 for m in math_mobs)`（沒有 aside）；:148-150 `aside.move_to([RAIL_X, content.get_center()[1], 0], aligned_edge=LEFT)` … `Block(\"aside\", aside, …, layer=\"decoration\")`。sizecheck.py:118-119 `if getattr(b, \"layer\", \"content\") in (\"decoration\", \"background\"): continue`（git log -L：dbd0f67 2026-06-23，晚於 aside 的 ba2daa2 2026-06-21）；:188 overlap 只收 content；:410 capacity 只收 content。_common.py:56-57 RAIL_X = SPINE_X + PRIMARY_W。",
+    "repro": "<scratch>/review-work/D2/repro_aside2.py → `3 sentences words=43 aside y[-2.89,3.48] … overflow/overlap findings: 0`、`4 sentences words=56 aside y[-3.72,4.31] … findings: 0`；repro_aside_collide.py → `horizontal intrusion of statement into aside panel: +0.528u (+71px)`，sizecheck 只有 1 條 L2 warn；repro_aside_scaffold.py → `motive/aside intersection: 4.40u x 0.15u`，sizecheck `[]`；repro_wrap_lines.py → 第一行 `est=7.125 real=7.960 (+11.7%)`。",
+    "confidence": "confirmed",
+    "known_ref": "DESIGN.md:748、:790（契約只寫「aside 豁免容量/overlap」，沒寫豁免出框；本條是新發現）",
+    "suggested_fix": "兩處擇一或都做。(a) definition_math 的 collapse 加上 `aside.height > zone_h` 就收合，並把 aside 的 y clamp 在 body zone 內。另外 aside 模式下 statement 改用 `PRIMARY_W - gutter` 包行（例如留 0.3u），吸收估寬誤差。(b) sizecheck 的 `_overflow_issues` 不要豁免 `aside`：可以只把 aside 改成 content layer 同時保留 overlap 豁免，或在 overflow 裡對 id=='aside' 特判；再加一條 aside 和 statement／scaffold 的 pairwise 碰撞檢查。theorem_proof 的 aside 一起處理。"
+   },
+   {
+    "id": "D2-03",
+    "level": 1,
+    "severity": "medium",
+    "category": "correctness",
+    "file": "video/pipeline/brand.py",
+    "line": 367,
+    "title": "`_wrap_mixed` 會在 `$…$` 與緊貼的文字之間硬插空格，§3.1 成片的 `( cos x≠0)` 就是這樣來的",
+    "description": "`_wrap_mixed` 先把字串切成 math span 與以空白切開的文字 token，只有純「收尾標點」（`[,.;:!?)\\]}]+`）會黏回前一個 token，最後一律用 `\" \".join` 組回去（:367、:376、:383）。所以數學 span 前後原本沒有空格的地方都會多出一個空格：`($f$)` 變成 `( $f$)`，`$x$-axis` 變成 `$x$ -axis`，`$f$'s`、`$n$th`、`$\\varepsilon$–$\\delta$` 也一樣。所有經 `brand.prose` 且含 inline math 的欄位都受影響，包括 statement、body、points、reason、scaffold、aside，不論有沒有換行（max_width=None 也會 join）。",
+    "failure_scenario": "ch03_trig_derivatives(.yml／_mimo.yml) 的 `all_six_tan_sec`、`all_six_cot_csc` 兩個 steps[0].reason 寫的是「quotient rule on $\\tfrac{\\sin x}{\\cos x}$ ($\\cos x\\neq 0$)」，送進 LaTeX 的卻是 `( $\\cos x\\neq 0$)`，畫面上左括號後多出約 9.5px 空白。ch03_chain_rule 的 `proof_delicate_choices.scaffold.motive`「an $\\varepsilon$–$\\delta$ argument」渲成「ε -- δ」，en dash 兩側多出空格。微積分散文很常寫 `$x$-axis`、`$y$-intercept`、`$n$th`，往後各章都會碰到。沒有任何閘在看這件事。",
+    "evidence": "brand.py:351-363 `tokens.extend(part.split())`／`if merged and re.fullmatch(r\"[,.;:!?)\\]}]+\", tok): merged[-1] += tok`；:367 `return [\" \".join(tokens)]`；:376/:383 `lines.append(\" \".join(cur))`。",
+    "repro": "<scratch>/review-work/D2/repro_wrap_space.py → `'the $x$-axis' -> ['the $x$ -axis']`、`'the inverse ($f^{-1}$) of $f$' -> ['the inverse ( $f^{-1}$) of $f$']`、`\"$f$'s graph\" -> [\"$f$ 's graph\"]`、`'the $n$th term' -> ['the $n$ th term']`；repro_wrap_space2.py（真 deck）→ `tex sent : quotient rule on $\\tfrac{…}{…}$ ( $\\cos x\\neq 0$)`，寬度多 +0.070u（+9.5px）；repro_wrap_space3.py → `an $\\varepsilon$ -- $\\delta$ argument`；在 4 份正典 deck 掃描，5 處命中。",
+    "confidence": "confirmed",
+    "known_ref": "",
+    "suggested_fix": "切 token 時記下每個 token 前面原本有沒有空白（例如用 `re.finditer` 保留分隔符），重組時只在原本有空白的地方插空格；換行只在原本的空白處斷。再補一條 selftest：`_wrap_mixed(\"the $x$-axis ($f$)\", fs, None) == [\"the $x$-axis ($f$)\"]`。"
+   },
+   {
+    "id": "D2-04",
+    "level": 1,
+    "severity": "medium",
+    "category": "error-handling",
+    "file": "video/pipeline/sizecheck.py",
+    "line": 593,
+    "title": "value_table 的空白 cell（例如表頭左上角）會讓 sizecheck 丟出未捕捉的 ZeroDivisionError，整個 preflight 崩潰",
+    "description": "`value_table._cell(\"\")` 走 `brand.prose(\"\")`，沒有 max_width，所以變成 `body_text` → `Tex(\"\")`。這個 Tex 高度是 0，`initial_height` 也是 0，但一樣會被 `_mark_prose` 標上 prose tag。sizecheck 的 `_floor_issues` → `_effective_font_px` 讀 `node.font_size`，也就是 manim 的 `height/initial_height`，當場 ZeroDivisionError；sibling 檢查的 `_norm_size`（:60）也一樣會炸。`_check_scenes_locked` 只有 `build_blocks` 包了 try（:1021-1025），這個例外會一路冒出 `check_scenes`，make.py 的 preflight 直接 traceback 結束，而不是回報成 SIZE finding。render 端的 floorprobe 對同一件事有 try/except，所以只有閘會崩。schema 和 lint 都不驗 value_table 的 cell。",
+    "failure_scenario": "property comparison 表很常留空白角落，例如 `header: [\"\", \"$x\\\\to 2^-$\", \"$x\\\\to 2^+$\"]`。`make.py` 或 `sizecheck.py` 跑到那一場就 traceback 中止，唯一的繞法是 `--skip-sizecheck`，但那會把整個 sizecheck 關掉，包括 overflow、floor 與 `{show}` target 檢查。",
+    "evidence": "sizecheck.py:593 `fs = float(node.font_size)`（沒有保護）；:60 `fs = float(node.font_size)`；:1021-1025 只有 build_blocks 在 try 裡。value_table.py:77 `return brand.prose(s, ground, role=role, size=size)`。manim tex_mobject.py:115 `return self.height / self.initial_height / SCALE_FACTOR_PER_FONT_POINT`。對照 floorprobe.py `_effective_px` 有 try/except，並回傳 None。",
+    "repro": "<scratch>/review-work/D2/repro_empty_cell.py → `Tex('') height 0 initial_height 0`；`S.check_scenes(meta, [value_table 場 header [\"\", …]])` → Traceback … sizecheck.py:628 `_floor_issues` → :593 `_effective_font_px` → `ZeroDivisionError: division by zero`。",
+    "confidence": "confirmed",
+    "known_ref": "",
+    "suggested_fix": "`_effective_font_px`／`_norm_size` 比照 floorprobe `_effective_px`：height 或 initial_height ≤0 時回傳 None，呼叫端直接略過。或在 `_prose_nodes` 就排除 height≈0 的節點。另外可以讓 value_table 空 cell 改用 `VGroup()` 佔位，不要建 `Tex(\"\")`。補一條 selftest：空 cell 的 value_table 過 check_scenes 不會拋例外。"
+   },
+   {
+    "id": "D2-05",
+    "level": 1,
+    "severity": "low",
+    "category": "correctness",
+    "file": "video/pipeline/templates/value_table.py",
+    "line": 76,
+    "title": "value_table 的「文字＋inline math」混合 cell 字級只有純文字 cell 的 78%（走 math anchor、沒乘 TEXT_SCALE），sibling／floor 閘看不到",
+    "description": "`_cell` 只要看到 `$` 就一律送 `brand.math_line`。混合字串（例如「exists at $x=2$」）在 math_line 裡走 `_tex_with_map(tex, …, fsz)`，而 `fsz = T.fs(size)` 是數學錨點，沒有乘 `TEXT_SCALE`。純文字 cell 走 `brand.prose` → `_text_fs(size)`，有乘 `TEXT_SCALE`。所以同一張表、同一個 `size=\"prose\"`，文字會出現兩種大小：混合 cell 的 font_size 是純文字 cell 的 1/1.2748 = 0.784。DESIGN 型階表寫「prose 42 = value_table 內文 cell」，sizecheck docstring 也說「stacked sibling prose must render at one size」。但 math_line 的輸出不帶 prose tag，sibling 閘和 floor 閘都量不到。",
+    "failure_scenario": "value_table 的 docstring 自己舉的 property comparison 用法，例如 rows `[[\"left\", \"$3$\", \"exists\"], [\"right\", \"$5$\", \"exists at $x=2$\"]]`：第二列的 \"exists at\" 約等於 33px，第一列的 \"exists\" 是 42px，同一欄字級不同，sizecheck 無 finding。目前正典 deck 沒有混合 cell，屬潛在問題。",
+    "evidence": "value_table.py:74-77 `if \"$\" in s: return brand.math_line(s, ground, role=role, size=size)` / `return brand.prose(...)`；brand.py:666-672 `fsz = T.fs(size)` … `if \"$\" in tex: return _tex_with_map(tex, ground, col, fsz)`；brand.py:397 `_prose_lines` 用 `fsz = _text_fs(size)`。",
+    "repro": "<scratch>/review-work/D2/repro_vt_mixed_cell.py → `plain cell: Tex font_size=37.37 -> 42.0px`、`mixed cell: Tex font_size=29.32`、`ratio mixed/plain = 0.784 (1/TEXT_SCALE = 0.784)`；同表跑 check_scenes → `no size finding`。",
+    "confidence": "confirmed",
+    "known_ref": "",
+    "suggested_fix": "`_cell` 改成一律走 `brand.prose`。prose 自己會把「整串單一 `$…$`」送去 math_line（display），混合字串則走 `_prose_lines`（text scale），和其他模板的 author 欄位路由一致。要保留現行數學 cell 的尺寸，就只把「單一 span 純數學」留給 math_line。"
+   },
+   {
+    "id": "D2-06",
+    "level": 2,
+    "severity": "low",
+    "category": "docs",
+    "file": "video/DESIGN.md",
+    "line": 179,
+    "title": "DESIGN 模板目錄表與 code 不一致：recap_cards 仍列已移除的 formulas[]／formula.N；callout 顏色仍寫 remark 藍／note 琥珀",
+    "description": "① 2026-06-29 的 124ca95 從 recap_cards 移除了 formula 卡，commit body 自己註明「DESIGN.md catalog 表的 recap_cards 列仍寫著 formulas[]／formula.N…待一併修齊」，但到快照時仍沒改。同一天寫成的 §3.2 storyboard（ch03_chain_rule.yml:630）就照 DESIGN 寫了 `formulas:`，模板會靜默忽略，schema 也不驗未知欄位。這次內容剛好和 points 重複，畫面沒有掉資訊，但作者看不出這個欄位是死的。② DESIGN.md:176 與 callout.py:5 的 docstring 寫「remark 藍／caution 紅／note 琥珀」，實際上 ACCENT_ROLE 已經把 remark 和 note 都映到 aside（slate 灰）；callout.py:73 的註解是對的。",
+    "failure_scenario": "作者照 DESIGN 在 recap 寫 `formulas:` 並期待右欄公式卡，實際什麼都不出現，也沒有任何警告；如果還寫了 `{show formula.0}`，就要到 sizecheck 才報「no matching block」。作者照文件選 `type: note` 期待琥珀色，實際得到灰色。",
+    "evidence": "DESIGN.md:179 `| recap_cards | … blue-bar remember-formula cards | points[]、formulas[] | point.N、formula.N |`；recap_cards.py 全檔沒有 formulas；ch03_chain_rule.yml:630 `formulas:`；DESIGN.md:176「色隨 type：remark 藍／caution 紅／note 琥珀」；callout.py:5 `remark -> blue, caution -> red, note -> amber`；blocks.py ACCENT_ROLE `\"remark\": \"aside\"`, `\"note\": \"aside\"`。",
+    "repro": "none：純文件對照（git show 124ca95 的 body 自述 DESIGN 未同步；grep formulas 在 pipeline/templates 零命中）",
+    "confidence": "confirmed",
+    "known_ref": "commit 124ca95 body（「待換機收尾」），不在指定的三份已知文檔內",
+    "suggested_fix": "DESIGN.md:179 改成 `points[]` → `point.N`，拿掉 blue-bar cards；:176 和 callout.py docstring 改成 remark／note＝aside 灰、caution＝紅。可選：lint 對 recap_cards 的 `formulas` 發 warn，或讓 schema 驗各模板的已知欄位。§3.2 那行 `formulas:` 交給 §3.2 session 自行刪除。"
+   },
+   {
+    "id": "D2-07",
+    "level": 3,
+    "severity": "low",
+    "category": "other",
+    "file": "video/pipeline/visuals/theme.py",
+    "line": 151,
+    "title": "theme 的舊 role 別名色碼凍結在 Direction B 之前的值，docstring 卻宣稱別名指向新 hue；glow_curve 的 halo 與 stroke 因此是兩種藍",
+    "description": "Direction B（de3004c）把 blue／amber／green／red 和 GLOW 改成新值，但 DARK 的別名 `secondary`（#5cc8ec）、`accent`（#f2b13c）、`success`（#54d199）、`warning`（#fb6a5d）沒動，仍是舊的 blue／amber／green／red。LIGHT 的 secondary、success、warning 也一樣。theme.py:27-29 的 docstring 說「kept as live ALIASES pointing at the new hues」，:151-155 的行尾註解也寫「-> blue」，都已不成立。commit 宣稱要「避免同一幀出現兩種藍」，但仍有別名的使用點：graph 預設曲線與 divider hero curve 用 `secondary`，procedure_steps 的序號用 `secondary`，sign_chart 的 ± 用 success／warning。其中 `glow_curve` 的 crisp stroke 取 `T.color(role)`＝#5cc8ec，halo 取 `GLOW[\"blue\"]`＝#4fa6de，同一條曲線上是兩個 hue。另外 theme.py 模組 docstring 仍寫 IBM Plex Sans（已換 Instrument Sans），「Colour contract」仍是 blue→definitions、amber→theorems，與現行語意軸相反。",
+    "failure_scenario": "預設 graph 曲線、divider hero curve 的 halo 色相（約 204°）和 stroke（約 195°）不一致。procedure 場的序號是 #5cc8ec，旁邊的 result math 是 blue_ink #79bfe8。之後改 palette 的人看 docstring 會以為改 `blue` 就會連動別名，其實不會。",
+    "evidence": "theme.py:27-29 docstring；:129 `\"blue\": \"#4fa6de\"`；:151 `\"secondary\": \"#5cc8ec\",   # -> blue`；:152 `\"accent\": \"#f2b13c\"  # -> amber`；:154-155 warning／success；git show de3004c：舊 `\"blue\": \"#5cc8ec\"`。brand.py:708-712 `crisp_hex = T.color(ground, role)`／`glow_hex, _a = T.glow_for(_glow_name(role))`。_selftest_semantic_palette 只守語意 role，不守別名。",
+    "repro": "none：靜態比對 hex（`T.DARK['secondary']='#5cc8ec'` 對 `T.DARK['blue']='#4fa6de'`、`GLOW['blue'][0]='#4fa6de'`）",
+    "confidence": "confirmed",
+    "known_ref": "",
+    "suggested_fix": "交給使用者裁決：(a) 把別名改成引用新 hue 值（例如在 dict 建好後 `DARK[\"secondary\"] = DARK[\"blue\"]`），這會改動現有畫面色，要走工具線的零行為改變流程並取得同意；或 (b) 保留舊值但修正 docstring 與行尾註解，並讓 `glow_curve` 的 halo 取 crisp 色，確保 halo 與 stroke 同 hue。另外同步更新 theme.py 模組 docstring 的字體與色軸描述。"
+   },
+   {
+    "id": "D2-08",
+    "level": 3,
+    "severity": "low",
+    "category": "correctness",
+    "file": "video/pipeline/templates/definition_math.py",
+    "line": 82,
+    "title": "definition_math 的 LABEL 沒跟上 Direction B 擴充的 accent 值：remark／caution／corollary／derivation 等沒寫 scene_role 時 chip 顯示「[ definition ]」",
+    "description": "`LABEL` 只有 definition／theorem／proposition／example／warning／procedure／recap。Direction B 讓 ACCENT_ROLE 多出 caution、corollary、derivation、note、proof、remark、solution、strategy，它們查不到 LABEL，一律退成「[ definition ]」。只要沒寫 `scene_role`／`kicker`／`label` 蓋過去，eyebrow 就會把 remark、corollary 標成 DEFINITION，顏色卻是 aside 灰或 result 藍。現行 deck 的 remark 場都另外寫了 `scene_role: remark`，所以目前沒有觸發，屬潛在問題。lint 不檢查 accent 與 chip 是否一致。",
+    "failure_scenario": "新節作者寫 `template: definition_math, accent: corollary`（或 `accent: remark`），沒寫 scene_role → 畫面 chip 顯示「[ DEFINITION ]」。",
+    "evidence": "definition_math.py:31-35 LABEL dict；:82 `label=LABEL.get(spec.get(\"accent\", \"definition\"), \"[ definition ]\")`；scene_roles.SCENE_ROLE_CHIP 已有 remark／caution／note／derivation 等 chip 文字可用。",
+    "repro": "<scratch>/review-work/D2/repro_dm_label.py → caution／corollary／derivation／note／proof／remark／solution／strategy 八個 accent 值都解析成 `chip [ definition ]`。",
+    "confidence": "confirmed",
+    "known_ref": "",
+    "suggested_fix": "LABEL 查不到時改用 `SCENE_ROLE_CHIP.get(accent)`（remark→[ remark ] 等），corollary 另補一條；或讓 lint 對「definition_math 的 accent 不在 LABEL 且沒寫 scene_role」發 warn。"
+   },
+   {
+    "id": "D2-09",
+    "level": 3,
+    "severity": "low",
+    "category": "dead-code",
+    "file": "video/pipeline/visuals/layout.py",
+    "line": 17,
+    "title": "visuals/layout.py 的 SceneLayout 是無人引用的 gen-1 遺留，版面常數與現行 Lectern 分歧，也根本無法實例化",
+    "description": "`SceneLayout` 全 repo 沒有任何引用（grep 只命中自身）。它寫死的 header_top 3.5、primary_top 2.3、progress_y -3.65 等區帶，與 theme／_common 的 MASTHEAD_TOP 3.45、SAFE_MARGIN 等現行版面不一致，其中 progress_y 已經超出下安全線 -3.45。建構子要求 `theme[\"layout\"]` 字典，但 `visuals.theme` 是模組，傳進去會 TypeError。`graph_utils.sample_function_points` 同樣沒有使用者，而且吞掉所有例外。依 CLAUDE.md，這種 dead code 只提出、不擅自刪除。",
+    "failure_scenario": "日後有人想「用 layout manager 放內容」而 import 它，會拿到與 Lectern 不一致的區帶（progress 列落在安全線外），或直接 TypeError。",
+    "evidence": "layout.py:20-35 `layout = theme[\"layout\"]` … `self.header_top = 3.5` … `self.progress_y = -3.65`；grep `SceneLayout|visuals.layout` 在 video/ 下（排除 _archive）只命中 layout.py 本身；`sample_function_points` 只出現在 visuals/__init__.py 的 re-export。",
+    "repro": "none：grep 引用盤點（見 evidence）",
+    "confidence": "confirmed",
+    "known_ref": "",
+    "suggested_fix": "交給使用者決定是否移進 `_archive/`（連同 `sample_function_points` 的 re-export）；若保留，至少在 docstring 註明「未使用、常數不代表現行版面」。"
+   }
+  ]
+ },
+ {
+  "slice": "D1 模板核心（graph／derivation／worked_example／theorem_proof）",
+  "files_reviewed": [
+   {
+    "path": "video/pipeline/templates/_common.py",
+    "depth": "full"
+   },
+   {
+    "path": "video/pipeline/templates/__init__.py",
+    "depth": "full"
+   },
+   {
+    "path": "video/pipeline/templates/graph.py",
+    "depth": "full"
+   },
+   {
+    "path": "video/pipeline/templates/derivation.py",
+    "depth": "full"
+   },
+   {
+    "path": "video/pipeline/templates/worked_example.py",
+    "depth": "full"
+   },
+   {
+    "path": "video/pipeline/templates/theorem_proof.py",
+    "depth": "full"
+   },
+   {
+    "path": "video/pipeline/brand.py",
+    "depth": "skim"
+   },
+   {
+    "path": "video/pipeline/blocks.py",
+    "depth": "skim"
+   },
+   {
+    "path": "video/pipeline/timing.py",
+    "depth": "skim"
+   },
+   {
+    "path": "video/pipeline/pacing.py",
+    "depth": "skim"
+   },
+   {
+    "path": "video/pipeline/scene.py",
+    "depth": "skim"
+   },
+   {
+    "path": "video/pipeline/focus.py",
+    "depth": "skim"
+   },
+   {
+    "path": "video/pipeline/sizecheck.py",
+    "depth": "skim"
+   },
+   {
+    "path": "video/pipeline/stillness.py",
+    "depth": "skim"
+   },
+   {
+    "path": "video/pipeline/visuals/graph_utils.py",
+    "depth": "skim"
+   },
+   {
+    "path": "video/pipeline/visuals/theme.py",
+    "depth": "skim"
+   }
+  ],
+  "health_summary": "beat 時長會計整體是一致的：transform／cancel 的 consumed 和 fixed_seconds、paced 的 rail walk、`seconds: beat` 的 sweep、carry flight 對得上，player 端又以實測時鐘對齊，所以沒找到會造成音畫不同步的 run_time 錯誤。本片相關的 12 支 selftest 全綠（`_selftest_transform` 在並行時因 Tex 快取競爭紅過一次，單跑是綠的）。問題集中在「選項組合」下的版面與 inset，有四類：inset 的 late-binding 閉包、inset 角落和標題／註解相撞、derivation 有 `part:` 沒 `prompt:` 時錨點錯位、被 layer 豁免而 sizecheck 看不到的碰撞（aside、inset）。十條裡大多沒被現役正典 deck 觸發（latent），但輸入都是模板文件或 schema 公開支援的寫法。",
+  "not_covered": "沒有跑任何 Manim render，畫面問題全靠 build 後的 mobject 幾何與 FakeScene 量測，沒有抽幀目視。沒審 video/animations/ 的 hook。沒驗 light ground。以下只讀 code 分析、判斷不足以列為 finding：\n(a) carry 的 `to: {corner, scale}` 和 focus 的 save_state／restore 互動：飛行前被 dim、事後 restore，會把物件飛回飛行前的位置。現役 deck 無此組合。\n(b) 數值 `seconds` 的 sweep 沒宣告 fixed_seconds，[stillness] advisory 把它當成填滿整拍而豁免。設計文字明說 sweep 算宣告過的填拍，所以沒列。\n(c) 非 y_clip 曲線的可去奇點（sin(x)/x）若剛好取樣到 x=0 會出 NaN。實測幾個對稱區間都沒有精確取到 0，所以沒列。\nD1-03 同一個 head[1]／blocks[1] 取標題的寫法也出現在 definition_math、procedure_steps、recap_cards、sign_chart、value_table，那些不在本片，沒驗。\n第一支重現腳本與 selftest runner 以 cwd=video 執行，在快照的 video/media/Tex 寫入 Tex 快取；該目錄被 .gitignore 忽略，快照 git status 仍 clean。重現腳本全在 C:/Users/Kao/AppData/Local/Temp/claude/C--Users-Kao-Downloads-Calculus-handout/e0c76b36-cfde-401a-952a-54f01b50bb25/scratchpad/review-work/D1/。",
+  "findings": [
+   {
+    "id": "D1-01",
+    "level": 1,
+    "severity": "medium",
+    "category": "correctness",
+    "file": "video/pipeline/templates/graph.py",
+    "line": 741,
+    "title": "inset 內 sweep 的 always_redraw 閉包 late-binding：sweep 不是最後一個 plot 時，鏡片裡的游標、帶狀填色、追蹤點會變成最後一個 plot 的顏色",
+    "description": "`_inset_block` 在 `for i, plot in enumerate(all_plots)` 迴圈裡定義 `band()`／`rule()`／`dot()`。閉包直接引用迴圈變數 `col`、`plot`、`x_from`、`x_of`、`top_fn`、`bot_fn`（只有 dot 的 `f` 有用預設參數綁定）。`follow: true`（預設）時這些函式交給 `always_redraw`，每一幀才呼叫；那時迴圈早已跑完，所以讀到的是最後一次迭代的值。其中 `col` 每個 plot 都會重設，於是鏡片的 sweep 游標被畫成清單最後一個 plot 的顏色，主圖 sweep 本身顏色正確。有兩個 sweep 時，第一個 sweep 的鏡片 `x_of` 還會跟著第二個 sweep 的 tracker 走。build 當下第一次呼叫是在迭代內，顏色正確，所以靜態量測的閘看不出來，只有 render 時的 updater 會錯。",
+    "failure_scenario": "在 inset 場景中照旁白順序排 plot：`plots: [curve, curve2, sweep, point(color_role: concept)]`，`inset.follow: true`。sweep 播放時，主圖游標是 accent 琥珀色，鏡片裡的游標／帶／點卻是 concept 赭色。現役 squeeze_graph 和 _demo_inset 碰巧都把 sweep 排最後，所以沒觸發。",
+    "evidence": "graph.py:643 `col = _role_color(ground, plot, ...)`（每個 plot 重設）；graph.py:708 `def x_of(tracker=tracker, ...)`（每個 sweep 重新綁定）；graph.py:728-742 band 內 `x_of()`、`x_from`、`color=col`、`plot.get(\"opacity\")`；graph.py:749 rule `color=col`；graph.py:757 dot `color=col`；graph.py:714 `live = (lambda fn: always_redraw(lambda: z(fn())))`",
+    "repro": "python r5b.py（build 後設 `_sweep_live=True`、`tracker.set_value(0.9)`、`panel.update()`）。輸出：sweep 不是最後一個 → sweep.band／rule／dot 的 stroke 都是 #D98F3C（最後那個 point 的 concept 色）；sweep 最後 → 都是 #F2B13C（accent，正確）。",
+    "confidence": "confirmed",
+    "known_ref": "",
+    "suggested_fix": "讓閉包捕捉每次迭代自己的值。做法一：把 sweep 分支抽成獨立函式，比照 `_sweep_block` 的寫法，讓變數成為函式區域變數。做法二：所有閉包改用預設參數綁定（`def band(col=col, plot=plot, x_from=x_from, x_of=x_of, top_fn=top_fn, bot_fn=bot_fn)`，rule／dot 同理）。另補一支 selftest：sweep 排在中間，update 後斷言鏡片游標顏色等於 sweep 的顏色。"
+   },
+   {
+    "id": "D1-02",
+    "level": 1,
+    "severity": "medium",
+    "category": "false-negative-gate",
+    "file": "video/pipeline/templates/graph.py",
+    "line": 620,
+    "title": "inset 面板只貼 frame 安全角，不避開標題帶和註解帶：top_left 必定蓋住標題，bottom_* 必定蓋住註解，sizecheck 完全不報",
+    "description": "面板中心只由 frame 角落、SIDE_GUTTER、SAFE_MARGIN 決定，面板上緣剛好是 MASTHEAD_TOP，而圖的標題也從同一個 y 起、從 SPINE_X 起排。面板有不透明底色、z_index=10，Block 放在 layer=\"graph\"，而 sizecheck._overlap_issues 只比對 content 層，所以面板蓋住標題或註解時沒有任何警告。實測四個角落的結果：top_left 無論標題多短都會蓋掉標題開頭 3.2u；top_right 會蓋住右緣超過 x=3.17 的標題（現有 9 個 graph 標題中有 2 個會被蓋：sector_inequality、shm_stacked_graphs）；bottom_left／bottom_right 會蓋住置中、全寬的 annotation 兩端 2.65u。",
+    "failure_scenario": "作者寫 `inset: {corner: top_left}`，或替長標題場景加 top_right inset，或在有 annotation 的場景用 bottom 角落。`{show inset}` 之後，標題或註解的一截被不透明的鏡片蓋住，直到場景結束。sizecheck 與 make 都照常放行。",
+    "evidence": "graph.py:620-621 `centre = [sx * (T.FRAME_W / 2 - T.SIDE_GUTTER - _INSET_W / 2), sy * (T.FRAME_H / 2 - T.SAFE_MARGIN - _INSET_H / 2), 0]`；graph.py:623-624 border `fill_opacity=1.0`；graph.py:771 `.set_z_index(_INSET_Z)`；graph.py:774 `Block(\"inset\", group, ..., layer=\"graph\")`；sizecheck.py:188 `if getattr(b, \"layer\", \"content\") != \"content\": continue`",
+    "repro": "python r10_inset_title.py：top_left 時 title=(-6.37,0.59,2.78,3.45)、panel=(-6.37,-3.17,1.45,3.45)，重疊 3.20×0.67u，sizecheck 對 title／inset 報 none；top_right 配 43 字元標題時重疊 3.20×0.59u，只報了 safe-margin warn。python r10b.py：bottom_right／bottom_left 與 annotation 重疊 2.65×0.36u，sizecheck none。python r13_titles.py：現役 graph 標題 2/9 右緣超過 top_right 面板左緣 3.17。",
+    "confidence": "confirmed",
+    "known_ref": "",
+    "suggested_fix": "兩處擇一或都做。(1) 模板端：top 角面板上緣限制在 `title.get_bottom()[1] - _TITLE_GRAPH_GAP` 以下，bottom 角面板下緣限制在 annotation 群組上緣以上（`_inset_block` 需要拿到 title 與 annotation 群組）；放不下就 raise，與 corner 非法時同一個路徑。(2) 閘端：sizecheck 把 inset 的 `_inset_panel` 當成 content 參與重疊檢查。"
+   },
+   {
+    "id": "D1-03",
+    "level": 1,
+    "severity": "medium",
+    "category": "correctness",
+    "file": "video/pipeline/templates/derivation.py",
+    "line": 436,
+    "title": "derivation 有 `part:` 沒 `prompt:` 時，`head[1]` 拿到的是頁碼指示而不是標題，整條推導鏈被推出畫面右側",
+    "description": "`_common.scene_head` 在 `part:` 存在時，把頁碼指示 Block 插在 index 1、title 退到 index 2。註解明說這機制推廣給每個 scene_head 模板，讓長證明可以分頁。derivation 沒有 prompt 時仍寫 `body_ref = head[1].mobject`，於是 body_ref 變成右上角的頁碼 tag。後果有三：`body_zone` 從頁碼下方起算，body 區會往上壓進標題帶；scaffold 以 `align_to(body_ref, LEFT)` 對齊到頁碼左緣 x=5.52；最後 `content.align_to(body_ref, LEFT)` 把整條鏈的左緣也移到 x=5.52，右端到 x≈15，出畫。theorem_proof 已經為同一件事修過（theorem_proof.py:170-172 改成按 id 找 title），derivation 沒跟上。",
+    "failure_scenario": "一條純推導鏈（沒有例題 prompt）太長而拆成兩頁，照 scene_head 註解寫 `part: {current: 2, total: 2}`。所有 step／result 被推到 x∈[5.52, 15.1]；sizecheck 報 'clipped by the frame edge -- shorten it' 的 error，指向錯誤的原因，作者寫法上無解，只能補一個 prompt 或拿掉 part。",
+    "evidence": "derivation.py:435-436 `head = scene_head(spec, ctx, label=\"[ derivation ]\")` / `body_ref = head[1].mobject`；_common.py:281-285 part Block 在 title 之前 append；derivation.py:441 `sb.mobject.next_to(body_ref, DOWN, ...).align_to(body_ref, LEFT)`；derivation.py:576 `content.align_to(body_ref, LEFT)`",
+    "repro": "python r7_derivation_part.py：沒有 part 時 step.0 x[-6.37,3.23]；有 part 2/2 時 step.0 x[5.52,15.12]、result x[5.52,14.70]，sizecheck 對 step.0／step.1／result 各報一條 error；加上 scaffold.motive 時 motive 也在 x[5.52,8.64]。",
+    "confidence": "confirmed",
+    "known_ref": "theorem_proof.py:170-172 已記載並修正同型問題（僅限 theorem_proof）",
+    "suggested_fix": "`body_ref = next(b.mobject for b in head if b.id == \"title\")`，與 theorem_proof 相同。同型的 head[1]／blocks[1] 寫法還在 definition_math.py:84、procedure_steps.py:45、recap_cards.py:40、sign_chart.py:82、value_table.py:84（不在本片），建議一起改並補一支 `part:` 無 prompt 的 selftest。"
+   },
+   {
+    "id": "D1-04",
+    "level": 1,
+    "severity": "medium",
+    "category": "correctness",
+    "file": "video/pipeline/templates/worked_example.py",
+    "line": 145,
+    "title": "worked_example 的答案框走 `paced:` 時，先單獨淡入空框並停留 1/3 拍，答案式才進場",
+    "description": "`_answer_box` 回傳 `VGroup(box, eq, tag)`，沒有宣告 `_paced_chrome`／`_paced_parts`。result 預設 anim 是 \"fade\"，被 `paced:` 點名後由 pacing.apply 換成 paced_reveal；block_parts 回傳 [box, eq, tag] 三段，依序淡入並平均分配停留時間。結果是一個空的答案框先出現、停一段，答案才落下，最後才是 tag。pacing.py 的 chrome_of 註解把「chrome 先單獨露出、在任何內容之前撐半拍」明列為缺陷，recap_cards 已用 `_paced_chrome` 修掉。模板自己的撰寫契約範例和 demo deck 都寫 `paced: [step.0, result]`，照文件寫就會觸發。DESIGN 也宣稱 paced 與 derivation 一致，但 derivation 的 result 列走起來是 eq → leader → reason，不會先露空框。",
+    "failure_scenario": "_demo_worked_example.yml 的 companion_limit_example：result 在 6 秒拍上的時間軸是 t=0 FadeIn(RoundedRectangle)，空框停到 t=1.8 才 FadeIn(MathTex) 答案，t=3.6 才出 tag。拍越長空框停越久；10 秒拍約空停 3 秒。",
+    "evidence": "worked_example.py:145 `return VGroup(box, eq, tag)`；worked_example.py:426 `\"anim\": res.get(\"anim\") or \"fade\"`；pacing.py:47-51 `block_parts`：沒有宣告時 2..8 個 submobject 逐一走；pacing.py:55-60 chrome_of docstring；recap_cards.py:67-68 是唯一宣告 chrome 的模板",
+    "repro": "python r3_paced_band.py（真 deck spec ＋ FakeScene，beat_seconds=6）：t=0.00 play FadeIn(RoundedRectangle)；t=0.45 wait 1.35；t=1.80 play FadeIn(MathTex)；t=2.25 wait 1.35；t=3.60 play FadeIn(Tex)。",
+    "confidence": "confirmed",
+    "known_ref": "",
+    "suggested_fix": "在 `_answer_box` 的 VGroup 上宣告 `band._paced_chrome = box`、`band._paced_parts = [eq, tag]`（或把 tag 也併進 chrome），讓框與答案同一拍進場，再用 FakeScene 補一支 selftest 驗第一個 play 就含答案式。"
+   },
+   {
+    "id": "D1-05",
+    "level": 1,
+    "severity": "low",
+    "category": "false-negative-gate",
+    "file": "video/pipeline/templates/theorem_proof.py",
+    "line": 197,
+    "title": "theorem_proof aside 路徑的陳述卡寬度預算少扣了 padding，長陳述卡會越過 RAIL_X、和 aside 卡相疊，gate 不報，只給一條誤導的 band advisory",
+    "description": "statement 以 `max_width=PRIMARY_W - 0.3` 折行，accent_panel 再左右各加 `pad_x=0.6`，所以卡寬上限是 PRIMARY_W + 0.9。卡左緣貼 SPINE_X，右緣可達 RAIL_X + 0.9；aside 卡左緣正好放在 RAIL_X，兩張卡水平最多重疊 0.9u。aside Block 在 layer=\"decoration\"，被 overlap guard 豁免。sizecheck 唯一的輸出是 `_statement_regime_issues` 把貼 spine 的寬卡誤判為 band，建議作者縮短陳述以回到 rail，但 aside 路徑本來就不會 promote，這條訊息把人帶錯方向。",
+    "failure_scenario": "statement-only 命題（有 aside、無 proof），陳述約 100 字元並折成兩三行。實測陳述卡右緣到 1.67，aside 卡從 1.06 起，兩卡重疊 0.61u；sizecheck 只輸出 band promotion 的 warn。",
+    "evidence": "theorem_proof.py:196-197 `statement = brand.prose(..., size=\"h2\", max_width=PRIMARY_W - 0.3)`；theorem_proof.py:198-199 `accent_panel(..., pad=0.42, pad_x=0.6)`；theorem_proof.py:201-202 card 左緣貼 SPINE_X、`aside.move_to([RAIL_X, 0, 0], aligned_edge=LEFT)`；theorem_proof.py:205 `Block(\"aside\", aside, ..., layer=\"decoration\")`",
+    "repro": "python r11_aside.py：短陳述 card=(-6.37,0.55)、aside=(1.06,5.33)，無重疊；長陳述 card=(-6.37,1.67)、aside=(1.06,5.33)，水平重疊 0.61u；sizecheck 只報 'the statement wrapped, so it renders as a full-width band ... (band promotion)'。",
+    "confidence": "confirmed",
+    "known_ref": "",
+    "suggested_fix": "statement 的 max_width 改成扣掉卡的左右 padding 再留欄距，例如 `PRIMARY_W - 2*0.6 - 0.3`，讓卡右緣不超過 RAIL_X 減欄距；aside 是教學內容，建議改 layer=\"content\" 讓 overlap guard 看得到。另外 sizecheck 的 band 判定應該排除 use_aside 路徑（不在本片）。"
+   },
+   {
+    "id": "D1-06",
+    "level": 1,
+    "severity": "low",
+    "category": "integration",
+    "file": "video/pipeline/templates/graph.py",
+    "line": 643,
+    "title": "inset 重建 plot 顏色時漏套 meta.color_map 的預設 role，鏡片曲線和主圖曲線不同色",
+    "description": "`_plot_blocks` 在 plot 沒寫 color／color_role、但 label 含色表 token 時，改用色表 role（SPEC 規則 5，graph.py:414-417）。`_inset_block` 直接從原始 plot dict 算 `_role_color(ground, plot, \"secondary\")`，沒套這段邏輯。於是同一條曲線主圖用語意色，鏡片裡退回 secondary 藍，違反規則 5 的「同量同色」，而且放大鏡本來就是用來讓觀眾把兩處對起來看的。",
+    "failure_scenario": "deck 設了 `color_map: {\"\\\\sin\": concept}`，graph 寫 `{kind: function, expression: sin(x), label: \"$y=\\\\sin x$\"}` 並加 inset。主圖 sin 曲線是赭色 #D98F3C，鏡片裡的同一條曲線是藍色 #5CC8EC。現役 squeeze_graph 的 plot 都顯式寫了 color_role，所以沒觸發。",
+    "evidence": "graph.py:414-417 `if \"color\" not in plot and \"color_role\" not in plot and plot.get(\"label\"): role = brand.mapped_role(...); plot = dict(plot, color_role=role)`；graph.py:643 `col = _role_color(ground, plot, \"accent\" if kind == \"sweep\" else \"secondary\")`（未套 mapped_role）",
+    "repro": "python r2_inset_colormap.py：main curve stroke #D98F3C（concept），lens curve stroke #5CC8EC（secondary）。",
+    "confidence": "confirmed",
+    "known_ref": "",
+    "suggested_fix": "把「套色表預設 role」抽成一個 helper，例如 `_effective_plot(plot)`，`_plot_blocks` 與 `_inset_block` 都先過它再取色；補一支 inset＋color_map 的 selftest。"
+   },
+   {
+    "id": "D1-07",
+    "level": 1,
+    "severity": "low",
+    "category": "error-handling",
+    "file": "video/pipeline/templates/graph.py",
+    "line": 216,
+    "title": "y_clip 曲線的 `label_x` 被 bare except 靜默吞掉，標籤改放到曲線尾端",
+    "description": "y_clip 路徑產生的 curve 是多段 VMobject 組成的 VGroup，不是 ParametricFunction。`axes.input_to_graph_point(label_x, graph)` 對它丟出 'Cannot call Mobject.point_from_proportion for a Mobject with no points'，被 `except Exception: pass` 吞掉，流程落回預設的 x_end 尾端擺放。作者指定的位置無聲失效，而 y_clip 正是 §1.4 漸近線／blow-up 曲線用的路徑，這類曲線的尾端貼著裁切邊，最需要手動指定標籤位置。",
+    "failure_scenario": "`{kind: function, expression: \"1/x**2\", x_range: [0.3, 2.2], y_clip: true, label: \"$y=1/x^2$\", label_x: 0.6}`：標籤中心落在 (3.35,-1.83)，也就是 x=2.2 的尾端，而不是 x=0.6 曲線點 (-1.57,-0.27) 旁。沒有任何警告。",
+    "evidence": "graph.py:211-217 `if label_x is not None: try: label.next_to(axes.input_to_graph_point(float(label_x), graph), side, buff=0.18); return` / `except Exception: pass`；graph.py:439 y_clip 時 `graph = _clipped_function_curve(...)`（VGroup）；graph.py:450 `curve = graph`",
+    "repro": "python r12_labelx_yclip.py：y_clip=False 時標籤 x 與 label_x 的曲線點一致（-0.95）；y_clip=True 時標籤 (3.35,-1.83)，對照點 (-1.57,-0.27)。python r12b.py：input_to_graph_point 丟 'Exception Cannot call Mobject.point_from_proportion for a Mobject with no points'。",
+    "confidence": "confirmed",
+    "known_ref": "",
+    "suggested_fix": "label_x 改用算式求點：`axes.c2p(lx, safe_eval_expression(plot[\"expression\"], lx))`，預設尾端分支本來就這樣算，不依賴 curve 型別；真的算不出來時印出警告，不要靜默 pass。"
+   },
+   {
+    "id": "D1-08",
+    "level": 1,
+    "severity": "low",
+    "category": "correctness",
+    "file": "video/pipeline/templates/theorem_proof.py",
+    "line": 269,
+    "title": "theorem_proof 沒有 proof／qed 也沒有 aside 時，仍放一個靜態的 PROOF eyebrow，底下什麼都沒有",
+    "description": "use_aside 只在有 aside 時提早 return。沒有 proof、沒有 qed、也沒有 aside 的 statement-only 場景會走主路徑：`proof_label` 無條件建立並 append，`rides_with_proof` 因為 step_mobs 為空而是 False，所以 static=True，PROOF 從 t=0 顯示到場尾，下方空無一物。selftest `test_statement_only_proposition_builds_no_label` 的意圖是「沒有 proof chain 就沒有 eyebrow」，但它只測 aside 路徑。",
+    "failure_scenario": "用 theorem_proof 呈現一條書中略去證明的定理，只寫 statement。畫面上有陳述卡，卡下方孤零零一個 `PROOF`。",
+    "evidence": "theorem_proof.py:194 `use_aside = bool(spec.get(\"aside\")) and not steps and not qed_text`；theorem_proof.py:222 `proof_label = brand.eyebrow(\"proof\", ...)`；theorem_proof.py:268-271 `rides_with_proof = bool(step_mobs) and ...` / `blocks.append(Block(\"proof_label\", ..., static=not rides_with_proof, ...))`（沒有 step_mobs／qrow 的條件）；_selftest_theorem_proof_label.py:190-199 只覆蓋 aside 路徑",
+    "repro": "python r8_theorem_fallback.py 第二案（statement only）：ids=['spine','eyebrow','title','statement','proof_label','motif']，proof_label static=True。",
+    "confidence": "confirmed",
+    "known_ref": "",
+    "suggested_fix": "只在 `step_mobs or qrow` 時建立並 append proof_label；把 selftest 擴到「無 aside 的 statement-only」情形。"
+   },
+   {
+    "id": "D1-09",
+    "level": 1,
+    "severity": "low",
+    "category": "error-handling",
+    "file": "video/pipeline/templates/graph.py",
+    "line": 403,
+    "title": "graph single 模式省略 `axes:` 或 x_range／y_range 時直接 KeyError，但 `_build_single` 本身有預設值、compare 模式也吃得下",
+    "description": "`_build_single` 用 `{\"x_range\": [...], \"y_range\": [...], **spec.get(\"axes\", {})}` 準備了預設軸，卻把原始 spec 傳給 `_plot_blocks` 和 `_inset_block`，兩者都直接讀 `spec[\"axes\"][\"x_range\"]`。compare 模式的 `_panel` 有把合併後的 ac 寫回 `side[\"axes\"]`，所以沒事。schema 不檢查 axes，結果是 sizecheck／make 在 build 時拋出不透明的 KeyError，而不是用預設值。",
+    "failure_scenario": "一個 hook 主導、不寫 plots 的 graph 場景，或只寫 `axes: {x_length: 6}` 的場景：build_blocks 丟 `KeyError: 'axes'` 或 `KeyError: 'x_range'`。同樣寫法在 `mode: 2up` 下可正常 build。現役 deck 都有完整 axes，所以沒觸發。",
+    "evidence": "graph.py:806-810 `ac = {\"x_range\": [-1.45, 1.45, 0.5], \"y_range\": [-0.28, 1.55, 0.25], **spec.get(\"axes\", {})}`；graph.py:832 `_plot_blocks(spec, axes, ground)`（傳原始 spec）；graph.py:403-405 `ac = spec[\"axes\"]` / `_range(ac[\"x_range\"], 0.5)`；graph.py:636-638 同型；對照 graph.py:897-898 `side[\"axes\"] = ac`",
+    "repro": "python r1_axes_default.py：no axes key → KeyError: 'axes' at graph.py 403；axes 無 x_range → KeyError: 'x_range' at graph.py 404；compare 模式無 axes → OK 7 blocks；無 plots 也無 axes → KeyError: 'axes'。",
+    "confidence": "confirmed",
+    "known_ref": "",
+    "suggested_fix": "`_build_single` 比照 `_panel`，傳 `dict(spec, axes=ac)` 給 `_plot_blocks` 與 `_inset_block`。"
+   },
+   {
+    "id": "D1-10",
+    "level": 3,
+    "severity": "low",
+    "category": "correctness",
+    "file": "video/pipeline/templates/graph.py",
+    "line": 163,
+    "title": "graph 標題改錨 SIDE_GUTTER 後，clamp 寬度仍以 SAFE_MARGIN 計算，被 clamp 的長標題仍會越過右側安全邊界",
+    "description": "`_build_single`／`_build_compare` 已把標題左緣從 SAFE_MARGIN 移到 SIDE_GUTTER（對齊 spine），但 `_title` 的上限仍是 `FRAME_W - 2*SAFE_MARGIN` = 13.126u。被 clamp 到上限的標題右緣會落在 6.755，超過右安全邊界 6.563 約 0.19u。其他模板用 CONTENT_W 當上限。sizecheck 會報 safe-margin warn（反應式），所以不是靜默，但這個 clamp 在它存在的意義（長標題）上沒有達成目的。",
+    "failure_scenario": "一個約 45 字元以上的 graph 標題被 clamp 到 13.126u，右緣 6.755 越界，sizecheck 報 'title spills past the safe margin'；作者只能自行縮短標題。",
+    "evidence": "graph.py:163 `max_w = T.FRAME_W - 2 * T.SAFE_MARGIN`；graph.py:165-166 `_clamp_shrink(mob, max_w, size_px)`；graph.py:801-803 `left = -T.FRAME_W / 2 + T.SIDE_GUTTER`、`title.move_to([left + title.width / 2, ...])`",
+    "repro": "python r6_title_clamp.py：兩個長標題都是 w=13.126、left=-6.370、right=6.755，對照 gutter 邊界 6.370、safe 邊界 6.563；sizecheck warn 'block title spills past the safe margin'。",
+    "confidence": "confirmed",
+    "known_ref": "",
+    "suggested_fix": "`max_w = T.FRAME_W - 2 * T.SIDE_GUTTER`（即 `_common.CONTENT_W`），與 scene_head 一致。"
+   }
+  ]
+ }
+]

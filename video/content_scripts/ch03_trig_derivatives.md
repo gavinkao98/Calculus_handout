@@ -1,7 +1,7 @@
 # §3.1 Derivatives of Sine and Cosine — 影片內容稿（content script）
 
 > **產線：** 講義 → 影片，gen-2。Chapter 3 第一節，從 HTML 講義逐節重跑。
-> **權威來源：** [`../../../handout/latex/src/ch03/chapter3.tex`](../../../handout/latex/src/ch03/chapter3.tex) §3.1（2026-08-09 拍板的唯一內容源；此前為 `legacy/html_handout/fragments/ch03/sec-3-1.html`，已封存）。
+> **權威來源：** [`../../handout/latex/src/ch03/chapter3.tex`](../../handout/latex/src/ch03/chapter3.tex) §3.1（2026-08-09 拍板的唯一內容源；此前為 `legacy/html_handout/fragments/ch03/sec-3-1.html`，已封存）。
 > **source_rev：** `handout/latex/src/ch03/chapter3.tex` `sha256:acc1feed6c089bbe5745848af4a8483bb76392c55a474c25836e92c32f59cc0a` — 該 `.tex` 的 LF 正規化 sha256（產生器 `python video/pipeline/source_rev.py <源檔>`）。schema／make／derive preflight 比對現檔，不符即 `[source_rev]` WARN＝「講義已變」→ 走 [`../CONTENT_METHODOLOGY.md`](../CONTENT_METHODOLOGY.md) §8（diff→外科修改→scoped NFA）後重蓋。
 > **2026-09-13 §8 對齊完成（Task D-2）：** 全 21 個 content 場逐單元對 `.tex` diff，5 場跟改（`difference_quotient_for_sine` 補和差化積恆等式的來源、`sector_inequality` 補 corner piece $ABC$ 一句、`derivative_of_cosine` 補伴隨恆等式的來源、`shm_compute` 收回過強的「exactly the functions」、`recap` 接收從 `radians_essential` 移來的度數導數公式），其餘 16 場判定不跟改。stamp 自此指向 `.tex`，舊的 fragment stamp（`sha256:92c9…`，lock 時 2026-06-29 commit `5f3e7ea`）功成身退。**兩處刻意與講義不同**（2026-09-13 使用者裁決，理由＝書可以翻頁、影片不能）：`sector_inequality` 的偶函數論證移到不等式之後（講義在之前）、度數導數公式移到 `recap`（講義留在 radians 的 Caution 裡）。
 > **這是什麼：** 純內容中間產物（source of truth）。格式見 [`../CONTENT_METHODOLOGY.md`](../CONTENT_METHODOLOGY.md) §6——只含 `id`／`source`／`learning_goal`／`kind`／`narration`／`visual_need`／`animation_cue`，**不含**任何工程欄位（template／`{show}`／accent／payload／divider）。工程是第二階段的事。
