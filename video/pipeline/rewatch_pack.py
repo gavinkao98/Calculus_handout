@@ -58,6 +58,7 @@ from pathlib import Path
 
 sys.path.insert(0, str(Path(__file__).resolve().parents[1]))
 from pipeline import _bootstrap  # noqa: E402
+from pipeline import pauses  # noqa: E402
 from pipeline.timing import SCENE_LEAD_SECONDS  # noqa: E402
 
 _bootstrap.bootstrap()
@@ -495,6 +496,9 @@ def main() -> int:
               f"{manifest['deck_id']!r}'s, not {args.deck!r} -- re-synthesise or re-render "
               f"this deck before packing it", flush=True)
         return 2
+    # make.py rendered from this manifest with the storyboard's `pauses:` folded in (in
+    # memory only); fold the same holds in here or every beat after one is timed early
+    manifest = pauses.apply_pauses_timing(sb["scenes"], manifest)
     by_id = {e["scene_id"]: e for e in manifest["scenes"]}
     av_dir = REPO / "video" / "output" / "_av" / args.deck
     out = args.out or (section_dir / "rewatch_pack")
@@ -554,7 +558,8 @@ def main() -> int:
         entry = by_id.get(sid, {})
         mode = entry.get("narration_mode", "silent")
         beats = [b for b in entry.get("beats", []) if "start_seconds" in b] if mode in ("beats", "scene_aligned") else []
-        words = load_words(entry, audio_dir) if mode == "scene_aligned" else None
+        words = (pauses.shift_words(load_words(entry, audio_dir), entry.get("pause_splices"))
+                 if mode == "scene_aligned" else None)
         dur, g0 = durs[sid], starts[sid]
         av = av_dir / f"{sid}.mp4"
         stem = f"{n:02d}_{sid}"

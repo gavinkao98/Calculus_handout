@@ -66,6 +66,7 @@ _bootstrap.bootstrap()
 import numpy as np  # noqa: E402
 import yaml  # noqa: E402
 
+from pipeline import pauses  # noqa: E402
 from pipeline.timing import SCENE_LEAD_SECONDS  # noqa: E402
 from pipeline.sizecheck import graph_label_geometry  # noqa: E402
 from pipeline.texlock import tex_lock  # noqa: E402
@@ -671,7 +672,9 @@ def main() -> int:
     storyboard = load_storyboard(args.storyboard)
     meta = storyboard["meta"]
     deck_id = meta["id"]
-    manifest = load_manifest(deck_id, meta)
+    # make.py rendered from this manifest with the storyboard's `pauses:` folded in (in
+    # memory only); fold the same holds in here or every grab after one is early
+    manifest = pauses.apply_pauses_timing(storyboard["scenes"], load_manifest(deck_id, meta))
 
     sec_dir = _bootstrap.section_output_dir(meta)
     critic_subdir = "critic_mimo" if deck_id.endswith("_mimo") else "critic"

@@ -16,34 +16,43 @@ repo (synthesised mp4s, hand-written manifests; nothing under video/output is to
         was missing, and the name is just (index, sample time) -- so re-packing a re-render
         whose timing had not changed (`--reuse-audio`, or an unchanged mock estimate) into
         the same dir kept the PREVIOUS render's pictures beside this render's motion numbers.
+  B-02  the pack times beats on the clock make.py rendered. make.py folds `pauses:` into its
+        IN-MEMORY manifest only; the pack read the on-disk one, so after every hold each
+        reveal time, each "beat N reveal" tile, the dead-zone beat (`_beat_at`) and the
+        forced-alignment words were `seconds` early. The expected values here are computed
+        by the very call make.py makes (`pauses.apply_pauses`).
 """
 from pipeline import _bootstrap
 
 _bootstrap.bootstrap()
 
 import contextlib
+import copy
 import json
 import subprocess
 import sys
 import tempfile
 from pathlib import Path
 
+import yaml
 from PIL import Image
 
+from pipeline import audio, pauses
 from pipeline import rewatch_pack as RP
+from pipeline.timing import SCENE_LEAD_SECONDS as LEAD, SCENE_TAIL_SECONDS as TAIL
 
 
 @contextlib.contextmanager
-def fake_repo(deck: str, say: str = "hello {show body} world"):
+def fake_repo(deck: str, say: str = "hello {show body} world", extra: str = ""):
     """A throwaway repo root holding one storyboard `<deck>.yml` with one content scene
-    `s1`; yields (root, section output dir). rewatch_pack's REPO and section lookup point
-    at it for the duration."""
+    `s1` (`extra` = more flow-mapping fields for it); yields (root, section output dir).
+    rewatch_pack's REPO and section lookup point at it for the duration."""
     with tempfile.TemporaryDirectory(ignore_cleanup_errors=True) as td:
         root = Path(td)
         (root / "video" / "storyboards").mkdir(parents=True)
         (root / "video" / "storyboards" / f"{deck}.yml").write_text(
             f"meta: {{id: {deck}, section: '9.1'}}\n"
-            f"scenes:\n  - {{id: s1, kind: content, template: callout, say: '{say}'}}\n",
+            f"scenes:\n  - {{id: s1, kind: content, template: callout, say: '{say}'{extra}}}\n",
             encoding="utf-8")
         sec = root / "video" / "output" / "ch09" / "s9.1"
         orig = RP.REPO, RP._bootstrap.section_output_dir
@@ -163,6 +172,77 @@ def test_the_scene_folder_holds_exactly_the_frames_this_pack_lists():
         listed = {s["file"] for s in pack(sec)["scenes"][0]["samples"]}
         on_disk = {p.name for p in fdir.iterdir()}
     assert on_disk == listed, (sorted(on_disk), sorted(listed))
+
+
+# ---- B-02: `pauses:` -- the pack's clock is the rendered one ---------------------------
+
+PAUSED_SAY = "{show a} one two {show b} three four {show c} five six"
+PAUSED_EXTRA = ", pauses: [{after: b, seconds: 1.5}]"
+BOX_X = {"a": 20, "b": 120, "c": 220}           # where each reveal's white box is drawn
+
+
+def _paused_fixture(root: Path, sec: Path, deck: str) -> dict:
+    """Disk manifest + FA words for a 3-beat scene_aligned scene (a [0,2], b [2,4], c [4,6])
+    whose storyboard holds 1.5 s after `b`; renders the clip make.py would have rendered
+    (each box appears at its PAUSED reveal time) and returns make.py's in-memory entry."""
+    adir = sec / "audio_mimo"
+    (adir / "align").mkdir(parents=True)
+    wav = adir / "01_s1.wav"
+    audio.write_pcm_wav(wav, audio.silence_pcm(6.0))
+    words = [{"word": w, "start": float(i), "end": float(i + 1)}
+             for i, w in enumerate("one two three four five six".split())]
+    wf = adir / "align" / "01_s1.words.json"
+    wf.write_text(json.dumps({"words": words}), encoding="utf-8")
+    beats = [{"index": i + 1, "reveal": r, "text": t, "audio_seconds": 2.0,
+              "start_seconds": 2.0 * i, "end_seconds": 2.0 * (i + 1)}
+             for i, (r, t) in enumerate([("a", "one two"), ("b", "three four"), ("c", "five six")])]
+    disk = {"deck_id": deck, "scenes": [{
+        "scene_id": "s1", "scene_number": 1, "narration_mode": "scene_aligned",
+        "audio_file": str(wav), "audio_seconds": 6.0, "beats": beats,
+        "alignment": {"words_file": str(wf)}}]}
+    (adir / "manifest.json").write_text(json.dumps(disk), encoding="utf-8")
+
+    scenes = yaml.safe_load((root / "video" / "storyboards" / f"{deck}.yml")
+                            .read_text(encoding="utf-8"))["scenes"]
+    mem = pauses.apply_pauses(scenes, copy.deepcopy(disk), sec / "_paused")["scenes"][0]
+    dur = LEAD + mem["audio_seconds"] + TAIL
+    boxes = ",".join(f"drawbox=x={BOX_X[b['reveal']]}:y=60:w=80:h=60:color=white:t=fill:"
+                     f"enable='gte(t,{LEAD + b['start_seconds']})'" for b in mem["beats"])
+    av = root / "video" / "output" / "_av" / deck
+    av.mkdir(parents=True)
+    subprocess.run(["ffmpeg", "-y", "-v", "error", "-f", "lavfi", "-i",
+                    f"color=c=black:s=320x180:r=30:d={dur}", "-vf", boxes,
+                    "-pix_fmt", "yuv420p", str(av / "s1.mp4")], check=True, capture_output=True)
+    return mem
+
+
+def test_a_paused_scene_is_packed_on_the_rendered_clock():
+    deck = "demo_deck_mimo"
+    with fake_repo(deck, PAUSED_SAY, PAUSED_EXTRA) as (root, sec):
+        mem = _paused_fixture(root, sec, deck)
+        disk_beats = json.loads((sec / "audio_mimo" / "manifest.json")
+                                .read_text(encoding="utf-8"))["scenes"][0]["beats"]
+        assert run(deck) == 0
+        rec = pack(sec)["scenes"][0]
+        md = (sec / "rewatch_pack" / "01_s1.md").read_text(encoding="utf-8")
+        c_tile = next(s for s in rec["samples"] if s["why"] == "beat 3 reveal -> c")
+        c_px = Image.open(sec / "rewatch_pack" / "01_s1" / c_tile["file"]).convert("RGB") \
+            .getpixel((BOX_X["c"] + 40, 90))
+    mb = mem["beats"]
+    # reveal times and the beat table
+    assert rec["reveal_times"] == [round(LEAD + b["start_seconds"], 2) for b in mb], rec["reveal_times"]
+    assert [(b["start_seconds"], b["end_seconds"]) for b in rec["beats"]] == \
+        [(b["start_seconds"], b["end_seconds"]) for b in mb], rec["beats"]
+    # the "beat 3 reveal" tile is taken after c really appears, and shows it
+    assert c_tile["t_video"] == round(LEAD + mb[2]["start_seconds"] + RP.POST_REVEAL, 2), c_tile
+    assert c_px[0] > 200, f"tile {c_tile['file']} does not show block c yet: {c_px}"
+    # the FA words moved with the audio: at that instant the voice is on "five"
+    assert "[five]" in c_tile["words"], c_tile["words"]
+    # the dead zone is attributed to the beat it sits in on the rendered clock
+    span = rec["motion"]["fine_longest_still_span"]
+    want = RP._beat_at(span, mb)
+    assert want != RP._beat_at(span, disk_beats), "fixture does not tell the two clocks apart"
+    assert f"{want}  <-- LOCATE DEAD ZONES HERE" in md, (want, span)
 
 
 if __name__ == "__main__":
