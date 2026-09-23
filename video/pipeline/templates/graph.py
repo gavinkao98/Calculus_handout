@@ -160,7 +160,9 @@ def _title(text: str, ground: str):
                                  size=T.fs("h1") * 0.88 / T.PX_TO_FS)
     else:
         mob = brand.heading(text, ground, role="primary", size="h1")
-    max_w = T.FRAME_W - 2 * T.SAFE_MARGIN
+    # the title is left-anchored at SIDE_GUTTER (both modes), so it may span CONTENT_W -- the
+    # old FRAME_W - 2*SAFE_MARGIN let a clamped title run ~0.19u past the right safe margin
+    max_w = T.FRAME_W - 2 * T.SIDE_GUTTER
     size_px = T._SCALE_PX['h1'] * 0.88 if '$' in text else T._SCALE_PX['h1']
     if mob.width > max_w:
         brand._clamp_shrink(mob, max_w, size_px)

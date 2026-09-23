@@ -1,5 +1,5 @@
 """Self-test: graph single mode -- regressions from the 2026-09-23 code review
-(D1-09 default axes). Run from video/:
+(D1-09 default axes, D1-07 label_x on a y_clip curve, D1-10 title clamp width). Run from video/:
     python -m pipeline._selftest_graph_single
 """
 from pipeline import _bootstrap
@@ -101,6 +101,30 @@ def test_label_x_with_no_point_on_the_curve_warns():
                      plots=[dict(_BLOWUP, y_clip=True, label_x=0)]))
     out = [ln for ln in buf.getvalue().splitlines() if ln.startswith("[graph]")]
     assert out and "label_x" in out[0], buf.getvalue()[-500:]
+
+
+# -- D1-10: a clamped long title stays inside the gutter it is anchored to ----------------
+
+_LONG_TITLE = "Why the Squeeze Forces the Ratio of Sine to Theta All the Way Up to One"
+
+
+def test_clamped_long_title_stays_inside_the_right_gutter():
+    """The title is left-anchored at SIDE_GUTTER, so its clamp width must be CONTENT_W
+    (FRAME_W - 2*SIDE_GUTTER), not FRAME_W - 2*SAFE_MARGIN: the latter left a clamped title's
+    right edge ~0.19u past the right safe margin (sizecheck 'title spills')."""
+    from pipeline import sizecheck
+    from pipeline.visuals import theme as T
+    right_edge = T.FRAME_W / 2 - T.SIDE_GUTTER
+    single = _spec(title=_LONG_TITLE, plots=[], say="x", axes=dict(_DEFAULT_AXES))
+    compare = {"id": "c", "kind": "content", "template": "graph", "mode": "2up",
+               "title": _LONG_TITLE, "say": "x",
+               "left": {"plots": [dict(_PARABOLA)]}, "right": {"plots": [dict(_PARABOLA)]}}
+    for spec in (single, compare):
+        blocks = build_blocks(spec, {"ground": "dark", "meta": _META})
+        title = next(b for b in blocks if b.id == "title").mobject
+        assert float(title.get_right()[0]) <= right_edge + 1e-3, (spec["mode"], title.get_right()[0], right_edge)
+        spills = [m for _, m in sizecheck._overflow_issues(spec, blocks) if "'title'" in m]
+        assert not spills, (spec["mode"], spills)
 
 
 if __name__ == "__main__":
