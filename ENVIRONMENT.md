@@ -248,7 +248,7 @@ copy tools\agy.cmd "%APPDATA%\npm\agy.cmd"
 
 ### 祕鑰
 - 全部走環境變數，**永不進版控、不寫檔、不記 log**。`.env` 已 gitignored。
-- 離線路徑不需要 key：`make.py --backend mock`、`tts.py --backend mock`、`critic.py --dry-run`、
+- 離線路徑不需要 key：`make.py --backend mock`、`tts.py --backend mock --unit beat`、`critic.py --dry-run`、
   `doctor.py`。批次計費前依 [`CLAUDE.md`](CLAUDE.md) 報用量徵同意。
 
 ## 在用 / 不在用
