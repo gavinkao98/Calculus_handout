@@ -62,6 +62,47 @@ def test_single_mode_inset_without_axes_builds():
     assert "inset" in by
 
 
+# -- D1-07: label_x is honoured on a y_clip curve, and a bad one says so ------------------
+
+_BLOWUP = {"kind": "function", "expression": "1/x**2", "x_range": [0.3, 2.2],
+           "color_role": "secondary", "label": "$y=1/x^2$", "label_x": 0.6}
+_BLOWUP_AXES = {"x_range": [-0.2, 2.4, 0.5], "y_range": [-0.3, 6, 1]}
+
+
+def _label_and_anchor(plot, lx):
+    by = _by_id(_spec(axes=dict(_BLOWUP_AXES), plots=[plot], say="x"))
+    lab, axes = by["label.0"].mobject, by["axes"].mobject
+    return lab, axes.c2p(lx, 1 / lx ** 2)
+
+
+def test_label_x_is_honoured_on_a_y_clip_curve():
+    """y_clip builds the curve as a VGroup of segments; label_x used to go through
+    input_to_graph_point, which needs a ParametricFunction -- the exception was swallowed and
+    the label silently landed at the curve's tail (x=2.2) instead of beside x=0.6."""
+    lab, anchor = _label_and_anchor(dict(_BLOWUP, y_clip=True), 0.6)
+    assert abs(float(lab.get_center()[0]) - float(anchor[0])) < 1e-3, (lab.get_center(), anchor)
+    gap = float(lab.get_bottom()[1]) - float(anchor[1])   # label_side up: sits just above
+    assert 0 < gap < 0.3, (gap, lab.get_center(), anchor)
+
+
+def test_label_x_without_y_clip_is_unchanged():
+    """Control: the plain axes.plot curve placed label_x correctly all along."""
+    lab, anchor = _label_and_anchor(dict(_BLOWUP, x_range=[0.45, 2.2]), 0.6)
+    assert abs(float(lab.get_center()[0]) - float(anchor[0])) < 1e-3, (lab.get_center(), anchor)
+
+
+def test_label_x_with_no_point_on_the_curve_warns():
+    """label_x where the expression has no value (a pole): the default placement is used,
+    but not silently -- the author's position did not take."""
+    import contextlib, io
+    buf = io.StringIO()
+    with contextlib.redirect_stdout(buf):
+        _by_id(_spec(axes=dict(_BLOWUP_AXES), say="x",
+                     plots=[dict(_BLOWUP, y_clip=True, label_x=0)]))
+    out = [ln for ln in buf.getvalue().splitlines() if ln.startswith("[graph]")]
+    assert out and "label_x" in out[0], buf.getvalue()[-500:]
+
+
 if __name__ == "__main__":
     import sys, traceback
     fails = 0

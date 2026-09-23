@@ -210,11 +210,18 @@ def _place_function_label(label, graph, axes: Axes, plot: dict[str, Any],
     side = _SIDE.get(str(plot.get("label_side", "up")).lower(), UP)
     label_x = plot.get("label_x")
     if label_x is not None:
+        # from the expression, like the tail default below: input_to_graph_point needs a
+        # ParametricFunction, and a y_clip curve is a VGroup of segments (it threw, swallowed)
         try:
-            label.next_to(axes.input_to_graph_point(float(label_x), graph), side, buff=0.18)
+            lx = float(label_x)
+            ly = safe_eval_expression(plot["expression"], lx)
+            if not math.isfinite(ly):
+                raise ValueError(f"y={ly}")
+            label.next_to(axes.c2p(lx, ly), side, buff=0.18)
             return
-        except Exception:
-            pass
+        except Exception as exc:
+            print(f"[graph] label_x={label_x!r} on {plot['expression']!r}: no point on the curve "
+                  f"({type(exc).__name__}: {exc}); label falls back to the default placement")
     # Default: place near the tail end of the curve
     x_end = float(xr[1])
     y_span = yr[1] - yr[0]
@@ -451,8 +458,8 @@ def _plot_blocks(spec: dict[str, Any], axes: Axes, ground: str) -> tuple[list[Bl
                     color=col,
                     stroke_width=sw,
                 )
-            # keep the solid curve as the geometry reference for label placement (it is a
-            # ParametricFunction; the dashed wrapper is not, and input_to_graph_point needs one)
+            # keep the solid curve as the geometry reference for label placement (the label's
+            # last-resort fallback sits next to it; the dashed wrapper is only a copy of it)
             curve = graph
             if plot.get("dashed"):
                 graph = _dashed_curve(graph)
