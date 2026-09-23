@@ -1077,7 +1077,8 @@ indicate-budget）。**已知限制：這個預算只覆蓋「同一拍宣告、
 淡出以「淡出前剩下的場尾時間」為上限（至少 1 影格），hold 再吃掉淡出之後剩下的餘裕，所以
 上述 sweep-up 還原與 `exit` 淡出不會再讓整場超時——除非兩者合計超過 SCENE_TAIL_SECONDS 本身
 （06 `evenness` 拍舊版地板疊加在淡出之上時實測超時 0.189 s，已還原成 hook 自己壓暗＋還原；
-`_tail` 改法後同一情境不再超時，storyboard `focus:`／hook `_evenness_anim` 皆未再變動）。
+依 `_tail` 現行算術，同一情境的場末 restore 0.4 s＋`exit` 淡出 0.5 s＋剩餘 hold 0.1 s 恰好落在
+1.0 s 場尾內；未重新 render 驗證，storyboard `focus:`／hook `_evenness_anim` 皆未再變動）。
 
 **`color_role`（derivation 的 `steps[i]` / `result`）——跨場延續。** 圖已經用顏色替各部分
 命名了（`graph` 的 plot 一直有 `color_role`），推導列寫同一個 role，讀者就看得出這一行講的
