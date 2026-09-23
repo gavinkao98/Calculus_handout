@@ -11,6 +11,7 @@
   - E-02（`RefCheckTest`）：log 有 undefined reference／multiply defined label 就 FAIL 並列出 key。
   - E-03（`InteractionTest`＋實跑）：latexmk 以 nonstopmode／halt-on-error 跑、stdin 接 DEVNULL——
     TeX 錯誤不得停在 `?` 提示等主控台輸入。
+  - E-04（`DiagnosticsTest`）：兩段 FAIL 都要印出子程序的 stderr／stdout 尾巴，字形閘另看 returncode。
 """
 import contextlib
 import io
@@ -138,6 +139,36 @@ class InteractionTest(StubBuild):
         self.assertIn("-interaction=nonstopmode", args)
         self.assertIn("-halt-on-error", args)
         self.assertIs(kw.get("stdin"), subprocess.DEVNULL, "stdin 不得沿用父程序（主控台）")
+
+
+class DiagnosticsTest(StubBuild):
+    """E-04：以前 FAIL 只印 log 的 `!` 行與字形閘 stdout 尾巴，子程序的 stderr 全丟。"""
+
+    def test_glyph_gate_crash_shows_stderr(self):
+        """審查員的重現：kpsewhich 不在 PATH，check_glyphs 在 stderr 丟 traceback、stdout 全空。"""
+        crash = (1, "", "Traceback (most recent call last):\n  File \"check_glyphs.py\", line 95\n"
+                        "FileNotFoundError: [WinError 2] 系統找不到指定的檔案。\n")
+        code, out, in_dist, _ = self.build(glyph=crash)
+        self.assertEqual(code, 1, out)
+        self.assertIn("FileNotFoundError", out)
+        self.assertFalse(in_dist)
+
+    def test_glyph_gate_nonzero_rc_fails_even_if_pass_printed(self):
+        """字形閘印了 PASS 之後才崩（rc≠0）也不得放行。"""
+        late = (1, GLYPH_PASS[1], "Traceback (most recent call last):\nRuntimeError: boom\n")
+        code, out, in_dist, _ = self.build(glyph=late)
+        self.assertEqual(code, 1, out)
+        self.assertIn("RuntimeError: boom", out)
+        self.assertFalse(in_dist)
+
+    def test_latexmk_failure_without_bang_lines_shows_latexmk_output(self):
+        """log 裡沒有 `!`（latexmk 自己出錯）時，原因只在 latexmk 的輸出裡。"""
+        fail = (11, "Latexmk: This is Latexmk, John Collins, 9 March 2026. Version 4.88.\n",
+                "Latexmk: Could not find file 'x.tex'.\n-- Use the -f option to force complete processing.\n")
+        code, out, in_dist, _ = self.build(latexmk=fail)
+        self.assertEqual(code, 1, out)
+        self.assertIn("Could not find file", out)
+        self.assertFalse(in_dist)
 
 
 @unittest.skipUnless(shutil.which("latexmk"), "需要 latexmk（MiKTeX）")

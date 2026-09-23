@@ -28,6 +28,15 @@ UNITS = {
 }
 
 
+def print_tail(label, text, n=6):
+    """FAIL 時印子程序輸出的最後 n 行（capture 起來的輸出，不印就沒人看得到）。"""
+    lines = (text or "").strip().splitlines()[-n:]
+    if lines:
+        print(f"    ── {label}（最後 {len(lines)} 行）")
+        for ln in lines:
+            print("   ", ln)
+
+
 def build(ch):
     name = UNITS[ch]
     srcdir = HERE / "src" / ch
@@ -69,13 +78,18 @@ def build(ch):
             print("    multiply defined label:", key)
         if refs_bad and not (undefined or multiply):
             print(f"    log 有 undefined／multiply-defined 摘要但抓不到 key，見 {log_path}")
+        if not errors and not (undefined or multiply):
+            # log 沒有 `!` 也沒有 key 可列（例如 latexmk 自己出錯、沒跑到 TeX）：原因只在它的輸出裡
+            print_tail("latexmk stdout", r.stdout)
+            print_tail("latexmk stderr", r.stderr)
         sys.exit(1)
 
     g = subprocess.run([sys.executable, "check_glyphs.py", f"src/{ch}/{name}.pdf"],
                        cwd=HERE, capture_output=True, text=True, encoding="utf-8", errors="replace")
-    if "字形閘 PASS" not in g.stdout:
-        print(f"{ch}: FAIL  字形閘——")
+    if g.returncode != 0 or "字形閘 PASS" not in g.stdout:
+        print(f"{ch}: FAIL  字形閘 rc={g.returncode}——")
         print("\n".join(g.stdout.strip().splitlines()[-6:]))
+        print_tail("check_glyphs stderr", g.stderr)     # 閘本身崩潰時 traceback 只在這裡
         sys.exit(1)
 
     dist = HERE / "dist" / ch
