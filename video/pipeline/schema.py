@@ -211,6 +211,14 @@ def _carry_issues(sid: str, scene: dict, say, scenes: list, index: int) -> "list
     if not isinstance(entries, list):
         return [("error", f"{sid}.carry: must be a list of {{from, block, as, to}}")]
     prev = _prev_content_in_act(scenes, index)
+    # What that scene fades out in its tail (`exit:`, scene.py _tail). make.py hard-cuts the
+    # carry boundary, so a block on both lists would fade out and snap back across the cut
+    # (F-05). Shape errors in `exit` itself are _exit_issues' to report.
+    prev_exit: set = set()
+    if prev is not None:
+        prev_scene = next(s for s in reversed(scenes[:index]) if isinstance(s, dict))
+        if isinstance(prev_scene.get("exit"), list):
+            prev_exit = {e for e in prev_scene["exit"] if isinstance(e, str)}
     revealed = set(reveal_targets(say) if isinstance(say, str) else [])
     issues: list[tuple[str, str]] = []
     seen_as: set[str] = set()
@@ -235,6 +243,13 @@ def _carry_issues(sid: str, scene: dict, say, scenes: list, index: int) -> "list
         elif not isinstance(blk, str) or not blk:
             issues.append(("error", f"{where}.block: required non-empty block id (or a list of ids "
                                     f"carried as one group)"))
+        if src == prev:
+            for bid in (blk if isinstance(blk, list) else [blk]):
+                if isinstance(bid, str) and bid in prev_exit:
+                    issues.append(("error", f"{where}.block {bid!r}: {prev!r} fades it out in "
+                                            f"its tail (`exit:`), so the carried copy would "
+                                            f"vanish and snap back across the cut -- drop it "
+                                            f"from {prev}.exit or stop carrying it"))
         as_id = item.get("as")
         if not isinstance(as_id, str) or not as_id:
             issues.append(("error", f"{where}.as: required non-empty block id"))
