@@ -198,6 +198,30 @@ def test_statement_only_proposition_builds_no_label():
     assert "proof_label" not in _ids(build_blocks(spec, {"ground": "dark", "meta": _META}))
 
 
+def test_statement_only_without_aside_builds_no_label():
+    """Code review 2026-09-23, D1-08: with no aside the statement-only scene takes the MAIN
+    path, which used to build the eyebrow unconditionally -- a static PROOF under the card
+    for the whole scene, with nothing below it."""
+    spec = {"id": "thm_only", "kind": "content", "template": "theorem_proof",
+            "accent": "theorem", "title": "A Theorem",
+            "statement": "Sine is continuous everywhere.",
+            "say": "Words only."}
+    blocks = build_blocks(spec, {"ground": "dark", "meta": _META})
+    assert "statement" in _ids(blocks)
+    assert "proof_label" not in _ids(blocks), \
+        "no proof and no qed -> no PROOF eyebrow standing over an empty column"
+
+
+def test_a_qed_alone_still_gets_its_label():
+    """The eyebrow heads the proof column whenever it has anything in it -- a bare `qed`
+    line counts."""
+    spec = {"id": "thm_qed", "kind": "content", "template": "theorem_proof",
+            "accent": "theorem", "title": "A Theorem",
+            "statement": "Every $f$ is nice.", "qed": "$a = c$",
+            "say": "Words only."}
+    assert "proof_label" in _ids(build_blocks(spec, {"ground": "dark", "meta": _META}))
+
+
 if __name__ == "__main__":
     import sys
     import traceback

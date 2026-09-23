@@ -193,10 +193,13 @@ def build(spec: dict[str, Any], ctx: dict[str, Any]) -> list[Block]:
     #    the rail, the pair centred (Lectern bias). --
     use_aside = bool(spec.get("aside")) and not steps and not qed_text
     if use_aside:
+        # wrap inside the card's own side padding too, so the card's right edge stays a
+        # 0.3u column gap short of RAIL_X, where the aside card starts
+        pad_x = 0.6
         statement = brand.prose(spec.get("statement", ""), ground, role="primary",
-                                size="h2", max_width=PRIMARY_W - 0.3)
+                                size="h2", max_width=PRIMARY_W - 2 * pad_x - 0.3)
         card = brand.accent_panel(statement, ground, bar_role=accent_role(spec),
-                                  fill_role="panel", pad=0.42, pad_x=0.6)
+                                  fill_role="panel", pad=0.42, pad_x=pad_x)
         aside = build_aside(spec["aside"], ground, max_width=RAIL_W)
         card.move_to([left + card.width / 2, 0, 0])
         aside.move_to([RAIL_X, 0, 0], aligned_edge=LEFT)
@@ -219,15 +222,17 @@ def build(spec: dict[str, Any], ctx: dict[str, Any]) -> list[Block]:
     stmt_text = spec.get("statement", "")
 
     proof_left = left + 0.4
-    proof_label = brand.eyebrow("proof", ground, role="muted")
     step_mobs = [brand.prose(p, ground, role="text", size="step", max_width=content_w - 1.0,
                              seg_roles=rows[i].get("seg_roles") if isinstance(rows[i], dict) else None)
                 for i, p in enumerate(steps)]
     qrow = _qed_row(qed_text, ground) if qed_text else None
     # the proof stack's vertical extent at the chain's min pitch: label + (label->chain gap) + rows
     row_hs = [m.height for m in step_mobs] + ([qrow.height] if qrow is not None else [])
-    proof_stack_h = proof_label.height + (0.5 + sum(row_hs) + max(len(row_hs) - 1, 0) * _ROW_GAP
-                                          if row_hs else 0.0)
+    # The PROOF eyebrow heads the proof column, so a statement-only scene (no proof, no qed)
+    # gets none -- else it stands alone under the card for the whole scene.
+    proof_label = brand.eyebrow("proof", ground, role="muted") if row_hs else None
+    proof_stack_h = (proof_label.height + 0.5 + sum(row_hs) + max(len(row_hs) - 1, 0) * _ROW_GAP
+                     if row_hs else 0.0)
 
     promote_pref, _n_lines, is_formula = statement_regime(spec, ground)
     promote = promote_pref
@@ -249,7 +254,8 @@ def build(spec: dict[str, Any], ctx: dict[str, Any]) -> list[Block]:
     #    RAIL mode a row wide enough to reach the card's column drops the whole chain BELOW the card;
     #    in BAND mode the chain already sits below the full-width band. --
     reaches_rail = (not promote) and any(proof_left + m.width > RAIL_X - 0.25 for m in step_mobs)
-    proof_label.move_to([proof_left, proof_top - proof_label.height / 2, 0], aligned_edge=LEFT)
+    if proof_label is not None:
+        proof_label.move_to([proof_left, proof_top - proof_label.height / 2, 0], aligned_edge=LEFT)
     # The eyebrow rides with the first step when narration reveals it ({show proof.0}), so the
     # word PROOF no longer stands over an empty column for the whole run-up; with no marker it
     # stays in the opening frame as before. Timing only -- placement above is untouched.
@@ -266,9 +272,10 @@ def build(spec: dict[str, Any], ctx: dict[str, Any]) -> list[Block]:
     #     middle whenever `reaches_rail` drops the chain below the card -- the overlap /
     #     capacity guards read that empty span as content (it warned on _demo_tall_rows).
     rides_with_proof = bool(step_mobs) and reveals(spec, "proof.0")
-    blocks.append(Block("proof_label", proof_label, anim="fade",
-                        static=not rides_with_proof,
-                        reveal_with="proof.0" if rides_with_proof else None))
+    if proof_label is not None:
+        blocks.append(Block("proof_label", proof_label, anim="fade",
+                            static=not rides_with_proof,
+                            reveal_with="proof.0" if rides_with_proof else None))
 
     chain: list = []
     y = 0.0

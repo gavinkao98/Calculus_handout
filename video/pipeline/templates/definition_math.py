@@ -81,7 +81,7 @@ def build(spec: dict[str, Any], ctx: dict[str, Any]) -> list[Block]:
     head = scene_head(spec, ctx,
                       label=LABEL.get(spec.get("accent", "definition"), "[ definition ]"))
     blocks += head
-    title = head[1].mobject
+    title = next(b.mobject for b in head if b.id == "title")
 
     scaffold_blocks = render_scaffold(spec.get("scaffold"), ground, ctx.get("meta"))
     for sb in scaffold_blocks:

@@ -42,7 +42,7 @@ def build(spec: dict[str, Any], ctx: dict[str, Any]) -> list[Block]:
     ground = ctx["ground"]
     blocks: list[Block] = []
     blocks += scene_head(spec, ctx, label="[ procedure ]")
-    title = blocks[1].mobject
+    title = next(b.mobject for b in blocks if b.id == "title")
 
     left = SPINE_X
     content: list = []   # step rows + result maths, centred in the zone (above the strip)
