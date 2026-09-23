@@ -62,11 +62,6 @@ def capacity_meta(spec: dict[str, Any]) -> list[ColumnPlan]:
     over-wide table) stays an authoring error caught reactively by _overflow_issues."""
     return [ColumnPlan(min_pitch=0.0, model="group", extra_bottom=0.45)]
 
-# accent role (blue/amber/green/red) -> its lifted ink tint for the punchline cells,
-# so the accent column/row echoes the SCENE's accent instead of always blue.
-_ACCENT_INK = {"secondary": "blue_ink", "accent": "amber_ink",
-               "success": "green_ink", "warning": "red_ink"}
-
 
 def _cell(text: str, ground: str, *, role: str, size):
     """One table cell. Routed on content like every author field: math (or
@@ -97,7 +92,10 @@ def build(spec: dict[str, Any], ctx: dict[str, Any]) -> list[Block]:
     accent_col = spec.get("accent_col")
     accent_row = spec.get("accent_row")
 
-    accent_ink = _ACCENT_INK.get(role, "blue_ink")
+    # the accent role's lifted ink tint for the punchline cells, so the accent column/row
+    # echoes the SCENE's accent (same hue as col_tint below). Every semantic role
+    # accent_role() returns has a `<role>_ink` in both palettes (_selftest_semantic_palette).
+    accent_ink = f"{role}_ink"
 
     def cell_role(r: int | None, c: int) -> str:
         # r is None for the header row. The punchline (accent) column/row is the
