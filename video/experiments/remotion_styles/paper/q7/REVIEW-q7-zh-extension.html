@@ -1,0 +1,61 @@
+<!doctype html>
+<html lang="zh-Hant"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Q7 中文延伸段審核</title>
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/katex.min.css">
+<script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/katex.min.js"></script>
+<script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/contrib/auto-render.min.js" onload="renderMathInElement(document.body,{delimiters:[{left:'\\(',right:'\\)',display:false},{left:'\\[',right:'\\]',display:true}]})"></script>
+<style>
+:root{--paper:#F4EFE4;--shade:#E9E1CF;--ink:#1F1B16;--ink2:#5A5249;--rule:#C9BFAD;--red:#BA0C2F;--blue:#1F5E9E;--gold:#A07C10}
+@media (prefers-color-scheme: dark){:root:not([data-theme="light"]){--paper:#1c1a17;--shade:#2a2621;--ink:#ece6da;--ink2:#b8ae9f;--rule:#4a443b;--red:#e0566f;--blue:#6ea2d8;--gold:#d2ad45}}
+body{margin:0;background:var(--paper);color:var(--ink);font:16px/1.7 "Noto Serif TC","Songti TC",serif}
+main{max-width:1280px;margin:0 auto;padding:24px 16px 80px}
+h1{font-size:26px;margin:.2em 0} h2{font-size:20px;margin:40px 0 8px;border-bottom:2px solid var(--ink);padding-bottom:4px}
+.meta{color:var(--ink2);font-size:13px;font-weight:normal}
+.box{border:1px solid var(--rule);background:var(--shade);padding:12px 16px;margin:14px 0;border-radius:4px}
+.box h3{margin:0 0 6px;font-size:16px} .box ul{margin:4px 0;padding-left:1.3em}
+.red{color:var(--red)} .blue{color:var(--blue)} .gold{color:var(--gold)}
+.wrap{overflow-x:auto}
+table{border-collapse:collapse;width:100%;min-width:900px;font-size:14.5px}
+th,td{border-top:1px solid var(--rule);padding:8px 10px;vertical-align:top;text-align:left}
+th{font-size:13px;color:var(--ink2);font-weight:600} td.b,th.b{width:84px} td.say{width:30%;font-size:15.5px}
+code{font-family:ui-monospace,Consolas,monospace;font-size:.9em}
+</style></head><body><main>
+<h1>Q7 中文版延伸段：旁白與逐拍畫面（審核用）</h1>
+<div class="meta">2026-09-26・只改中文版（<code>q7/q7.zh.yml</code>），英文版 <code>q7/q7.yml</code> 不動・逐拍設計全文＝<code>q7/EXTENSION.zh.md</code>・延伸段合計 840 字，以每秒 4.5 字估約 187 秒</div>
+
+<div class="box"><h3>刪改清單（使用者 2026-09-26 裁決）</h3><ul>
+<li>刪除 <code>writeup</code>（考場寫法）整場。</li>
+<li><code>angles</code> 刪除 <code>irrational</code> 拍；該場停在「a 小題就證完了」。</li>
+<li>刪除原 <code>epilogue</code>（題目之外），改為延伸段四場：<code>ext_design</code>（B）→ <code>ext_room</code>（A）→ <code>ext_family</code>（C）→ <code>ext_dense</code>（無理斜率，沿用原 √2 動畫）。</li>
+<li><code>recap</code> 的旁白沒有提到考場寫法，不用改。</li>
+<li>mock 結構驗證：<code>tts.py --backend mock --unit beat</code> 共 65 次 beat 呼叫、0 次重試；新四場 beat 數 7／5／5／2，每拍 reveal id 正確。</li>
+</ul></div>
+
+<div class="box"><h3>「不說出題靈感」的處理</h3><ul>
+<li>官方只公開題目卷，沒有解答、命題說明、講評或出題者署名（報告 §一）。旁白與畫面<b>都不</b>說出題者的靈感、意圖，也不說「改編自」。</li>
+<li>B 段一開頭就說「我們回頭分析」，畫面小字「以下是我們的事後分析」；問句「為什麼偏偏是角落和邊中點」問的是數學上的原因。</li>
+<li>A 段連接詞用「巧的是，這正是一個有名問題裡的關鍵事實」——陳述數學上的等價，不說來源；房間圖整拍標「示意圖，非 Tokarsky 原圖」，旁白也說「畫面只是示意」。</li>
+<li>C 段只說「這一招不只用在這一題」，不說誰先提出、不講 Gardner 專欄年份、不講 Paper Pool 出處（報告附錄：未核對）。AIME 題只改寫題意，不上原文。</li>
+</ul></div>
+
+<div class="box"><h3>待裁決</h3><ul>
+<li><b>兩種邊中點怎麼區分</b>：預設同一個<span class="gold">金色</span>，左右中點＝實線圈、上下中點＝虛線圈（不加新色相，避免撞 V10）；替代案：圈內短槓。</li>
+<li><b>Tokarsky 的念法</b>：旁白保留英文原名；MiMo 冰糖念英文人名未驗（驗要花一次付費呼叫）。念得怪就改為旁白說「一位數學家」、名字只上畫面。</li>
+<li><b>長度</b>：以每秒 4.5 字估約 187 秒，略超過 3 分鐘上限；要壓到 3 分鐘內，最省事的是刪 <code>ext_design</code> 的 <code>odd</code> 拍（「一定是奇數次」，約 10 秒）。</li>
+</ul></div>
+<div class="wrap">
+<h2 id="ext_design">B　為什麼偏偏是角落和邊中點 <code>ext_design</code> <span class="meta">295 字・約 66 秒</span></h2><table><thead><tr><th class="b">beat</th><th>旁白（冰糖朗讀原文）</th><th>畫面</th><th>數學要點與來源</th></tr></thead><tbody><tr><td class="b"><code>start</code><div class="meta">37 字</div></td><td class="say">題目解完了，我們回頭分析：為什麼洞偏偏放在角落和邊中點，答案就從無窮多個變成零個？</td><td>右上角小張 (b) 八洞桌；左欄大字「角落＋邊中點：∞ → 0」；小字「以下是我們的事後分析」。</td><td>報告 §3.1 末段：要明說是事後分析。</td></tr><tr><td class="b"><code>classes</code><div class="meta">59 字</div></td><td class="say">格點依照兩個座標的奇偶，只分成四類。偶數偶數點是中心，奇數奇數點是角落；一個奇數、一個偶數的，分別是左右兩邊的中點，和上下兩邊的中點。</td><td>格點平面四類依序冒出：藍點（偶,偶）、紅圈（奇,奇）、金實線圈（奇,偶）、金虛線圈（偶,奇）；左欄 2×2「奇偶字典」，每格附小桌 icon 亮出對應的點。</td><td>平面點摺回真桌 \((X,Y)\mapsto(\mathrm{fold}(X),\mathrm{fold}(Y))\)：(偶,偶)→中心；(奇,奇)→四角；(奇,偶)→\((\pm1,0)\)；(偶,奇)→\((0,\pm1)\)。報告 §3.1；自驗 B1。</td></tr><tr><td class="b"><code>first</code><div class="meta">37 字</div></td><td class="say">射線上的第一個格點是 p、q，因為 p 跟 q 互質，它不可能是偶數偶數點，只會落在另外三類。</td><td>三條射線停在各自第一個格點：(1,1) 紅、(1,0) 金實線、(2,1) 金虛線；字典藍格註「第一個格點不會是它」。</td><td>\(\gcd(p,q)=1\Rightarrow\) 射線上第一個格點是 \((p,q)\)，且 \((p,q)\ne(\text{偶},\text{偶})\)。報告 §3.1；片中 halfway 場。</td></tr><tr><td class="b"><code>ab</code><div class="meta">43 字</div></td><td class="say">a 小題只堵住角落這一類，另外兩類放行，所以有無窮多個角度。b 小題把三類全部堵住，所以一個都沒有。</td><td>字典：(a) 只叉紅格、兩金格打勾，旁邊四洞小桌＋藍 ∞；(b) 三格全叉，八洞小桌＋紅 0。</td><td>(a) 一奇一偶的第一個格點沒洞，接著到 \((2p,2q)\) 回到中心；(b) 三個非零類全是洞。報告 §3.1；自驗 B2（380 個 vs 0 個）。</td></tr><tr><td class="b"><code>lr</code><div class="meta">43 字</div></td><td class="say">如果只在左右兩邊的中點加洞呢？鉛直往上打的那一球，碰到上邊的中點，那裡沒有洞，它就直直彈回中心。</td><td>只加左右中點洞的真桌（上下中點畫淡空圈＝沒洞）；球鉛直往上，碰上邊中點反彈回中心，藍閃；平面上射線 (0,1)→(0,2)。</td><td>只加左右：回到中心 ⇔ \(p\) 偶、\(q\) 奇（190 個，全部符合）；(0,1) 反彈 1 次回到中心；(2,1) 也回得來；(1,0) 落袋。報告 §3.1；自驗 B2。</td></tr><tr><td class="b"><code>each</code><div class="meta">33 字</div></td><td class="say">其實少掉任何一個中點的洞，都會有球回到中心。四個邊中點的洞，一個都不能少。</td><td>四張「八洞少一個」小桌，各自朝缺的那個中點直打，彈回中心、藍閃。</td><td>少右／左／上／下：(±1,0)、(0,±1) 各反彈 1 次回到中心；每種七洞桌在 \(|p|,|q|\le15\) 內各 95 個方向回到中心。<b>本輪補驗</b>（報告只驗了「左右一起少」）；自驗 B3。</td></tr><tr><td class="b"><code>odd</code><div class="meta">43 字</div></td><td class="say">順帶一提，回到中心的球，反彈次數是 p 的絕對值加 q 的絕對值，一個奇數加一個偶數，所以一定是奇數次。</td><td>金色大數字計數器（沿用 foldback）；\(\text{反彈次數}=|p|+|q|\)、「一奇＋一偶＝奇數」；例 (1,0)→1、(2,1)→3、(1,4)→5。</td><td>報告 §3.4；自驗 B4（全部相符）。</td></tr></tbody></table><h2 id="ext_room">A　照不亮的房間 <code>ext_room</code> <span class="meta">238 字・約 53 秒</span></h2><table><thead><tr><th class="b">beat</th><th>旁白（冰糖朗讀原文）</th><th>畫面</th><th>數學要點與來源</th></tr></thead><tbody><tr><td class="b"><code>start</code><div class="meta">36 字</div></td><td class="say">再看一次 b 小題的八洞桌。畫上兩條中線、兩條對角線，桌子就被切成八片一樣的三角形。</td><td>大張八洞桌；四條對稱軸細虛線依序畫出；八片三角形輪流閃；選定 \((0,0)\)–\((1,0)\)–\((1,1)\) 那片加深。</td><td>報告 §3.3。</td></tr><tr><td class="b"><code>tri</code><div class="meta">37 字</div></td><td class="say">每一片都是等腰直角三角形：中心是四十五度角，邊中點是直角，角落是另一個四十五度角。</td><td>三頂點語意色：中心藍、邊中點金、角落紅；角度記號用 ink2：45°、直角、45°。</td><td>\(\angle O=45^\circ,\ \angle M=90^\circ,\ \angle K=45^\circ\)。自驗 A1。</td></tr><tr><td class="b"><code>fold</code><div class="meta">41 字</div></td><td class="say">把球的路徑沿著這四條線摺進同一片，就變成球在三角形裡反彈；所有的洞，都摺到另外兩個頂點上。</td><td>先畫 (b) 路徑 (2,1)：\((0,0)\to(1,\tfrac12)\to(0,1)\) 落上邊中點；其餘 7 片沿對稱軸翻回（Unfold 倒放），路徑摺成 \((0,0)\to(1,\tfrac12)\to(\tfrac23,\tfrac23)\to(1,0)\)。</td><td>摺疊映射 \((x,y)\mapsto(\max(|x|,|y|),\min(|x|,|y|))\)；邊中點全對應 \(M\)、角全對應 \(K\)、中心只對應 \(O\)。報告 §3.3；自驗 A2。</td></tr><tr><td class="b"><code>equiv</code><div class="meta">52 字</div></td><td class="say">所以 b 小題的答案是零，就等於說：在這種三角形裡，光碰到頂點就被吸收，那麼從一個四十五度角射出的光，永遠回不到那個角。</td><td>只留三角形；M、K 旁註「頂點吸收光（＝洞）」；從 O 射出 6 條光線，全部停在 M 或 K；大字「從 45° 角射出的光，回不到那個角」。</td><td>三角形直接模擬，489 個方向：M 331、K 158、回到 O 0；與正方形 (b) 摺疊後逐一相符。引理敘述：報告 §2.4（Quanta 2024、OU 簡報，已核對）。</td></tr><tr><td class="b"><code>room</code><div class="meta">72 字</div></td><td class="say">巧的是，這正是一個有名問題裡的關鍵事實。一九九五年，數學家 Tokarsky 用它造出一間牆壁都是鏡子的多邊形房間：在某一點點燈，另一點永遠照不到。畫面只是示意。</td><td>概念示意：數片等腰直角三角形拼成的不規則房間、一盞燈、一個暗點「照不到」；<b>右下角整拍固定「示意圖，非 Tokarsky 原圖」</b>；不畫計算光線。左欄「照明問題」「Tokarsky，1995」。</td><td>Tokarsky 1995 多邊形反例：Wikipedia Illumination problem（已核對）；引理用於該構造：Quanta 2024（已核對）；論文本身部分核對，只引年份人名。</td></tr></tbody></table><h2 id="ext_family">C　同一招的家族 <code>ext_family</code> <span class="meta">226 字・約 50 秒</span></h2><table><thead><tr><th class="b">beat</th><th>旁白（冰糖朗讀原文）</th><th>畫面</th><th>數學要點與來源</th></tr></thead><tbody><tr><td class="b"><code>start</code><div class="meta">22 字</div></td><td class="say">展開、拉直、找第一個同類的點，這一招不只用在這一題。</td><td>左欄固定三步口訣「展開 → 拉直 → 找第一個同類的點」；右側本題縮圖：原點→(4,2)。</td><td>片中 unfold／halfway 場。</td></tr><tr><td class="b"><code>rect</code><div class="meta">32 字</div></td><td class="say">例如寬五、高三的長方形撞球桌，只有角落有洞，球從左下角以四十五度打出去。</td><td>寬 5 高 3 的長方形桌，45° 折線 \((0,0)\to(3,3)\to(5,1)\to(4,0)\to(1,3)\to(0,2)\to(2,0)\to(5,3)\)，落右上角。</td><td>MathWorld：互質時撞 \(m+n-2\) 次後落入另一角（報告 §2.5，已核對）；自驗 C1：6 次、落 (5,3)。</td></tr><tr><td class="b"><code>unfold</code><div class="meta">44 字</div></td><td class="say">展開之後，路徑是一條四十五度的直線，第一次碰到角落的鏡像是在十五、十五：球反彈六次，掉進右上角的洞。</td><td>鋪成 15×15（3 欄 × 5 列）；角落鏡像 \((5a,3b)\) 畫小紅圈；\(y=x\) 到 (15,15) 紅閃；被穿過的牆亮金：直牆 2 道、橫牆 4 道，計數 2＋4＝6。</td><td>\(\operatorname{lcm}(5,3)=15\)；15/5、15/3 皆奇 → 右上角。plus.maths Arithmetic billiards（已核對）；自驗 C1。</td></tr><tr><td class="b"><code>cube</code><div class="meta">67 字</div></td><td class="say">搬到三維也一樣。二零零二年美國數學邀請賽有一題：光從邊長十二的立方體頂點射出，第一個反射點已經給定，問它在內壁一路反射，到下一次碰到頂點走了多長。</td><td>線框立方體（邊長 12），A、面 BCFG、P（距兩稜 7、5），光 A→P 後淡出；左欄改寫過的題意；小字「2002 AIME I 第 11 題（題意改寫）」。</td><td>以 A 為原點、面 BCFG 為 \(x=12\)：\(P=(12,7,5)\)。題文：報告 §2.6（ZIML 題本 PDF，已核對；本輪重讀同一 PDF 確認 AB = 12、7、5）。不照抄原文。</td></tr><tr><td class="b"><code>same</code><div class="meta">61 字</div></td><td class="say">展開成一整片立方格子，光就走一條直線；要找的是第一個三個座標都是十二的倍數的點，一百四十四、八十四、六十。路徑長是十二乘根號二百一十八。</td><td>立方格子示意；直線到 (144,84,60) 紅閃；TeX 推導與小字 \(m+n=230\)。</td><td>\(s(12,7,5)\in12\mathbb Z^3\Rightarrow s=12\)；\(L=12\sqrt{144+49+25}=12\sqrt{218}\)，218＝2·109，\(m+n=230\)；途中不碰稜。報告自算 230，<b>本輪自驗 C2 重算一致</b>。</td></tr></tbody></table><h2 id="ext_dense">無理斜率（片尾前最後一段） <code>ext_dense</code> <span class="meta">81 字・約 18 秒</span></h2><table><thead><tr><th class="b">beat</th><th>旁白（冰糖朗讀原文）</th><th>畫面</th><th>數學要點與來源</th></tr></thead><tbody><tr><td class="b"><code>start</code><div class="meta">12 字</div></td><td class="say">最後，打一球斜率是根號二的。</td><td>沿用原 Epilogue：大真桌；\(\tan\theta=\sqrt2\)。頁眉改「無理斜率」。</td><td>原 epilogue。</td></tr><tr><td class="b"><code>dense</code><div class="meta">69 字</div></td><td class="say">這條直線除了原點，碰不到任何格點，所以如果洞只是理想的點，球就永遠停不下來。讓它一直跑下去，它的軌跡會任意接近桌面上的每一個點。這件事我們只展示，不證明。</td><td>原 dense 動畫壓到約 15 秒跑完＋停約 3 秒；左欄要點、即時反彈計數、小字「展開後是環面上的一條直線。只展示，不證明。」</td><td>\(y=\sqrt2\,x\) 除原點外無格點；環面直線流稠密：報告 §2.3（已核對）。措辭依 GLOSSARY §三 F5（任意接近，不說填滿）。</td></tr></tbody></table>
+</div>
+
+<h2>數學自驗（精確有理數模擬）</h2>
+<ul>
+<li><b>B1 四類對應</b>：平面格點依 \((X\bmod2,Y\bmod2)\) 摺回真桌：(0,0)→中心；(1,1)→四角；(1,0)→\((\pm1,0)\)；(0,1)→\((0,\pm1)\)。✔</li>
+<li><b>B2</b>（直接在真桌上模擬，\(|p|,|q|\le15\) 的互質方向）：四角洞 380 個回到中心，恰為一奇一偶；八洞 0 個；只加左右中點 190 個，恰為 \(p\) 偶 \(q\) 奇；(0,1) 反彈 1 次回到中心。✔</li>
+<li><b>B3</b> 八洞少任何一個中點：各 95 個方向回到中心；朝缺口直打都回得來。✔（「四個缺一不可」字面成立）</li>
+<li><b>B4</b> 回到中心的反彈次數都等於 \(|p|+|q|\)，且都是奇數。✔</li>
+<li><b>A1</b> 三角形 \((0,0),(1,0),(1,1)\) 的角：45°、90°、45°。✔</li>
+<li><b>A2</b> 三角形撞球（頂點吸收）從中心型 45° 角射出，489 個方向：停在直角 331、停在另一個 45° 角 158、回到出發角 0；與正方形 (b) 經摺疊映射逐一比對，不一致 0。✔（等價成立）</li>
+<li><b>C1</b> 寬 5 高 3 從左下角 45°：反彈 6 次（＝5＋3−2），落右上角，展開終點 (15,15)。✔</li>
+<li><b>C2</b> AIME 2002 I #11：第一個三座標都是 12 倍數的點 (144,84,60)，長 \(12\sqrt{218}\)，218 無平方因子，\(m+n=230\)；途中不碰稜。✔（與報告自算一致）</li>
+</ul>
+</main></body></html>
