@@ -138,7 +138,10 @@ export const Foldback: React.FC = () => {
         {count}
       </div>
 
-      <Txt x={120} y={730} w={660} size={type.caption} p={p("count", 26, 60)}>
+      <Txt x={120} y={684} w={660} size={type.caption} italic c={color.ink2} p={p("count", 26, 40)}>
+        For a shot that makes it home:
+      </Txt>
+      <Txt x={120} y={736} w={660} size={type.caption} p={p("count", 26, 60)}>
         It crosses <span style={{ color: EDGE }}>|p| vertical</span> and <span style={{ color: EDGE }}>|q| horizontal</span> walls:
       </Txt>
       <M x={120} y={880} t={`\\text{bounces} = |p|+|q| = 2+1 = {\\color{${EDGE}}3}`} size={52} p={p("count", 30, 90)} />

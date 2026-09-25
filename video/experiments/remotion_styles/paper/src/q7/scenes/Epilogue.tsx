@@ -37,10 +37,10 @@ export const Epilogue: React.FC = () => {
       </Txt>
       <M x={120} y={356} t="\tan\theta=\sqrt2" size={70} p={p("dense", 26, 16)} />
       <Txt x={120} y={410} w={560} size={type.caption} italic c={color.ink2} p={p("dense", 26, 60)}>
-        Irrational: the line never meets a lattice point, so the ball never stops.
+        Irrational: the line never meets another lattice point, so the ball never stops.
       </Txt>
       <Txt x={120} y={560} w={560} size={type.caption} italic c={color.ink2} p={interpolate(f, [t0 + 200, t0 + 230], [0, 1], clamp)}>
-        Left to run, the path fills in the whole table.
+        Left to run, the path comes arbitrarily close to every point of the table.
       </Txt>
       <Txt x={120} y={700} w={560} size={type.label} c={color.ink3} p={interpolate(f, [t0 + 60, t0 + 80], [0, 1], clamp)} style={{ fontFeatureSettings: "'lnum' 1, 'tnum' 1" }}>
         bounces so far: {Math.max(0, bounces)}

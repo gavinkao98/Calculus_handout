@@ -51,33 +51,33 @@
 | `start` | Put coordinates on it. The real table runs from minus one to one, so every copy is two units wide. | 右側平面（羽化視窗）與粗框真桌；左欄 The real table is [−1,1]×[−1,1] so every copy is 2 units wide.；真桌上方尺寸線標 2。 |
 | `centers` | Copies of the center sit where both coordinates are even. Land on one, and the ball is home. | 所有 (偶,偶) 點以彈簧由近而遠冒出藍點，標 (0,0)、(2,0)、(2,2)、(−2,2)；左欄 ● (even, even) — a copy of the center: the ball is home。 |
 | `corners` | Copies of the corners sit where both coordinates are odd. Land on one, and the ball falls in. | 所有 (奇,奇) 點冒出紅圈，標 (1,1)、(3,1)、(−3,−1)；左欄 ○ (odd, odd) — a copy of a corner: the ball falls in。 |
-| `question` | So here is the whole problem. Does the line from the origin hit an even, even point before an odd, odd point? | 座標標籤退淡；兩條示範射線：一條到 (4,2)（藍閃），一條到 (1,1)（紅閃）；左欄 Does the ray from the origin hit a blue point before a red one?。 |
+| `question` | So here is the whole problem. Does the line from the origin hit another even, even point before an odd, odd point? | 座標標籤退淡；兩條示範射線：一條到 (4,2)（藍閃），一條到 (1,1)（紅閃）；左欄 Does the ray from the origin hit another blue point before a red one?。 |
 
-### 7. `halfway`——中點測試 → (a)（mock 43.0 s）
+### 7. `halfway`——中點測試 → (a)（mock 50.6 s）
 | beat | 旁白（英文原文） | 畫面 |
 |---|---|---|
 | `start` | To come home, aim at an even, even point. Call it two p, two q. | 右側格點平面（藍點、紅圈，另把其餘格點畫成小灰點）；一條線段從原點畫到 (6,4)（示意 p=3, q=2），標 (2p, 2q)；左欄 To come home, aim at a blue point (2p, 2q)。 |
-| `first` | Take the first one on the ray. Then p and q share no common factor, | 左欄 the first one on the ray: gcd(p, q) = 1。 |
-| `only` | so the only lattice points on the segment are the start, the end, and the midpoint, p, q. | 線段外的格點全部退淡；只有 (0,0)、(3,2)、(6,4) 保持全亮，中點標金色 (p, q)；左欄 Then the only lattice points on the segment are (0,0), (p,q), (2p,2q)。 |
+| `first` | Take the first one on the ray. Then p and q share no common factor. | 左欄 first blue point on the ray: gcd(p, q) = 1。 |
+| `only` | So the first lattice point along the ray is p, q, and the next one is two p, two q. The only lattice points on the segment are the start, the midpoint p, q, and the end. | 線段外的格點全部退淡；只有 (0,0)、(3,2)、(6,4) 保持全亮，中點標金色 (p, q)；左欄斜體 first lattice point on the ray: (p, q)／the next: (2p, 2q)，第二句時接 Only lattice points on the segment: (0,0), (p,q), (2p,2q)。 |
 | `mid` | Everything hangs on that midpoint. | 中點外一圈金色呼吸光環；左欄 Everything hangs on the midpoint (p, q).。 |
 | `odd` | If p and q are both odd, the midpoint is a corner, and the ball is pocketed halfway. The diagonal shot, one, one, does exactly this. | 示範 (1,1)：球從原點滾向 (2,2)，在中點 (1,1) 的紅圈落袋（紅閃），之後的一段只剩灰虛線；左欄 p, q both odd → a corner: pocketed halfway。 |
 | `mixed` | If one is odd and the other is even, the midpoint is harmless, and the ball makes it home. And they can't both be even. | 示範 (1,2)：球經過中點 (1,2)（金圈，安全）到 (2,4) 回家（藍閃）；左欄 one odd, one even → safe: the ball comes home、both even → impossible, as gcd = 1。 |
 
-### 8. `foldback`——摺回真桌＋反彈計數（mock 30.6 s）
+### 8. `foldback`——摺回真桌＋反彈計數（mock 39.8 s）
 | beat | 旁白（英文原文） | 畫面 |
 |---|---|---|
 | `start` | Try one, zero. The line runs to two, zero. | 兩張桌子、直線從原點到 (2,0)，中點 (1,0) 金圈；左欄 (p,q) = (1,0)、aim at (2, 0); the midpoint (1, 0) is safe，BOUNCES 計數器 0（金色大數字）。 |
 | `fold1` | Fold it back onto the real table. One bounce off the right wall, and home. | 第二張桌子以右牆為軸翻回真桌，計數器跳 1（彈一下）；球在真桌上往右撞牆再回到中心（藍閃）。 |
 | `next` | Now two, one. The line runs to four, two. | 換成 (p,q) = (2,1)：四張桌子、直線到 (4,2)，中點 (2,1) 金圈，計數器歸 0。 |
 | `fold2` | Fold it back, one wall at a time. Three folds, three bounces. It is the shot we saw come home. | 三次摺回（右上那張→上面那張→右邊那張），計數器 1、2、3；最後球在真桌上跑出 Shot 4 的菱形、回家。 |
-| `count` | In general, the line crosses p vertical walls and q horizontal walls, so the ball bounces p plus q times. | 再展開一次，被穿過的牆（x=1、x=3 兩道直牆與 y=1 一道橫牆）亮成金色；左欄 It crosses \|p\| vertical and \|q\| horizontal walls:、bounces = \|p\| + \|q\| = 2 + 1 = 3。 |
+| `count` | In general, for a shot that makes it home, the line crosses the absolute value of p vertical walls and the absolute value of q horizontal walls. So the ball bounces the absolute value of p, plus the absolute value of q, times. | 再展開一次，被穿過的牆（x=1、x=3 兩道直牆與 y=1 一道橫牆）亮成金色；左欄斜體 For a shot that makes it home:、It crosses \|p\| vertical and \|q\| horizontal walls:、bounces = \|p\| + \|q\| = 2 + 1 = 3。 |
 
-### 9. `angles`——回到 θ（mock 28.6 s）
+### 9. `angles`——回到 θ（mock 37.4 s）
 | beat | 旁白（英文原文） | 畫面 |
 |---|---|---|
-| `start` | Back to the angle. Tangent theta is q over p, with no common factor, one odd and one even. | 左欄 tan θ = q/p，no common factor; one odd, one even；右側大真桌上一條斜率 2 的射線，金色角弧標 θ。 |
-| `family` | Take p equal to one, and q any even number, two k. Every k gives a different angle, so there are infinitely many. That proves part a. | (p,q) = (1, 2k)，列表 k = 0,1,2,3 → tan θ = 0, 2, 4, 6, ⋮；桌上射線依序彈出（k = 0, ±1, ±2, ±3, ±4, ±6, ±9 及反方向），越來越擠向鉛直方向；藍色虛線鉛直射擊標 (0, 1) works too；藍框 Infinitely many angles. (a) is proved.。 |
-| `irrational` | And an irrational slope never hits a lattice point at all. The ball never falls in, but it never comes home either. | 桌下斜體註 An irrational slope never meets a lattice point: never pocketed, never home.。 |
+| `start` | Back to the angle. The shot goes in the direction p, q, with no common factor, one odd and one even. When p is not zero, tangent theta is q over p. And p equal to zero is the straight up-and-down shot. | 左欄先出 direction (p, q)、no common factor; one odd, one even；唸到 When p is not zero 時接 tan θ = q/p (p ≠ 0)；右側大真桌上一條斜率 2 的射線，金色角弧標 θ；唸到 p equal to zero 時藍色虛線鉛直射擊淡入並標 (0, 1) works too。 |
+| `family` | Take p equal to one, and q any even number, two k. Every k gives a different angle, so there are infinitely many. That proves part a. | (p,q) = (1, 2k)，列表 k = 0,1,2,3 → tan θ = 0, 2, 4, 6, ⋮；桌上射線依序彈出（k = 0, ±1, ±2, ±3, ±4, ±6, ±9 及反方向），越來越擠向鉛直方向（藍色虛線鉛直射擊已在上一拍出現）；藍框 Infinitely many angles. (a) is proved.。 |
+| `irrational` | And an irrational slope never hits any other lattice point. The ball never falls in, but it never comes home either. | 桌下斜體註 An irrational slope never meets another lattice point: never pocketed, never home.。 |
 
 ### 10. `twist`——(b)：加上邊中點洞（mock 38.6 s）
 | beat | 旁白（英文原文） | 畫面 |
@@ -98,16 +98,16 @@
 | beat | 旁白（英文原文） | 畫面 |
 |---|---|---|
 | `start` | On the exam, four lines are enough. | HOW TO WRITE IT ON THE EXAM、斜體 *Solution.*，左側紅色豎線。 |
-| `s1` | Unfold the table into a plane of copies. | 1. **Unfold.** Reflect the table across its walls. The path becomes the ray from the origin with slope tan θ, in a plane tiled by copies of [−1,1]². |
+| `s1` | Unfold the table into a plane of copies. | 1. **Unfold.** Reflect the table across its walls. The path becomes a straight ray from the origin, in direction (cos θ, sin θ), across a plane tiled by copies of [−1,1]². |
 | `s2` | Centers sit at even, even points, and corner pockets at odd, odd points. | 2. **Name the points.** Copies of the center: (2m, 2n). Corner pockets: (odd, odd). In (b), the edge pockets add (odd, even) and (even, odd). |
 | `s3` | Aim at two p, two q, and check the midpoint, p, q. | 3. **Check the midpoint.** Coming home means reaching some (2p, 2q), gcd(p, q) = 1, first. The only lattice point strictly between is (p, q). |
 | `s4` | Conclude. Infinitely many angles in part a, and none in part b. | 4. **Conclude.** (a) If p + q is odd, (p, q) is no pocket; tan θ = 2k for every integer k gives infinitely many θ. (b) (p, q) is never (even, even), so it is always a pocket: no angle works. ∎ |
 
-### 13. `epilogue`——題外：無理斜率填滿桌面（mock 21.0 s，含 4 s 停留）
+### 13. `epilogue`——題外：無理斜率的路徑在桌面上稠密（mock 24.2 s，含 4 s 停留）
 | beat | 旁白（英文原文） | 畫面 |
 |---|---|---|
 | `start` | One more thing, beyond this problem. | BEYOND THIS PROBLEM；右側大真桌。 |
-| `dense` | Shoot at a slope of the square root of two. The ball never hits a lattice point, so it never stops. Let it run, and its path slowly fills in the whole table. | tan θ = √2；球由慢到快（加速）一直彈，淡墨軌跡越疊越密、幾乎鋪滿整張桌子；左欄即時計數 bounces so far、Left to run, the path fills in the whole table.、小字 (Unfolded, it is one straight line on a torus. Shown here, not proved.)。 |
+| `dense` | Shoot at a slope of the square root of two. The line never hits another lattice point, so with ideal point pockets the ball never stops. Let it run, and its path comes arbitrarily close to every point on the table. | tan θ = √2；球由慢到快（加速）一直彈，淡墨軌跡越疊越密、幾乎鋪滿整張桌子；左欄 Irrational: the line never meets another lattice point, so the ball never stops.、即時計數 bounces so far、Left to run, the path comes arbitrarily close to every point of the table.、小字 (Unfolded, it is one straight line on a torus. Shown here, not proved.)。 |
 
 ### 14. `outro`——片尾（無旁白）（6.0 s）
 - **畫面：** 置中排版（沿用第三幕 outro 慣例）：小球桌花飾（菱形路徑一圈圈回家）、END OF PROBLEM 7、Square Billiards、(a) infinitely many · (b) none、紅色短線、置中 lockup。

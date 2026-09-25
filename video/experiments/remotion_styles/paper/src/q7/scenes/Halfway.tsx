@@ -25,10 +25,14 @@ const MIX = pts((x, y) => ev(x) !== ev(y));
 const same = (a: V, b: V) => a[0] === b[0] && a[1] === b[1];
 
 export const Halfway: React.FC = () => {
-  const { f, at, p, guard } = useS();
+  const { f, at, p, pf, atWord, guard } = useS();
   const seg = p("start", 40, 20);
   const only = p("only", 24);
   const mid = p("mid", 24);
+  // second sentence of `only` ("The only lattice points on the segment ..."); the mock has no word timing
+  const tList = atWord("The only lattice points", { afterFrame: at("only") }) ?? at("only", 0.42);
+  const onlyList = pf(tList, 26);
+  const onlyListM = pf(tList + 16, 26);
   const oddT = at("odd");
   const mixT = at("mixed");
   const demo = interpolate(f, [oddT, oddT + 20], [0, 1], clamp); // the generic segment steps back
@@ -161,22 +165,25 @@ export const Halfway: React.FC = () => {
       </Txt>
       <M x={120} y={330} t={`{\\color{${HOMEC}}(2p,\\,2q)}`} size={64} p={p("start", 26, 30)} />
       <Txt x={400} y={284} w={380} size={type.caption} italic c={color.ink2} p={p("first", 24)}>
-        the first one on the ray:
+        first blue point on the ray:
       </Txt>
       <M x={400} y={374} t="\gcd(p,q)=1" size={52} p={p("first", 26, 20)} />
-      <Txt x={120} y={408} w={640} size={type.body} p={only}>
-        Then the only lattice points
+      <Txt x={120} y={410} w={640} size={type.caption} italic c={color.ink2} p={only}>
+        first lattice point on the ray: <span style={{ color: EDGE }}>(p, q)</span>
         <br />
-        on the segment are
+        the next: (2p, 2q)
       </Txt>
-      <M x={120} y={586} t={`(0,0),\\quad {\\color{${EDGE}}(p,q)},\\quad (2p,2q)`} size={54} p={p("only", 26, 16)} />
-      <Txt x={120} y={614} w={640} size={type.caption} italic c={color.ink2} p={mid}>
+      <Txt x={120} y={522} w={640} size={type.body} p={onlyList}>
+        Only lattice points on the segment:
+      </Txt>
+      <M x={120} y={648} t={`(0,0),\\quad {\\color{${EDGE}}(p,q)},\\quad (2p,2q)`} size={54} p={onlyListM} />
+      <Txt x={120} y={672} w={640} size={type.caption} italic c={color.ink2} p={mid}>
         Everything hangs on the midpoint <span style={{ color: EDGE }}>(p, q)</span>.
       </Txt>
 
-      <div style={{ position: "absolute", left: 120, top: 700, width: 620, height: 2, background: color.rule, opacity: p("odd", 20) }} />
+      <div style={{ position: "absolute", left: 120, top: 752, width: 620, height: 2, background: color.rule, opacity: p("odd", 20) }} />
       {cases.map(([a, b, q], i) => (
-        <Txt key={i} x={120} y={722 + i * 60} w={720} size={type.caption} p={q}>
+        <Txt key={i} x={120} y={772 + i * 58} w={720} size={type.caption} p={q}>
           {a} <span style={{ fontStyle: "italic" }}>→ {b}</span>
         </Txt>
       ))}
