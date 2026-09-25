@@ -19,7 +19,10 @@ const edge = (d: V): V => {
 };
 
 export const Angles: React.FC = () => {
-  const { f, fps, at, p, guard } = useS();
+  const { f, fps, at, p, pf, atWord, guard } = useS();
+  // "When p is not zero, tangent theta is q over p. And p equal to zero is the straight up-and-down shot."
+  const tTan = atWord("When p is not zero", { afterFrame: at("start") }) ?? at("start", 0.5);
+  const tVert = atWord("And p equal to zero", { afterFrame: at("start") }) ?? at("start", 0.76);
   const tbl = p("start", 30);
   const first = p("start", 30, 30);
   const fam = at("family");
@@ -69,7 +72,7 @@ export const Angles: React.FC = () => {
           </g>
         )}
         {/* vertical (0, 1) */}
-        <line x1={O[0]} y1={px(W, [0, 1])[1]} x2={O[0]} y2={px(W, [0, -1])[1]} stroke={HOMEC} strokeWidth={2.4} strokeDasharray="8 8" opacity={p("family", 20, 150)} />
+        <line x1={O[0]} y1={px(W, [0, 1])[1]} x2={O[0]} y2={px(W, [0, -1])[1]} stroke={HOMEC} strokeWidth={2.4} strokeDasharray="8 8" opacity={pf(tVert, 20)} />
         <circle cx={O[0]} cy={O[1]} r={9} fill={HOMEC} />
       </Layer>
       <M {...thLbl} />
@@ -77,10 +80,11 @@ export const Angles: React.FC = () => {
       <Kicker x={120} y={150} p={p("start", 22)}>
         Back to the angle
       </Kicker>
-      <M x={120} y={310} t="\tan\theta=\dfrac{q}{p}" size={80} p={p("start", 26, 10)} />
-      <Txt x={120} y={404} w={700} size={type.caption} italic c={color.ink2} p={p("start", 24, 40)}>
+      <M x={120} y={296} t="\text{direction}\ \ (p,\,q)" size={64} p={p("start", 26, 10)} />
+      <Txt x={120} y={316} w={700} size={type.caption} italic c={color.ink2} p={p("start", 24, 40)}>
         no common factor; one odd, one even
       </Txt>
+      <M x={120} y={452} t="\tan\theta=q/p\quad(p\neq0)" size={60} p={pf(tTan, 26)} />
 
       <M x={120} y={540} t="(p,q)=(1,\,2k)" size={60} p={p("family", 26)} />
       {list.map(([k, t], i) => {
@@ -108,9 +112,9 @@ export const Angles: React.FC = () => {
         </Txt>
       </div>
       <Txt x={1330} y={930} w={760} align="center" size={type.caption} italic c={color.ink2} p={p("irrational", 26)}>
-        An irrational slope never meets a lattice point: never pocketed, never home.
+        An irrational slope never meets another lattice point: never pocketed, never home.
       </Txt>
-      <Txt x={O[0] + 16} y={px(W, [0, 1])[1] - 58} w={300} size={30} italic c={HOMEC} p={p("family", 20, 160)}>
+      <Txt x={O[0] + 16} y={px(W, [0, 1])[1] - 58} w={300} size={30} italic c={HOMEC} p={pf(tVert + 10, 20)}>
         (0, 1) works too
       </Txt>
     </Sheet>

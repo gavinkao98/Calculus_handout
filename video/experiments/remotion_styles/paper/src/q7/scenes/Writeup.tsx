@@ -10,8 +10,8 @@ export const Writeup: React.FC = () => {
     [
       "Unfold.",
       <>
-        Reflect the table across its walls. The path becomes the ray from the origin with slope <T src="\tan\theta" />, in a plane tiled by
-        copies of <T src="[-1,1]^2" />.
+        Reflect the table across its walls. The path becomes a straight ray from the origin, in direction{" "}
+        <T src="(\cos\theta,\,\sin\theta)" />, across a plane tiled by copies of <T src="[-1,1]^2" />.
       </>,
       "s1",
     ],

@@ -174,8 +174,8 @@ export const Dictionary: React.FC = () => {
       </Txt>
 
       <div style={{ position: "absolute", left: 120, top: 780, width: 560, height: 2, background: color.rule, opacity: q }} />
-      <Txt x={120} y={806} w={600} size={type.body} p={q}>
-        Does the ray from the origin hit a <span style={{ color: HOMEC }}>blue</span> point before a <span style={{ color: POCKET }}>red</span> one?
+      <Txt x={120} y={806} w={640} size={type.body} p={q}>
+        Does the ray from the origin hit another <span style={{ color: HOMEC }}>blue</span> point before a <span style={{ color: POCKET }}>red</span> one?
       </Txt>
     </Sheet>
   );
