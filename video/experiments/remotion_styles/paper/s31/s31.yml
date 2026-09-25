@@ -1,0 +1,165 @@
+# §3.1 Derivatives of Sine and Cosine — unguided-generation experiment (paper style, Remotion).
+# Spoken English only (no LaTeX: MiMo reads the text literally). Each {show <id>} starts a beat;
+# the Remotion scenes look beats up by these ids (src/s31/). Timing comes from tts.py's manifest.
+#   mock:  python video/pipeline/tts.py --storyboard video/experiments/remotion_styles/paper/s31/s31.yml \
+#            --scene all --backend mock --unit beat --output-dir video/experiments/remotion_styles/paper/public/audio/s31_mock
+meta:
+  id: s31_unguided
+  section: "3.1"
+  title: Derivatives of Sine and Cosine
+  voice: Dean
+
+scenes:
+  - id: circle
+    kind: content
+    say: |
+      Here is a point riding around a circle of radius one.
+      {show height} Watch only its height.
+      {show trace} Plotted against the angle, that height traces out the sine curve.
+      {show question} So here is the question for this whole section. How fast does sine change?
+      {show speed} The picture already hints at an answer. Measure the angle in radians,
+      and the angle is exactly the distance travelled along the circle. So the point moves at speed one,
+      and its velocity is an arrow of length one, tangent to the circle.
+      {show vertical} The vertical part of that arrow is the cosine of the angle.
+      {show guess} So the height should change at the rate cosine.
+      {show caveat} But that is a guess read off a picture. In this section, we earn it.
+
+  - id: title
+    kind: intro
+    duration: 6.0
+
+  - id: stuck
+    kind: content
+    say: |
+      Every derivative so far came from one recipe. Write the difference quotient, then let h shrink to zero.
+      {show square} For x squared, algebra does the work. Expand, and every term left on top carries a factor of h.
+      {show cancel} Cancel it, and setting h to zero is harmless. The answer is two x.
+      {show sine} Now try sine.
+      {show plug} Set h to zero, and we get zero over zero. And there is no h to pull out of sine of x plus h.
+      {show funnel} As we will see, the whole problem comes down to a single limit: sine theta over theta, as theta goes to zero.
+      It is zero over zero too, and no algebra will crack it. The new tool will be geometry, on the unit circle.
+      {show radians} One rule for the entire section: every angle is in radians.
+
+  - id: rewrite
+    kind: content
+    say: |
+      First, a rewrite. One identity turns a difference of sines into a product.
+      {show identity} Sine A minus sine B equals two, times cosine of the average, times sine of half the difference.
+      It comes straight from the angle addition formulas.
+      {show substitute} Take A equal to x plus h, and B equal to x. The average is x plus h over two. Half the difference is h over two.
+      {show split} Now slide the two down under the h. The difference quotient splits into two factors.
+      {show owe1} As h goes to zero, the first factor goes to cosine x, as long as cosine is continuous.
+      {show owe2} The second factor is sine theta over theta, with theta equal to h over two, and theta goes to zero as well.
+      {show ledger} So we owe two things. Cosine must be continuous, and sine theta over theta must go to one. Let's pay both debts.
+
+  - id: areas
+    kind: content
+    say: |
+      Draw the unit circle, and an angle theta between zero and a right angle.
+      {show points} Mark A at the point one, zero. B on the circle, at cosine theta, sine theta.
+      And C straight above A, on the tangent line, at height tangent theta.
+      {show tri1} The triangle O A B has base one and height sine theta. Its area is one half sine theta.
+      {show sector} The sector O A B contains that triangle. Because theta is in radians, the sector's area is one half theta.
+      {show tri2} And the big triangle O A C contains the sector. Its area is one half tangent theta.
+      {show chain} Three nested shapes, three ordered areas. Double everything. Sine theta is at most theta, which is at most tangent theta.
+      {show divide} Divide through by sine theta, and flip. Cosine theta is at most sine theta over theta, which is at most one.
+      {show even} We took theta positive. But sine theta over theta is an even function, so negative theta gives the same bounds.
+      {show bonus} And there is a bonus. The size of sine theta is never more than the size of theta.
+
+  - id: continuity
+    kind: content
+    say: |
+      That bonus pays the first debt.
+      {show squeeze} The size of sine theta sits between zero and the size of theta. As theta goes to zero, it is squeezed to zero.
+      {show gap} Now compare sine at two nearby points. The same product identity bounds the gap. It is at most twice the size of sine of half the distance.
+      {show shrink} As x approaches x naught, that bound shrinks to zero. So sine x approaches sine x naught.
+      {show cosgap} Cosine obeys the very same bound.
+      {show paid} So sine and cosine are continuous, everywhere. First debt paid.
+
+  - id: limit
+    kind: content
+    say: |
+      Now the second debt. Here is the graph of sine theta over theta.
+      {show bounds} And here are the two bounds from the areas. Above it, the constant one. Below it, cosine theta.
+      {show pinch} Cosine is continuous, so as theta goes to zero, it climbs to one. The ratio is trapped between two things that both go to one.
+      {show value} So the limit of sine theta over theta, as theta goes to zero, is one.
+      {show paid} The ratio is even, so both sides agree. Second debt paid.
+
+  - id: warnings
+    kind: content
+    say: |
+      Two warnings, before we cash this in.
+      {show identity} First, this is a limit, not an identity. At theta equal to pi over two, the ratio is two over pi, about zero point six four.
+      At pi, it is zero. Only near zero is the ratio close to one.
+      {show degrees} Second, radians are not optional. The sector area, one half theta, only holds in radians.
+      {show factor} Measure in degrees, and the limit comes out as pi over one hundred eighty.
+      That factor follows you into the derivative. The derivative of sine of x degrees is pi over one hundred eighty, times cosine of x degrees.
+
+  - id: payoff
+    kind: content
+    say: |
+      Now we collect. Here is the difference quotient, split in two.
+      {show limits} As h goes to zero, the first factor goes to cosine x, by continuity. The second goes to one, by the key limit.
+      {show theorem} So the derivative of sine x is cosine x.
+      {show cosine} Cosine goes the same way. Its product identity carries a minus sign,
+      so the quotient becomes minus sine of x plus h over two, times the same ratio.
+      {show theorem2} So the derivative of cosine x is minus sine x.
+
+  - id: slope
+    kind: content
+    say: |
+      Here is what the first theorem means in a picture.
+      {show tangent} Slide a tangent line along the sine curve, and read off its slope.
+      {show cosine} Underneath, draw cosine.
+      {show match} At every x, the slope of sine equals the height of cosine.
+      {show peak} Where sine peaks, its tangent is flat, and cosine crosses zero.
+      {show circle} It is the same fact the circle suggested at the start. The height of the point changes at the rate cosine.
+
+  - id: companion
+    kind: content
+    say: |
+      The key limit unlocks others. Take one minus cosine theta, over theta.
+      {show conj} Multiply top and bottom by one plus cosine theta.
+      {show pythag} The top becomes one minus cosine squared, which is sine squared.
+      {show factor} Split it. Sine theta over theta, times sine theta over one plus cosine theta.
+      {show evaluate} The first factor goes to one. The second goes to zero over two, which is zero. So this limit is zero.
+
+  - id: four
+    kind: content
+    say: |
+      With sine and cosine in hand, the other four follow from the quotient rule.
+      {show tan} Tangent is sine over cosine.
+      {show quotient} The quotient rule gives cosine times cosine, minus sine times minus sine, all over cosine squared.
+      {show one} The top is cosine squared plus sine squared, which is one.
+      {show sec} So the derivative of tangent is secant squared.
+      {show table} The same steps give the other three: secant, cotangent and cosecant. Each holds wherever its denominator is not zero.
+      {show co} Notice the pattern. Every function whose name starts with co picks up a minus sign.
+
+  - id: spring
+    kind: content
+    say: |
+      Now hang a weight on a spring, and let it bob.
+      {show position} Say its height is sine t.
+      {show velocity} Its velocity is the derivative, cosine t.
+      {show accel} Its acceleration is the derivative again, minus sine t.
+      {show law} That is minus the height itself.
+      {show arrow} So the acceleration always points back toward the rest position, and it grows with the distance from it.
+      This is simple harmonic motion, and sine and cosine both obey it.
+
+  - id: cycle
+    kind: content
+    say: |
+      Keep differentiating sine.
+      {show step1} Sine goes to cosine.
+      {show step2} Cosine goes to minus sine.
+      {show step3} Minus sine goes to minus cosine.
+      {show step4} And minus cosine comes back to sine. Four steps, and we are home. The fourth derivative of sine is sine.
+      {show compare} Compare e to the x, which returns to itself in a single step.
+      Sine and cosine reach their own negatives in two steps. That is the spring law again. The second derivative is minus the function.
+
+  - id: next
+    kind: content
+    say: |
+      So now we can differentiate sine x itself.
+      {show inside} But what about sine of x squared, or sine of three x plus one? A function inside a function.
+      {show chain} That needs one more tool, the chain rule. It is the subject of the next section.

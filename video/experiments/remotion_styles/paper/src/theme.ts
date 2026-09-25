@@ -18,12 +18,14 @@ export const color = {
   rule: "#C9BFAD", // hairlines, range frames
   accent: "#BA0C2F", // rubric red = brand crimson (derivative / tangent)
   cobalt: "#1F5E9E", // blue-pencil ink (cosine)
+  ochre: "#A07C10", // §3.1 unguided: the angle θ as arc length / sector (validated all-pairs vs crimson ΔE 10.1 deutan, cobalt, ≥3:1)
 } as const;
 
 export const semantic = {
   sin: color.ink,
   cos: color.cobalt,
   derivative: color.accent,
+  angle: color.ochre,
   tangent: color.accent,
   point: color.ink,
   text: color.ink,

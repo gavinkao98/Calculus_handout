@@ -11,6 +11,7 @@ import { RegisterHTMLHandler } from "@mathjax/src/js/handlers/html.js";
 import "@mathjax/src/js/input/tex/base/BaseConfiguration.js";
 import "@mathjax/src/js/input/tex/ams/AmsConfiguration.js";
 import "@mathjax/src/js/input/tex/color/ColorConfiguration.js";
+import "@mathjax/src/js/input/tex/cancel/CancelConfiguration.js";
 import { MathJaxPagellaFont } from "@mathjax/mathjax-pagella-font/js/svg.js";
 
 export type Glyphs = {
@@ -24,7 +25,7 @@ export type Glyphs = {
 const adaptor = liteAdaptor();
 RegisterHTMLHandler(adaptor);
 const doc = mathjax.document("", {
-  InputJax: new TeX({ packages: ["base", "ams", "color"] }),
+  InputJax: new TeX({ packages: ["base", "ams", "color", "cancel"] }),
   OutputJax: new SVG({ fontData: MathJaxPagellaFont, fontCache: "none", linebreaks: { inline: false } }),
 });
 
