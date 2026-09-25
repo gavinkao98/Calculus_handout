@@ -8,7 +8,7 @@ import React from "react";
 import { interpolate, spring } from "remotion";
 import { color, type } from "../../theme";
 import { clamp } from "../../components/Type";
-import { Flash, HOMEC, HomeDot, Kicker, Layer, Ln, M, Mark, POCKET, Pocket, R_POCKET, Sheet, Txt, W_POCKET, World, dOf, mLbl, px, pxs, tLbl, useS } from "../kit";
+import { Flash, HOMEC, HomeDot, Kicker, Layer, Ln, M, Mark, POCKET, Pocket, R_POCKET, Sheet, Txt, W_POCKET, World, dOf, mLbl, px, pxs, useS, useT } from "../kit";
 import { V, polyAt } from "../geo";
 
 export const PLANE_W: World = { ox: 1190, oy: 610, u: 120 };
@@ -54,6 +54,8 @@ export const coordLbl = (W: World, [x, y]: V, kind: "home" | "corner", size = 32
 
 export const Dictionary: React.FC = () => {
   const { f, fps, at, p, guard } = useS();
+  const { t, r, tLbl } = useT();
+  const T = t.dictionary;
   const grid = p("start", 40);
   const real = p("start", 30, 10);
   const brace = p("start", 26, 60);
@@ -92,7 +94,7 @@ export const Dictionary: React.FC = () => {
   // bracket over the real table: "2 units"
   const by = 1.28;
   const two = { x: W.ox, y: px(W, [0, by])[1] - 14, t: "2", size: 36, align: "center" as const, c: color.ink2, p: brace };
-  const realLbl = { s: "the real table", x: W.ox, y: px(W, [0, -1])[1] + 20 };
+  const realLbl = { s: T.real, x: W.ox, y: px(W, [0, -1])[1] + 20 };
 
   const marks: Mark[] = [
     ...[-7, -5, -3, -1, 1, 3, 5, 7].map((x): Mark => ({ name: `wall x=${x}`, pts: pxs(W, [[x, -8], [x, 9]]), w: 1.8, on: grid > 0 })),
@@ -106,7 +108,7 @@ export const Dictionary: React.FC = () => {
   guard(marks, [...HL.map((l) => mLbl(l)), ...CL.map((l) => mLbl(l)), mLbl(two, "2 units"), tLbl(realLbl.s, realLbl.x, realLbl.y, type.label, real, 1, { italic: true, align: "center" })]);
 
   return (
-    <Sheet folio={11} title="A dictionary">
+    <Sheet folio={11} title={T.title}>
       <Layer>
         <PlaneMask id="q7-dict" />
         <g mask="url(#q7-dict)">
@@ -146,14 +148,14 @@ export const Dictionary: React.FC = () => {
 
       {/* key */}
       <Kicker x={120} y={150} p={p("start", 22)}>
-        Coordinates
+        {T.kicker}
       </Kicker>
       <Txt x={120} y={222} w={600} size={type.body} p={p("start", 26, 20)}>
-        The real table is
+        {T.tableIs}
       </Txt>
       <M x={120} y={340} t="[-1,1]\times[-1,1]" size={60} p={p("start", 26, 40)} />
       <Txt x={120} y={372} w={600} size={type.caption} italic c={color.ink2} p={brace}>
-        so every copy is 2 units wide.
+        {T.wide}
       </Txt>
 
       <Layer>
@@ -161,21 +163,21 @@ export const Dictionary: React.FC = () => {
         <circle cx={140} cy={647} r={R_POCKET} fill={color.paper} stroke={POCKET} strokeWidth={W_POCKET} opacity={p("corners", 20)} />
       </Layer>
       <Txt x={176} y={468} w={560} size={type.body} p={p("centers", 26)}>
-        (even, even)
+        {T.evenEven}
       </Txt>
       <Txt x={176} y={524} w={560} size={type.caption} italic c={HOMEC} p={p("centers", 26, 20)}>
-        a copy of the center: the ball is home
+        {T.homeNote}
       </Txt>
       <Txt x={176} y={618} w={560} size={type.body} p={p("corners", 26)}>
-        (odd, odd)
+        {T.oddOdd}
       </Txt>
       <Txt x={176} y={674} w={560} size={type.caption} italic c={POCKET} p={p("corners", 26, 20)}>
-        a copy of a corner: the ball falls in
+        {T.cornerNote}
       </Txt>
 
       <div style={{ position: "absolute", left: 120, top: 780, width: 560, height: 2, background: color.rule, opacity: q }} />
       <Txt x={120} y={806} w={640} size={type.body} p={q}>
-        Does the ray from the origin hit another <span style={{ color: HOMEC }}>blue</span> point before a <span style={{ color: POCKET }}>red</span> one?
+        {r(T.question)}
       </Txt>
     </Sheet>
   );

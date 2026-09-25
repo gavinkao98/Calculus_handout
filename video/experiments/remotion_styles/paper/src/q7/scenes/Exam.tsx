@@ -7,11 +7,10 @@
  */
 import React from "react";
 import { color, type } from "../../theme";
-import { Rule, SmallCaps } from "../../components/Type";
-import { Arrow, Ball, EDGE, HOMEC, Layer, Mark, Pocket, R_POCKET, Sheet, Table, Txt, World, arcPts, dOf, mLbl, M, px, pxs, tableMarks, useS, wipe, camPath } from "../kit";
+import { Rule } from "../../components/Type";
+import { Arrow, Ball, Caps, EDGE, HOMEC, Layer, Mark, Pocket, R_POCKET, Sheet, Table, Txt, World, arcPts, dOf, mLbl, M, px, pxs, tableMarks, useS, useT, wipe, camPath } from "../kit";
 import { V, polyAt, realPath, shot } from "../geo";
 import { CJK_STACK, useCjkReady } from "../cjk";
-import { ZH } from "../zh";
 
 /** Chinese setting: Garamond digits (lining) + Noto Serif TC ideographs, tracked a touch */
 const zh = (size: number, c: string, track: number): React.CSSProperties => ({
@@ -47,6 +46,9 @@ const DashedArrowPath: React.FC<{ W: World; pts: V[]; p: number }> = ({ W, pts, 
 
 export const Exam: React.FC = () => {
   const { f, at, p, pf, guard } = useS();
+  const { t, r } = useT();
+  const T = t.exam;
+  const C = T.card;
   const cjk = useCjkReady();
   const S = at("setup");
   const cam = camPath(f, { cx: 960, cy: 540, s: 1 }, [[S - 6, { cx: 960, cy: 1620, s: 1 }, 54]]);
@@ -97,12 +99,12 @@ export const Exam: React.FC = () => {
   );
 
   return (
-    <Sheet folio={7} title="Problem 7" h={2160} cam={cam} head={false}>
+    <Sheet folio={7} title={T.title} h={2160} cam={cam} head={false}>
       {/* ═════ top page: the exam (set in Chinese, as the original) ═════ */}
       {cjk && (
         <>
-          <div style={{ position: "absolute", left: 120, top: 104, ...zh(34, color.ink2, 0.24), ...wipe(pf(4, 22), 0) }}>{ZH.kicker}</div>
-          <div style={{ position: "absolute", left: 124, top: 214, ...zh(36, color.accent, 0.3), ...wipe(pf(10, 22), 0) }}>{ZH.numLabel}</div>
+          <div style={{ position: "absolute", left: 120, top: 104, ...zh(34, color.ink2, 0.24), ...wipe(pf(4, 22), 0) }}>{C.kicker}</div>
+          <div style={{ position: "absolute", left: 124, top: 214, ...zh(36, color.accent, 0.3), ...wipe(pf(10, 22), 0) }}>{C.numLabel}</div>
         </>
       )}
       <Rule x={120} y={150} w={1680} from={2} len={30} />
@@ -119,15 +121,15 @@ export const Exam: React.FC = () => {
 
       {cjk && (
         <>
-          <div style={{ position: "absolute", left: 690, top: 222, ...zh(36, color.accent, 0.3), ...wipe(pf(16, 22), 0) }}>{ZH.school}</div>
+          <div style={{ position: "absolute", left: 690, top: 222, ...zh(36, color.accent, 0.3), ...wipe(pf(16, 22), 0) }}>{C.school}</div>
           <div style={{ position: "absolute", left: 690, top: 280, ...zh(86, color.ink, 0.04), fontWeight: 500, lineHeight: 1.28, ...wipe(pf(20, 32), 0) }}>
-            {ZH.title1}
+            {C.title1}
             <br />
-            {ZH.title2}
+            {C.title2}
           </div>
           <div style={{ position: "absolute", left: 692, top: 516, width: 90 * pf(40, 20), height: 3, background: color.accent }} />
-          <div style={{ position: "absolute", left: 690, top: 540, ...zh(46, color.ink2, 0.08), ...wipe(pf(44, 26), 0) }}>{ZH.subtitle}</div>
-          {ZH.rows.map(([k, v], i) => (
+          <div style={{ position: "absolute", left: 690, top: 540, ...zh(46, color.ink2, 0.08), ...wipe(pf(44, 26), 0) }}>{C.subtitle}</div>
+          {C.rows.map(([k, v], i) => (
             <div
               key={k}
               style={{
@@ -154,45 +156,21 @@ export const Exam: React.FC = () => {
       {/* ═════ bottom page: the problem ═════ */}
       <div style={{ position: "absolute", left: 120, top: 1160, ...wipe(p("setup", 22, 30), 0) }}>
         <div style={{ width: 56, height: 2.5, background: color.accent, marginBottom: 14 }} />
-        <SmallCaps color={color.accent}>Problem 7 · Square billiards</SmallCaps>
+        <Caps color={color.accent}>{T.kicker}</Caps>
       </div>
-      {/* the page is an English translation: say so where it is true, set as a footnote */}
-      <Rule x={120} y={2016} w={180} from={at("setup") + 40} len={20} />
-      <Txt x={120} y={2028} w={900} size={32} italic c={color.ink3} p={p("setup", 44, 30)}>
-        Translated from the Chinese original.
-      </Txt>
-      {para(
-        1230,
-        p("setup", 60, 40),
+      {/* the English page is a translation: say so where it is true, set as a footnote (the zh page is the original) */}
+      {T.footnote && (
         <>
-          A square billiard table has a pocket at each of its four corners. A ball, treated as a point, is placed at the exact center of the table and
-          struck. It travels in a straight line and bounces off the edges by the law of reflection; once it falls into a pocket, the motion ends.
-        </>,
+          <Rule x={120} y={2016} w={180} from={at("setup") + 40} len={20} />
+          <Txt x={120} y={2028} w={900} size={32} italic c={color.ink3} p={p("setup", 44, 30)}>
+            {T.footnote}
+          </Txt>
+        </>
       )}
-      {para(
-        1466,
-        th,
-        <>
-          Let <i style={{ color: color.ochre }}>θ</i> be the angle between the shot direction and the bottom edge.
-        </>,
-      )}
-      {para(
-        1590,
-        pa,
-        <>
-          Our goal: after the shot, the ball returns to the center of the table before falling into any pocket. Prove that infinitely many angles{" "}
-          <i>θ</i> ∈ [0, 2<i>π</i>) achieve this.
-        </>,
-        "(a)",
-      )}
-      {para(
-        1790,
-        pb,
-        <>
-          Now the table also has a pocket at the midpoint of each edge. How many angles satisfy the requirement in (a)? Explain.
-        </>,
-        "(b)",
-      )}
+      {para(1230, p("setup", 60, 40), r(T.setup))}
+      {para(1466, th, r(T.theta))}
+      {para(1590, pa, r(T.parta), T.labelA)}
+      {para(1790, pb, r(T.partb), T.labelB)}
 
       <Layer h={2160}>
         {/* figure 1: the ball's path, with θ */}
@@ -211,11 +189,13 @@ export const Exam: React.FC = () => {
         <g opacity={fig3}>
           <Table W={W3} real pockets="all" draw={fig3} />
         </g>
-        {/* legend marks */}
-        <g opacity={fig}>
-          <circle cx={1330} cy={1590} r={8} fill={HOMEC} />
-          <Pocket W={{ ox: 0, oy: 0, u: 1 }} p={[1560, -1590]} />
-        </g>
+        {/* legend marks (the zh page words it as the exam does, in one caption line instead) */}
+        {T.legendStart && (
+          <g opacity={fig}>
+            <circle cx={1330} cy={1590} r={8} fill={HOMEC} />
+            <Pocket W={{ ox: 0, oy: 0, u: 1 }} p={[1560, -1590]} />
+          </g>
+        )}
         {fig3 > 0 && (
           <g opacity={fig3}>
             <Pocket W={{ ox: 0, oy: 0, u: 1 }} p={[1318, -1956]} c={EDGE} />
@@ -224,19 +204,38 @@ export const Exam: React.FC = () => {
       </Layer>
       <M {...thLbl} />
       <Txt x={W1.ox} y={1516} w={320} align="center" size={30} italic c={color.ink2} p={fig}>
-        the ball’s path
+        {T.figPath}
       </Txt>
       <Txt x={W2.ox} y={1516} w={320} align="center" size={30} italic c={color.ink2} p={fig}>
-        into a pocket: the end
+        {T.figEnd}
       </Txt>
-      <Txt x={1348} y={1570} w={240} size={30} italic c={color.ink2} p={fig}>
-        start (center)
-      </Txt>
-      <Txt x={1560 + R_POCKET + 12} y={1570} w={240} size={30} italic c={color.ink2} p={fig}>
-        pocket
-      </Txt>
+      {T.legendStart && (
+        <>
+          <Txt x={1348} y={1570} w={240} size={30} italic c={color.ink2} p={fig}>
+            {T.legendStart}
+          </Txt>
+          <Txt x={1560 + R_POCKET + 12} y={1570} w={240} size={30} italic c={color.ink2} p={fig}>
+            {T.legendPocket}
+          </Txt>
+        </>
+      )}
+      {T.figNote && (
+        // an opening full-width 「（」 carries half an em of air on its left: hang it so the ideographs align at the figure's edge
+        <Txt
+          x={W1.ox - 128}
+          y={1572}
+          w={W2.ox + 128 - (W1.ox - 128)}
+          size={30}
+          lh={1.35}
+          c={color.ink2}
+          p={fig}
+          style={T.figNote.startsWith("（") ? { textIndent: "-0.5em" } : undefined}
+        >
+          {r(T.figNote)}
+        </Txt>
+      )}
       <Txt x={1318 + R_POCKET + 12} y={1936} w={400} size={30} italic c={color.ink2} p={fig3}>
-        the table in (b): eight pockets
+        {T.fig3}
       </Txt>
     </Sheet>
   );

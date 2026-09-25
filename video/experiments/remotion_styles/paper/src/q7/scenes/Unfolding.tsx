@@ -8,7 +8,7 @@ import React from "react";
 import { interpolate } from "remotion";
 import { color, type } from "../../theme";
 import { clamp } from "../../components/Type";
-import { EDGE, Flash, HOMEC, Kicker, Layer, Mark, Sheet, Txt, Unfold, World, camPath, dOf, px, pxs, tLbl, tableMarks, useS } from "../kit";
+import { EDGE, Flash, HOMEC, Kicker, Layer, Mark, Sheet, Txt, Unfold, World, camPath, dOf, px, pxs, tableMarks, useS, useT } from "../kit";
 import { V, polyAt, realPath, shot } from "../geo";
 
 const S = shot([2, 1], 2);
@@ -17,6 +17,8 @@ const smooth = (x: number) => 0.5 - 0.5 * Math.cos(Math.PI * Math.max(0, Math.mi
 
 export const Unfolding: React.FC = () => {
   const { f, at, p, guard } = useS();
+  const { t, r, tLbl } = useT();
+  const T = t.unfold;
   const F1 = at("first");
   const cam = camPath(f, { cx: 960, cy: 690, s: 1.6 }, [[F1, { cx: 960, cy: 540, s: 1 }, 46]]);
 
@@ -37,8 +39,8 @@ export const Unfolding: React.FC = () => {
   if (stage === 0 && roll > 0) ball = polyAt(realPath(S), roll).p;
   if (run > 0) ball = polyAt([[0, 0], [4, 2]], run).p;
 
-  const homeLbl = { s: "home", x: px(W, [4, 2])[0] + 22, y: px(W, [4, 2])[1] + 20 };
-  const realLbl = { s: "the real table", x: W.ox, y: W.oy + W.u + 28 };
+  const homeLbl = { s: T.home, x: px(W, [4, 2])[0] + 22, y: px(W, [4, 2])[1] + 20 };
+  const realLbl = { s: T.real, x: W.ox, y: W.oy + W.u + 28 };
   const marks: Mark[] = [
     ...tableMarks(W, "real table"),
     ...tableMarks(W, "copy 3", [4, 2], "corners", false, stage >= 3),
@@ -68,13 +70,13 @@ export const Unfolding: React.FC = () => {
   ];
 
   const steps: Array<[string, number]> = [
-    ["the right wall", p("first", 22, 54)],
-    ["the top wall", p("second", 22)],
-    ["the next wall", p("third", 22)],
+    [T.steps[0], p("first", 22, 54)],
+    [T.steps[1], p("second", 22)],
+    [T.steps[2], p("third", 22)],
   ];
 
   return (
-    <Sheet folio={10} title="Unfold the table" cam={cam}>
+    <Sheet folio={10} title={T.title} cam={cam}>
       <Layer>
         <defs>
           <filter id="q7-feather" x="-10%" y="-10%" width="120%" height="120%">
@@ -113,13 +115,13 @@ export const Unfolding: React.FC = () => {
 
       {/* notes column (visible once the camera has pulled back) */}
       <Kicker x={120} y={150} p={p("first", 22, 40)}>
-        Unfolding
+        {T.kicker}
       </Kicker>
       <Txt x={120} y={222} w={480} size={type.body} p={p("first", 26, 44)}>
-        Bounces are hard. Straight lines are easy.
+        {T.easy}
       </Txt>
       <Txt x={120} y={352} w={600} size={type.caption} italic c={color.ink2} p={p("first", 22, 50)}>
-        At each bounce, mirror the table across
+        {T.across}
       </Txt>
       {steps.map(([s, q], i) => (
         <div key={s} style={{ position: "absolute", left: 120, top: 408 + i * 56, opacity: q > 0 ? 1 : 0 }}>
@@ -132,10 +134,10 @@ export const Unfolding: React.FC = () => {
         </div>
       ))}
       <Txt x={120} y={600} w={480} size={type.body} p={p("line", 26, 70)}>
-        One straight line, ending at the center of a copy: the ball is <span style={{ color: HOMEC }}>home</span>.
+        {r(T.line)}
       </Txt>
       <Txt x={120} y={820} w={480} size={type.caption} italic c={color.ink2} p={p("plane", 26, 30)}>
-        Mirrored in every direction, the copies tile the plane. Every shot is a straight line.
+        {T.plane}
       </Txt>
     </Sheet>
   );

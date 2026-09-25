@@ -7,7 +7,7 @@ import React from "react";
 import { interpolate, spring } from "remotion";
 import { color, type } from "../../theme";
 import { clamp } from "../../components/Type";
-import { HOMEC, Kicker, Layer, M, Mark, Sheet, Table, Txt, World, arcPts, mLbl, px, tableMarks, useS } from "../kit";
+import { HOMEC, Kicker, Layer, M, Mark, Sheet, Table, Txt, World, arcPts, mLbl, px, tableMarks, useS, useT } from "../kit";
 import { V } from "../geo";
 
 const W: World = { ox: 1330, oy: 560, u: 330 };
@@ -19,10 +19,13 @@ const edge = (d: V): V => {
 };
 
 export const Angles: React.FC = () => {
-  const { f, fps, at, p, pf, atWord, guard } = useS();
+  const { f, fps, at, p, pf, atWord, has, guard } = useS();
+  const { t } = useT();
+  const T = t.angles;
   // "When p is not zero, tangent theta is q over p. And p equal to zero is the straight up-and-down shot."
-  const tTan = atWord("When p is not zero", { afterFrame: at("start") }) ?? at("start", 0.5);
-  const tVert = atWord("And p equal to zero", { afterFrame: at("start") }) ?? at("start", 0.76);
+  // Beats `tan` / `vert` where the storyboard has them (the zh cut: beat-unit TTS, no word timing), else the spoken phrase.
+  const tTan = has("tan") ? at("tan") : atWord("When p is not zero", { afterFrame: at("start") }) ?? at("start", 0.5);
+  const tVert = has("vert") ? at("vert") : atWord("And p equal to zero", { afterFrame: at("start") }) ?? at("start", 0.76);
   const tbl = p("start", 30);
   const first = p("start", 30, 30);
   const fam = at("family");
@@ -45,7 +48,7 @@ export const Angles: React.FC = () => {
     ["k=3", "\\tan\\theta=6"],
   ];
   return (
-    <Sheet folio={14} title="Back to the angle">
+    <Sheet folio={14} title={T.title}>
       <Layer>
         <Table W={W} real draw={tbl} />
         {/* the fan: (1, 2k) and (−1, −2k) */}
@@ -78,11 +81,11 @@ export const Angles: React.FC = () => {
       <M {...thLbl} />
 
       <Kicker x={120} y={150} p={p("start", 22)}>
-        Back to the angle
+        {T.kicker}
       </Kicker>
-      <M x={120} y={296} t="\text{direction}\ \ (p,\,q)" size={64} p={p("start", 26, 10)} />
+      <M x={120} y={296} t={T.dirTex} size={64} p={p("start", 26, 10)} />
       <Txt x={120} y={316} w={700} size={type.caption} italic c={color.ink2} p={p("start", 24, 40)}>
-        no common factor; one odd, one even
+        {T.coprime}
       </Txt>
       <M x={120} y={452} t="\tan\theta=q/p\quad(p\neq0)" size={60} p={pf(tTan, 26)} />
 
@@ -108,14 +111,14 @@ export const Angles: React.FC = () => {
         }}
       >
         <Txt x={0} y={0} w={660} size={type.body} c={HOMEC} p={p("family", 24, 150)} style={{ position: "relative" }}>
-          Infinitely many angles. (a) is proved.
+          {T.proved}
         </Txt>
       </div>
       <Txt x={1330} y={930} w={760} align="center" size={type.caption} italic c={color.ink2} p={p("irrational", 26)}>
-        An irrational slope never meets another lattice point: never pocketed, never home.
+        {T.irrational}
       </Txt>
       <Txt x={O[0] + 16} y={px(W, [0, 1])[1] - 58} w={300} size={30} italic c={HOMEC} p={pf(tVert + 10, 20)}>
-        (0, 1) works too
+        {T.vertical}
       </Txt>
     </Sheet>
   );

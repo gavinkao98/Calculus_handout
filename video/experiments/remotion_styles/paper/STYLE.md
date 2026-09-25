@@ -12,7 +12,7 @@
 | 語意 | sin / cos / derivative / tangent | `ink` / `#1F5E9E`（藍鉛筆）/ `accent` / `accent` |
 | 字型 | 內文、標題、小型大寫 | EB Garamond 400/500/600＋斜體（@fontsource，OFL，打包進 bundle） |
 | 字型 | 數學 | MathJax 4 SVG＋Pagella，`mathScale 0.9` 對齊 Garamond x-height |
-| 字型 | 中文（目前只有 Q7 片頭） | Noto Serif TC 思源宋體 400/500（`@fontsource/noto-serif-tc` 5.3.0，OFL）；只打包字串用到的 unicode-range 分片，見下「中文字型」 |
+| 字型 | 中文（Q7 片頭；Q7ZH 全片） | Noto Serif TC 思源宋體 400/500/600（`@fontsource/noto-serif-tc` 5.3.0，OFL）；只打包字串用到的 unicode-range 分片，見下「中文字型」 |
 | 字級（px@1080p，鏡頭縮放前） | display / title / h2 / formula / proof / body / caption / label / smallCaps / micro | 300 / 108 / 64 / 112 / 70 / 44 / 36 / 34 / 28 / 28（第三幕起：凡要讀的字 ≥ 28，見下「字級下限」） |
 | 格線 | 邊界 / 旁註欄 / 主欄 | 120 / x120 w280 / x460 w1340；書眉基線 74、書眉線 94 |
 | 線寬 | hairline / axis / curve / tangent / emphasis | 1.5 / 1.8 / 4.2 / 3.4 / 5 |
@@ -23,10 +23,25 @@
 
 ## 中文字型（2026-09-26，Q7 片頭）
 
-- **只打包用得到的字。** 畫面上的中文字串集中在 `src/q7/zh.ts`；`node scripts/cjk-subsets.mjs` 讀它、從 @fontsource 的 unicode-range 分片裡挑出涵蓋這些字的 woff2，產生 `src/q7/cjkFaces.ts`（靜態 import → 只有這些檔進 bundle）。改了字串就重跑。現況：41 個非 ASCII 字元 → 400、500 各 7 片，共 14 檔、約 639 KiB。
-- **不准缺字、不准退回系統字型。** `src/q7/cjk.ts` 的 `useCjkReady()` 用 `delayRender` 擋住 render，直到：① 每個字都落在已打包的分片範圍內；② 各字面 `FontFace.load()` 完成、`document.fonts.load()` 對實際字串載入；③ 用 canvas 量字寬證明畫字的是 Noto（size-adjust 後每字 0.86 em，系統字型會是 1 em）。任一條不成立就 `cancelRender`，不會默默出豆腐或換字型。字型延遲載入：只有呼叫 `useCjkReady` 的場景會載，其他片不受影響。
+- **只打包用得到的字。** 畫面上的中文字串集中在 `src/q7/i18n/zh.ts`（中文版全部字串）與 `src/q7/i18n/card.ts`（兩版共用的考卷卡）；`node scripts/cjk-subsets.mjs` 讀它們、從 @fontsource 的 unicode-range 分片裡挑出涵蓋這些字的 woff2，產生 `src/q7/cjkFaces.ts`（靜態 import → 只有這些檔進 bundle）。改了字串就重跑。只挑 Garamond 拉丁分片畫不到的字（`$…$` 內的 TeX 由 MathJax 畫，不算）；含中文的字串缺字就報錯，純英文的佔位字串只警告。現況（2026-09-26，zh 表多數仍是英文佔位）：195 字 → 400／500／600 各 13 片，共 39 檔、約 1.7 MiB。
+- **不准缺字、不准退回系統字型。** `src/q7/cjk.ts` 的 `useCjkReady()` 用 `delayRender` 擋住 render，直到：⓪ zh 表的 TeX（`…Tex` 欄位與 `$…$`）裡沒有中文；① 每個中文字串的每個字都落在已打包的分片範圍內；② 各字面 `FontFace.load()` 完成、`document.fonts.load()` 對實際字串載入；③ 用 canvas 量字寬證明畫字的是 Noto（size-adjust 後每字 0.86 em，系統字型會是 1 em）。任一條不成立就 `cancelRender`，不會默默出豆腐或換字型。英文版只有呼叫 `useCjkReady` 的片頭兩場會載；中文版（`Q7ZH`）每一張紙都等它（`Q7.tsx` 的 `CjkGate`），render log 會印 `[cjk] Noto Serif TC 400/500/600 in use`。
 - **與 Garamond 混排：** 字族堆疊 `'EB Garamond', 'Noto Serif TC'`——數字與拉丁字走 Garamond（設 `lnum` 等高數字），漢字與全形標點落到 Noto。同字級下漢字看起來大一號，所以 Noto 字面加 `size-adjust: 86%`（`CJK_SCALE`），漢字約為 Garamond 大寫高的 1.2 倍。標題用 500、其餘 400（漢字本身比 Garamond 重，不用 600）；中文不用斜體（瀏覽器只會假斜），小型大寫的角色改成加字距（0.24–0.3 em）的小字。
 - **字級下限照舊，以有效字級計：** font-size × 0.86 ≥ 28 px，所以中文最小設 34 px。右齊欄位若以全形「）」收尾，要讓它右懸（`marginRight −0.36em`），否則右緣會比數字內縮約半個字身。
+
+## 中文版排版（2026-09-26，Q7 雙語，模板規則）
+
+Q7 是「單一來源、雙語」：動畫、幾何、版面座標只有一份（`src/q7/scenes/*`），上畫面的字串抽在 `src/q7/i18n/en.ts`／`zh.ts`（同形狀，`Strings` 型別強制 key 一致），`Q7` composition 的 `lang` 決定用哪張表；`Q7ZH`＝`lang: "zh"`＋`audio/q7zh_mock/manifest.json`。場景一律透過 `useT()` 取字串，文字元件用 `src/q7/kit.tsx` 的語系版 `Txt`／`Kicker`／`Caps`／`Sheet`——英文時它們原樣轉給 §3.1 的元件（英文輸出逐像素不變），中文時才套下列規則。
+
+1. **中文沒有斜體。** 英文版用 italic 的地方，中文分兩種處理：
+   - **整段斜體**（圖說、旁註、標籤等「次要語域」）→ 直立的 Noto，靠原本的次要墨色（`ink2`／`ink3`）或語意色區分層級，不另加效果。
+   - **句中強調**（字串標記 `{i:…}`，例如 *mirror image*、*Unfolding*）→ **600 字重＋原本的語意色**（無色時就是墨黑 600）。
+   - 全片 zh 範圍掛 `font-synthesis: none`，瀏覽器不能假斜、假粗；Noto 打包 400／500／600 三個真字重。
+2. **字族與字級。** 所有中文走 `'EB Garamond', 'Noto Serif TC', serif`（`ZH_FONT`；zh 範圍另有 `!important` 的保險，Page 書眉等共用元件也不會落到系統字型）。字級低於 34 的一律抬到 34（有效 29 px）；英文 30 px 的圖說在中文就是 34。中文散文設等高數字（`lnum`），Garamond 的舊式數字在漢字旁會往下沉。
+3. **小型大寫的角色（kicker、書眉、SHOT 1、BOUNCES）** → 34 px、500 字重、加字距：kicker 0.24 em、書眉這種長行 0.12 em。
+4. **換行。** 中文任兩字之間都能斷，`Txt` 在中文用 `line-break: strict`（行首不放「，。）」等）。另外兩條自動處理：① 段尾最後 3 字綁在一起（`nowrap`），不留一字孤行（「個。」）；② 標點擠壓——全形收尾標點後面緊接另一個標點（「）。」「。」」）時前者收回半個字身（打包的 Noto 分片沒有 `halt`，`text-spacing-trim` 不作用）。需要控制斷行位置（例如把長問句按語意切三行）時在字串裡寫 `\n`。圖說若以全形「（」起頭，讓它左懸半字身（`textIndent −0.5em`），漢字對齊圖框左緣。
+5. **中文夾數學。** 數學一律寫成 `$…$`（Pagella TeX，`InlineTex` 以 TeX 自己的深度對齊基線），不要用 Garamond 斜體字母代替；`$…$` 前後不手動加空格——與漢字相鄰時自動留 0.18 em，挨著全形標點時不留（標點本身有空）。數字與漢字之間照台灣慣例手打半形空格（「115 學年度」「寬 2 個單位」）。整條 TeX（`…Tex` 欄位）的 `\text{}` 裡不能放中文（MathJax 量不到寬度，渲染時擋下）：要把字拆成文字＋公式兩塊。
+6. **標籤守門照常生效。** `useT().tLbl` 在中文用實際畫字的字族堆疊、實際字級（抬到 34 後）量寬，框的上下緣也放寬一點（Noto 的漢字比 Garamond 占滿 em 框），不拿 Garamond 量中文。
+7. **逐字對時錨點。** 中文旁白用 `--unit beat` 合成、沒有逐字對齊，所以英文版靠 `atWord("…")` 卡字的三個點在中文分鏡裡是獨立的拍（angles 的 `tan`／`vert`、halfway 的 `list`）；場景寫法 `has("tan") ? at("tan") : atWord(...) ?? at(...)`，`has()` 查不到不 throw。英文分鏡沒有這三拍，行為不變。
 
 ## 字級下限（第三幕起，模板規則）
 

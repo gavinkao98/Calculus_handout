@@ -4,15 +4,15 @@ import { interpolate } from "remotion";
 import { color } from "../../theme";
 import { BrandLockup } from "../../components/Shell";
 import { Rule, clamp } from "../../components/Type";
-import { Sheet, useS, wipe } from "../kit";
+import { Sheet, useS, useT, wipe } from "../kit";
 import { CJK_STACK, useCjkReady } from "../cjk";
-import { ZH } from "../zh";
 
 /** the lockup artwork sits in the left part of its 1040×300 box: its visual centre is at 36.45 % of the width */
 export const INK_CENTRE = 0.3645;
 
 export const Logo: React.FC = () => {
   const { f, pf } = useS();
+  const { t } = useT();
   const cjk = useCjkReady();
   const H = 250;
   const W = (H * 1040) / 300;
@@ -41,7 +41,7 @@ export const Logo: React.FC = () => {
             ...wipe(pf(44, 22), 0),
           }}
         >
-          {ZH.logoSub}
+          {t.logo.sub}
         </div>
       )}
     </Sheet>

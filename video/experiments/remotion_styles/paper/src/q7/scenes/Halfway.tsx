@@ -8,7 +8,7 @@ import React from "react";
 import { interpolate } from "remotion";
 import { color, type } from "../../theme";
 import { clamp } from "../../components/Type";
-import { Ball, EDGE, Flash, HOMEC, HomeDot, Kicker, Layer, M, Mark, POCKET, Pocket, R_POCKET, Sheet, Txt, W_POCKET, World, dOf, mLbl, px, pxs, useS } from "../kit";
+import { Ball, EDGE, Flash, HOMEC, HomeDot, Kicker, Layer, M, Mark, POCKET, Pocket, R_POCKET, Sheet, Txt, W_POCKET, World, dOf, mLbl, px, pxs, useS, useT } from "../kit";
 import { V, polyAt } from "../geo";
 import { Grid, PlaneMask } from "./Dictionary";
 
@@ -25,12 +25,15 @@ const MIX = pts((x, y) => ev(x) !== ev(y));
 const same = (a: V, b: V) => a[0] === b[0] && a[1] === b[1];
 
 export const Halfway: React.FC = () => {
-  const { f, at, p, pf, atWord, guard } = useS();
+  const { f, at, p, pf, atWord, has, guard } = useS();
+  const { t, r, it } = useT();
+  const T = t.halfway;
   const seg = p("start", 40, 20);
   const only = p("only", 24);
   const mid = p("mid", 24);
-  // second sentence of `only` ("The only lattice points on the segment ..."); the mock has no word timing
-  const tList = atWord("The only lattice points", { afterFrame: at("only") }) ?? at("only", 0.42);
+  // second sentence of `only` ("The only lattice points on the segment ..."): its own beat `list` where the
+  // storyboard has one (the zh cut: beat-unit TTS, no word timing), else the spoken phrase; the mock has no word timing
+  const tList = has("list") ? at("list") : atWord("The only lattice points", { afterFrame: at("only") }) ?? at("only", 0.42);
   const onlyList = pf(tList, 26);
   const onlyListM = pf(tList + 16, 26);
   const oddT = at("odd");
@@ -89,32 +92,15 @@ export const Halfway: React.FC = () => {
   guard(marks, Object.entries(L).map(([k, l]) => mLbl(l, k)));
 
   const midGlow = mid * genO;
-  const cases: Array<[React.ReactNode, React.ReactNode, number]> = [
-    [
-      <>
-        <i>p</i>, <i>q</i> both odd
-      </>,
-      <span style={{ color: POCKET }}>a corner: pocketed halfway</span>,
-      p("odd", 24),
-    ],
-    [
-      <>
-        one odd, one even
-      </>,
-      <span style={{ color: HOMEC }}>safe: the ball comes home</span>,
-      p("mixed", 24),
-    ],
-    [
-      <>
-        both even
-      </>,
-      <span style={{ color: color.ink3 }}>impossible, as gcd = 1</span>,
-      p("mixed", 24, 110),
-    ],
+  const outcome = [POCKET, HOMEC, color.ink3];
+  const cases: Array<[string, string, string, number]> = [
+    [...T.cases[0], outcome[0], p("odd", 24)],
+    [...T.cases[1], outcome[1], p("mixed", 24)],
+    [...T.cases[2], outcome[2], p("mixed", 24, 110)],
   ];
 
   return (
-    <Sheet folio={12} title="The halfway test">
+    <Sheet folio={12} title={T.title}>
       <Layer>
         <PlaneMask id="q7-half" x={780} y={150} w={1080} h={860} />
         <g mask="url(#q7-half)">
@@ -158,33 +144,31 @@ export const Halfway: React.FC = () => {
       ))}
 
       <Kicker x={120} y={150} p={p("start", 22)}>
-        The halfway test
+        {T.kicker}
       </Kicker>
       <Txt x={120} y={216} w={640} size={type.body} p={p("start", 26, 10)}>
-        To come home, aim at a blue point
+        {T.aim}
       </Txt>
       <M x={120} y={330} t={`{\\color{${HOMEC}}(2p,\\,2q)}`} size={64} p={p("start", 26, 30)} />
       <Txt x={400} y={284} w={380} size={type.caption} italic c={color.ink2} p={p("first", 24)}>
-        first blue point on the ray:
+        {T.firstBlue}
       </Txt>
       <M x={400} y={374} t="\gcd(p,q)=1" size={52} p={p("first", 26, 20)} />
       <Txt x={120} y={410} w={640} size={type.caption} italic c={color.ink2} p={only}>
-        first lattice point on the ray: <span style={{ color: EDGE }}>(p, q)</span>
-        <br />
-        the next: (2p, 2q)
+        {r(T.firstLattice)}
       </Txt>
       <Txt x={120} y={522} w={640} size={type.body} p={onlyList}>
-        Only lattice points on the segment:
+        {T.onlyList}
       </Txt>
       <M x={120} y={648} t={`(0,0),\\quad {\\color{${EDGE}}(p,q)},\\quad (2p,2q)`} size={54} p={onlyListM} />
       <Txt x={120} y={672} w={640} size={type.caption} italic c={color.ink2} p={mid}>
-        Everything hangs on the midpoint <span style={{ color: EDGE }}>(p, q)</span>.
+        {r(T.hangs)}
       </Txt>
 
       <div style={{ position: "absolute", left: 120, top: 752, width: 620, height: 2, background: color.rule, opacity: p("odd", 20) }} />
-      {cases.map(([a, b, q], i) => (
+      {cases.map(([a, b, c, q], i) => (
         <Txt key={i} x={120} y={772 + i * 58} w={720} size={type.caption} p={q}>
-          {a} <span style={{ fontStyle: "italic" }}>→ {b}</span>
+          {r(a)} <span style={it}>{T.arrow} <span style={{ color: c }}>{r(b)}</span></span>
         </Txt>
       ))}
     </Sheet>

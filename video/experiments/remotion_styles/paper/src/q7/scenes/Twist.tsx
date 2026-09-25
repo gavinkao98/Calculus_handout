@@ -8,7 +8,7 @@ import React from "react";
 import { interpolate, spring } from "remotion";
 import { color, type } from "../../theme";
 import { clamp } from "../../components/Type";
-import { Ball, EDGE, Flash, HOMEC, HomeDot, Kicker, Layer, M, Mark, POCKET, Pocket, R_POCKET, Sheet, Table, Txt, W_POCKET, World, dOf, mLbl, px, pxs, tableMarks, useS } from "../kit";
+import { Ball, EDGE, Flash, HomeDot, Kicker, Layer, M, Mark, POCKET, Pocket, R_POCKET, Sheet, Table, Txt, W_POCKET, World, dOf, mLbl, px, pxs, tableMarks, useS, useT } from "../kit";
 import { V, polyAt, polyLen, realPath, shot } from "../geo";
 import { Grid, PlaneMask } from "./Dictionary";
 
@@ -28,6 +28,8 @@ const PATH21 = realPath(shot([2, 1], 1)); // → (1, ½) → the top pocket (0, 
 
 export const Twist: React.FC = () => {
   const { f, fps, at, p, guard } = useS();
+  const { t, r } = useT();
+  const X = t.twist;
   const t0 = at("start");
   const tc = at("copies");
   const tr = at("revisit");
@@ -67,7 +69,7 @@ export const Twist: React.FC = () => {
 
   const ans = p("answer", 30);
   return (
-    <Sheet folio={15} title="Part (b)">
+    <Sheet folio={15} title={X.title}>
       <Layer>
         {/* the real table, now with eight pockets */}
         <Table W={T} real draw={tbl} pockets="corners" />
@@ -121,25 +123,25 @@ export const Twist: React.FC = () => {
       ))}
 
       <Kicker x={120} y={150} p={p("start", 22)}>
-        Part (b)
+        {X.kicker}
       </Kicker>
       <Txt x={120} y={216} w={860} size={type.body} p={p("start", 26, 10)}>
-        Add a pocket at the middle of every edge.
+        {X.add}
       </Txt>
       <Txt x={120} y={282} w={860} size={type.caption} p={p("copies", 24)}>
-        Their copies: <span style={{ color: EDGE }}>(odd, even)</span> and <span style={{ color: EDGE }}>(even, odd)</span>.
+        {r(X.copies)}
       </Txt>
       <Txt x={120} y={334} w={860} size={type.caption} p={p("copies", 24, 40)}>
-        Now every lattice point is a pocket, except <span style={{ color: HOMEC }}>(even, even)</span>.
+        {r(X.every)}
       </Txt>
-      <M x={120} y={440} t={`\\gcd(p,q)=1\\ \\Rightarrow\\ {\\color{${EDGE}}(p,q)}\\neq(\\text{even},\\text{even})`} size={46} p={p("test", 26)} />
+      <M x={120} y={440} t={`\\gcd(p,q)=1\\ \\Rightarrow\\ {\\color{${EDGE}}(p,q)}\\neq${X.evenTex}`} size={46} p={p("test", 26)} />
       <Txt x={120} y={470} w={860} size={type.caption} italic c={POCKET} p={p("test", 24, 50)}>
-        The midpoint is always a pocket: every trip home is cut halfway.
+        {X.cut}
       </Txt>
 
       <div style={{ position: "absolute", left: 0, top: 0, opacity: ans }}>
         <Txt x={850} y={640} w={260} size={type.caption} italic c={color.ink2} p={ans}>
-          angles in (b):
+          {X.answer}
         </Txt>
         <Txt x={850} y={680} w={260} size={200} lh={1} c={POCKET} p={ans} style={{ fontFeatureSettings: "'lnum' 1" }}>
           0

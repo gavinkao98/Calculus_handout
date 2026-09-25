@@ -3,8 +3,8 @@ import React from "react";
 import { interpolate, useCurrentFrame } from "remotion";
 import { color, features, font } from "../../theme";
 import { BrandLockup } from "../../components/Shell";
-import { InkReveal, Rule, SmallCaps, clamp } from "../../components/Type";
-import { Ball, HOMEC, Layer, POCKET, Sheet, Table, World, dOf } from "../kit";
+import { InkReveal, Rule, clamp } from "../../components/Type";
+import { Ball, Caps, Layer, Sheet, Table, World, dOf, useT } from "../kit";
 import { polyAt, realPath, shot } from "../geo";
 import { INK_CENTRE } from "./Logo";
 
@@ -12,6 +12,8 @@ const HOMEPATH = realPath(shot([2, 1], 2));
 
 export const Outro: React.FC = () => {
   const f = useCurrentFrame();
+  const { t, r, it } = useT();
+  const T = t.outro;
   const s = interpolate(f, [0, 150], [1.05, 1], clamp);
   const W: World = { ox: 960, oy: 250, u: 80 };
   const lap = interpolate(((f - 20) % 110 + 110) % 110, [0, 90], [0, 1], clamp);
@@ -30,16 +32,16 @@ export const Outro: React.FC = () => {
         )}
       </Layer>
       <InkReveal from={16} len={24} style={{ left: 460, top: 380, width: 1000, height: 40, textAlign: "center" }}>
-        <SmallCaps color={color.accent}>End of Problem 7</SmallCaps>
+        <Caps color={color.accent}>{T.end}</Caps>
       </InkReveal>
       <InkReveal from={26} len={34} style={{ left: 160, top: 430, width: 1600, height: 130, textAlign: "center" }}>
         <div style={{ fontFamily: font.serif, fontSize: 92, fontWeight: 500, color: color.ink, letterSpacing: "-0.01em", fontFeatureSettings: features.text }}>
-          Square Billiards
+          {T.title}
         </div>
       </InkReveal>
       <InkReveal from={40} len={30} style={{ left: 260, top: 560, width: 1400, height: 70, textAlign: "center" }}>
-        <div style={{ fontFamily: font.serif, fontStyle: "italic", fontSize: 46, color: color.ink2, fontFeatureSettings: features.text }}>
-          (a) <span style={{ color: HOMEC }}>infinitely many</span> &ensp;·&ensp; (b) <span style={{ color: POCKET }}>none</span>
+        <div style={{ fontFamily: font.serif, ...it, fontSize: 46, color: color.ink2, fontFeatureSettings: features.text }}>
+          {r(T.answer)}
         </div>
       </InkReveal>
       <Rule x={880} y={690} w={160} weight={3} color={color.accent} from={50} len={20} />

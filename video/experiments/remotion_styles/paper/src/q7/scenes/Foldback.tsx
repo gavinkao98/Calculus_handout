@@ -7,8 +7,8 @@
 import React from "react";
 import { interpolate, spring } from "remotion";
 import { color, features, font, type } from "../../theme";
-import { SmallCaps, clamp } from "../../components/Type";
-import { Ball, EDGE, Flash, HOMEC, Kicker, Layer, M, Sheet, Txt, Unfold, World, dOf, px, useS } from "../kit";
+import { clamp } from "../../components/Type";
+import { Ball, Caps, EDGE, Flash, HOMEC, Kicker, Layer, M, Sheet, Txt, Unfold, World, dOf, px, useS, useT } from "../kit";
 import { V, polyAt, polyLen, realPath, shot } from "../geo";
 
 const W: World = { ox: 980, oy: 700, u: 140 };
@@ -20,6 +20,8 @@ const ease = (x: number) => 0.5 - 0.5 * Math.cos(Math.PI * Math.max(0, Math.min(
 
 export const Foldback: React.FC = () => {
   const { f, fps, at, p } = useS();
+  const { t, r } = useT();
+  const T = t.foldback;
   const tF1 = at("fold1");
   const tN = at("next");
   const tF2 = at("fold2");
@@ -54,7 +56,7 @@ export const Foldback: React.FC = () => {
   );
 
   return (
-    <Sheet folio={13} title="Fold it back">
+    <Sheet folio={13} title={T.title}>
       <Layer>
         {/* (1, 0) */}
         {aO > 0 && aIn > 0 && (
@@ -101,24 +103,24 @@ export const Foldback: React.FC = () => {
       </Layer>
 
       <Kicker x={120} y={150} p={p("start", 22)}>
-        Fold it back
+        {T.kicker}
       </Kicker>
       <div style={{ position: "absolute", left: 0, top: 0, opacity: which === "a" ? aO : 0 }}>
         <M x={120} y={290} t="(p,q)=(1,0)" size={60} p={p("start", 26, 8)} />
         <Txt x={120} y={320} w={620} size={type.caption} italic c={color.ink2} p={p("start", 24, 20)}>
-          aim at (2, 0); the midpoint (1, 0) is safe
+          {T.aimA}
         </Txt>
       </div>
       <div style={{ position: "absolute", left: 0, top: 0, opacity: which === "b" ? bIn : 0 }}>
         <M x={120} y={290} t="(p,q)=(2,1)" size={60} p={bIn} />
         <Txt x={120} y={320} w={620} size={type.caption} italic c={color.ink2} p={bIn}>
-          aim at (4, 2); the midpoint (2, 1) is safe
+          {T.aimB}
         </Txt>
       </div>
 
       {/* the counter */}
       <div style={{ position: "absolute", left: 120, top: 440, ...{ opacity: p("start", 20, 30) } }}>
-        <SmallCaps color={color.ink2}>Bounces</SmallCaps>
+        <Caps color={color.ink2}>{T.bounces}</Caps>
       </div>
       <div
         style={{
@@ -139,12 +141,12 @@ export const Foldback: React.FC = () => {
       </div>
 
       <Txt x={120} y={684} w={660} size={type.caption} italic c={color.ink2} p={p("count", 26, 40)}>
-        For a shot that makes it home:
+        {T.forHome}
       </Txt>
       <Txt x={120} y={736} w={660} size={type.caption} p={p("count", 26, 60)}>
-        It crosses <span style={{ color: EDGE }}>|p| vertical</span> and <span style={{ color: EDGE }}>|q| horizontal</span> walls:
+        {r(T.crosses)}
       </Txt>
-      <M x={120} y={880} t={`\\text{bounces} = |p|+|q| = 2+1 = {\\color{${EDGE}}3}`} size={52} p={p("count", 30, 90)} />
+      <M x={120} y={880} t={`${T.countTex}{\\color{${EDGE}}3}`} size={52} p={p("count", 30, 90)} />
     </Sheet>
   );
 };
