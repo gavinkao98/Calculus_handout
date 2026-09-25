@@ -97,6 +97,10 @@ export const stroke = {
   ring: 2.5, // paper ring around dots
 } as const;
 
+/** Graph labels (STYLE.md「圖上標籤」): the minimum gap, in page px at 1080p, between a label's
+ *  glyph box and the outer edge of any drawn mark (curve, axis, tick, dot, region boundary). */
+export const labelGuard = { clearance: 10 } as const;
+
 // ── Motion ────────────────────────────────────────────────────────────────
 export const fps = 30;
 export const dur = {

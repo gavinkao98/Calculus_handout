@@ -4,7 +4,7 @@ import { Easing, interpolate } from "remotion";
 import { color, stroke, type } from "../../theme";
 import { clamp } from "../../components/Type";
 import { EqNumber } from "../../components/Marginalia";
-import { HOME, Hatches, Kicker, Layer, Ln, M, Sheet, Txt, camPath, useS } from "../kit";
+import { HOME, Hatches, Kicker, Layer, Ln, M, Pt, Sheet, Txt, arcPts, camPath, dotMark, mLbl, tLbl, useS } from "../kit";
 
 const PI = Math.PI;
 const O = { x: 210, y: 930 };
@@ -17,7 +17,7 @@ const Swatch: React.FC<{ y: number; fill: string; p: number }> = ({ y, fill, p }
   p <= 0 ? null : <rect x={X} y={y - 34} width={44} height={34} fill={fill} stroke={color.ink} strokeWidth={1.6} opacity={p} />;
 
 export const Areas: React.FC = () => {
-  const { f, at, p } = useS();
+  const { f, at, p, guard } = useS();
   const th = interpolate(f, [20, at("points") - 10], [0.3, TH], { ...clamp, easing: Easing.inOut(Easing.cubic) });
   const c = Math.cos(th);
   const s = Math.sin(th);
@@ -47,6 +47,37 @@ export const Areas: React.FC = () => {
   const triB = `M${O.x} ${O.y} L${A.x} ${A.y} L${B.x} ${B.y} Z`;
   const triC = `M${O.x} ${O.y} L${A.x} ${A.y} L${C.x} ${C.y} Z`;
   const outline = (d: string, q: number, w = 2.6) => (q > 0 ? <path d={d} fill="none" stroke={color.ink} strokeWidth={w} strokeLinejoin="round" opacity={q} /> : null);
+
+  // labels: sin θ names the dashed plumb from B and sits on its open (left) side, over the hatching
+  // (a paper knock-out is allowed there: no stroke passes under it); tan θ sits right of x = 1.
+  const L = {
+    // rides the bisector as the angle opens
+    th: { x: O.x + 175 * Math.cos(th / 2), y: O.y - 175 * Math.sin(th / 2) + 17, t: "\\theta", size: 50, align: "center" as const, c: color.ochre, p: arcP },
+    O: { x: O.x - 22, y: O.y + 50, t: "O", size: 46, align: "right" as const, p: axes },
+    A: { x: A.x + 18, y: A.y + 52, t: "A=(1,0)", size: 44, p: pts },
+    B: { x: B.x - 44, y: B.y + 8, t: "B=(\\cos\\theta,\\sin\\theta)", size: 44, align: "right" as const, p: pts },
+    C: { x: C.x - 18, y: C.y - 28, t: "C=(1,\\tan\\theta)", size: 44, align: "right" as const, p: pts },
+    sin: { x: B.x - 18, y: (B.y + O.y) / 2 + 40, t: "\\sin\\theta", size: 40, align: "right" as const, c: color.ink2, bg: true, p: t1, o: 1 - dimOthers },
+    tan: { x: A.x + 18, y: (C.y + O.y) / 2, t: "\\tan\\theta", size: 40, c: color.ink2, p: t2, o: 1 - dimOthers },
+  };
+  const tri = (P: { x: number; y: number }): Pt[] => [[O.x, O.y], [A.x, A.y], [P.x, P.y], [O.x, O.y]];
+  guard(
+    [
+      { name: "x-axis", pts: [[O.x - 40, O.y], [O.x + R + 150, O.y]], w: stroke.axis, on: axes > 0 },
+      { name: "y-axis", pts: [[O.x, O.y + 40], [O.x, O.y - R - 60]], w: stroke.axis, on: axes > 0 },
+      { name: "quarter circle", pts: arcPts(O.x, O.y, R, 0, PI / 2, 96), w: 3.4, on: arcP > 0 },
+      { name: "tangent line x = 1", pts: [[A.x, O.y + 30], [A.x, O.y - R * 1.12]], w: 2, on: tan > 0 },
+      { name: "triangle OAB", pts: tri(B), w: 3, on: t1 > 0 },
+      { name: "sector OAB", pts: [[O.x, O.y], ...arcPts(O.x, O.y, R, 0, th), [O.x, O.y]], w: 3, on: sc > 0 },
+      { name: "triangle OAC", pts: tri(C), w: 3, on: t2 > 0 },
+      { name: "radius OB", pts: [[O.x, O.y], [B.x, B.y]], w: 2.6, on: arcP > 0 },
+      { name: "angle arc", pts: arcPts(O.x, O.y, 110, 0, th, 24), w: 4, on: arcP > 0 },
+      { name: "plumb from B", pts: [[B.x, O.y], [B.x, B.y]], w: 2, on: t1 > 0 },
+      dotMark("O", O.x, O.y, axes > 0),
+      ...[A, B, C].map((q, i) => dotMark("ABC"[i], q.x, q.y, pts > 0)),
+    ],
+    [...Object.values(L).map((q) => mLbl(q)), tLbl("base 1", O.x + R * 0.45, O.y + 20, type.label, t1, 1 - dimOthers, { italic: true })],
+  );
 
   return (
     <Sheet folio={116} title="Paying the debts: areas" cam={cam} h={H}>
@@ -95,13 +126,9 @@ export const Areas: React.FC = () => {
       </Layer>
 
       {/* figure labels */}
-      <M x={O.x + 150} y={O.y - 30} t="\theta" size={50} c={color.ochre} p={arcP} />
-      <M x={O.x - 22} y={O.y + 50} t="O" size={46} align="right" p={axes} />
-      <M x={A.x + 18} y={A.y + 52} t="A=(1,0)" size={44} p={pts} />
-      <M x={B.x - 44} y={B.y + 8} t="B=(\cos\theta,\sin\theta)" size={44} align="right" p={pts} />
-      <M x={C.x - 22} y={C.y + 10} t="C=(1,\tan\theta)" size={44} align="right" p={pts} />
-      <M x={B.x + 14} y={(B.y + O.y) / 2 + 40} t="\sin\theta" size={40} c={color.ink2} bg p={t1} o={1 - dimOthers} />
-      <M x={A.x + 18} y={(C.y + O.y) / 2} t="\tan\theta" size={40} c={color.ink2} bg p={t2} o={1 - dimOthers} />
+      {Object.values(L).map((q) => (
+        <M key={q.t} {...q} />
+      ))}
       <Txt x={O.x + R * 0.45} y={O.y + 20} w={200} size={type.label} italic c={color.ink2} p={t1} o={1 - dimOthers}>
         base 1
       </Txt>

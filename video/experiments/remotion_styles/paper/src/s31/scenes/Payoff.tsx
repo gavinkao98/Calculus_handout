@@ -8,7 +8,14 @@ import { Arrow, HOME, Kicker, Layer, M, Sheet, Txt, camPath, texW, useS, wipe } 
 const C = color.cobalt;
 const A = color.accent;
 const SZ = 66; // both quotient rows (sine and cosine) are the same object at the same size
-const H = 1280;
+const H = 1580;
+// vertical plan (page px). Top region (camera home, 0–1080): the sine row, its two limits, Theorem 1.
+// Bottom region (one move, frame 500–1580): Theorem 1 kept as context, the side remark, the cosine
+// row, Theorem 2 — every block a clear step apart, the whole group centred in that frame.
+const T1 = 650; // Theorem 1 rule top
+const WITH_Y = 960; // side-remark baseline
+const COS_Y = 1090; // cosine-row baseline
+const T2 = 1240; // Theorem 2 rule top
 const LHS = "\\frac{\\sin(x+h)-\\sin x}{h}=";
 const COSF = `{\\color{${C}}\\cos\\!\\left(x+\\tfrac{h}{2}\\right)}`;
 const RATIO = "\\frac{\\sin(h/2)}{h/2}";
@@ -17,12 +24,12 @@ const COSROW = `\\frac{{\\color{${C}}\\cos(x+h)-\\cos x}}{h}=-\\sin\\!\\left(x+\
 
 const TheoremBox: React.FC<{ x: number; y: number; n: string; t: string; p: number }> = ({ x, y, n, t, p }) => (
   <>
-    {/* label sits above the rule so the full-size d/dx numerator has the whole box height */}
+    {/* the label sits above the rule, a full step above the tall d/dx numerator; the rule spans the formula */}
     <div style={{ position: "absolute", left: x, top: y - 38, ...wipe(p, 0) }}>
       <SmallCaps color={A}>Theorem {n}</SmallCaps>
     </div>
-    <div style={{ position: "absolute", left: x, top: y, width: 5, height: 170 * p, background: A }} />
-    <M x={x + 30} y={y + 124} size={104} p={p} t={t} />
+    <div style={{ position: "absolute", left: x, top: y, width: 5, height: 225 * p, background: A }} />
+    <M x={x + 30} y={y + 154} size={104} p={p} t={t} />
   </>
 );
 
@@ -41,6 +48,7 @@ export const Payoff: React.FC = () => {
   // Theorem 1 has inked and before the cosine line is written; the sine rows stay in view below it.
   const cam = camPath(f, HOME, [[at("cosine") - 44, { cx: 960, cy: H - 540, s: 1 }, 40]]);
   const kick = 1 - interpolate(cam.cy, [540, 600], [0, 1], clamp); // the kicker would be clipped: fade it
+  const lift = 1 - interpolate(cam.cy, [540, 760], [0, 1], clamp); // so would the sine row and its limits
   const lim = p("limits", 30);
   // the second factor's limit value ("1") appears as the narration names it ("...goes to one")
   const oneAt = atWord("one", { afterFrame: at("limits") }) ?? at("limits") + Math.round((at("theorem") - at("limits")) * 0.45);
@@ -52,6 +60,7 @@ export const Payoff: React.FC = () => {
           Collecting
         </Kicker>
       </div>
+      <div style={{ opacity: lift }}>
       <M x={X} y={300} size={SZ} p={p("start", 34, 8)} t={SINROW} />
       <Layer h={H}>
         <Arrow x1={cA} y1={352} x2={cA} y2={420} p={lim} c={C} w={2.6} head={13} />
@@ -65,9 +74,10 @@ export const Payoff: React.FC = () => {
       <Txt x={cB} y={500} w={420} align="center" size={30} italic c={color.ink2} p={pf(oneAt + 14, 24)}>
         by the key limit ²
       </Txt>
+      </div>
       <TheoremBox
         x={X}
-        y={600}
+        y={T1}
         n="1"
         p={p("theorem", 34)}
         t={`{\\color{${A}}\\frac{d}{dx}}\\sin x={\\color{${C}}\\cos x}`}
@@ -76,15 +86,15 @@ export const Payoff: React.FC = () => {
       {/* a side remark (inline), then the cosine row at the same size as the sine row */}
       <M
         x={X}
-        y={842}
+        y={WITH_Y}
         size={40}
         c={color.ink2}
         display={false}
         p={p("cosine", 26)}
         t="\text{with}\quad \cos A-\cos B=-2\sin\tfrac{A+B}{2}\,\sin\tfrac{A-B}{2}:"
       />
-      <M x={X} y={942} size={SZ} p={p("cosine", 34, 60)} t={COSROW} />
-      <TheoremBox x={X} y={1046} n="2" p={p("theorem2", 34)} t={`{\\color{${A}}\\frac{d}{dx}}{\\color{${C}}\\cos x}=-\\sin x`} />
+      <M x={X} y={COS_Y} size={SZ} p={p("cosine", 34, 60)} t={COSROW} />
+      <TheoremBox x={X} y={T2} n="2" p={p("theorem2", 34)} t={`{\\color{${A}}\\frac{d}{dx}}{\\color{${C}}\\cos x}=-\\sin x`} />
     </Sheet>
   );
 };

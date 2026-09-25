@@ -63,7 +63,7 @@ const SheetSlot: React.FC<{ s: SceneT; first: boolean; last: boolean }> = ({ s, 
         boxShadow: tin < 1 ? `-30px 0 60px rgba(30,20,10,${0.35 * (1 - tin * 0.6)})` : undefined,
       }}
     >
-      <SceneCtx.Provider value={{ beats: s.beats, dur: s.dur, words: s.words }}>
+      <SceneCtx.Provider value={{ id: s.id, beats: s.beats, dur: s.dur, words: s.words }}>
         {Comp ? <Comp /> : null}
       </SceneCtx.Provider>
       {tout > 0 && <AbsoluteFill style={{ background: `rgba(40,28,12,${0.28 * tout})` }} />}

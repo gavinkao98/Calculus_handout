@@ -3,14 +3,14 @@ import React from "react";
 import { interpolate } from "remotion";
 import { color, stroke, type } from "../../theme";
 import { clamp } from "../../components/Type";
-import { Kicker, Layer, Ledger, Ln, M, Sheet, Txt, useS } from "../kit";
+import { Kicker, Layer, Ledger, Ln, M, Sheet, Txt, dotMark, mLbl, sample, useS } from "../kit";
 
 const C = color.cobalt;
 const X = 470;
 const G = { x: 1610, y: 480, u: 90 };
 
 export const Continuity: React.FC = () => {
-  const { f, at, p } = useS();
+  const { f, at, p, guard } = useS();
   // derivation page: camera locked; every line of the continuity argument stays on the sheet.
   const plot = p("squeeze", 30);
   const th = interpolate(f, [at("squeeze") + 30, at("gap") - 20], [1.9, 0.02], { ...clamp, easing: (t) => 1 - Math.pow(1 - t, 2) });
@@ -35,6 +35,25 @@ export const Continuity: React.FC = () => {
     return top + bot + "Z";
   })();
   const paid = p("paid", 30, 10);
+  // |sin θ| is named in the open paper under its own left hump (inside the light band, clear of the
+  // curve and the axis); the right hump is where the red bar sweeps, so it stays empty.
+  const L = {
+    abs: { x: gx(2.1) + 12, y: gy(2.1) + 10, size: 40, c: color.ink2, p: plot, t: "|\\theta|" },
+    sin: { x: gx(-1.55), y: G.y - 24, size: 36, align: "center" as const, p: plot, t: "|\\sin\\theta|" },
+    squeeze: { x: X, y: 400, size: 50, p: p("squeeze", 30, 40), t: "0\\ \\le\\ |\\sin\\theta|\\ \\le\\ |\\theta|\\ \\ \\Longrightarrow\\ \\ \\lim_{\\theta\\to0}\\sin\\theta=0" },
+  };
+  const on = plot > 0;
+  const bar = interpolate(f, [at("squeeze") + 30, at("squeeze") + 44, at("gap") - 10, at("gap") + 10], [0, 1, 1, 0], clamp);
+  guard(
+    [
+      { name: "θ-axis", pts: [[gx(-2.2), G.y], [gx(2.2), G.y]], w: stroke.axis, on },
+      { name: "|θ| (band edge)", pts: sample(Math.abs, -2.1, 2.1, gx, gy, 120), w: 2.6, on },
+      { name: "|sin θ| curve", pts: sample((v) => Math.abs(Math.sin(v)), -2.1, 2.1, gx, gy, 120), w: stroke.curve, on },
+      { name: "red bar", pts: [[gx(th), G.y], [gx(th), gy(th)]], w: 3, on: on && bar > 0.05 },
+      dotMark("moving dot", gx(th), gy(Math.abs(Math.sin(th))), on && bar > 0.05),
+    ],
+    Object.values(L).map((q) => mLbl(q)),
+  );
   return (
     <Sheet folio={117} title="Debt 1: continuity">
       <Ledger x={120} y={330} st={{ show: 1 - p("squeeze", 30, 10) + p("paid", 30), items: [{ show: 1, paid, focus: 1 - paid }, { show: 1, paid: 0 }] }} />
@@ -42,7 +61,7 @@ export const Continuity: React.FC = () => {
         From the bonus
       </Kicker>
       <M x={X} y={270} size={66} p={p("start", 30, 6)} t="|\sin\theta|\ \le\ |\theta|" />
-      <M x={X} y={400} size={50} p={p("squeeze", 30, 40)} t="0\ \le\ |\sin\theta|\ \le\ |\theta|\ \ \Longrightarrow\ \ \lim_{\theta\to0}\sin\theta=0" />
+      <M {...L.squeeze} />
 
       {/* squeeze figure */}
       <Layer>
@@ -51,14 +70,14 @@ export const Continuity: React.FC = () => {
         <path d={path(Math.abs)} fill="none" stroke={color.ink3} strokeWidth={2.6} opacity={plot} />
         <path d={path((v) => Math.abs(Math.sin(v)))} fill="none" stroke={color.ink} strokeWidth={stroke.curve} opacity={plot} />
         {plot > 0 && (
-          <g opacity={interpolate(f, [at("squeeze") + 30, at("squeeze") + 44, at("gap") - 10, at("gap") + 10], [0, 1, 1, 0], clamp)}>
+          <g opacity={bar}>
             <line x1={gx(th)} y1={G.y} x2={gx(th)} y2={gy(th)} stroke={color.accent} strokeWidth={3} />
             <circle cx={gx(th)} cy={gy(Math.abs(Math.sin(th)))} r={stroke.dot} fill={color.ink} stroke={color.paper} strokeWidth={stroke.ring} />
           </g>
         )}
       </Layer>
-      <M x={gx(2.1) + 10} y={gy(2.1) + 10} size={40} c={color.ink2} p={plot} t="|\theta|" />
-      <M x={gx(1.2)} y={gy(0.2)} size={36} bg p={plot} t="|\sin\theta|" />
+      <M {...L.abs} />
+      <M {...L.sin} />
 
       {/* the gap between two nearby values */}
       <Kicker x={X} y={470} p={p("gap", 24)}>

@@ -1,7 +1,7 @@
 /** C6 — two cautions: a limit, not an identity; radians only (degrees bring π/180). */
 import React from "react";
 import { color, stroke, type } from "../../theme";
-import { Kicker, Layer, Ln, M, Sheet, Txt, useS } from "../kit";
+import { Kicker, Layer, Ln, M, Sheet, Txt, arcPts, dotMark, mLbl, sample, useS } from "../kit";
 
 const PI = Math.PI;
 const A = color.accent;
@@ -11,7 +11,7 @@ const gy = (v: number) => G.y - v * G.uy;
 const sinc = (v: number) => (Math.abs(v) < 1e-6 ? 1 : Math.sin(v) / v);
 
 export const Warnings: React.FC = () => {
-  const { at, p } = useS();
+  const { at, p, guard } = useS();
   // two columns, camera locked. Focus moves by dimming: once caution 2 starts, caution 1 recedes.
   const recede = 1 - 0.5 * p("degrees", 30);
   const id = p("identity", 30);
@@ -30,6 +30,30 @@ export const Warnings: React.FC = () => {
   const R = 150;
   const S = { x: 1560, y: 470 };
   const th = 0.85;
+  // the value 2/π names the red bar's height, so it stands in the open paper beside that bar
+  // (under the curve), not on the curve by the dot.
+  const L1 = {
+    one: { x: G.x - 26, y: gy(1) + 12, t: "1", size: type.label, align: "right" as const, c: color.ink2, p: id },
+    half: { x: gx(PI / 2), y: G.y + 50, t: "\\pi/2", display: false, size: type.label, align: "center" as const, c: color.ink2, p: id },
+    pi: { x: gx(PI), y: G.y + 50, t: "\\pi", size: type.label, align: "center" as const, c: color.ink2, p: id },
+    val: { x: gx(PI / 2) - 20, y: (G.y + gy(2 / PI)) / 2 + 14, t: "2/\\pi\\approx0.64", display: false, size: 40, align: "right" as const, p: d1 },
+  };
+  const thL = { x: S.x + R + 14, y: S.y - 50, t: "\\theta", size: 44, c: color.ochre, p: p("degrees", 30, 20) };
+  const sectorOn = p("degrees", 30, 20) > 0;
+  guard(
+    [
+      { name: "θ-axis", pts: [[G.x, G.y], [gx(PI + 0.35), G.y]], w: stroke.axis, on: id > 0 },
+      { name: "y-axis", pts: [[G.x, G.y + 10], [G.x, gy(1.1)]], w: stroke.axis, on: id > 0 },
+      { name: "dashed y = 1", pts: [[G.x, gy(1)], [gx(PI + 0.3), gy(1)]], w: 1.6, on: id > 0 },
+      { name: "sinθ/θ curve", pts: sample(sinc, 0.001, PI + 0.25, gx, gy, 160), w: stroke.curve, on: cur > 0 },
+      { name: "hole at θ = 0", pts: [[G.x, gy(1)]], w: 2 * 8 + 3, on: cur > 0 },
+      { name: "red bar at π/2", pts: [[gx(PI / 2), G.y], [gx(PI / 2), gy(2 / PI)]], w: 3.4, on: d1 > 0 },
+      dotMark("dot at π/2", gx(PI / 2), gy(2 / PI), d1 > 0),
+      dotMark("dot at π", gx(PI), G.y, d2 > 0),
+      { name: "sector", pts: [[S.x, S.y], ...arcPts(S.x, S.y, R, 0, th), [S.x, S.y]], w: 6, on: sectorOn },
+    ],
+    [...Object.values(L1).map((q) => mLbl(q)), mLbl(thL)],
+  );
   return (
     <Sheet folio={119} title="Two cautions">
       <Layer>
@@ -57,10 +81,9 @@ export const Warnings: React.FC = () => {
           <circle cx={gx(PI)} cy={G.y} r={stroke.dot} fill={A} stroke={color.paper} strokeWidth={stroke.ring} />
         </g>
       </Layer>
-      <M x={G.x - 14} y={gy(1) + 12} t="1" size={type.label} align="right" c={color.ink2} p={id} />
-      <M x={gx(PI / 2)} y={G.y + 50} t="\pi/2" display={false} size={type.label} align="center" c={color.ink2} p={id} />
-      <M x={gx(PI)} y={G.y + 50} t="\pi" size={type.label} align="center" c={color.ink2} p={id} />
-      <M x={gx(PI / 2) + 18} y={gy(2 / PI) - 20} t="2/\pi\approx0.64" display={false} size={40} bg p={d1} />
+      {Object.values(L1).map((q) => (
+        <M key={q.t} {...q} />
+      ))}
       <M x={470} y={800} size={50} p={d1} t={`\\frac{\\sin(\\pi/2)}{\\pi/2}=\\frac{2}{\\pi}\\approx{\\color{${A}}0.64}`} />
       <M x={470} y={930} size={50} p={d2} t={`\\frac{\\sin\\pi}{\\pi}={\\color{${A}}0}`} />
       <Txt x={760} y={884} w={360} size={type.caption} italic c={color.ink2} p={p("identity", 24, Math.round((at("degrees") - at("identity")) * 0.72))}>
@@ -81,7 +104,7 @@ export const Warnings: React.FC = () => {
           <path d={`M${S.x + R} ${S.y} A${R} ${R} 0 0 0 ${S.x + R * Math.cos(th)} ${S.y - R * Math.sin(th)}`} fill="none" stroke={color.ochre} strokeWidth={6} />
         </g>
       </Layer>
-      <M x={S.x + R + 14} y={S.y - 50} t="\theta" size={44} c={color.ochre} p={p("degrees", 30, 20)} />
+      <M {...thL} />
       <M x={1190} y={380} size={52} p={p("degrees", 30, 30)} t={`\\text{sector area}=\\frac12\\,{\\color{${color.ochre}}\\theta}`} />
       <Txt x={1190} y={410} w={330} size={type.caption} italic c={color.ink2} p={p("degrees", 24, 60)}>
         holds only when θ is the arc length — radians

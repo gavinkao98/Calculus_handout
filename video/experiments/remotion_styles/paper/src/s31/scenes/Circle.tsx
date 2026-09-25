@@ -7,7 +7,7 @@ import React from "react";
 import { Easing, interpolate } from "remotion";
 import { color, semantic, stroke, type } from "../../theme";
 import { clamp, measure } from "../../components/Type";
-import { Arrow, HOME, Kicker, Layer, Ln, M, Sheet, Txt, camPath, useS } from "../kit";
+import { Arrow, HOME, Kicker, Layer, Ln, M, Mark, Sheet, Txt, arcPts, arrowMarks, camPath, dotMark, mLbl, sample, tLbl, useS } from "../kit";
 
 const PI = Math.PI;
 const O = { x: 540, y: 580 };
@@ -16,22 +16,22 @@ const G = { x: 940, y: 580, ux: 800 / (2 * PI) }; // graph: same vertical unit a
 const TH = 0.9; // where the point parks
 
 export const Circle: React.FC = () => {
-  const { f, at, p, pf, atWord } = useS();
+  const { f, at, p, pf, atWord, guard } = useS();
   const fT = at("trace");
   const fS = at("speed");
   const omega = (2 * PI) / Math.max(90, at("question") - fT);
 
   // ── the angle: constant spin, then it glides to rest at TH ──
   let phi = omega * (f - fT);
-  if (f > fS) {
-    const phiS = omega * (fS - fT);
-    const base = phiS + 0.9;
-    const target = base + ((((TH - base) % (2 * PI)) + 2 * PI) % (2 * PI));
-    const len = Math.max(30, Math.round(((target - phiS) / omega) * 1.7));
-    phi = phiS + (target - phiS) * interpolate(f, [fS, fS + len], [0, 1], { ...clamp, easing: Easing.out(Easing.cubic) });
-  }
+  const phiS = omega * (fS - fT);
+  const base = phiS + 0.9;
+  const target = base + ((((TH - base) % (2 * PI)) + 2 * PI) % (2 * PI));
+  const len = Math.max(30, Math.round(((target - phiS) / omega) * 1.7));
+  if (f > fS) phi = phiS + (target - phiS) * interpolate(f, [fS, fS + len], [0, 1], { ...clamp, easing: Easing.out(Easing.cubic) });
   const P = { x: O.x + R * Math.cos(phi), y: O.y - R * Math.sin(phi) };
-  const parked = interpolate(f, [fS + 40, fS + 70], [0, 1], clamp);
+  // the point's labels (sin θ, the arrow's "speed 1") ink as it comes to rest, not while it still
+  // glides across the crosshair
+  const parked = interpolate(f, [fS + len - 30, fS + len], [0, 1], clamp);
 
   // ── reveals ──
   const circ = pf(4, 46);
@@ -81,6 +81,50 @@ export const Circle: React.FC = () => {
     const e = Math.max(0.001, TH * arc);
     return `M${O.x + R} ${O.y} A${R} ${R} 0 0 0 ${O.x + R * Math.cos(e)} ${O.y - R * Math.sin(e)}`;
   })();
+
+  // ── labels + the guard (every label clear of every mark; see kit checkLabels) ──
+  const hLbl = { x: P.x + 14, y: (P.y + O.y) / 2 - 24 };
+  const spd = { x: tip.x - 60, y: tip.y - 66 };
+  const L = {
+    // low beside the height bar, in the wedge under the radius (mid-height, the radius runs through it)
+    sin: { x: P.x - 14, y: O.y - 22, t: "\\sin\\theta", size: 40, align: "right" as const, p: parked * hgt },
+    th: { x: O.x + R * Math.cos(TH / 2) + 22, y: O.y - R * Math.sin(TH / 2) + 8, t: "\\theta", size: 46, c: color.ochre, p: arc },
+    cos: { x: P.x + 18, y: (P.y + tip.y) / 2 + 12, t: "\\cos\\theta", size: 44, c: color.cobalt, p: vert },
+  };
+  const GL = [
+    // the curve crosses the axis at π and 2π, so each tick label sits above the axis on the side the
+    // curve has left empty (right of π, left of 2π)
+    { x: gx(PI) + 16, y: G.y - 16, t: "\\pi", size: type.label, c: color.ink2, p: graph, o: graphO },
+    { x: gx(2 * PI) - 16, y: G.y - 16, t: "2\\pi", size: type.label, align: "right" as const, c: color.ink2, p: graph, o: graphO },
+    { x: gx(2 * PI) + 40, y: G.y + 12, t: "\\theta", size: 40, c: color.ink2, p: graph, o: graphO },
+    { x: gx(PI / 2) - 30, y: gy(1) - 28, t: "y=\\sin\\theta", size: 44, p: graph, o: graphO },
+  ];
+  const gOn = graph > 0 && graphO > 0.05;
+  const marks: Mark[] = [
+    { name: "crosshair (horizontal)", pts: [[O.x - R * 1.22, O.y], [O.x + R * 1.22, O.y]], w: stroke.axis, on: axes > 0 },
+    { name: "crosshair (vertical)", pts: [[O.x, O.y + R * 1.22], [O.x, O.y - R * 1.22]], w: stroke.axis, on: axes > 0 },
+    { name: "unit circle", pts: arcPts(O.x, O.y, R, 0, 2 * PI, 120), w: stroke.curve * 0.8, on: circ > 0 },
+    { name: "gold arc", pts: arcPts(O.x, O.y, R, 0, Math.max(0.001, TH * arc), 24), w: 9, on: arc > 0 },
+    // the spinning point's radius, height bar and dot are checked at their resting pose (parked);
+    // the graph's live cursor (guide, bar, dot) never rests — the graph fades before the point parks.
+    { name: "radius", pts: [[O.x, O.y], [P.x, P.y]], w: stroke.hairline * 1.4, on: parked >= 1 },
+    { name: "height bar", pts: [[P.x, O.y], [P.x, O.y + (P.y - O.y) * hgt]], w: stroke.emphasis + 1, on: parked >= 1 && hgt > 0 },
+    { name: "graph θ-axis", pts: [[gx(0), G.y], [gx(2 * PI) + 20, G.y]], w: stroke.axis, on: gOn },
+    { name: "graph y-axis", pts: [[gx(0), gy(-1)], [gx(0), gy(1)]], w: stroke.axis, on: gOn },
+    ...[PI, 2 * PI].map((v): Mark => ({ name: "graph tick", pts: [[gx(v), G.y], [gx(v), G.y + 10]], w: stroke.axis, on: gOn })),
+    { name: "sine curve", pts: sample(Math.sin, 0, curveEnd, gx, gy, 160), w: stroke.curve, on: gOn && curveEnd > 0 },
+    ...arrowMarks("velocity arrow", P.x, P.y, tip.x, tip.y, { w: 4.5, head: 20, on: arrow * parked > 0 }),
+    { name: "horizontal part", pts: [[tip.x, tip.y], [P.x, tip.y]], w: 2, on: vert > 0 },
+    { name: "vertical part", pts: [[P.x, P.y], [P.x, tip.y]], w: stroke.emphasis + 1, on: vert > 0 },
+    dotMark("P", P.x, P.y, parked >= 1, stroke.dot + 1),
+    { name: "centre", pts: [[O.x, O.y]], w: 9, on: axes > 0 },
+  ];
+  // "height" rides the spinning point and fades out as it parks: it has no resting pose to check.
+  guard(marks, [
+    tLbl("speed 1", spd.x, spd.y, type.label, arrow * parked, 1, { italic: true }),
+    ...Object.values(L).map((q) => mLbl(q)),
+    ...GL.map((q) => mLbl(q)),
+  ]);
 
   return (
     <Sheet folio={111} title="" head={false} cam={cam}>
@@ -139,23 +183,16 @@ export const Circle: React.FC = () => {
       </Layer>
 
       {/* labels */}
-      <Txt x={P.x + 14} y={(P.y + O.y) / 2 - 24} size={type.label} italic c={color.ink2} p={hgt} o={1 - parked} w={200}>
+      <Txt x={hLbl.x} y={hLbl.y} size={type.label} italic c={color.ink2} p={hgt} o={1 - parked} w={200}>
         height
       </Txt>
-      <M x={P.x - 14} y={(P.y + O.y) / 2 + 14} t="\sin\theta" size={40} align="right" p={parked * hgt} />
-      <M x={O.x + R * Math.cos(TH / 2) + 22} y={O.y - R * Math.sin(TH / 2) + 8} t="\theta" size={46} c={color.ochre} p={arc} />
-      <M x={P.x + 18} y={(P.y + tip.y) / 2 + 12} t="\cos\theta" size={44} c={color.cobalt} p={vert} />
-      <Txt x={tip.x - 60} y={tip.y - 66} size={type.label} italic c={color.accent} p={arrow * parked} w={220}>
+      <M {...L.sin} />
+      <M {...L.th} />
+      <M {...L.cos} />
+      <Txt x={spd.x} y={spd.y} size={type.label} italic c={color.accent} p={arrow * parked} w={220}>
         speed 1
       </Txt>
-      {graph > 0 && (
-        <>
-          <M x={gx(PI)} y={G.y + 50} t="\pi" size={type.label} align="center" c={color.ink2} p={graph} o={graphO} />
-          <M x={gx(2 * PI)} y={G.y + 50} t="2\pi" size={type.label} align="center" c={color.ink2} p={graph} o={graphO} />
-          <M x={gx(2 * PI) + 40} y={G.y + 12} t="\theta" size={40} c={color.ink2} p={graph} o={graphO} />
-          <M x={gx(PI / 2) - 30} y={gy(1) - 28} t="y=\sin\theta" size={44} p={graph} o={graphO} />
-        </>
-      )}
+      {graph > 0 && GL.map((q) => <M key={q.t} {...q} />)}
 
       {/* the question */}
       <Txt x={960} y={140} w={1400} align="center" size={78} italic p={q} o={1 - p("speed", 30)}>

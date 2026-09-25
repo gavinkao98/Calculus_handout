@@ -5,7 +5,7 @@
  */
 import React, { createContext, useContext } from "react";
 import { AbsoluteFill, interpolate, spring, useCurrentFrame, useVideoConfig } from "remotion";
-import { color, ease, features, font, springs, stroke, type } from "../theme";
+import { color, ease, features, font, labelGuard, springs, stroke, type } from "../theme";
 import { Camera, Page } from "../components/Shell";
 import { Vignette } from "../components/Paper";
 import { SmallCaps, clamp, measure } from "../components/Type";
@@ -14,12 +14,12 @@ import { AlignedWord, findWord } from "../lib/words";
 import { BeatT, LEAD } from "./timing";
 
 // ── Beat clock ────────────────────────────────────────────────────────────
-export const SceneCtx = createContext<{ beats: BeatT[]; dur: number; words?: AlignedWord[] }>({ beats: [], dur: 300 });
+export const SceneCtx = createContext<{ id?: string; beats: BeatT[]; dur: number; words?: AlignedWord[] }>({ beats: [], dur: 300 });
 
 export const useS = () => {
   const f = useCurrentFrame();
   const { fps } = useVideoConfig();
-  const { beats, dur, words } = useContext(SceneCtx);
+  const { id: scene = "?", beats, dur, words } = useContext(SceneCtx);
   const find = (id: string) => {
     const b = beats.find((x) => x.id === id);
     if (!b) throw new Error(`no beat "${id}" (have: ${beats.map((x) => x.id).join(", ")})`);
@@ -50,7 +50,9 @@ export const useS = () => {
     const seconds = findWord(words, phrase, { occurrence: opts.occurrence, afterSeconds });
     return seconds === undefined ? undefined : LEAD + Math.round(seconds * fps);
   };
-  return { f, fps, dur, at, end, p, pf, sp, atWord };
+  /** graph-label collision guard for this scene at this frame (see `checkLabels`) */
+  const guard = (marks: Mark[], labels: Lbl[]) => checkLabels(scene, f, marks, labels);
+  return { f, fps, dur, at, end, p, pf, sp, atWord, guard };
 };
 
 // ── Camera path ───────────────────────────────────────────────────────────
@@ -392,3 +394,134 @@ export const Ledger: React.FC<{ x?: number; y?: number; st: LedgerState }> = ({ 
 export const Rubric: React.FC<{ x: number; y: number; h: number; p?: number }> = ({ x, y, h, p = 1 }) => (
   <div style={{ position: "absolute", left: x, top: y, width: 4, height: h * p, background: color.accent }} />
 );
+
+// ── Graph-label guard (STYLE.md「圖上標籤」) ─────────────────────────────────
+// A graph scene lists the marks drawn at this frame (curves as sampled polylines, axes and ticks as
+// segments, dots as points, filled regions by their boundary) and the boxes of the labels set on the
+// figure, all in page px. Every frame, each label that has finished inking and is visible is measured
+// against every visible mark; closer than `labelGuard.clearance` → throw, so the render fails rather
+// than ship a label touching the graph. Things that move (a spinning point, a sliding tangent) are
+// registered only at their resting pose. A mark with `owner` (a leader line) is exempt for that one
+// label only. A paper knock-out (`bg`) does not excuse a stroke underneath: same clearance, same throw.
+export type Pt = [number, number];
+export type Box = { l: number; t: number; r: number; b: number };
+/** `w` = full stroke width (a dot: its diameter incl. the paper ring); `on: false` = not drawn now.
+ *  `owner`: a leader line or tick that points at one label — exempt for that label only. */
+export type Mark = { name: string; pts: Pt[]; w: number; on?: boolean; owner?: string };
+/** `on` = fully inked and visible now. `rot`: the box is in a frame rotated by `a` rad about (x, y)
+ *  (lettering set along a line), and marks are measured in that frame. */
+export type Lbl = { name: string; box: Box; on: boolean; bg?: boolean; rot?: { a: number; x: number; y: number } };
+
+/** glyph box of an `M` placed with the same props */
+export const texBox = (t: string, x: number, y: number, size: number, align: "left" | "center" | "right" = "left", display = true): Box => {
+  const g = tex(t, display);
+  const k = (size * font.mathScale) / 1000;
+  const w = g.w * k;
+  const l = align === "center" ? x - w / 2 : align === "right" ? x - w : x;
+  return { l, t: y + g.minY * k, r: l + w, b: y + (g.minY + g.h) * k };
+};
+/** glyph box of a one-line `Txt` with the same props (x is the anchor for `align`) */
+export const txtBox = (s: string, x: number, y: number, size: number, o: { italic?: boolean; align?: "left" | "center" | "right"; lh?: number } = {}): Box => {
+  const width = measure(s, size, { italic: o.italic });
+  const l = o.align === "center" ? x - width / 2 : o.align === "right" ? x - width : x;
+  const em = y + (((o.lh ?? 1.3) - 1) * size) / 2; // top of the em box inside the line box
+  return { l, t: em + size * 0.12, r: l + width, b: em + size * 1.0 };
+};
+/** sample y = fn(v), v ∈ [a, b], into page px */
+export const sample = (fn: (v: number) => number, a: number, b: number, X: (v: number) => number, Y: (v: number) => number, n = 200): Pt[] =>
+  Array.from({ length: n + 1 }, (_, i) => {
+    const v = a + ((b - a) * i) / n;
+    return [X(v), Y(fn(v))] as Pt;
+  });
+/** circular arc in page px (angles counter-clockwise as on paper) */
+export const arcPts = (cx: number, cy: number, r: number, a0: number, a1: number, n = 48): Pt[] =>
+  Array.from({ length: n + 1 }, (_, i) => {
+    const a = a0 + ((a1 - a0) * i) / n;
+    return [cx + r * Math.cos(a), cy - r * Math.sin(a)] as Pt;
+  });
+export const toD = (pts: Pt[]) => pts.map(([x, y], i) => `${i ? "L" : "M"}${x.toFixed(1)} ${y.toFixed(1)}`).join("");
+
+const segBox = (a: Pt, b: Pt, q: Box): number => {
+  const inside = (p: Pt) => p[0] >= q.l && p[0] <= q.r && p[1] >= q.t && p[1] <= q.b;
+  if (inside(a) || inside(b)) return 0;
+  const C: Pt[] = [
+    [q.l, q.t],
+    [q.r, q.t],
+    [q.r, q.b],
+    [q.l, q.b],
+  ];
+  const cross = (p1: Pt, p2: Pt, p3: Pt, p4: Pt) => {
+    const d = (p2[0] - p1[0]) * (p4[1] - p3[1]) - (p2[1] - p1[1]) * (p4[0] - p3[0]);
+    if (Math.abs(d) < 1e-9) return false;
+    const u = ((p3[0] - p1[0]) * (p4[1] - p3[1]) - (p3[1] - p1[1]) * (p4[0] - p3[0])) / d;
+    const v = ((p3[0] - p1[0]) * (p2[1] - p1[1]) - (p3[1] - p1[1]) * (p2[0] - p1[0])) / d;
+    return u >= 0 && u <= 1 && v >= 0 && v <= 1;
+  };
+  for (let i = 0; i < 4; i++) if (cross(a, b, C[i], C[(i + 1) % 4])) return 0;
+  const ptBox = (p: Pt) => Math.hypot(Math.max(q.l - p[0], 0, p[0] - q.r), Math.max(q.t - p[1], 0, p[1] - q.b));
+  const ptSeg = (p: Pt) => {
+    const dx = b[0] - a[0];
+    const dy = b[1] - a[1];
+    const L = dx * dx + dy * dy || 1;
+    const t = Math.max(0, Math.min(1, ((p[0] - a[0]) * dx + (p[1] - a[1]) * dy) / L));
+    return Math.hypot(p[0] - a[0] - t * dx, p[1] - a[1] - t * dy);
+  };
+  return Math.min(ptBox(a), ptBox(b), ...C.map(ptSeg));
+};
+/** gap (px) between a label box and a mark's outer edge; negative = overlap */
+export const gap = (m: Mark, q: Box): number => {
+  let d = m.pts.length === 1 ? segBox(m.pts[0], m.pts[0], q) : Infinity;
+  for (let i = 1; i < m.pts.length && d > 0; i++) d = Math.min(d, segBox(m.pts[i - 1], m.pts[i], q));
+  return d - m.w / 2;
+};
+export const checkLabels = (scene: string, frame: number, marks: Mark[], labels: Lbl[], clear: number = labelGuard.clearance) => {
+  for (const l of labels) {
+    if (!l.on) continue;
+    for (const m of marks) {
+      if (m.on === false || m.pts.length === 0 || m.owner === l.name) continue;
+      const r = l.rot;
+      const local = r
+        ? { ...m, pts: m.pts.map(([x, y]): Pt => [(x - r.x) * Math.cos(r.a) + (y - r.y) * Math.sin(r.a), -(x - r.x) * Math.sin(r.a) + (y - r.y) * Math.cos(r.a)]) }
+        : m;
+      const d = gap(local, l.box);
+      if (d < clear)
+        throw new Error(
+          `[label-guard] scene "${scene}" frame ${Math.round(frame)}: label "${l.name}" is ${d.toFixed(1)} px from mark "${m.name}" ` +
+            `(clearance ${clear} px${l.bg ? "; a paper knock-out may not hide a stroke" : ""}). Move the label into empty space or add a leader line.`,
+        );
+    }
+  }
+};
+/** the marks of an `Arrow` drawn with the same geometry (shaft + both head strokes), fully drawn */
+export const arrowMarks = (name: string, x1: number, y1: number, x2: number, y2: number, o: { bend?: number; w?: number; head?: number; on?: boolean } = {}): Mark[] => {
+  const { bend = 0, w = 3, head = 16, on = true } = o;
+  const L = Math.hypot(x2 - x1, y2 - y1) || 1;
+  const qx = (x1 + x2) / 2 - ((y2 - y1) / L) * bend;
+  const qy = (y1 + y2) / 2 + ((x2 - x1) / L) * bend;
+  const pt = (t: number): Pt => [(1 - t) * (1 - t) * x1 + 2 * (1 - t) * t * qx + t * t * x2, (1 - t) * (1 - t) * y1 + 2 * (1 - t) * t * qy + t * t * y2];
+  const shaft = Array.from({ length: 41 }, (_, i) => pt(i / 40));
+  const [bx, by] = pt(0.98);
+  const ang = Math.atan2(y2 - by, x2 - bx);
+  const wing = (s: number): Pt[] => [[x2 - Math.cos(ang + s * 0.42) * head, y2 - Math.sin(ang + s * 0.42) * head], [x2, y2]];
+  return [
+    { name, pts: shaft, w, on },
+    { name: `${name} (head)`, pts: wing(-1), w, on },
+    { name: `${name} (head)`, pts: wing(1), w, on },
+  ];
+};
+/** the mark of a dot (radius r plus its paper ring) */
+export const dotMark = (name: string, x: number, y: number, on = true, r: number = stroke.dot): Mark => ({ name, pts: [[x, y]], w: 2 * r + stroke.ring, on });
+type MProps = React.ComponentProps<typeof M>;
+/** the guard entry for an `M` rendered with the same props: `<M {...q} />` + `mLbl(q)` */
+export const mLbl = (q: MProps, name: string = q.t): Lbl => ({
+  name,
+  box: texBox(q.t, q.x, q.y, q.size ?? type.proof, q.align, q.display ?? true),
+  on: (q.p ?? 1) >= 1 && (q.o ?? 1) > 0.05,
+  bg: q.bg,
+});
+/** the guard entry for a one-line `Txt` (pass the same x, y, size, italic, align as the Txt) */
+export const tLbl = (s: string, x: number, y: number, size: number, p: number, o = 1, opt: { italic?: boolean; align?: "left" | "center" | "right"; lh?: number } = {}): Lbl => ({
+  name: s,
+  box: txtBox(s, x, y, size, opt),
+  on: p >= 1 && o > 0.05,
+});

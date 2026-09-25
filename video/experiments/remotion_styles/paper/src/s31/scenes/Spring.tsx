@@ -1,7 +1,7 @@
 /** C12 — a weight on a spring: s = sin t, s' = cos t, s'' = −sin t = −s. */
 import React from "react";
 import { color, stroke } from "../../theme";
-import { Arrow, Hatches, Kicker, Layer, Ln, M, Sheet, Txt, useS } from "../kit";
+import { Arrow, Hatches, Kicker, Layer, Ln, M, Mark, Sheet, Txt, mLbl, sample, tLbl, useS } from "../kit";
 
 const PI = Math.PI;
 const A = color.accent;
@@ -14,7 +14,7 @@ const rowsY = [330, 570, 810];
 const UY = 80;
 
 export const Spring: React.FC = () => {
-  const { f, p } = useS();
+  const { f, p, guard } = useS();
   const t = Math.max(0, (f - 10) / 30) * 1.55;
   const s = Math.sin(t);
   const wy = REST - s * AMP;
@@ -44,6 +44,25 @@ export const Spring: React.FC = () => {
     return d;
   };
   const arrowP = p("arrow", 24);
+  // guard: the plates' axes, curves and the law's box against the plate labels (the cursor sweeps
+  // continuously and has no resting pose; the weight and its arrow sit apart on the left)
+  const lawP = p("law", 24, 20);
+  const words = ["height", "velocity", "acceleration"];
+  guard(
+    [
+      ...rowsY.flatMap((y0, i): Mark[] => [
+        { name: `plate ${i + 1} t-axis`, pts: [[GX, y0], [GX + GW + 20, y0]], w: stroke.axis, on: shows[i] > 0 },
+        { name: `plate ${i + 1} s-axis`, pts: [[GX, y0 - UY - 10], [GX, y0 + UY + 10]], w: stroke.axis, on: shows[i] > 0 },
+        { name: `plate ${i + 1} curve`, pts: sample(fns[i], 0, 2 * PI, gxv, (v) => y0 - v * UY, 160), w: stroke.curve, on: shows[i] > 0 },
+      ]),
+      { name: "law box", pts: [[GX, 930], [GX + 560, 930], [GX + 560, 1040], [GX, 1040], [GX, 930]], w: 2.4, on: lawP > 0 },
+    ],
+    [
+      ...rowsY.map((y0, i) => mLbl({ x: GX + GW + 50, y: y0 + 14, size: 50, p: shows[i], t: labels[i] })),
+      ...rowsY.map((y0, i) => tLbl(words[i], GX + GW + 50, y0Label(y0), 28, shows[i], 1, { italic: true })),
+      mLbl({ x: GX + 280, y: 1005, align: "center", size: 68, p: p("law", 30), t: "s''=-\\,s" }),
+    ],
+  );
   return (
     <Sheet folio={124} title="A weight on a spring">
       <Layer>
