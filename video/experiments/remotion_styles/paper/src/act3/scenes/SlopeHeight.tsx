@@ -49,20 +49,25 @@ const PanelTitle: React.FC<{ x: number; y: number; letter: string; tex: string; 
 );
 
 export const SlopeHeight: React.FC = () => {
-  const { frame, at, p, sp } = useBeats();
+  const { frame, at, atWord, p, sp } = useBeats();
   const tH = at("tanhalf");
   const tP = at("tanpi");
   const sw = at("sweep");
   const W = at("words");
   const S = at("symbols");
 
-  // ── the live x ──
+  // ── the live x ── each leg lands on the word that names its destination
+  // (the tangent visibly goes flat right as "flat" is said, etc.); a mock
+  // manifest has no alignment, so fall back to the old fixed fraction.
+  const tanhalfEnd = atWord("flat", { afterFrame: tH }) ?? at("tanhalf", 0.5);
+  const tanpiEnd = atWord("negative one", { afterFrame: tP }) ?? at("tanpi", 0.6);
+  const sweepEnd = atWord("it", { afterFrame: sw }) ?? at("sweep", 0.88);
   const xt =
     frame < tP
-      ? interpolate(frame, [tH + 4, at("tanhalf", 0.5)], [0, PI / 2], { ...clamp, easing: ease.inOut })
+      ? interpolate(frame, [tH + 4, tanhalfEnd], [0, PI / 2], { ...clamp, easing: ease.inOut })
       : frame < sw
-        ? interpolate(frame, [tP + 2, at("tanpi", 0.6)], [PI / 2, PI], { ...clamp, easing: ease.inOut })
-        : interpolate(frame, [sw + 8, at("sweep", 0.88)], [PI, 2 * PI], { ...clamp, easing: ease.inOut });
+        ? interpolate(frame, [tP + 2, tanpiEnd], [PI / 2, PI], { ...clamp, easing: ease.inOut })
+        : interpolate(frame, [sw + 8, sweepEnd], [PI, 2 * PI], { ...clamp, easing: ease.inOut });
   const m = Math.cos(xt);
   const y = Math.sin(xt);
 
@@ -101,9 +106,18 @@ export const SlopeHeight: React.FC = () => {
     { x: PI / 2, from: tP + 2 },
     { x: PI, from: sw + 8 },
   ];
-  // heights read at the same three points
-  const heights = [0.4, 0.53, 0.64].map((k, i) => ({ x: stamps[i].x, from: at("heights", k) }));
-  const match = interpolate(frame, [at("heights", 0.8), at("heights", 0.8) + 10, at("heights", 0.8) + 30], [0, 1, 0], clamp);
+  // heights read at the same three points — anchored to the words that name
+  // them ("...one, zero, negative one"), falling back to the old fractions
+  // when the scene has no word-level alignment
+  const heightsStart = at("heights");
+  const heightCues = [
+    { w: "one", k: 0.4 },
+    { w: "zero", k: 0.53 },
+    { w: "negative one", k: 0.64 },
+  ];
+  const heights = heightCues.map((h, i) => ({ x: stamps[i].x, from: atWord(h.w, { afterFrame: heightsStart }) ?? at("heights", h.k) }));
+  const matchAt = atWord("match", { afterFrame: heightsStart }) ?? at("heights", 0.8);
+  const match = interpolate(frame, [matchAt, matchAt + 10, matchAt + 30], [0, 1, 0], clamp);
   const liveB = p(sw + 4, 14); // the live cosine reading joins for the sweep
   const [bx0, by0] = px(B, xt, 0);
   const [, byq] = px(B, xt, m);

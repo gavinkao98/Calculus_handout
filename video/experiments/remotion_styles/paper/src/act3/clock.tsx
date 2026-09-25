@@ -6,6 +6,7 @@
 import React, { createContext, useContext } from "react";
 import { Easing, interpolate, spring, useCurrentFrame, useVideoConfig } from "remotion";
 import { ease, springs } from "../theme";
+import { findWord } from "../lib/words";
 import type { ActTiming, SceneTiming } from "./timing";
 
 const Ctx = createContext<SceneTiming | null>(null);
@@ -56,7 +57,19 @@ export const useBeats = () => {
   /** A spring that starts at `from`. */
   const sp = (from: number, config: Parameters<typeof spring>[0]["config"] = springs.pop) =>
     spring({ frame: frame - from, fps, config });
-  return { frame, fps, dur: t.dur, lead: t.lead, at, end, p, sp, has: (id: string) => id in t.beats };
+  /**
+   * Frame at which `phrase` is spoken in this scene's narration (the Nth
+   * occurrence, default first), or `undefined` if the scene has no
+   * word-level alignment (mock manifest) — callers must then fall back to
+   * `at(...)`. `afterFrame` (e.g. a beat's `at(id)`) disambiguates a phrase
+   * that recurs earlier in the scene.
+   */
+  const atWord = (phrase: string, opts: { occurrence?: number; afterFrame?: number } = {}): number | undefined => {
+    const afterSeconds = opts.afterFrame === undefined ? undefined : (opts.afterFrame - t.lead) / fps;
+    const seconds = findWord(t.words, phrase, { occurrence: opts.occurrence, afterSeconds });
+    return seconds === undefined ? undefined : t.lead + Math.round(seconds * fps);
+  };
+  return { frame, fps, dur: t.dur, lead: t.lead, at, end, p, sp, has: (id: string) => id in t.beats, atWord };
 };
 
 // ── Camera ───────────────────────────────────────────────────────────────

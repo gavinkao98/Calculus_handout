@@ -8,6 +8,7 @@
  * code change: scene length = lead + audio + tail, every cue is a beat start.
  */
 import { staticFile } from "remotion";
+import { AlignedWord, loadSceneWords } from "../lib/words";
 
 export const FPS = 30;
 export const LEAD = 30; // frames of picture before the first word
@@ -35,6 +36,7 @@ type ManifestScene = {
   audio_seconds?: number;
   duration?: number;
   beats?: ManifestBeat[];
+  alignment?: { words_file?: string };
 };
 export type Manifest = { backend?: string; scenes: ManifestScene[] };
 
@@ -46,6 +48,7 @@ export type SceneTiming = {
   lead: number;
   audio: string | null; // staticFile() src
   beats: Record<string, BeatSpan>; // key: reveal id ("_" = the words before the first {show})
+  words?: AlignedWord[]; // forced-alignment word list, scene-relative seconds; absent for mock manifests
   out: Handover;
 };
 export type ActTiming = { scenes: SceneTiming[]; total: number; backend: string };
@@ -60,7 +63,7 @@ const publicSrc = (abs: string): string => {
 
 const f = (s: number) => Math.round(s * FPS);
 
-export const buildAct = (m: Manifest): ActTiming => {
+export const buildAct = (m: Manifest, wordsByScene: Map<string, AlignedWord[]> = new Map()): ActTiming => {
   const byId = new Map(m.scenes.map((s) => [s.scene_id, s]));
   let t = 0;
   const scenes: SceneTiming[] = ORDER.map((o, i) => {
@@ -87,6 +90,7 @@ export const buildAct = (m: Manifest): ActTiming => {
       lead,
       audio: s.kind === "content" && s.audio_file ? publicSrc(s.audio_file) : null,
       beats,
+      words: wordsByScene.get(o.id),
       out: o.out,
     };
   });
@@ -98,5 +102,7 @@ export const DEFAULT_MANIFEST = "audio/act3_mock/manifest.json";
 export const loadAct = async (path: string): Promise<ActTiming> => {
   const res = await fetch(staticFile(path));
   if (!res.ok) throw new Error(`cannot load ${path} (${res.status}) — run tts.py --backend mock first (see act3/SCRIPT.md)`);
-  return buildAct((await res.json()) as Manifest);
+  const manifest = (await res.json()) as Manifest;
+  const wordsByScene = await loadSceneWords(manifest.scenes);
+  return buildAct(manifest, wordsByScene);
 };

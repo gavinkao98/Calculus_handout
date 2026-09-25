@@ -47,11 +47,15 @@ const nodePose = (i: number): Poses[string] => {
 };
 
 export const Cycle: React.FC = () => {
-  const { frame, at, p, sp, dur } = useBeats();
+  const { frame, at, atWord, p, sp, dur } = useBeats();
   const rowAt = [0, at("d1"), at("d2"), at("d3"), at("d4")];
   const RING = at("ring");
   const F4 = at("fourth");
   const CMP = at("compare");
+  // "you're home: the fourth derivative..." / "...cosine take four." — the
+  // formula and the "four steps" caption land on those words when aligned.
+  const fourthHome = atWord("home", { afterFrame: F4 }) ?? at("fourth", 0.35);
+  const compareFour = atWord("four", { afterFrame: CMP }) ?? at("compare", 0.35);
 
   // ── stage: table entries, then the ring copies ──
   const keys: Key[] = [];
@@ -181,7 +185,7 @@ export const Cycle: React.FC = () => {
         {penO > 0 && <circle cx={penX} cy={penY} r={11} fill={color.accent} stroke={color.paper} strokeWidth={stroke.ring} opacity={penO} />}
 
         {/* centre: four turns home */}
-        <g opacity={p(at("fourth", 0.35), 18)} transform={`translate(${R.cx} ${R.cy + 16 - 6 * home})`}>
+        <g opacity={p(fourthHome, 18)} transform={`translate(${R.cx} ${R.cy + 16 - 6 * home})`}>
           <FormulaG tokens={[{ key: "c", tex: "\\frac{d^{4}}{dx^{4}}\\sin x=\\sin x" }]} opts={{ size: 42, align: "center" }} />
         </g>
 
@@ -200,7 +204,7 @@ export const Cycle: React.FC = () => {
       <Gloss x={E.cx} w={520} align="center" y={R.cy + R.r + 74} size={40} opacity={p(CMP + 24, 18)}>
         one step
       </Gloss>
-      <Gloss x={R.cx} w={520} align="center" y={R.cy + R.r + 74} size={40} opacity={p(at("compare", 0.35), 18)}>
+      <Gloss x={R.cx} w={520} align="center" y={R.cy + R.r + 74} size={40} opacity={p(compareFour, 18)}>
         four steps
       </Gloss>
     </Sheet>

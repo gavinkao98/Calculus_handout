@@ -56,6 +56,19 @@
 - 場長與每拍起點只來自 tts.py 的 `manifest.json`：場長＝lead＋旁白秒數＋tail，拍起點＝lead＋`start_seconds`。場景只寫 `at("<拍 id>", 拍內比例)`，不寫秒數。換成真 MiMo manifest（`--props='{"manifest":"audio/act3_mimo/manifest.json"}'`）即全片重新對時。
 - 每場一個 `<Audio>`（manifest 的場音檔）；無旁白場（`kind: outro`）用 manifest 的 `duration`。
 
+### 把動畫釘在某個字上（word-level alignment）
+
+scene-aligned 的旁白（`manifest.json` 每場帶 `alignment.words_file`）有逐字對時（`src/lib/words.ts`，泛用、不綁第三幕）。比起「拍內第幾成比例」的猜測時間點，這能讓某個視覺事件精準卡在某個字被念出來的那一刻。
+
+- `useBeats()`（`clock.tsx`）多一個 `atWord(phrase, { occurrence?, afterFrame? })`：回傳該場旁白裡第 N 次出現 `phrase`（一個字或幾個字的片語，不分大小寫、忽略標點）的**幀**；`afterFrame` 通常傳某拍的 `at("<拍 id>")`，用來跳過同一個字在更早處的出現。
+- **mock manifest 沒有 `alignment`，`atWord` 會回傳 `undefined`**——這是唯一允許的 fallback，寫法固定是 `atWord(...) ?? at("<拍 id>", 拍內比例)`，讓沒有對時資料時退回原本的固定比例，行為不變。
+- 找不到字（有對時資料、但這個字真的不在裡面）會直接 throw，不會默默吃掉——寫錯字或片語會在 render 時立刻爆炸，不會悄悄退化成沒對準。
+- 範例（`scenes/SlopeHeight.tsx` 的 `heights` 拍，旁白「...one, zero, negative one...」）：
+  ```ts
+  const heightsStart = at("heights");
+  const from = atWord("one", { afterFrame: heightsStart }) ?? at("heights", 0.4);
+  ```
+
 ## 檔案大小（第三幕的紙紋調整）
 
 - 動態測試 15 s crf16 是 42 MB（2.8 MB/s）：全解析度的逐像素紙紋跟著鏡頭移動，x264 無法預測。
