@@ -1,5 +1,5 @@
 # 2026 臺大北區科學人才培育計畫數學組入學考 第 7 題（正方形撞球桌）——解題影片腳本（紙本編輯排版）
-> 2026-09-26，motion-designer 子代理。旁白為英文（原文照登），框架說明為繁體中文。旁白源＝[`q7.yml`](q7.yml)（tts.py 格式，`{show <id>}` 切 beat）；畫面＝`../src/q7/`。時長為 mock（150 wpm 估算），換真 MiMo manifest 後全片自動重新對時。題目出處：115 學年度國立臺灣大學北區高中學生科學研究人才培育計畫－數學組入學考試（2026-09-06 舉行）第 7 題；畫面上只放英文（本專案沒有打包 CJK 字型）。
+> 2026-09-26，motion-designer 子代理。旁白為英文（原文照登），框架說明為繁體中文。旁白源＝[`q7.yml`](q7.yml)（tts.py 格式，`{show <id>}` 切 beat）；畫面＝`../src/q7/`。時長為 mock（150 wpm 估算），換真 MiMo manifest 後全片自動重新對時。題目出處：115 學年度國立臺灣大學北區高中學生科學研究人才培育計畫－數學組入學考試（2026-09-06 舉行）第 7 題；片頭（`logo` 副標與 `exam` 上半頁考卷卡）用中文、排 Noto Serif TC 思源宋體；其餘畫面英文。
 ## 敘事取向
 照使用者核准的教學計畫走：先把題目交代清楚（考試身分＋題目＋重畫的三張原圖），用四發試射勾起「哪些球會回家」，再用「反射＝鏡像」一拍鋪好唯一的工具，然後**慢慢展開桌子**（一次反射一拍，下一張桌子像書頁一樣以那面牆為軸翻過來，被反彈的那段路徑隨之翻成直線的延續）。展開後把平面上的格點依奇偶上色（藍＝(偶,偶)＝中心的複本＝回家；紅圈＝(奇,奇)＝角洞的複本），題目就變成「從原點出發的直線先碰到藍點還是紅圈」。核心論證是**中點測試**：瞄準射線上第一個 (偶,偶) 點 (2p, 2q)，gcd(p, q) = 1，線段上只有起點、終點與中點 (p, q) 三個格點（畫面明寫，不跳過）；p、q 皆奇則中點是角洞、半路落袋，一奇一偶則中點安全、回家。之後把 (1,0) 與 (2,1) 摺回真桌，計數器逐次反彈跳號（|p| + |q|），回到 θ（tan θ = 2k 的家族→無窮多個），再加入邊中點洞做 (b)：中點永遠是洞，答案 0。收在並排回顧、考場寫法、以及「無理斜率會把整張桌子填滿」的延伸（只展示不證明）。
 ## 設計語彙（本片新增）
@@ -9,12 +9,12 @@
 - **時序：** 與 §3.1 同一套 manifest 讀法（lead 15、tail 27、重疊 22 幀），另外 `timing.ts` 的 `HOLD` 在 epilogue（+4 s）、recap、writeup 後面加停留，讓畫面有時間跑完。
 ## 逐場逐拍
 ### 1. `logo`——品牌開場（無旁白）（4.0 s）
-- **畫面：** 空白紙頁正中央，lockup 以墨跡由左到右排上，下方紅色短線與小型大寫 CALCULUS · VIDEO NOTES；鏡頭從 1.05 緩緩退到 1.0。
+- **畫面：** 空白紙頁正中央，lockup 以墨跡由左到右排上，下方紅色短線與中文副標「115 學年度北區人才培育計畫入學考第七題」（思源宋體，加字距）；鏡頭從 1.05 緩緩退到 1.0。
 ### 2. `exam`——考卷卡（mock 47.8 s）
 | beat | 旁白（英文原文） | 畫面 |
 |---|---|---|
-| `start` | This is problem seven from the twenty twenty-six math entrance exam of National Taiwan University's Northern Taiwan High School Science Talent Program, held on September sixth. | 上半頁（像書名頁）：左邊大字 PROBLEM 7，下面的花飾是一張小球桌、球沿 (2,1) 的菱形路徑一圈圈回家；右欄 NATIONAL TAIWAN UNIVERSITY、Northern Taiwan High School Science Talent Program、Mathematics · 2026 Entrance Exam，點狀引導線列出 Academic year 115／Held September 6, 2026／Problem 7 of 7；頁腳註「Academic year 115 of the Minguo calendar is the 2026–27 school year」。 |
-| `setup` | A square billiard table has a pocket at each corner. A ball, treated as a point, starts at the exact center. It rolls in straight lines, bounces off the edges by the law of reflection, and stops once it falls into a pocket. | 鏡頭下移到下半頁（全場唯一一次移動）：題目英文全文排入；右側重畫考卷的兩張圖（球的路徑、落袋結束，虛點線加箭頭），圖例「● start (center)　○ pocket」。 |
+| `start` | This is problem seven from the twenty twenty-six math entrance exam of National Taiwan University's Northern Taiwan High School Science Talent Program, held on September sixth. | 上半頁（像書名頁，中文：思源宋體＋Garamond 數字）：頂線左側「入學考試・數學組」；左邊紅字「題號」、下面大字 7，再下面的花飾是一張小球桌、球沿 (2,1) 的菱形路徑一圈圈回家；右欄紅字「國立臺灣大學」、標題「北區高中學生／科學研究人才培育計畫」、紅色短線、「數學組・115 學年度入學考試」，點狀引導線列出 學年度 115／測驗日期 115 年 9 月 6 日（星期日）／題號 第 7 題（共 7 題）。 |
+| `setup` | A square billiard table has a pocket at each corner. A ball, treated as a point, starts at the exact center. It rolls in straight lines, bounces off the edges by the law of reflection, and stops once it falls into a pocket. | 鏡頭下移到下半頁（全場唯一一次移動）：題目英文全文排入；右側重畫考卷的兩張圖（球的路徑、落袋結束，虛點線加箭頭），圖例「● start (center)　○ pocket」；左下頁腳註 *Translated from the Chinese original.*（這一頁才是翻譯）。 |
 | `theta` | Theta is the angle between the shot and the bottom edge. | 「Let θ be the angle…」排入；圖一的起點畫出水平參考線與金色角弧、標 θ。 |
 | `parta` | Part a. Prove that infinitely many angles bring the ball back to the center before it falls into any pocket. | (a) 題文排入（θ ∈ [0, 2π)）。 |
 | `partb` | Part b. Add a pocket at the midpoint of every edge. How many angles work now? | (b) 題文排入；右下重畫 (b) 的八洞球桌（角洞紅、邊洞金），圖說 the table in (b): eight pockets。 |
