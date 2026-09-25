@@ -4,13 +4,13 @@ import { Easing, interpolate } from "remotion";
 import { color, stroke, type } from "../../theme";
 import { clamp } from "../../components/Type";
 import { EqNumber } from "../../components/Marginalia";
-import { Hatches, Kicker, Layer, Ln, M, Sheet, Txt, camPath, useS } from "../kit";
+import { HOME, Hatches, Kicker, Layer, Ln, M, Sheet, Txt, camPath, useS } from "../kit";
 
 const PI = Math.PI;
 const O = { x: 210, y: 930 };
 const R = 640;
 const TH = 0.78;
-const H = 1330;
+const H = 1280;
 const X = 1110; // right column
 
 const Swatch: React.FC<{ y: number; fill: string; p: number }> = ({ y, fill, p }) =>
@@ -37,14 +37,11 @@ export const Areas: React.FC = () => {
   // the shape being talked about is full strength; the others recede once all three are down
   const dimOthers = p("chain", 30);
 
-  const cam = camPath(f, { cx: 620, cy: 640, s: 1.35 }, [
-    [at("points") + 40, { cx: 700, cy: 560, s: 1.2 }, 50],
-    [at("tri1"), { cx: 980, cy: 520, s: 1.05 }, 60],
-    [at("chain"), { cx: 1420, cy: 640, s: 1.4 }, 60],
-    [at("divide", 0.45), { cx: 1400, cy: 800, s: 1.3 }, 50],
-    [at("even"), { cx: 960, cy: 820, s: 1.05 }, 60],
-    [at("bonus"), { cx: 960, cy: 790, s: 1 }, 60],
-  ]);
+  // figure + the whole inequality chain fit the first 1080 px, so the camera is locked through the
+  // derivation; ONE move down the sheet (after the boxed result has inked, before "negative θ" is
+  // written) brings in the footnotes while the chain and the box stay in view.
+  const cam = camPath(f, HOME, [[at("even") - 30, { cx: 960, cy: H - 540, s: 1 }, 40]]);
+  const lo = 12; // the lower region's writing waits for the camera to settle
 
   const sector = `M${O.x} ${O.y} L${A.x} ${A.y} A${R} ${R} 0 0 0 ${B.x} ${B.y} Z`;
   const triB = `M${O.x} ${O.y} L${A.x} ${A.y} L${B.x} ${B.y} Z`;
@@ -110,50 +107,52 @@ export const Areas: React.FC = () => {
       </Txt>
 
       {/* right column: the three areas */}
-      <Kicker x={X} y={150} p={p("tri1", 20)}>
-        Three nested areas
-      </Kicker>
+      <div style={{ opacity: interpolate(cam.cy, [540, 580], [1, 0], clamp) /* would be clipped by the move down */ }}>
+        <Kicker x={X} y={150} p={p("tri1", 20)}>
+          Three nested areas
+        </Kicker>
+      </div>
       <Layer h={H}>
-        <Swatch y={290} fill="url(#h45)" p={t1} />
-        <Swatch y={390} fill="url(#dots)" p={sc} />
-        <Swatch y={490} fill="url(#h135)" p={t2} />
+        <Swatch y={270} fill="url(#h45)" p={t1} />
+        <Swatch y={365} fill="url(#dots)" p={sc} />
+        <Swatch y={460} fill="url(#h135)" p={t2} />
       </Layer>
-      <M x={X + 70} y={290} size={52} p={t1} t="\triangle OAB:\ \ \tfrac12\cdot1\cdot\sin\theta" />
-      <M x={X + 70} y={390} size={52} p={sc} t={`\\text{sector}\\ OAB:\\ \\ \\tfrac12\\,{\\color{${color.ochre}}\\theta}`} />
-      <Txt x={X + 450} y={352} w={320} size={type.caption} italic c={color.ochre} p={p("sector", 24, 40)}>
+      <M x={X + 70} y={270} size={52} p={t1} t="\triangle OAB:\ \ \frac12\cdot1\cdot\sin\theta" />
+      <M x={X + 70} y={365} size={52} p={sc} t={`\\text{sector}\\ OAB:\\ \\ \\frac12\\,{\\color{${color.ochre}}\\theta}`} />
+      <Txt x={X + 450} y={326} w={320} size={type.caption} italic c={color.ochre} p={p("sector", 24, 40)}>
         true in radians
       </Txt>
-      <M x={X + 70} y={490} size={52} p={t2} t="\triangle OAC:\ \ \tfrac12\cdot1\cdot\tan\theta" />
+      <M x={X + 70} y={460} size={52} p={t2} t="\triangle OAC:\ \ \frac12\cdot1\cdot\tan\theta" />
 
       {/* the chain */}
-      <M x={X} y={640} size={60} p={p("chain", 30)} t="\tfrac12\sin\theta\ \le\ \tfrac12\theta\ \le\ \tfrac12\tan\theta" />
-      <Txt x={X} y={680} w={100} size={type.caption} italic c={color.accent} p={p("chain", 20, 70)}>
+      <M x={X} y={570} size={60} p={p("chain", 30)} t="\frac12\sin\theta\ \le\ \frac12\theta\ \le\ \frac12\tan\theta" />
+      <Txt x={X} y={624} w={100} size={type.caption} italic c={color.accent} p={p("chain", 20, 70)}>
         × 2
       </Txt>
-      <M x={X + 90} y={740} size={66} p={p("chain", 30, 70)} t="\sin\theta\ \le\ \theta\ \le\ \tan\theta" />
-      <Txt x={X} y={790} w={600} size={type.caption} italic c={color.ink2} p={p("divide", 20)}>
+      <M x={X + 90} y={674} size={66} p={p("chain", 30, 70)} t="\sin\theta\ \le\ \theta\ \le\ \tan\theta" />
+      <Txt x={X} y={712} w={600} size={type.caption} italic c={color.ink2} p={p("divide", 20)}>
         divide by sin θ, then take reciprocals:
       </Txt>
-      <M x={X + 90} y={920} size={60} p={p("divide", 30, 20)} t="1\ \le\ \frac{\theta}{\sin\theta}\ \le\ \frac{1}{\cos\theta}" />
+      <M x={X + 90} y={828} size={60} p={p("divide", 30, 20)} t="1\ \le\ \frac{\theta}{\sin\theta}\ \le\ \frac{1}{\cos\theta}" />
       {/* the result, boxed */}
       <Layer h={H}>
-        <rect x={X - 10} y={975} width={640} height={170} fill="none" stroke={color.accent} strokeWidth={2.4} opacity={p("divide", 24, 110)} />
+        <rect x={X - 10} y={874} width={640} height={160} fill="none" stroke={color.accent} strokeWidth={2.4} opacity={p("divide", 24, 110)} />
       </Layer>
-      <M x={X + 30} y={1085} size={74} p={p("divide", 34, 90)} t="\cos\theta\ \le\ \frac{\sin\theta}{\theta}\ \le\ 1" />
-      <EqNumber y={1040} n="1" opacity={p("divide", 24, 120)} />
+      <M x={X + 30} y={978} size={74} p={p("divide", 34, 90)} t="\cos\theta\ \le\ \frac{\sin\theta}{\theta}\ \le\ 1" />
+      <EqNumber y={934} n="1" opacity={p("divide", 24, 120)} />
 
-      {/* even + bonus */}
-      <Kicker x={160} y={1030} p={p("even", 24)}>
+      {/* even + bonus (lower region) */}
+      <Kicker x={160} y={1040} p={p("even", 24, lo)}>
         Negative θ
       </Kicker>
-      <M x={160} y={1160} size={54} p={p("even", 30, 16)} t="\frac{\sin(-\theta)}{-\theta}=\frac{-\sin\theta}{-\theta}=\frac{\sin\theta}{\theta}" />
-      <Txt x={160} y={1200} w={700} size={type.caption} italic c={color.ink2} p={p("even", 24, 40)}>
+      <M x={160} y={1160} size={54} p={p("even", 30, 16 + lo)} t="\frac{\sin(-\theta)}{-\theta}=\frac{-\sin\theta}{-\theta}=\frac{\sin\theta}{\theta}" />
+      <Txt x={160} y={1196} w={700} size={type.caption} italic c={color.ink2} p={p("even", 24, 40 + lo)}>
         an even function: the same bounds hold on both sides
       </Txt>
-      <Kicker x={X} y={1180} p={p("bonus", 24)}>
+      <Kicker x={X} y={1080} p={p("bonus", 24)}>
         Bonus
       </Kicker>
-      <M x={X + 190} y={1235} size={62} p={p("bonus", 30, 10)} t="|\sin\theta|\ \le\ |\theta|" />
+      <M x={X + 190} y={1135} size={62} p={p("bonus", 30, 10)} t="|\sin\theta|\ \le\ |\theta|" />
     </Sheet>
   );
 };

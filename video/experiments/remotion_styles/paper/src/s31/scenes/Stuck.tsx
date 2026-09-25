@@ -1,27 +1,29 @@
 /** C1 — the recipe works for x² (the h cancels), jams for sine; everything funnels into sinθ/θ. */
 import React from "react";
+import { interpolate } from "remotion";
 import { color, stroke, type } from "../../theme";
-import { Arrow, Kicker, Layer, Ln, M, Sheet, Txt, camPath, useS } from "../kit";
+import { clamp } from "../../components/Type";
+import { Arrow, HOME, Kicker, Layer, Ln, M, Sheet, Txt, camPath, texW, useS } from "../kit";
 
 const A = color.accent;
 const H = 1560;
+const RECIPE_LHS = `{\\color{${A}}f'(x)}=\\lim_{h\\to0}`;
+const RECIPE = `${RECIPE_LHS}\\frac{f(x+h)-f(x)}{h}`;
 
 export const Stuck: React.FC = () => {
   const { f, at, p, pf, atWord } = useS();
-  // camera moves land as the narration names what they're pointing at
+  // emphasis lands as the narration names it (underline / caption ink), not with the camera
   const startAt = atWord("difference quotient", { afterFrame: at("start") }) ?? at("start", 0.55);
   const plugAt = atWord("pull out", { afterFrame: at("plug") }) ?? at("plug", 0.7);
   const funnelZeroAt = atWord("zero over zero", { afterFrame: at("funnel") }) ?? at("funnel", 0.55);
-  const cam = camPath(f, { cx: 960, cy: 330, s: 1.7 }, [
-    [startAt, { cx: 960, cy: 300, s: 1.55 }, 90],
-    [at("square") - 10, { cx: 620, cy: 560, s: 1.28 }, 50],
-    [at("sine") - 6, { cx: 1320, cy: 560, s: 1.28 }, 44],
-    [plugAt, { cx: 960, cy: 540, s: 1 }, 50],
-    [at("funnel"), { cx: 960, cy: 1010, s: 1 }, 70],
-    [funnelZeroAt, { cx: 900, cy: 1030, s: 1.12 }, 60],
-    [at("radians"), { cx: 960, cy: 1010, s: 1 }, 50],
-  ]);
+  // two regions on a tall sheet: the worked pair (top), then the funnel (bottom). One move, in the
+  // gap after the (b) caption has inked and before the funnel starts drawing.
+  const cam = camPath(f, HOME, [[at("funnel") - 48, { cx: 960, cy: 990, s: 1 }, 52]]);
+  const rW = texW(RECIPE, 78);
+  const qL = 960 - rW / 2 + texW(RECIPE_LHS, 78);
   const dimTop = 1 - 0.55 * p("funnel", 40);
+  // the (a)/(b) captions sit on the lower frame's top edge: fade them rather than clip them
+  const away = interpolate(cam.cy, [540, 760], [1, 0], clamp);
   const cancel = p("cancel", 26);
   return (
     <Sheet folio={113} title="Why sine resists algebra" cam={cam} h={H}>
@@ -35,17 +37,19 @@ export const Stuck: React.FC = () => {
           align="center"
           size={78}
           p={pf(20, 34)}
-          t={`{\\color{${A}}f'(x)}=\\lim_{h\\to0}\\frac{f(x+h)-f(x)}{h}`}
+          t={RECIPE}
         />
         <Layer h={H}>
+          {/* "the difference quotient": underline the quotient as it is named */}
+          <Ln x1={qL} y1={376} x2={960 + rW / 2} y2={376} p={pf(startAt, 22)} c={A} w={3} o={1 - p("square", 30)} />
           <Ln x1={960} y1={400} x2={960} y2={860} p={p("square", 30)} c={color.rule} />
         </Layer>
 
         {/* (a) x squared */}
-        <Txt x={160} y={410} size={type.label + 2} italic c={color.ink2} p={p("square", 20)} w={60}>
+        <Txt x={160} y={410} size={type.label + 2} italic c={color.ink2} p={p("square", 20)} o={away} w={60}>
           (a)
         </Txt>
-        <M x={212} y={440} size={44} c={color.ink2} p={p("square", 20)} t="f(x)=x^2" />
+        <M x={212} y={440} size={44} c={color.ink2} p={p("square", 20)} o={away} t="f(x)=x^2" />
         <M x={160} y={560} size={62} p={p("square", 30, 8)} t="\frac{(x+h)^2-x^2}{h}=\frac{2xh+h^2}{h}" />
         <M
           x={160}
@@ -60,13 +64,13 @@ export const Stuck: React.FC = () => {
         </Txt>
 
         {/* (b) sine */}
-        <Txt x={1020} y={410} size={type.label + 2} italic c={color.ink2} p={p("sine", 16)} w={60}>
+        <Txt x={1020} y={410} size={type.label + 2} italic c={color.ink2} p={p("sine", 16)} o={away} w={60}>
           (b)
         </Txt>
-        <M x={1072} y={440} size={44} c={color.ink2} p={p("sine", 16)} t="f(x)=\sin x" />
+        <M x={1072} y={440} size={44} c={color.ink2} p={p("sine", 16)} o={away} t="f(x)=\sin x" />
         <M x={1020} y={560} size={62} p={p("sine", 26, 4)} t="\frac{\sin(x+h)-\sin x}{h}" />
         <M x={1020} y={700} size={62} p={p("plug", 30)} t={`\\xrightarrow{\\;h=0\\;}\\ \\frac{\\sin x-\\sin x}{0}={\\color{${A}}\\frac{0}{0}}`} />
-        <Txt x={1020} y={782} w={780} size={type.caption} italic c={A} p={p("plug", 26, 70)}>
+        <Txt x={1020} y={782} w={780} size={type.caption} italic c={A} p={pf(plugAt - 6, 26)}>
           and there is no factor of h to pull out of sin(x + h)
         </Txt>
       </div>
@@ -82,7 +86,7 @@ export const Stuck: React.FC = () => {
       <Kicker x={700} y={1082} p={p("funnel", 24, 30)} rule={false}>
         Everything comes down to
       </Kicker>
-      <Txt x={1270} y={1140} w={560} size={type.body - 2} italic c={color.ink2} p={p("funnel", 28, Math.round((at("radians") - at("funnel")) * 0.35))}>
+      <Txt x={1270} y={1140} w={560} size={type.body - 2} italic c={color.ink2} p={pf(funnelZeroAt - 4, 28)}>
         Also <span style={{ color: A, fontStyle: "normal" }}>0/0</span> — algebra can’t crack it.
       </Txt>
       <Txt x={1270} y={1250} w={330} size={type.body - 2} italic c={color.ink} p={p("funnel", 28, Math.round((at("radians") - at("funnel")) * 0.62))}>

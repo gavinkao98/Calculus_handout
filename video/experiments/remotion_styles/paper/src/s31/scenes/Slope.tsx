@@ -5,7 +5,7 @@ import { color, semantic, stroke, type } from "../../theme";
 import { clamp } from "../../components/Type";
 import { Curve, Dot, PlotFrame, RangeAxes, SlopeTriangle, Tangent, TangentNote, Tick, px } from "../../components/Plot";
 import { FigureCaption } from "../../components/Marginalia";
-import { Arrow, Layer, M, Sheet, Txt, camPath, useS, wipe } from "../kit";
+import { Arrow, Layer, M, Sheet, Txt, useS, wipe } from "../kit";
 
 const PI = Math.PI;
 const A: PlotFrame = { ox: 520, oy: 340, ux: 170, uy: 150 };
@@ -25,11 +25,7 @@ export const Slope: React.FC = () => {
   );
   const m = Math.cos(x);
   const y = Math.sin(x);
-  const cam = camPath(f, { cx: 1000, cy: 360, s: 1.35 }, [
-    [at("cosine") - 10, { cx: 1000, cy: 560, s: 1.05 }, 50],
-    [at("peak"), { cx: 1020, cy: 560, s: 1.2 }, 40],
-    [at("circle"), { cx: 960, cy: 540, s: 1 }, 50],
-  ]);
+  // camera locked: both panels and the margin are one composition; emphasis is the red bars.
   const axA = p("start", 30);
   const sinP = p("start", 50, 20);
   const grow = sp("tangent", 6);
@@ -48,7 +44,7 @@ export const Slope: React.FC = () => {
   const P = { x: O.x + R * Math.cos(x), y: O.y - R * Math.sin(x) };
   const V = { x: -R * Math.sin(x), y: -R * Math.cos(x) };
   return (
-    <Sheet folio={121} title="Slope equals height" cam={cam}>
+    <Sheet folio={121} title="Slope equals height">
       <Layer>
         <defs>
           <clipPath id="slclip">

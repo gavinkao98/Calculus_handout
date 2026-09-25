@@ -7,7 +7,7 @@ import React from "react";
 import { Easing, interpolate } from "remotion";
 import { color, semantic, stroke, type } from "../../theme";
 import { clamp, measure } from "../../components/Type";
-import { Arrow, Kicker, Layer, Ln, M, Sheet, Txt, camPath, useS } from "../kit";
+import { Arrow, HOME, Kicker, Layer, Ln, M, Sheet, Txt, camPath, useS } from "../kit";
 
 const PI = Math.PI;
 const O = { x: 540, y: 580 };
@@ -52,14 +52,9 @@ export const Circle: React.FC = () => {
   const guess = p("guess", 30);
   const cav = p("caveat", 26, 8);
 
-  const cam = camPath(f, { cx: 660, cy: O.y - 20, s: 1.5 }, [
-    [fT - 10, { cx: 1000, cy: 590, s: 1.08 }, 60],
-    [at("question"), { cx: 960, cy: 540, s: 1 }, 50],
-    [fS + 10, { cx: 1010, cy: 560, s: 1.06 }, 60],
-    [at("vertical"), { cx: 780, cy: 470, s: 1.45 }, 50],
-    [at("guess"), { cx: 1080, cy: 600, s: 1.12 }, 50],
-    [at("caveat"), { cx: 960, cy: 540, s: 1 }, 70],
-  ]);
+  // hero open: close on the circle while it inks, then ONE pull back to the page (before
+  // the height is drawn); from there the camera is locked for the rest of the scene.
+  const cam = camPath(f, { cx: 640, cy: O.y, s: 1.5 }, [[58, HOME, 56]]);
 
   // graph marker
   const gx = (x: number) => G.x + x * G.ux;

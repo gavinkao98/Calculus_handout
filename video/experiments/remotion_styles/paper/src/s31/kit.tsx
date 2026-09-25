@@ -296,7 +296,7 @@ export const Ln: React.FC<{ x1: number; y1: number; x2: number; y2: number; p?: 
 export type LedgerState = { show: number; items: Array<{ show: number; paid: number; focus?: number }> };
 const DEBTS = [
   { n: "1", words: "cos is continuous" },
-  { n: "2", t: String.raw`\dfrac{\sin\theta}{\theta}\to 1` },
+  { n: "2", t: String.raw`\sin\theta/\theta\to 1` }, // marginalia: inline, like the running text beside it
 ];
 export const Ledger: React.FC<{ x?: number; y?: number; st: LedgerState }> = ({ x = 120, y = 300, st }) => {
   if (st.show <= 0) return null;
@@ -309,7 +309,7 @@ export const Ledger: React.FC<{ x?: number; y?: number; st: LedgerState }> = ({ 
         if (!it || it.show <= 0) return null;
         const top = 70 + i * 170;
         const k = (48 * font.mathScale) / 1000;
-        const g = d.t ? tex(d.t, true) : null;
+        const g = d.t ? tex(d.t, false) : null;
         const W = g ? g.w * k : measure(d.words ?? "", 36, { italic: true });
         return (
           <div key={d.n} style={{ position: "absolute", left: 0, top, width: 290, height: 130, ...wipe(it.show, 4) }}>

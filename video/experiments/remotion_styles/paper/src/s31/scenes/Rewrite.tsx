@@ -2,7 +2,7 @@
 import React from "react";
 import { color, type } from "../../theme";
 import { MathStage, Piece, extent, row } from "../../components/Stage";
-import { Arrow, Kicker, Layer, Ledger, M, Sheet, Txt, camPath, useS } from "../kit";
+import { Arrow, Kicker, Layer, Ledger, M, Sheet, Txt, useS } from "../kit";
 
 const C = color.cobalt;
 const SZ = 72;
@@ -22,7 +22,7 @@ const P: Record<string, Piece> = {
 };
 
 export const Rewrite: React.FC = () => {
-  const { f, at, p, atWord } = useS();
+  const { at, p, atWord } = useS();
   const k1 = row(P, ["lhs", ["eq", 0.3], { num: ["two", ["cosf", 0.08], ["sinf", 0.1]], den: ["hden"], bar: "bar", gap: 0.3 }], X, Y, SZ);
   const k2 = row(P, ["lhs", ["eq", 0.3], ["cosf", 0.3], ["dot", 0.14], { num: ["sinf"], den: ["hden", ["sl", 0.02], ["two", 0.02]], bar: "bar", gap: 0.14 }], X, Y, SZ);
   // the substituted formula lands as the narration finishes naming A and B ("...and B equal to x")
@@ -33,16 +33,13 @@ export const Rewrite: React.FC = () => {
   ];
   const ec = extent(P, k2, "cosf");
   const eb = extent(P, k2, "bar");
-  const cam = camPath(f, { cx: 960, cy: 300, s: 1.45 }, [
-    [at("substitute"), { cx: 1000, cy: 560, s: 1.3 }, 60],
-    [at("owe1") - 10, { cx: 1080, cy: 700, s: 1.25 }, 50],
-    [at("ledger"), { cx: 920, cy: 610, s: 1.12 }, 60],
-  ]);
+  // a derivation: the camera is locked on the whole page; the identity, the substitution and the
+  // rewritten quotient all stay in view while the two debts are drawn beneath it.
   const o1 = p("owe1", 26);
   const o2 = p("owe2", 26);
   const led = p("ledger", 26, 10);
   return (
-    <Sheet folio={115} title="Two debts" cam={cam}>
+    <Sheet folio={115} title="Two debts">
       <Kicker x={X} y={140} p={p("start", 24, 10)}>
         Sum to product
       </Kicker>
@@ -51,7 +48,7 @@ export const Rewrite: React.FC = () => {
         y={300}
         size={76}
         p={p("identity", 34)}
-        t={`\\sin A-\\sin B=2\\,{\\color{${C}}\\cos\\frac{A+B}{2}}\\,\\sin\\frac{A-B}{2}`}
+        t={`\\sin A-\\sin B=2\\,{\\color{${C}}\\cos\\tfrac{A+B}{2}}\\,\\sin\\tfrac{A-B}{2}`}
       />
       <M x={X} y={400} size={40} c={color.ink2} p={p("identity", 30, 90)} t="\text{from}\quad \sin(u+v)-\sin(u-v)=2\cos u\,\sin v" />
       <M x={X} y={500} size={50} c={color.ink2} p={p("substitute", 26)} t="A=x+h,\qquad B=x" />
@@ -66,7 +63,7 @@ export const Rewrite: React.FC = () => {
       <Txt x={ec.cx} y={Y + 222} w={560} align="center" size={type.caption} italic c={color.ink2} p={p("owe1", 24, 30)}>
         if cos is continuous<sup style={{ color: color.accent, fontStyle: "normal", fontSize: "0.7em" }}> 1</sup>
       </Txt>
-      <M x={eb.cx - 30} y={Y + 110} align="right" size={40} c={color.ink2} p={p("owe2", 24, 4)} t="\theta=\tfrac h2\to0" />
+      <M x={eb.cx - 30} y={Y + 110} align="right" size={40} c={color.ink2} p={p("owe2", 24, 4)} display={false} t="\theta=h/2\to0" />
       <M x={eb.cx} y={Y + 290} align="center" size={56} p={p("owe2", 24, 12)} t={`\\frac{\\sin\\theta}{\\theta}\\to{\\color{${color.accent}}\\,?}`} />
       <Txt x={eb.cx} y={Y + 326} w={560} align="center" size={type.caption} italic c={color.ink2} p={p("owe2", 24, 30)}>
         we need this to be 1<sup style={{ color: color.accent, fontStyle: "normal", fontSize: "0.7em" }}> 2</sup>

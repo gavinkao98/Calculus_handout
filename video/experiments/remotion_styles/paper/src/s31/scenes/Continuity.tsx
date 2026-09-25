@@ -3,7 +3,7 @@ import React from "react";
 import { interpolate } from "remotion";
 import { color, stroke, type } from "../../theme";
 import { clamp } from "../../components/Type";
-import { Kicker, Layer, Ledger, Ln, M, Sheet, Txt, camPath, useS } from "../kit";
+import { Kicker, Layer, Ledger, Ln, M, Sheet, Txt, useS } from "../kit";
 
 const C = color.cobalt;
 const X = 470;
@@ -11,12 +11,7 @@ const G = { x: 1610, y: 480, u: 90 };
 
 export const Continuity: React.FC = () => {
   const { f, at, p } = useS();
-  const cam = camPath(f, { cx: 960, cy: 500, s: 1.1 }, [
-    [at("squeeze") + 20, { cx: 1100, cy: 420, s: 1.12 }, 60],
-    [at("gap"), { cx: 1000, cy: 640, s: 1.2 }, 60],
-    [at("cosgap"), { cx: 1000, cy: 720, s: 1.15 }, 40],
-    [at("paid"), { cx: 960, cy: 540, s: 1 }, 50],
-  ]);
+  // derivation page: camera locked; every line of the continuity argument stays on the sheet.
   const plot = p("squeeze", 30);
   const th = interpolate(f, [at("squeeze") + 30, at("gap") - 20], [1.9, 0.02], { ...clamp, easing: (t) => 1 - Math.pow(1 - t, 2) });
   const gx = (v: number) => G.x + v * G.u;
@@ -41,7 +36,7 @@ export const Continuity: React.FC = () => {
   })();
   const paid = p("paid", 30, 10);
   return (
-    <Sheet folio={117} title="Debt 1: continuity" cam={cam}>
+    <Sheet folio={117} title="Debt 1: continuity">
       <Ledger x={120} y={330} st={{ show: 1 - p("squeeze", 30, 10) + p("paid", 30), items: [{ show: 1, paid, focus: 1 - paid }, { show: 1, paid: 0 }] }} />
       <Kicker x={X} y={140} p={p("start", 24)}>
         From the bonus

@@ -3,21 +3,17 @@ import React from "react";
 import { color, font, type } from "../../theme";
 import { BrandLockup } from "../../components/Shell";
 import { Rule, SmallCaps } from "../../components/Type";
-import { M, Sheet, Txt, camPath, useS, wipe } from "../kit";
+import { M, Sheet, Txt, useS, wipe } from "../kit";
 
 const A = color.accent;
 const O = color.ochre;
 
 export const Next: React.FC = () => {
-  const { f, at, p, dur } = useS();
-  const cam = camPath(f, { cx: 960, cy: 420, s: 1.3 }, [
-    [at("chain") - 10, { cx: 960, cy: 540, s: 1 }, 60],
-    [at("chain") + 60, { cx: 960, cy: 548, s: 1.03 }, dur - at("chain") - 60],
-  ]);
+  const { at, p } = useS();
   const inside = p("inside", 30);
   const out = 1 - 0.8 * p("chain", 30);
   return (
-    <Sheet folio={126} title="" head={false} device={false} cam={cam}>
+    <Sheet folio={126} title="" head={false} device={false}>
       <div style={{ opacity: out }}>
         <Txt x={960} y={120} w={900} align="center" size={type.caption} italic c={color.ink2} p={p("start", 24, 6)}>
           We can differentiate

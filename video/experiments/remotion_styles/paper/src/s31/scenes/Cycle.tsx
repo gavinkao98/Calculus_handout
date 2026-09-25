@@ -1,7 +1,7 @@
 /** C13 — the four-step derivative cycle; e^x returns in one step, sin/cos flip sign in two. */
 import React from "react";
 import { color } from "../../theme";
-import { Arrow, Kicker, Layer, M, Sheet, Txt, camPath, useS } from "../kit";
+import { Arrow, Kicker, Layer, M, Sheet, Txt, useS } from "../kit";
 
 const A = color.accent;
 const C = color.cobalt;
@@ -17,19 +17,16 @@ const nodes = [
 const pos = (a: number, r = R) => ({ x: O.x + r * Math.cos(a), y: O.y + r * Math.sin(a) });
 
 export const Cycle: React.FC = () => {
-  const { f, at, p, atWord } = useS();
+  const { at, p, pf, atWord } = useS();
   const steps = ["step1", "step2", "step3", "step4"];
-  // the camera settles as the narration lands on the payoff word of each beat
-  const step4At = atWord("home", { afterFrame: at("step4") }) ?? at("step4", 0.5);
-  const compareBackAt = atWord("spring law", { afterFrame: at("compare") }) ?? at("compare", 0.7);
-  const cam = camPath(f, { cx: 760, cy: 560, s: 1.45 }, [
-    [step4At, { cx: 900, cy: 560, s: 1.1 }, 60],
-    [at("compare"), { cx: 1100, cy: 560, s: 1.05 }, 60],
-    [compareBackAt, { cx: 960, cy: 540, s: 1 }, 60],
-  ]);
+  // captions ink as the narration lands on their payoff word
+  const step4At = atWord("home", { afterFrame: at("step4") }) ?? at("step4") + 90;
+  const compareBackAt = atWord("spring law", { afterFrame: at("compare") }) ?? at("compare") + 200;
+  // camera locked on the full page (a push-in here would clip the running head); the e^x
+  // comparison fills the right half when its beat arrives.
   const half = p("compare", 40, 170);
   return (
-    <Sheet folio={125} title="The derivative cycle" cam={cam}>
+    <Sheet folio={125} title="The derivative cycle">
       <Kicker x={470} y={140} p={p("start", 24)}>
         Differentiate again, and again
       </Kicker>
@@ -70,10 +67,10 @@ export const Cycle: React.FC = () => {
       })}
       {nodes.map((nd, i) => {
         const mid = pos(nd.a + Math.PI / 4, R - 64);
-        return <M key={`d${i}`} x={mid.x} y={mid.y + 14} align="center" size={40} c={A} p={p(steps[i], 20, 14)} t="\tfrac{d}{dx}" />;
+        return <M key={`d${i}`} x={mid.x} y={mid.y + 14} align="center" size={46} c={A} p={p(steps[i], 20, 14)} display={false} t="\frac{d}{dx}" />;
       })}
       <M x={O.x} y={O.y + 20} align="center" size={50} p={p("step4", 30, 60)} t={`\\frac{d^4}{dx^4}\\sin x=\\sin x`} />
-      <Txt x={O.x} y={O.y + 44} w={400} align="center" size={30} italic c={color.ink2} p={p("step4", 26, 90)}>
+      <Txt x={O.x} y={O.y + 66} w={400} align="center" size={30} italic c={color.ink2} p={pf(Math.min(step4At - 14, at("compare") - 70), 26)}>
         four steps, and home
       </Txt>
 
@@ -83,7 +80,7 @@ export const Cycle: React.FC = () => {
         one step back to itself
       </Txt>
       <M x={1240} y={650} size={52} c={color.ochre} p={half} t={`\\frac{d^2}{dx^2}\\sin x=-\\sin x`} />
-      <Txt x={1240} y={690} w={560} size={32} italic c={color.ink2} p={p("compare", 26, 200)}>
+      <Txt x={1240} y={690} w={560} size={32} italic c={color.ink2} p={pf(compareBackAt - 20, 26)}>
         half a turn: two steps give the negative — the spring law <span style={{ fontStyle: "normal", color: A }}>s″ = −s</span>
       </Txt>
     </Sheet>

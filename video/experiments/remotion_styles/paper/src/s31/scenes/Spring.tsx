@@ -1,7 +1,7 @@
 /** C12 — a weight on a spring: s = sin t, s' = cos t, s'' = −sin t = −s. */
 import React from "react";
 import { color, stroke } from "../../theme";
-import { Arrow, Hatches, Kicker, Layer, Ln, M, Sheet, Txt, camPath, useS } from "../kit";
+import { Arrow, Hatches, Kicker, Layer, Ln, M, Sheet, Txt, useS } from "../kit";
 
 const PI = Math.PI;
 const A = color.accent;
@@ -14,15 +14,11 @@ const rowsY = [330, 570, 810];
 const UY = 80;
 
 export const Spring: React.FC = () => {
-  const { f, at, p } = useS();
+  const { f, p } = useS();
   const t = Math.max(0, (f - 10) / 30) * 1.55;
   const s = Math.sin(t);
   const wy = REST - s * AMP;
-  const cam = camPath(f, { cx: 700, cy: 540, s: 1.25 }, [
-    [at("position") - 5, { cx: 960, cy: 540, s: 1.05 }, 50],
-    [at("law"), { cx: 1080, cy: 700, s: 1.2 }, 50],
-    [at("arrow"), { cx: 960, cy: 540, s: 1 }, 60],
-  ]);
+  // camera locked: weight, the three graphs and the law read as one plate.
   // coil from the ceiling (y 150) to the top of the weight
   const top = 150;
   const bot = wy - 50;
@@ -49,7 +45,7 @@ export const Spring: React.FC = () => {
   };
   const arrowP = p("arrow", 24);
   return (
-    <Sheet folio={124} title="A weight on a spring" cam={cam}>
+    <Sheet folio={124} title="A weight on a spring">
       <Layer>
         <Hatches />
         {/* ceiling */}

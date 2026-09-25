@@ -3,7 +3,7 @@ import React from "react";
 import { interpolate } from "remotion";
 import { color, stroke, type } from "../../theme";
 import { clamp } from "../../components/Type";
-import { Kicker, Layer, Ledger, Ln, M, Sheet, Txt, camPath, useS } from "../kit";
+import { HOME, Kicker, Layer, Ledger, Ln, M, Sheet, Txt, camPath, useS } from "../kit";
 
 const PI = Math.PI;
 const G = { x: 1130, y: 720, ux: 205, uy: 300 };
@@ -21,11 +21,13 @@ const path = (fn: (v: number) => number, a: number, b: number, n = 200) => {
 
 export const Limit: React.FC = () => {
   const { f, at, p } = useS();
-  const cam = camPath(f, { cx: 1100, cy: 560, s: 1.1 }, [
-    [at("pinch") + 10, { cx: 1130, cy: 480, s: 2.3 }, 70],
-    [at("value"), { cx: 1000, cy: 540, s: 1.02 }, 60],
-    [at("paid"), { cx: 960, cy: 540, s: 1 }, 40],
+  // one of the film's two hero push-ins (the other is the cold open): lean into the pinch at θ → 0,
+  // then come back to the full page BEFORE the verdict is written. Nothing is written during either move.
+  const cam = camPath(f, HOME, [
+    [at("pinch") - 6, { cx: 1130, cy: 560, s: 1.4 }, 46],
+    [at("value") - 48, HOME, 44],
   ]);
+  const pushed = interpolate(cam.s, [1, 1.4], [0, 1], clamp); // marginal type the push would clip fades out
   const ax = p("start", 30, 4);
   const cur = p("start", 50, 30);
   const one = p("bounds", 30);
@@ -46,9 +48,11 @@ export const Limit: React.FC = () => {
   const paid = p("paid", 30, 20);
   return (
     <Sheet folio={118} title="Debt 2: the key limit" cam={cam}>
-      <Kicker x={470} y={140} p={p("start", 24)}>
-        The squeeze
-      </Kicker>
+      <div style={{ opacity: 1 - pushed }}>
+        <Kicker x={470} y={140} p={p("start", 24)}>
+          The squeeze
+        </Kicker>
+      </div>
       <Layer>
         <defs>
           <clipPath id="limclip">

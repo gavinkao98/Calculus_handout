@@ -1,7 +1,7 @@
 /** C6 — two cautions: a limit, not an identity; radians only (degrees bring π/180). */
 import React from "react";
 import { color, stroke, type } from "../../theme";
-import { Kicker, Layer, Ln, M, Sheet, Txt, camPath, useS } from "../kit";
+import { Kicker, Layer, Ln, M, Sheet, Txt, useS } from "../kit";
 
 const PI = Math.PI;
 const A = color.accent;
@@ -11,12 +11,9 @@ const gy = (v: number) => G.y - v * G.uy;
 const sinc = (v: number) => (Math.abs(v) < 1e-6 ? 1 : Math.sin(v) / v);
 
 export const Warnings: React.FC = () => {
-  const { f, at, p } = useS();
-  const cam = camPath(f, { cx: 960, cy: 540, s: 1 }, [
-    [at("identity"), { cx: 800, cy: 580, s: 1.3 }, 50],
-    [at("degrees"), { cx: 1400, cy: 560, s: 1.3 }, 60],
-    [at("factor", 0.55), { cx: 960, cy: 540, s: 1 }, 60],
-  ]);
+  const { at, p } = useS();
+  // two columns, camera locked. Focus moves by dimming: once caution 2 starts, caution 1 recedes.
+  const recede = 1 - 0.5 * p("degrees", 30);
   const id = p("identity", 30);
   const cur = p("identity", 44, 20);
   const d1 = p("identity", 24, 80);
@@ -34,11 +31,12 @@ export const Warnings: React.FC = () => {
   const S = { x: 1560, y: 470 };
   const th = 0.85;
   return (
-    <Sheet folio={119} title="Two cautions" cam={cam}>
+    <Sheet folio={119} title="Two cautions">
       <Layer>
         <Ln x1={1130} y1={170} x2={1130} y2={960} p={p("start", 30)} c={color.rule} />
       </Layer>
       {/* caution 1 */}
+      <div style={{ opacity: recede }}>
       <Kicker x={470} y={140} p={p("start", 24, 4)}>
         Caution 1
       </Kicker>
@@ -60,14 +58,15 @@ export const Warnings: React.FC = () => {
         </g>
       </Layer>
       <M x={G.x - 14} y={gy(1) + 12} t="1" size={type.label} align="right" c={color.ink2} p={id} />
-      <M x={gx(PI / 2)} y={G.y + 50} t="\tfrac{\pi}{2}" size={type.label} align="center" c={color.ink2} p={id} />
+      <M x={gx(PI / 2)} y={G.y + 50} t="\pi/2" display={false} size={type.label} align="center" c={color.ink2} p={id} />
       <M x={gx(PI)} y={G.y + 50} t="\pi" size={type.label} align="center" c={color.ink2} p={id} />
-      <M x={gx(PI / 2) + 18} y={gy(2 / PI) - 20} t="\tfrac{2}{\pi}\approx0.64" size={40} bg p={d1} />
+      <M x={gx(PI / 2) + 18} y={gy(2 / PI) - 20} t="2/\pi\approx0.64" display={false} size={40} bg p={d1} />
       <M x={470} y={800} size={50} p={d1} t={`\\frac{\\sin(\\pi/2)}{\\pi/2}=\\frac{2}{\\pi}\\approx{\\color{${A}}0.64}`} />
-      <M x={470} y={910} size={50} p={d2} t={`\\frac{\\sin\\pi}{\\pi}={\\color{${A}}0}`} />
-      <Txt x={760} y={870} w={360} size={type.caption} italic c={color.ink2} p={p("identity", 24, Math.round((at("degrees") - at("identity")) * 0.72))}>
+      <M x={470} y={930} size={50} p={d2} t={`\\frac{\\sin\\pi}{\\pi}={\\color{${A}}0}`} />
+      <Txt x={760} y={884} w={360} size={type.caption} italic c={color.ink2} p={p("identity", 24, Math.round((at("degrees") - at("identity")) * 0.72))}>
         Only near 0 is the ratio close to 1.
       </Txt>
+      </div>
 
       {/* caution 2 */}
       <Kicker x={1190} y={140} p={p("degrees", 24)}>
@@ -83,7 +82,7 @@ export const Warnings: React.FC = () => {
         </g>
       </Layer>
       <M x={S.x + R + 14} y={S.y - 50} t="\theta" size={44} c={color.ochre} p={p("degrees", 30, 20)} />
-      <M x={1190} y={380} size={52} p={p("degrees", 30, 30)} t={`\\text{sector area}=\\tfrac12\\,{\\color{${color.ochre}}\\theta}`} />
+      <M x={1190} y={380} size={52} p={p("degrees", 30, 30)} t={`\\text{sector area}=\\frac12\\,{\\color{${color.ochre}}\\theta}`} />
       <Txt x={1190} y={410} w={330} size={type.caption} italic c={color.ink2} p={p("degrees", 24, 60)}>
         holds only when θ is the arc length — radians
       </Txt>

@@ -3,7 +3,7 @@ import React from "react";
 import { color, features, font, stroke, type } from "../../theme";
 import { BrandLockup } from "../../components/Shell";
 import { Rule, SmallCaps } from "../../components/Type";
-import { Arrow, Layer, Sheet, Txt, camPath, useS, wipe } from "../kit";
+import { Arrow, Layer, Sheet, Txt, useS, wipe } from "../kit";
 
 const contents: Array<[string, string]> = [
   ["i", "Why sine resists algebra"],
@@ -13,8 +13,7 @@ const contents: Array<[string, string]> = [
 ];
 
 export const Title: React.FC = () => {
-  const { f, pf, dur } = useS();
-  const cam = camPath(f, { cx: 960, cy: 540, s: 1 }, [[0, { cx: 960, cy: 548, s: 1.035 }, dur]]);
+  const { f, pf } = useS();
   const O = { x: 330, y: 720 };
   const R = 120;
   const th = 0.9 + f * 0.012;
@@ -22,7 +21,7 @@ export const Title: React.FC = () => {
   const tip = { x: P.x - R * 0.75 * Math.sin(th), y: P.y - R * 0.75 * Math.cos(th) };
   const circ = pf(20, 40);
   return (
-    <Sheet folio={112} title="" head={false} device={false} cam={cam}>
+    <Sheet folio={112} title="" head={false} device={false} >
       <div style={{ position: "absolute", left: 120, top: 112, ...wipe(pf(8, 22), 0) }}>
         <SmallCaps>Chapter 3 · Differentiation Rules</SmallCaps>
       </div>
