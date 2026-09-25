@@ -19,4 +19,9 @@
 3. 依選定方向做完 §3.1 第三幕。
 4. 使用者滿意後定為模板。
 
+## 進度
+
+- **2026-09-25：** 使用者比較三方向後選定**紙本編輯排版**（`paper/`）。`paper/act3/` 完成 §3.1 第三幕整幕：旁白改寫（`act3.yml`、`SCRIPT.md`），MiMo `mimo-v2.5-tts`／Dean 以 `--unit auto`（實際落到 beat）合成，共 35 次呼叫、0 次重試，約 2 分 44 秒音訊；成片約 2 分 56 秒，本機 render 約 2 分 45 秒。重現方式：在 `paper/` 下執行 `npm ci`，接著 `npx remotion bundle`，再執行 `npx remotion render build Act3 out/act3.mp4 --codec=h264 --crf=20 --props='{"manifest":"audio/act3_mimo/manifest.json"}'`。音訊在 `paper/public/audio/`，不進版控；換機要重跑 TTS，並先徵得使用者同意。
+- 尚未做：loudnorm 響度正規化（目前峰值 0 dBFS）、真實書頁捲曲的翻頁效果、定為模板。
+
 各方向資料夾是獨立的 Remotion 專案：`npm ci` 還原依賴，`npx remotion studio` 預覽；`out/` 與 `node_modules/` 不進版控。
