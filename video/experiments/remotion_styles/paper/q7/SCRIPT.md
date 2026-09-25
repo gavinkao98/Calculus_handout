@@ -125,9 +125,23 @@ npm run q7:stills   # out/q7_stills/
 真配音（MiMo，**需先徵得使用者同意**）：`--backend mimo --unit scene --output-dir …/public/audio/q7_scene`，再 `npx remotion render build Q7 out/q7.mp4 --codec=h264 --crf=20 --props='{"manifest":"audio/q7_scene/manifest.json"}'`，最後 `python scripts/loudnorm.py`。
 
 ## 中文版（`Q7ZH`，2026-09-26）
-- **同一套動畫、另一張字串表：** 畫面字串在 `../src/q7/i18n/zh.ts`（與 `en.ts` 同形狀），排版規則見 [`../STYLE.md`](../STYLE.md)「中文版排版」；用字照 [`GLOSSARY.zh.md`](GLOSSARY.zh.md)（回到中心、鏡像桌、偶數偶數點／奇數奇數點、洞／掉進洞裡、中點測試），每拍畫面文字對照中文旁白 [`q7.zh.yml`](q7.zh.yml)。`writeup` 是台灣考卷的中文證明寫法（「證明：」四步、「故」、∎），不是英文四步的直譯，數學內容與英文版一致。
+- **同一套動畫、另一張字串表：** 畫面字串在 `../src/q7/i18n/zh.ts`（與 `en.ts` 同形狀），排版規則見 [`../STYLE.md`](../STYLE.md)「中文版排版」；用字照 [`GLOSSARY.zh.md`](GLOSSARY.zh.md)（回到中心、鏡像桌、偶數偶數點／奇數奇數點、洞／掉進洞裡、中點測試），每拍畫面文字對照中文旁白 [`q7.zh.yml`](q7.zh.yml)。（`zh.ts` 裡的 `writeup` 是台灣考卷的中文證明寫法，2026-09-26 起中文版不再播這場，字串留著給 `Strings` 型別。）
+- **場景清單與英文版不同（2026-09-26 使用者裁決：只改中文版）：**
+
+  | | 共同段 | 結尾 |
+  |---|---|---|
+  | en（`Q7`） | logo, exam, hook, mirror, unfold, dictionary, halfway, foldback, angles, twist, recap | writeup, epilogue, outro |
+  | zh（`Q7ZH`） | 同左（`angles` 少了 `irrational` 拍，停在「a 小題就證完了」） | ext_design, ext_room, ext_family, ext_dense, outro |
+
+  延伸段四場（為什麼偏偏是角落和邊中點／照不亮的房間／同一招的家族／無理斜率）的逐拍畫面設計、事實來源與自驗＝[`EXTENSION.zh.md`](EXTENSION.zh.md)；實作在 `../src/q7/scenes/ExtDesign.tsx`、`ExtRoom.tsx`、`ExtFamily.tsx`，`ext_dense` 是原 `Epilogue.tsx` 的縮短版（`ExtDense`，同一張 √2 畫面、時鐘壓到 `HOLD` 之前跑完）。延伸段的精確幾何（三角形摺疊、紙張三摺的動畫、長方形桌路徑）在 `../src/q7/extGeo.ts`，全是分段線性映射先切斷點再映射，不取樣。延伸段的畫面字串在 `../src/q7/i18n/ext.zh.ts`（中文專屬表，場景用 `useT().ext` 取）。
+- **同一來源下只改單一語系的做法（之後其他題目沿用）：**
+  1. **語系場景清單：** `Q7_SCENES` 是兩種語言用到的所有場景元件；順序由 `Q7_ORDER[lang]` 決定。manifest 的場景必須與該語系清單逐一相同（`Root.tsx` 的 `calculateMetadata` 會擋），單場 composition 各語系各一組（`Q7-<id>`、`Q7ZH-<id>`，id 的 `_` 換成 `-`，Remotion 不收底線）。
+  2. **可選 beat：** 某語系刪掉的拍，場景裡用 `useS().has(id)` 判斷再畫（`Angles.tsx` 的 `irrational`）；`at()`／`p()` 對不存在的拍會擲錯，不會默默跳過。
+  3. **語系 HOLD：** `timing.ts` 的 `HOLD` 依語系分表（`HOLD.en`、`HOLD.zh`），`loadShow(manifest, lang)` 套用；語系專屬的停留（例如 zh 的 `ext_dense: 90`）不影響另一語系的時間軸。
+  4. **語系專屬字串：** 只有一個語系有的場景，字串放獨立的表（`i18n/ext.zh.ts`，型別＝該表形狀），掛在 `i18n/index.ts` 的 `EXT`；不要為此在另一語系塞空字串。字型分片腳本 `scripts/cjk-subsets.mjs` 與 `cjk.ts` 的字形閘都要把這張表納入。
+  5. **驗收：** 另一語系跑一次靜幀逐像素比對（改動前後 diff 全為 0）。
 - **中文專屬欄位：** 英文 TeX 裡帶 `\text{bounces}`／`\text{direction}`／`(\text{even},\text{even})` 的三條，中文改排「中文＋行內 TeX」（`foldback.countLine`、`angles.dirLine`、`twist.testLine`）；`recap` 的大 ∞ 用 TeX `\infty`（Pagella），不落到系統字型。`exam` 中文題目頁的段落間距另算（3＋1＋3＋3 行、段距一律 48 px）；`unfold` 的「回到中心」標在鏡像桌中心的正上方（中文比 home 寬，放右下會壓到桌框）。英文版逐像素不變。
-- **配音：** MiMo `mimo-v2.5-tts`、voice 冰糖、`--unit beat`（中文沒有逐字對齊；英文版靠 `atWord` 卡字的三處，在中文分鏡是獨立的拍：angles 的 `tan`／`vert`、halfway 的 `list`）。2026-09-26 成品：54 次呼叫、0 次重試；1080p、loudnorm −19 LUFS（TP −2.8 dBTP），全片 6 分 45 秒，`out/q7zh_final.mp4`（音訊在 `public/audio/q7zh_beat/`，不進版控）。
+- **配音：** MiMo `mimo-v2.5-tts`、voice 冰糖、`--unit beat`（中文沒有逐字對齊；英文版靠 `atWord` 卡字的三處，在中文分鏡是獨立的拍：angles 的 `tan`／`vert`、halfway 的 `list`）。首輪 54 次＋延伸段 19 次，累計 73 次、0 次重試；之後依審核改了延伸段六拍旁白，冰糖重配 6 次（manifest receipt：6 次呼叫、0 次重試）。2026-09-26 含延伸段的成品：1080p、loudnorm −19 LUFS（TP −2.8 dBTP），全片 9 分 09 秒（16483 幀），`out/q7zh_final.mp4`（音訊在 `public/audio/q7zh_beat/`，不進版控）。
 ```bash
 # 真配音（MiMo 計費，需先徵得使用者同意）
 python video/pipeline/tts.py --storyboard video/experiments/remotion_styles/paper/q7/q7.zh.yml \

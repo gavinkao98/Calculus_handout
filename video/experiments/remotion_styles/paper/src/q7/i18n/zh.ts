@@ -164,9 +164,10 @@ export const zh: Strings = {
       ],
     ],
   },
+  // 中文版沒有 epilogue 場：這組字串給 ext_dense（延伸段最後一場，同一張 √2 畫面，縮短版）
   epilogue: {
-    title: "題目之外",
-    kicker: "題目之外",
+    title: "無理斜率",
+    kicker: "最後一球",
     shoot: "擊球斜率取",
     irrational: "無理數斜率：直線除了原點，再也碰不到任何格點。若洞只是理想的點，球就永遠停不下來。",
     dense: "讓它一直跑下去，軌跡會任意接近桌面上的每一個點。",

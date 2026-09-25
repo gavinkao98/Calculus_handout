@@ -6,10 +6,13 @@
 import { createContext } from "react";
 import { en, Strings } from "./en";
 import { zh } from "./zh";
+import { ExtStrings, extZh } from "./ext.zh";
 
 export type Lang = "en" | "zh";
-export type { Strings };
+export type { Strings, ExtStrings };
 export const TABLES: Record<Lang, Strings> = { en, zh };
+/** scenes only one language has (the zh extension): their own table, per language that has them */
+export const EXT: Partial<Record<Lang, ExtStrings>> = { zh: extZh };
 export const LangCtx = createContext<Lang>("en");
 
 /** fill `{n}`-style slots */

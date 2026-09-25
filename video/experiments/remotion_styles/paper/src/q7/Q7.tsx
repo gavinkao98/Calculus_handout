@@ -24,10 +24,15 @@ import { Recap } from "./scenes/Recap";
 import { Writeup } from "./scenes/Writeup";
 import { Epilogue } from "./scenes/Epilogue";
 import { Outro } from "./scenes/Outro";
+import { ExtDesign } from "./scenes/ExtDesign";
+import { ExtRoom } from "./scenes/ExtRoom";
+import { ExtFamily } from "./scenes/ExtFamily";
+import { ExtDense } from "./scenes/Epilogue";
 import { Lang, LangCtx } from "./i18n";
 import { ZH_FONT } from "./kit";
 import { useCjkReady } from "./cjk";
 
+/** every sheet either language uses; which ones, and in what order, is Q7_ORDER[lang] */
 export const Q7_SCENES: Record<string, React.FC> = {
   logo: Logo,
   exam: Exam,
@@ -42,9 +47,22 @@ export const Q7_SCENES: Record<string, React.FC> = {
   recap: Recap,
   writeup: Writeup,
   epilogue: Epilogue,
+  ext_design: ExtDesign,
+  ext_room: ExtRoom,
+  ext_family: ExtFamily,
+  ext_dense: ExtDense,
   outro: Outro,
 };
-export const Q7_ORDER = Object.keys(Q7_SCENES);
+/**
+ * Each language has its own scene list (2026-09-26: only the zh cut changed —
+ * writeup and epilogue out, the four-scene extension in). The manifest must
+ * list exactly these scenes, in this order (checked in Root's calculateMetadata).
+ */
+const COMMON = ["logo", "exam", "hook", "mirror", "unfold", "dictionary", "halfway", "foldback", "angles", "twist", "recap"];
+export const Q7_ORDER: Record<Lang, string[]> = {
+  en: [...COMMON, "writeup", "epilogue", "outro"],
+  zh: [...COMMON, "ext_design", "ext_room", "ext_family", "ext_dense", "outro"],
+};
 
 /** `lang`: which string table the sheets are set from (i18n/); the animation is the same */
 export type Q7Props = { manifest: string; lang?: Lang; show?: Show; id?: string };

@@ -13,7 +13,7 @@ import { InlineTex, Rule, SmallCaps } from "../components/Type";
 import { Cam, HOME, Kicker as BaseKicker, Lbl, Mark, Pt, SceneCtx, Txt as BaseTxt, keepOnPage, tLbl as baseTLbl, useS as baseUseS, wipe } from "../s31/kit";
 import { Shot, V, Wall, at, flip, foldedInto, polyAt } from "./geo";
 import { CJK_MIN, CJK_STACK } from "./cjk";
-import { LangCtx, TABLES } from "./i18n";
+import { EXT, ExtStrings, LangCtx, TABLES } from "./i18n";
 
 export * from "../s31/kit";
 
@@ -201,6 +201,12 @@ export const useT = () => {
     lang,
     zh,
     t: TABLES[lang],
+    /** the strings of the zh-only extension scenes (throws in a language that has none) */
+    get ext(): ExtStrings {
+      const e = EXT[lang];
+      if (!e) throw new Error(`no extension strings for "${lang}" (the extension scenes are zh only)`);
+      return e;
+    },
     /** render a marked-up table string */
     r: (s: string) => rich(s, zh),
     /** the style of an italic aside: italic in English, upright in Chinese */
@@ -374,7 +380,12 @@ export const Ball: React.FC<{ W: World; p: V; o?: number; r?: number }> = ({ W, 
   return <circle cx={x} cy={y} r={r} fill={color.ink} stroke={color.paper} strokeWidth={stroke.ring + 0.5} opacity={o} />;
 };
 
-export type PocketSet = "corners" | "all" | "none";
+/**
+ * Which pockets a table has. Always the four corners unless "none"; edge
+ * midpoints: "all" = four, "lr" = the left/right two only (ext_design),
+ * { missing } = all eight but that one midpoint (ext_design's "each").
+ */
+export type PocketSet = "corners" | "all" | "none" | "lr" | { missing: V };
 const CORNERS: V[] = [
   [1, 1],
   [-1, 1],
@@ -387,6 +398,16 @@ const MIDS: V[] = [
   [-1, 0],
   [0, -1],
 ];
+/** the edge midpoints that are pockets under `set` */
+export const midPockets = (set: PocketSet): V[] =>
+  set === "all" ? MIDS : set === "lr" ? MIDS.filter((m) => m[1] === 0) : typeof set === "object" ? MIDS.filter((m) => m[0] !== set.missing[0] || m[1] !== set.missing[1]) : [];
+/** a top/bottom midpoint (even, odd): drawn dashed where the two kinds of midpoint must be told apart */
+const isTB = (m: V) => m[0] === 0;
+/** a place that could be a pocket but is not: a faint hollow ring (ink3, no fill) */
+export const Ghost: React.FC<{ W: World; p: V; o?: number; r?: number }> = ({ W, p, o = 1, r = R_POCKET }) => {
+  const [x, y] = px(W, p);
+  return <circle cx={x} cy={y} r={r} fill="none" stroke={color.ink3} strokeWidth={2} opacity={o} />;
+};
 
 /**
  * One copy of the table with centre c (math units). `map` bends every point
@@ -408,7 +429,13 @@ export const Table: React.FC<{
   lineW?: number;
   lineC?: string;
   pocketO?: number;
-}> = ({ W, c = [0, 0], pockets = "corners", real, o = 1, draw = 1, home = true, fill, fillO = 1, map = (p) => p, sx = 1, sy = 1, lineW, lineC, pocketO = 1 }) => {
+  /** ext_design: top/bottom midpoint pockets dashed (left/right stay solid) */
+  split?: boolean;
+  /** ext_design: midpoints that are not pockets drawn as faint rings */
+  ghosts?: boolean;
+  /** pocket ring radius */
+  pr?: number;
+}> = ({ W, c = [0, 0], pockets = "corners", real, o = 1, draw = 1, home = true, fill, fillO = 1, map = (p) => p, sx = 1, sy = 1, lineW, lineC, pocketO = 1, split, ghosts, pr = R_POCKET }) => {
   if (o <= 0) return null;
   const q = (p: V): V => map([c[0] + p[0], c[1] + p[1]]);
   const outline = [q([-1, -1]), q([1, -1]), q([1, 1]), q([-1, 1]), q([-1, -1])];
@@ -426,8 +453,15 @@ export const Table: React.FC<{
         strokeDasharray={draw < 1 ? `${per * draw} ${per}` : undefined}
       />
       {home && draw >= 1 && <HomeDot W={W} p={q([0, 0])} sx={sx} sy={sy} r={real ? 8 : 7} />}
-      {pockets !== "none" && draw >= 1 && CORNERS.map((p, i) => <Pocket key={`c${i}`} W={W} p={q(p)} sx={sx} sy={sy} o={pocketO} />)}
-      {pockets === "all" && draw >= 1 && MIDS.map((p, i) => <Pocket key={`m${i}`} W={W} p={q(p)} c={EDGE} sx={sx} sy={sy} o={pocketO} />)}
+      {pockets !== "none" && draw >= 1 && CORNERS.map((p, i) => <Pocket key={`c${i}`} W={W} p={q(p)} sx={sx} sy={sy} o={pocketO} r={pr} />)}
+      {pockets === "all" && !split && pr === R_POCKET && draw >= 1 && MIDS.map((p, i) => <Pocket key={`m${i}`} W={W} p={q(p)} c={EDGE} sx={sx} sy={sy} o={pocketO} />)}
+      {(pockets !== "all" || split || pr !== R_POCKET) &&
+        draw >= 1 &&
+        midPockets(pockets).map((m, i) => {
+          const [x, y] = px(W, q(m));
+          return <circle key={`m${i}`} cx={x} cy={y} r={pr} fill={color.paper} stroke={EDGE} strokeWidth={W_POCKET} strokeDasharray={split && isTB(m) ? `${(pr * Math.PI) / 5} ${(pr * Math.PI) / 7.5}` : undefined} opacity={pocketO} />;
+        })}
+      {ghosts && draw >= 1 && MIDS.filter((m) => !midPockets(pockets).includes(m)).map((m, i) => <Ghost key={`g${i}`} W={W} p={q(m)} o={pocketO} r={pr} />)}
     </g>
   );
 };
@@ -440,7 +474,7 @@ export const tableMarks = (W: World, name: string, c: V = [0, 0], pockets: Pocke
     { name: `${name} centre`, pts: [px(W, q([0, 0]))], w: 16, on },
   ];
   if (pockets !== "none") CORNERS.forEach((p) => ms.push({ name: `${name} pocket`, pts: [px(W, q(p))], w: 2 * R_POCKET + W_POCKET, on }));
-  if (pockets === "all") MIDS.forEach((p) => ms.push({ name: `${name} edge pocket`, pts: [px(W, q(p))], w: 2 * R_POCKET + W_POCKET, on }));
+  midPockets(pockets).forEach((p) => ms.push({ name: `${name} edge pocket`, pts: [px(W, q(p))], w: 2 * R_POCKET + W_POCKET, on }));
   return ms;
 };
 

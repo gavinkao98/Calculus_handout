@@ -25,7 +25,10 @@ const s31Meta: CalculateMetadataFunction<S31Props> = async ({ props }) => {
 //   npx remotion render build Q7 out/q7.mp4 --props='{"manifest":"audio/q7_mimo/manifest.json"}'
 // Q7ZH = the same animation set from the Chinese string table (lang "zh"), on its own manifest.
 const q7Meta: CalculateMetadataFunction<Q7Props> = async ({ props }) => {
-  const show = await loadQ7(props.manifest);
+  const lang = props.lang ?? "en";
+  const show = await loadQ7(props.manifest, lang);
+  const ids = show.scenes.map((x) => x.id).join(",");
+  if (ids !== Q7_ORDER[lang].join(",")) throw new Error(`${props.manifest}: scenes ${ids} are not the ${lang} scene list ${Q7_ORDER[lang].join(",")}`);
   const s = props.id ? show.scenes.find((x) => x.id === props.id) : null;
   if (props.id && !s) throw new Error(`no scene ${props.id}`);
   return { durationInFrames: s ? s.dur : show.total, props: { ...props, show } };
@@ -97,7 +100,7 @@ export const RemotionRoot: React.FC = () => (
     <Folder name="Q7">
       <Composition id="Q7" component={Q7} width={1920} height={1080} fps={30} durationInFrames={300} defaultProps={Q7_DEFAULTS} calculateMetadata={q7Meta} />
       <Composition id="Q7ZH" component={Q7} width={1920} height={1080} fps={30} durationInFrames={300} defaultProps={Q7ZH_DEFAULTS} calculateMetadata={q7Meta} />
-      {Q7_ORDER.map((id) => (
+      {Q7_ORDER.en.map((id) => (
         <Composition
           key={id}
           id={`Q7-${id}`}
@@ -107,6 +110,19 @@ export const RemotionRoot: React.FC = () => (
           fps={30}
           durationInFrames={300}
           defaultProps={{ ...Q7_DEFAULTS, id }}
+          calculateMetadata={q7Meta}
+        />
+      ))}
+      {Q7_ORDER.zh.map((id) => (
+        <Composition
+          key={`zh-${id}`}
+          id={`Q7ZH-${id.replace(/_/g, "-")}`} // composition ids allow no "_": ext_design → Q7ZH-ext-design
+          component={Q7}
+          width={1920}
+          height={1080}
+          fps={30}
+          durationInFrames={300}
+          defaultProps={{ ...Q7ZH_DEFAULTS, id }}
           calculateMetadata={q7Meta}
         />
       ))}
