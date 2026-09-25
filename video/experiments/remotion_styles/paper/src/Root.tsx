@@ -7,6 +7,17 @@ import { F2Slope } from "./scenes/F2Slope";
 import { F3Cycle } from "./scenes/F3Cycle";
 import { Act3, ActProps, SceneComp } from "./act3/Act3";
 import { DEFAULT_MANIFEST, ORDER, loadAct } from "./act3/timing";
+import { S31, S31Props, S31_DEFAULTS, S31_ORDER } from "./s31/S31";
+import { loadShow } from "./s31/timing";
+
+// §3.1 unguided cut (src/s31/): its own manifest-driven timing.
+//   npx remotion render build S31 out/s31.mp4 --props='{"manifest":"audio/s31_mimo/manifest.json"}'
+const s31Meta: CalculateMetadataFunction<S31Props> = async ({ props }) => {
+  const show = await loadShow(props.manifest);
+  const s = props.id ? show.scenes.find((x) => x.id === props.id) : null;
+  if (props.id && !s) throw new Error(`no scene ${props.id}`);
+  return { durationInFrames: s ? s.dur : show.total, props: { ...props, show } };
+};
 
 // Act 3 timing comes from the TTS manifest (mock now, MiMo later):
 //   npx remotion render build Act3 out/act3.mp4 --props='{"manifest":"audio/act3_mimo/manifest.json"}'
@@ -52,6 +63,22 @@ export const RemotionRoot: React.FC = () => (
           durationInFrames={300}
           defaultProps={{ manifest: DEFAULT_MANIFEST, id: o.id } as ActProps & { id: string }}
           calculateMetadata={sceneMeta}
+        />
+      ))}
+    </Folder>
+    <Folder name="S31">
+      <Composition id="S31" component={S31} width={1920} height={1080} fps={30} durationInFrames={300} defaultProps={S31_DEFAULTS} calculateMetadata={s31Meta} />
+      {S31_ORDER.map((id) => (
+        <Composition
+          key={id}
+          id={`S31-${id}`}
+          component={S31}
+          width={1920}
+          height={1080}
+          fps={30}
+          durationInFrames={300}
+          defaultProps={{ ...S31_DEFAULTS, id }}
+          calculateMetadata={s31Meta}
         />
       ))}
     </Folder>

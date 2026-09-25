@@ -101,3 +101,10 @@ scene-aligned 的旁白（`manifest.json` 每場帶 `alignment.words_file`）有
 - **小型大寫是「假」的。** @fontsource 的 EB Garamond 沒有 `smcp`，目前用縮小大寫＋字距模擬，筆畫比真小型大寫細。
 - **Pagella 數學＋Garamond 內文**是兩個家族，x-height 用 `mathScale` 對過，但混排的行內數學仍略重。
 - 「書」的隱喻很強，若整部片都是頁面，長時間可能單調；需要翻頁與跨頁版型變化來撐節奏。
+
+## §3.1 無指引生成版（`src/s31/`，2026-09-25）
+
+- 一場一張紙（`kit.tsx` 的 `Sheet`：`Page`＋鏡頭，`keepOnPage` 自動把鏡頭夾在紙內）；下一張從右側斜斜滑上來蓋住上一張（`S31.tsx`，重疊 22 幀），紙可以比畫面長（1240–1560 px），鏡頭沿紙下移。
+- 時序全由 tts.py manifest 決定（`timing.ts`；lead 15、tail 27 幀），場景只用 `useS().at("<beat id>")`。
+- 新增 token：`color.ochre = #A07C10`＝「角 θ／弧長／扇形」（validator 全配對通過）；`Hatches`（45° 墨斜線、金色點描、135° 淡斜線）區分巢狀面積；`Ledger`（旁註欄 OWED 帳本，付清時劃線＋PAID IN FULL）；`M`（整條 TeX、左→右墨跡、`bg` 紙色鏤空）。
+- 腳本與逐拍畫面說明見 [`s31/SCRIPT.md`](s31/SCRIPT.md)。
