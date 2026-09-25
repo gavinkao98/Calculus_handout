@@ -7,14 +7,18 @@ const A = color.accent;
 const H = 1560;
 
 export const Stuck: React.FC = () => {
-  const { f, at, p, pf } = useS();
+  const { f, at, p, pf, atWord } = useS();
+  // camera moves land as the narration names what they're pointing at
+  const startAt = atWord("difference quotient", { afterFrame: at("start") }) ?? at("start", 0.55);
+  const plugAt = atWord("pull out", { afterFrame: at("plug") }) ?? at("plug", 0.7);
+  const funnelZeroAt = atWord("zero over zero", { afterFrame: at("funnel") }) ?? at("funnel", 0.55);
   const cam = camPath(f, { cx: 960, cy: 330, s: 1.7 }, [
-    [at("start", 0.55), { cx: 960, cy: 300, s: 1.55 }, 90],
+    [startAt, { cx: 960, cy: 300, s: 1.55 }, 90],
     [at("square") - 10, { cx: 620, cy: 560, s: 1.28 }, 50],
     [at("sine") - 6, { cx: 1320, cy: 560, s: 1.28 }, 44],
-    [at("plug", 0.7), { cx: 960, cy: 540, s: 1 }, 50],
+    [plugAt, { cx: 960, cy: 540, s: 1 }, 50],
     [at("funnel"), { cx: 960, cy: 1010, s: 1 }, 70],
-    [at("funnel", 0.55), { cx: 900, cy: 1030, s: 1.12 }, 60],
+    [funnelZeroAt, { cx: 900, cy: 1030, s: 1.12 }, 60],
     [at("radians"), { cx: 960, cy: 1010, s: 1 }, 50],
   ]);
   const dimTop = 1 - 0.55 * p("funnel", 40);

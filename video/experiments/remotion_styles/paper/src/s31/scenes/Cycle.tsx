@@ -17,12 +17,15 @@ const nodes = [
 const pos = (a: number, r = R) => ({ x: O.x + r * Math.cos(a), y: O.y + r * Math.sin(a) });
 
 export const Cycle: React.FC = () => {
-  const { f, at, p } = useS();
+  const { f, at, p, atWord } = useS();
   const steps = ["step1", "step2", "step3", "step4"];
+  // the camera settles as the narration lands on the payoff word of each beat
+  const step4At = atWord("home", { afterFrame: at("step4") }) ?? at("step4", 0.5);
+  const compareBackAt = atWord("spring law", { afterFrame: at("compare") }) ?? at("compare", 0.7);
   const cam = camPath(f, { cx: 760, cy: 560, s: 1.45 }, [
-    [at("step4", 0.5), { cx: 900, cy: 560, s: 1.1 }, 60],
+    [step4At, { cx: 900, cy: 560, s: 1.1 }, 60],
     [at("compare"), { cx: 1100, cy: 560, s: 1.05 }, 60],
-    [at("compare", 0.7), { cx: 960, cy: 540, s: 1 }, 60],
+    [compareBackAt, { cx: 960, cy: 540, s: 1 }, 60],
   ]);
   const half = p("compare", 40, 170);
   return (

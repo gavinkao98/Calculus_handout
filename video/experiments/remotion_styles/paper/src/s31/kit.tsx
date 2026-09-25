@@ -10,15 +10,16 @@ import { Camera, Page } from "../components/Shell";
 import { Vignette } from "../components/Paper";
 import { SmallCaps, clamp, measure } from "../components/Type";
 import { tex } from "../math/tex";
-import { BeatT } from "./timing";
+import { AlignedWord, findWord } from "../lib/words";
+import { BeatT, LEAD } from "./timing";
 
 // ── Beat clock ────────────────────────────────────────────────────────────
-export const SceneCtx = createContext<{ beats: BeatT[]; dur: number }>({ beats: [], dur: 300 });
+export const SceneCtx = createContext<{ beats: BeatT[]; dur: number; words?: AlignedWord[] }>({ beats: [], dur: 300 });
 
 export const useS = () => {
   const f = useCurrentFrame();
   const { fps } = useVideoConfig();
-  const { beats, dur } = useContext(SceneCtx);
+  const { beats, dur, words } = useContext(SceneCtx);
   const find = (id: string) => {
     const b = beats.find((x) => x.id === id);
     if (!b) throw new Error(`no beat "${id}" (have: ${beats.map((x) => x.id).join(", ")})`);
@@ -37,7 +38,19 @@ export const useS = () => {
   const pf = (from: number, len = 24, easing = ease.ink) => interpolate(f, [from, from + len], [0, 1], { ...clamp, easing });
   const sp = (id: string, delay = 0, config: Parameters<typeof spring>[0]["config"] = springs.pop) =>
     spring({ frame: f - at(id) - delay, fps, config });
-  return { f, fps, dur, at, end, p, pf, sp };
+  /**
+   * Frame at which `phrase` is spoken in this scene's narration (the Nth
+   * occurrence, default first), or `undefined` if the scene has no
+   * word-level alignment (mock manifest) — callers must then fall back to
+   * `at(...)`. `afterFrame` (e.g. a beat's `at(id)`) disambiguates a phrase
+   * that recurs earlier in the scene.
+   */
+  const atWord = (phrase: string, opts: { occurrence?: number; afterFrame?: number } = {}): number | undefined => {
+    const afterSeconds = opts.afterFrame === undefined ? undefined : (opts.afterFrame - LEAD) / fps;
+    const seconds = findWord(words, phrase, { occurrence: opts.occurrence, afterSeconds });
+    return seconds === undefined ? undefined : LEAD + Math.round(seconds * fps);
+  };
+  return { f, fps, dur, at, end, p, pf, sp, atWord };
 };
 
 // ── Camera path ───────────────────────────────────────────────────────────

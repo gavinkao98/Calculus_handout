@@ -15,12 +15,14 @@ const rows: Array<{ f: string; d: string; co: boolean; dCo: string }> = [
 ];
 
 export const Four: React.FC = () => {
-  const { f, at, p } = useS();
+  const { f, at, p, atWord } = useS();
+  // the camera settles back as the narration names the "co-" pattern itself
+  const coAt = atWord("co", { afterFrame: at("co") }) ?? at("co", 0.4);
   const cam = camPath(f, { cx: 860, cy: 360, s: 1.4 }, [
     [at("quotient"), { cx: 900, cy: 480, s: 1.3 }, 50],
     [at("sec") - 10, { cx: 860, cy: 620, s: 1.25 }, 50],
     [at("table"), { cx: 1400, cy: 540, s: 1.3 }, 60],
-    [at("co", 0.4), { cx: 960, cy: 540, s: 1 }, 60],
+    [coAt, { cx: 960, cy: 540, s: 1 }, 60],
   ]);
   const co = p("co", 30);
   const rowY = (i: number) => 470 + i * 100;

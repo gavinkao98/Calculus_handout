@@ -9,11 +9,13 @@ const SZ = 64;
 const R2 = "=\\frac{\\sin\\theta}{\\theta}\\cdot\\frac{\\sin\\theta}{1+\\cos\\theta}";
 
 export const Companion: React.FC = () => {
-  const { f, at, p } = useS();
+  const { f, at, p, atWord } = useS();
+  // the camera settles on the second factor as the narration names it ("...goes to zero over two")
+  const evalAt = atWord("zero over two", { afterFrame: at("evaluate") }) ?? at("evaluate", 0.5);
   const cam = camPath(f, { cx: 900, cy: 330, s: 1.35 }, [
     [at("pythag"), { cx: 980, cy: 460, s: 1.25 }, 50],
     [at("factor"), { cx: 980, cy: 600, s: 1.25 }, 50],
-    [at("evaluate", 0.5), { cx: 960, cy: 560, s: 1.02 }, 60],
+    [evalAt, { cx: 960, cy: 560, s: 1.02 }, 60],
   ]);
   const wEq = texW("=", SZ);
   const c1 = XE + (wEq + texW("=\\frac{\\sin\\theta}{\\theta}", SZ)) / 2;

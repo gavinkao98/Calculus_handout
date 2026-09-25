@@ -23,7 +23,7 @@ const TheoremBox: React.FC<{ x: number; y: number; n: string; t: string; p: numb
 );
 
 export const Payoff: React.FC = () => {
-  const { f, at, p } = useS();
+  const { f, at, p, pf, atWord } = useS();
   const w0 = texW(LHS, SZ);
   const w1 = texW(LHS + COSF, SZ);
   const w2 = texW(LHS + COSF + "\\cdot", SZ);
@@ -36,7 +36,9 @@ export const Payoff: React.FC = () => {
     [at("theorem2"), { cx: 960, cy: 620, s: 1 }, 60],
   ]);
   const lim = p("limits", 30);
-  const lim2 = p("limits", 30, Math.round((at("theorem") - at("limits")) * 0.45));
+  // the second factor's limit value ("1") appears as the narration names it ("...goes to one")
+  const oneAt = atWord("one", { afterFrame: at("limits") }) ?? at("limits") + Math.round((at("theorem") - at("limits")) * 0.45);
+  const lim2 = pf(oneAt, 30);
   return (
     <Sheet folio={120} title="The two derivatives" cam={cam} h={1240}>
       <Kicker x={X} y={140} p={p("start", 24)}>
@@ -52,7 +54,7 @@ export const Payoff: React.FC = () => {
         by continuity ¹
       </Txt>
       <M x={cB} y={480} align="center" size={56} c={A} p={lim2} t="1" />
-      <Txt x={cB} y={500} w={420} align="center" size={30} italic c={color.ink2} p={p("limits", 24, Math.round((at("theorem") - at("limits")) * 0.45) + 14)}>
+      <Txt x={cB} y={500} w={420} align="center" size={30} italic c={color.ink2} p={pf(oneAt + 14, 24)}>
         by the key limit ²
       </Txt>
       <TheoremBox

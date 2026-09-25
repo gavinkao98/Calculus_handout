@@ -22,11 +22,13 @@ const P: Record<string, Piece> = {
 };
 
 export const Rewrite: React.FC = () => {
-  const { f, at, p } = useS();
+  const { f, at, p, atWord } = useS();
   const k1 = row(P, ["lhs", ["eq", 0.3], { num: ["two", ["cosf", 0.08], ["sinf", 0.1]], den: ["hden"], bar: "bar", gap: 0.3 }], X, Y, SZ);
   const k2 = row(P, ["lhs", ["eq", 0.3], ["cosf", 0.3], ["dot", 0.14], { num: ["sinf"], den: ["hden", ["sl", 0.02], ["two", 0.02]], bar: "bar", gap: 0.14 }], X, Y, SZ);
+  // the substituted formula lands as the narration finishes naming A and B ("...and B equal to x")
+  const k1At = atWord("B equal to", { afterFrame: at("substitute") }) ?? at("substitute", 0.35);
   const keys = [
-    { at: at("substitute", 0.35), poses: k1 },
+    { at: k1At, poses: k1 },
     { at: at("split") + 8, poses: k2 },
   ];
   const ec = extent(P, k2, "cosf");

@@ -16,7 +16,7 @@ const G = { x: 940, y: 580, ux: 800 / (2 * PI) }; // graph: same vertical unit a
 const TH = 0.9; // where the point parks
 
 export const Circle: React.FC = () => {
-  const { f, at, p, pf } = useS();
+  const { f, at, p, pf, atWord } = useS();
   const fT = at("trace");
   const fS = at("speed");
   const omega = (2 * PI) / Math.max(90, at("question") - fT);
@@ -44,8 +44,10 @@ export const Circle: React.FC = () => {
   const q = p("question", 30, 0, Easing.out(Easing.cubic));
   const arc = p("speed", 40);
   const note1 = p("speed", 26, 10);
-  const arrow = p("speed", 34, Math.round((at("vertical") - fS) * 0.5));
-  const note2 = p("speed", 26, Math.round((at("vertical") - fS) * 0.5) + 14);
+  // the velocity arrow appears as the narration names it ("...an arrow of length one")
+  const arrowAt = atWord("arrow", { afterFrame: fS }) ?? fS + Math.round((at("vertical") - fS) * 0.5);
+  const arrow = pf(arrowAt, 34);
+  const note2 = pf(arrowAt + 14, 26);
   const vert = p("vertical", 30);
   const guess = p("guess", 30);
   const cav = p("caveat", 26, 8);
