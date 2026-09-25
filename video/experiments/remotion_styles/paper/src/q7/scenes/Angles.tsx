@@ -121,9 +121,12 @@ export const Angles: React.FC = () => {
           {T.proved}
         </Txt>
       </div>
-      <Txt x={1330} y={930} w={760} align="center" size={type.caption} italic c={color.ink2} p={p("irrational", 26)}>
-        {T.irrational}
-      </Txt>
+      {/* zh has no `irrational` beat (2026-09-26: the scene ends on "(a) is proved") */}
+      {has("irrational") && (
+        <Txt x={1330} y={930} w={760} align="center" size={type.caption} italic c={color.ink2} p={p("irrational", 26)}>
+          {T.irrational}
+        </Txt>
+      )}
       <Txt x={O[0] + 16} y={px(W, [0, 1])[1] - 58} w={300} size={30} italic c={HOMEC} p={pf(tVert + 10, 20)}>
         {T.vertical}
       </Txt>

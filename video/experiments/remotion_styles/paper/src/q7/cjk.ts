@@ -14,6 +14,7 @@ import { cancelRender, continueRender, delayRender } from "remotion";
 import { CJK_FACES, LATIN_RANGE } from "./cjkFaces";
 import { CJK_RE, prose, texOf, walk } from "./i18n";
 import { zh } from "./i18n/zh";
+import { extZh } from "./i18n/ext.zh";
 
 export const CJK_FAMILY = "Noto Serif TC";
 /** Garamond first (Latin, digits), Noto for the ideographs and full-width punctuation. */
@@ -36,7 +37,7 @@ const inRange = (cp: number, range: string) =>
   });
 
 /** every zh-table string (the exam card included) */
-const ZH_ALL = walk(zh);
+const ZH_ALL = [...walk(zh), ...walk(extZh, "ext")];
 
 let ready: Promise<void> | null = null;
 const loadCjk = (): Promise<void> => {
