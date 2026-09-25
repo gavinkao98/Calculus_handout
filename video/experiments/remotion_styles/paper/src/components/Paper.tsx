@@ -3,14 +3,20 @@ import { AbsoluteFill } from "remotion";
 import { color } from "../theme";
 
 /**
- * Laid paper: flat stock colour + large soft mottling + a 512px grain tile
+ * Laid paper: flat stock colour + large soft mottling + a grain tile
  * (specks and fibres) generated once, deterministically, on a canvas.
  * It lives on the page, so it moves with the Camera like a real sheet.
+ *
+ * Act 3 (file-size pass): the speck noise is generated at half resolution
+ * (256 px, shown at 512 px → soft, low-frequency) and at ~⅓ the old alpha.
+ * Per-pixel noise that moves with the camera is what x264 cannot predict;
+ * the motion test (full-res specks, crf 16) ran 2.8 MB/s, this runs well
+ * under 1 MB/s at crf 20 while still reading as paper, not flat colour.
  */
 let grainUrl: string | null = null;
 const grain = (): string => {
   if (grainUrl) return grainUrl;
-  const N = 512;
+  const N = 256; // drawn at half-res, displayed at 512 px (see note above)
   const c = document.createElement("canvas");
   c.width = N;
   c.height = N;
@@ -27,18 +33,18 @@ const grain = (): string => {
     img.data[i * 4 + 0] = dark ? 92 : 255;
     img.data[i * 4 + 1] = dark ? 72 : 252;
     img.data[i * 4 + 2] = dark ? 44 : 240;
-    img.data[i * 4 + 3] = Math.floor(Math.abs(v - 0.5) * 2 * (v > 0.985 ? 60 : 16));
+    img.data[i * 4 + 3] = Math.floor(Math.abs(v - 0.5) * 2 * (v > 0.992 ? 46 : 6));
   }
   ctx.putImageData(img, 0, 0);
   // fibres
   ctx.lineCap = "round";
-  for (let k = 0; k < 140; k++) {
+  for (let k = 0; k < 40; k++) {
     const x = rnd() * N;
     const y = rnd() * N;
     const a = rnd() * Math.PI * 2;
-    const L = 6 + rnd() * 26;
+    const L = 4 + rnd() * 14;
     ctx.strokeStyle = `rgba(120, 96, 60, ${0.05 + rnd() * 0.08})`;
-    ctx.lineWidth = 0.5 + rnd() * 0.7;
+    ctx.lineWidth = 0.4 + rnd() * 0.4;
     ctx.beginPath();
     ctx.moveTo(x, y);
     ctx.quadraticCurveTo(

@@ -1,0 +1,100 @@
+# §3.1 Act 3 — "Derivatives of Sine and Cosine" (paper design system, Remotion).
+#
+# Narration storyboard in the minimal form video/pipeline/tts.py accepts:
+# meta.id / meta.section / meta.language + scenes[] with id, kind and `say:`.
+# `say:` is ALREADY spoken form (MiMo does not read LaTeX): no $...$ anywhere.
+# Each `{show <id>}` opens a beat; the Remotion act keys its choreography on
+# these ids (src/act3/scenes/*), so renaming one here means renaming it there.
+#
+# kind: content  -> narrated (tts.py writes one WAV per beat + a scene WAV)
+# kind: outro    -> silent, `duration` seconds (tts.py records it in the manifest)
+#
+# meta.id deliberately does NOT end in `_mimo`: that suffix switches on the
+# derive_spoken freshness gate, which only applies to generated decks.
+meta:
+  id: ch03_act3_paper
+  chapter: "Chapter 3"
+  section: "3.1"
+  title: "Derivatives of Sine and Cosine"
+  language: en
+
+scenes:
+  - id: intro
+    kind: content
+    say: |
+      How fast does sine change?
+      {show title} That's our question: the derivatives of sine and cosine.
+      {show contents} We'll prove both from the definition, see them on the
+      graph, and find the loop of four that ties them together.
+
+  - id: derivative_of_sine
+    kind: content
+    say: |
+      Start with sine.
+      {show statement} The claim: the derivative of sine x is cosine x, for
+      every real x.
+      {show definition} Go back to the definition: the limit, as h goes to
+      zero, of sine of x plus h, minus sine x, over h.
+      {show identity} The top is a difference of sines, and a sum-to-product
+      identity turns it into a product: two cosine of x plus h over two, times
+      sine of h over two.
+      {show rewrite} Slide the two down under the h, and the quotient splits
+      into two factors: cosine of x plus h over two, times sine of h over two,
+      over h over two.
+      {show limits} Now let h go to zero. The first factor tends to cosine x,
+      since cosine is continuous. The second is the fundamental limit: it goes
+      to one.
+      {show qed} Cosine x, times one. The derivative of sine is cosine.
+
+  - id: derivative_of_cosine
+    kind: content
+    say: |
+      Now turn to the facing page.
+      {show statement} Cosine works the same way. Its derivative is negative
+      sine x.
+      {show identity} Only the identity changes: cosine of x plus h, minus
+      cosine x, equals negative two, sine of x plus h over two, sine of h over
+      two.
+      {show rewrite} Divide by h as before: negative sine of x plus h over two,
+      times the same fraction.
+      {show limits} As h goes to zero: negative sine x, times one.
+      {show qed} So the derivative of cosine is negative sine x.
+      {show compare} Side by side: the same two tools, and one extra minus
+      sign.
+
+  - id: slope_equals_height
+    kind: content
+    say: |
+      What does this look like on a graph?
+      {show sine} Here's y equals sine x. Let's check the slope of its tangent
+      at a few points.
+      {show tan0} At zero, it's climbing, with slope one.
+      {show tanhalf} At pi over two, the top of the hump, the tangent is flat:
+      slope zero.
+      {show tanpi} At pi, it's falling, with slope negative one.
+      {show cosine} Now draw cosine x underneath,
+      {show heights} and read its heights at those same points: one, zero,
+      negative one. They match the slopes exactly.
+      {show sweep} And not just there. Wherever the tangent goes, its slope is
+      the height of cosine right below it.
+      {show words} In words: the slope of sine equals the height of cosine.
+      {show symbols} In symbols, that's our theorem.
+
+  - id: derivative_cycle
+    kind: content
+    say: |
+      Now step back and look at the pattern.
+      {show d1} Differentiate sine: you get cosine.
+      {show d2} Again: negative sine.
+      {show d3} Again: negative cosine.
+      {show d4} And once more: back to sine.
+      {show ring} Bend that list into a circle, and it becomes a cycle, one
+      quarter turn per derivative.
+      {show fourth} Four derivatives and you're home: the fourth derivative of
+      sine is sine.
+      {show compare} e to the x renews itself in one step; sine and cosine
+      take four. That endless loop is what lets them oscillate forever.
+
+  - id: outro
+    kind: outro
+    duration: 6.0

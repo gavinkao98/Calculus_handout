@@ -37,18 +37,24 @@ export const font = {
   mathScale: 0.9, // Pagella has a larger x-height than Garamond: shrink math to match
 } as const;
 
-/** Type scale (px). Modular-ish ratio ≈ 1.333 around a 40px body. */
+/**
+ * Type scale (px at 1080p, *before* camera scale).  Act 3 raised the floor:
+ * nothing a viewer must read is set below 28 px on screen (phone legibility),
+ * so every label/caption/small-cap size here is ≥ 28 and scenes keep the
+ * camera at s ≥ 1 whenever such text is the focal point.
+ */
 export const type = {
   display: 300, // section numeral on title cards
-  title: 104,
+  title: 108,
   h2: 64,
-  formula: 112, // display equations
+  formula: 112, // display equations (theorem statements)
+  proof: 70, // proof lines
   formulaSm: 76,
-  body: 40,
-  caption: 31,
-  label: 29, // figure labels, readouts
-  smallCaps: 21, // running heads, figure numbers: caps set small + tracked
-  micro: 22,
+  body: 44,
+  caption: 36,
+  label: 34, // figure labels, readouts
+  smallCaps: 28, // running heads, figure numbers: caps set small + tracked
+  micro: 28, // sidenotes, table heads (floor)
 } as const;
 
 export const tracking = {
