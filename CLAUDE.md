@@ -48,6 +48,7 @@ tts.py --backend mock --unit beat # 離線 TTS mock（不計費，可逕行；--
   - `model: opus` → 需要判斷力或品質的工作：hook／動畫編舞（有美感與教學判斷）、盲審與稽核（REWATCH 各鏡、視覺幀、NFA）、跨模組的設計與實作、卡住的除錯、任何「做壞了要重做」成本高的任務。
   - `model: sonnet` → 契約寫死、有測試能自證的機械性 code／文件改動（改顏色參數、傳一個參數、加一條 schema 檢查、補測試、同步文件）。
   - `model: haiku` → 純文字整理、逐條核對、格式轉換。
+  - **Remotion 影片的設計與動畫製作 → `subagent_type: motion-designer`**（[`.claude/agents/motion-designer.md`](.claude/agents/motion-designer.md)：Opus 5.5、`effort: medium`；2026-09-25 使用者裁決，試用中，效果不好再換）。呼叫時不要另傳 `model`，以免蓋掉定義檔設定。
   - 拿不準就派 Opus。有檔案改動的一律 `isolation: worktree`、一個 task 一個 commit、主對話只做 merge＋審核；worktree 開分支後先 `git merge main` 再動手（分支點可能落後）。難以交代清楚的（要邊看邊判斷）才留給主模型。
 - **獨立項目開新對話：** 與當前輪次不共用檔案、可以獨立驗收的項目（新模板、另一節、工具閘），用 `spawn_task` 開成新對話的 chip（自帶 worktree、prompt 要自足），不要塞進同一個對話把上下文撐滿；主對話只留「這一輪」的主線。
 - **契約先於派工：** 派工前先把成功標準寫進 kickoff／prompt（改哪些檔、測試怎麼證明、零行為改變怎麼證明、不准動什麼）；子代理回報必須含：改了哪些檔、測試數字、沒做到的條款。主模型只看回報＋抽查（幀、diff），不重做。
