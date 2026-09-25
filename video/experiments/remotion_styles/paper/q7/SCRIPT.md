@@ -13,7 +13,7 @@
 ### 2. `exam`——考卷卡（mock 47.8 s）
 | beat | 旁白（英文原文） | 畫面 |
 |---|---|---|
-| `start` | This is problem seven from the twenty twenty-six math entrance exam of National Taiwan University's Northern Taiwan High School Science Talent Program, held on September sixth. | 上半頁（像書名頁）：左邊大字 PROBLEM 7，下面的花飾是一張小球桌、球沿 (2,1) 的菱形路徑一圈圈回家；右欄 NATIONAL TAIWAN UNIVERSITY、Northern Taiwan High School Science Talent Program、Mathematics · 2026 Entrance Exam，點狀引導線列出 Academic year 115／Held September 6, 2026／Problem 7 of 7；頁腳註「Academic year 115 = 2026 in the Minguo calendar」。 |
+| `start` | This is problem seven from the twenty twenty-six math entrance exam of National Taiwan University's Northern Taiwan High School Science Talent Program, held on September sixth. | 上半頁（像書名頁）：左邊大字 PROBLEM 7，下面的花飾是一張小球桌、球沿 (2,1) 的菱形路徑一圈圈回家；右欄 NATIONAL TAIWAN UNIVERSITY、Northern Taiwan High School Science Talent Program、Mathematics · 2026 Entrance Exam，點狀引導線列出 Academic year 115／Held September 6, 2026／Problem 7 of 7；頁腳註「Academic year 115 of the Minguo calendar is the 2026–27 school year」。 |
 | `setup` | A square billiard table has a pocket at each corner. A ball, treated as a point, starts at the exact center. It rolls in straight lines, bounces off the edges by the law of reflection, and stops once it falls into a pocket. | 鏡頭下移到下半頁（全場唯一一次移動）：題目英文全文排入；右側重畫考卷的兩張圖（球的路徑、落袋結束，虛點線加箭頭），圖例「● start (center)　○ pocket」。 |
 | `theta` | Theta is the angle between the shot and the bottom edge. | 「Let θ be the angle…」排入；圖一的起點畫出水平參考線與金色角弧、標 θ。 |
 | `parta` | Part a. Prove that infinitely many angles bring the ball back to the center before it falls into any pocket. | (a) 題文排入（θ ∈ [0, 2π)）。 |

@@ -148,7 +148,7 @@ export const Exam: React.FC = () => {
       ))}
       <Rule x={120} y={930} w={1680} from={70} len={30} />
       <Txt x={120} y={950} w={1300} size={30} italic c={color.ink3} p={pf(80, 26)}>
-        Academic year 115 = 2026 in the Minguo calendar; the exam was held on September 6, 2026.
+        Academic year 115 of the Minguo calendar is the 2026–27 school year; the exam was held on September 6, 2026.
       </Txt>
 
       {/* ═════ bottom page: the problem ═════ */}
