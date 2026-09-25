@@ -12,6 +12,7 @@
 | 語意 | sin / cos / derivative / tangent | `ink` / `#1F5E9E`（藍鉛筆）/ `accent` / `accent` |
 | 字型 | 內文、標題、小型大寫 | EB Garamond 400/500/600＋斜體（@fontsource，OFL，打包進 bundle） |
 | 字型 | 數學 | MathJax 4 SVG＋Pagella，`mathScale 0.9` 對齊 Garamond x-height |
+| 字型 | 中文（目前只有 Q7 片頭） | Noto Serif TC 思源宋體 400/500（`@fontsource/noto-serif-tc` 5.3.0，OFL）；只打包字串用到的 unicode-range 分片，見下「中文字型」 |
 | 字級（px@1080p，鏡頭縮放前） | display / title / h2 / formula / proof / body / caption / label / smallCaps / micro | 300 / 108 / 64 / 112 / 70 / 44 / 36 / 34 / 28 / 28（第三幕起：凡要讀的字 ≥ 28，見下「字級下限」） |
 | 格線 | 邊界 / 旁註欄 / 主欄 | 120 / x120 w280 / x460 w1340；書眉基線 74、書眉線 94 |
 | 線寬 | hairline / axis / curve / tangent / emphasis | 1.5 / 1.8 / 4.2 / 3.4 / 5 |
@@ -19,6 +20,13 @@
 | 彈簧 | tangent / token / pop | damping 11·stiff 150·mass .7 / 15·120·.9 / 13·180·.6 |
 
 色彩檢核：crimson↔cobalt 以 dataviz validator 在紙色上通過（CVD ΔE 18.0、一般 ΔE 28.9、對比 ≥3:1）；墨黑是刻意的「文字墨」中性色，不算類別色（validator 對它的亮度帶／彩度警告屬預期）。
+
+## 中文字型（2026-09-26，Q7 片頭）
+
+- **只打包用得到的字。** 畫面上的中文字串集中在 `src/q7/zh.ts`；`node scripts/cjk-subsets.mjs` 讀它、從 @fontsource 的 unicode-range 分片裡挑出涵蓋這些字的 woff2，產生 `src/q7/cjkFaces.ts`（靜態 import → 只有這些檔進 bundle）。改了字串就重跑。現況：41 個非 ASCII 字元 → 400、500 各 7 片，共 14 檔、約 639 KiB。
+- **不准缺字、不准退回系統字型。** `src/q7/cjk.ts` 的 `useCjkReady()` 用 `delayRender` 擋住 render，直到：① 每個字都落在已打包的分片範圍內；② 各字面 `FontFace.load()` 完成、`document.fonts.load()` 對實際字串載入；③ 用 canvas 量字寬證明畫字的是 Noto（size-adjust 後每字 0.86 em，系統字型會是 1 em）。任一條不成立就 `cancelRender`，不會默默出豆腐或換字型。字型延遲載入：只有呼叫 `useCjkReady` 的場景會載，其他片不受影響。
+- **與 Garamond 混排：** 字族堆疊 `'EB Garamond', 'Noto Serif TC'`——數字與拉丁字走 Garamond（設 `lnum` 等高數字），漢字與全形標點落到 Noto。同字級下漢字看起來大一號，所以 Noto 字面加 `size-adjust: 86%`（`CJK_SCALE`），漢字約為 Garamond 大寫高的 1.2 倍。標題用 500、其餘 400（漢字本身比 Garamond 重，不用 600）；中文不用斜體（瀏覽器只會假斜），小型大寫的角色改成加字距（0.24–0.3 em）的小字。
+- **字級下限照舊，以有效字級計：** font-size × 0.86 ≥ 28 px，所以中文最小設 34 px。右齊欄位若以全形「）」收尾，要讓它右懸（`marginRight −0.36em`），否則右緣會比數字內縮約半個字身。
 
 ## 字級下限（第三幕起，模板規則）
 

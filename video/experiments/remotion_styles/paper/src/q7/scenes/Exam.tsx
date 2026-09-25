@@ -6,10 +6,23 @@
  * One camera move (top → bottom) when the narration turns to the statement.
  */
 import React from "react";
-import { color, font, type } from "../../theme";
+import { color, type } from "../../theme";
 import { Rule, SmallCaps } from "../../components/Type";
 import { Arrow, Ball, EDGE, HOMEC, Layer, Mark, Pocket, R_POCKET, Sheet, Table, Txt, World, arcPts, dOf, mLbl, M, px, pxs, tableMarks, useS, wipe, camPath } from "../kit";
 import { V, polyAt, realPath, shot } from "../geo";
+import { CJK_STACK, useCjkReady } from "../cjk";
+import { ZH } from "../zh";
+
+/** Chinese setting: Garamond digits (lining) + Noto Serif TC ideographs, tracked a touch */
+const zh = (size: number, c: string, track: number): React.CSSProperties => ({
+  fontFamily: CJK_STACK,
+  fontSize: size,
+  fontWeight: 400,
+  color: c,
+  letterSpacing: `${track}em`,
+  fontFeatureSettings: "'kern' 1, 'lnum' 1",
+  whiteSpace: "nowrap",
+});
 
 const HOMESHOT = shot([2, 1], 2); // the (2, 1) shot: centre → (1,½) → (0,1) → (−1,½) → centre
 const HOMEPATH = realPath(HOMESHOT);
@@ -17,12 +30,6 @@ const HOMEPATH = realPath(HOMESHOT);
 const TH = (30 * Math.PI) / 180;
 const PATH1 = realPath(shot([Math.cos(TH), Math.sin(TH)], 3.35)); // a shot that bounces twice
 const PATH2 = realPath(shot([1, 3], 1)); // one bounce off the top, into the bottom-right corner
-
-const details: Array<[string, string]> = [
-  ["Academic year", "115"],
-  ["Held", "September 6, 2026"],
-  ["Problem", "7 of 7"],
-];
 
 const DashedArrowPath: React.FC<{ W: World; pts: V[]; p: number }> = ({ W, pts, p }) => {
   if (p <= 0) return null;
@@ -40,6 +47,7 @@ const DashedArrowPath: React.FC<{ W: World; pts: V[]; p: number }> = ({ W, pts, 
 
 export const Exam: React.FC = () => {
   const { f, at, p, pf, guard } = useS();
+  const cjk = useCjkReady();
   const S = at("setup");
   const cam = camPath(f, { cx: 960, cy: 540, s: 1 }, [[S - 6, { cx: 960, cy: 1620, s: 1 }, 54]]);
 
@@ -90,18 +98,15 @@ export const Exam: React.FC = () => {
 
   return (
     <Sheet folio={7} title="Problem 7" h={2160} cam={cam} head={false}>
-      {/* ═════ top page: the exam ═════ */}
-      <div style={{ position: "absolute", left: 120, top: 112, ...wipe(pf(4, 22), 0) }}>
-        <SmallCaps>Entrance Exam · Mathematics</SmallCaps>
-      </div>
-      <div style={{ position: "absolute", right: 120, top: 112, ...wipe(pf(8, 22), 0) }}>
-        <SmallCaps>Translated from the Chinese</SmallCaps>
-      </div>
+      {/* ═════ top page: the exam (set in Chinese, as the original) ═════ */}
+      {cjk && (
+        <>
+          <div style={{ position: "absolute", left: 120, top: 104, ...zh(34, color.ink2, 0.24), ...wipe(pf(4, 22), 0) }}>{ZH.kicker}</div>
+          <div style={{ position: "absolute", left: 124, top: 214, ...zh(36, color.accent, 0.3), ...wipe(pf(10, 22), 0) }}>{ZH.numLabel}</div>
+        </>
+      )}
       <Rule x={120} y={150} w={1680} from={2} len={30} />
 
-      <div style={{ position: "absolute", left: 124, top: 222, ...wipe(pf(10, 22), 0) }}>
-        <SmallCaps color={color.accent}>Problem</SmallCaps>
-      </div>
       <Txt x={96} y={236} w={500} size={type.display} lh={1} p={pf(12, 30)} style={{ letterSpacing: "-0.02em", fontFeatureSettings: "'lnum' 1, 'kern' 1" }}>
         7
       </Txt>
@@ -112,50 +117,50 @@ export const Exam: React.FC = () => {
 
       <Rule x={620} y={236} w={660} vertical from={14} len={36} />
 
-      <div style={{ position: "absolute", left: 690, top: 232, ...wipe(pf(16, 22), 0) }}>
-        <SmallCaps color={color.accent}>National Taiwan University</SmallCaps>
-      </div>
-      <Txt x={690} y={278} w={1130} size={84} weight={500} lh={1.06} p={pf(20, 32)} style={{ letterSpacing: "-0.01em" }}>
-        Northern Taiwan High School
-        <br />
-        Science Talent Program
-      </Txt>
-      <div style={{ position: "absolute", left: 692, top: 480, width: 90 * pf(40, 20), height: 3, background: color.accent }} />
-      <Txt x={690} y={502} w={1130} size={50} italic c={color.ink2} p={pf(44, 26)}>
-        Mathematics · 2026 Entrance Exam
-      </Txt>
-      {details.map(([k, v], i) => (
-        <div
-          key={k}
-          style={{
-            position: "absolute",
-            left: 690,
-            top: 624 + i * 62,
-            width: 1110,
-            display: "flex",
-            alignItems: "baseline",
-            fontFamily: font.serif,
-            fontSize: 40,
-            color: color.ink,
-            fontFeatureSettings: "'kern' 1, 'lnum' 1",
-            ...wipe(pf(56 + i * 8, 22)),
-          }}
-        >
-          <span>{k}</span>
-          <span style={{ flex: 1, borderBottom: `2.5px dotted ${color.rule}`, margin: "0 18px", translate: "0 -9px" }} />
-          <span style={{ color: i === 2 ? color.accent : color.ink }}>{v}</span>
-        </div>
-      ))}
+      {cjk && (
+        <>
+          <div style={{ position: "absolute", left: 690, top: 222, ...zh(36, color.accent, 0.3), ...wipe(pf(16, 22), 0) }}>{ZH.school}</div>
+          <div style={{ position: "absolute", left: 690, top: 280, ...zh(86, color.ink, 0.04), fontWeight: 500, lineHeight: 1.28, ...wipe(pf(20, 32), 0) }}>
+            {ZH.title1}
+            <br />
+            {ZH.title2}
+          </div>
+          <div style={{ position: "absolute", left: 692, top: 516, width: 90 * pf(40, 20), height: 3, background: color.accent }} />
+          <div style={{ position: "absolute", left: 690, top: 540, ...zh(46, color.ink2, 0.08), ...wipe(pf(44, 26), 0) }}>{ZH.subtitle}</div>
+          {ZH.rows.map(([k, v], i) => (
+            <div
+              key={k}
+              style={{
+                position: "absolute",
+                left: 690,
+                top: 660 + i * 68,
+                width: 1110,
+                display: "flex",
+                alignItems: "baseline",
+                ...zh(42, color.ink, 0.06),
+                ...wipe(pf(56 + i * 8, 22)),
+              }}
+            >
+              <span>{k}</span>
+              <span style={{ flex: 1, borderBottom: `2.5px dotted ${color.rule}`, margin: "0 22px", translate: "0 -9px" }} />
+              {/* a full-width ） carries half an em of air on its right: hang it so the column ends flush with "115" */}
+              <span style={{ color: i === 2 ? color.accent : color.ink, letterSpacing: 0, marginRight: v.endsWith("）") ? "-0.36em" : 0 }}>{v}</span>
+            </div>
+          ))}
+        </>
+      )}
       <Rule x={120} y={930} w={1680} from={70} len={30} />
-      <Txt x={120} y={950} w={1300} size={30} italic c={color.ink3} p={pf(80, 26)}>
-        Academic year 115 of the Minguo calendar is the 2026–27 school year; the exam was held on September 6, 2026.
-      </Txt>
 
       {/* ═════ bottom page: the problem ═════ */}
       <div style={{ position: "absolute", left: 120, top: 1160, ...wipe(p("setup", 22, 30), 0) }}>
         <div style={{ width: 56, height: 2.5, background: color.accent, marginBottom: 14 }} />
         <SmallCaps color={color.accent}>Problem 7 · Square billiards</SmallCaps>
       </div>
+      {/* the page is an English translation: say so where it is true, set as a footnote */}
+      <Rule x={120} y={2016} w={180} from={at("setup") + 40} len={20} />
+      <Txt x={120} y={2028} w={900} size={32} italic c={color.ink3} p={p("setup", 44, 30)}>
+        Translated from the Chinese original.
+      </Txt>
       {para(
         1230,
         p("setup", 60, 40),

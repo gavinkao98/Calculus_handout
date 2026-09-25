@@ -34,6 +34,7 @@
 - **2026-09-26：解題影片 Q7（`paper/q7/`、`paper/src/q7/`）。** 2026 臺大北區科學人才培育計畫數學組入學考第 7 題（正方形撞球桌），英文旁白、依使用者核准的教學計畫製作：考卷卡 → 四發試射 → 反射＝鏡像 → 一拍一次反射地展開桌子（下一張桌子以牆為軸像書頁翻過來）→ 格點奇偶字典 → 中點測試證 (a) → 摺回真桌＋反彈計數 → tan θ = 2k 家族 → (b) 答案 0 → 回顧、考場寫法、√2 斜率填滿桌面的延伸。
   - **只做了 mock 時序**（14 場、12 個有旁白的場、51 個 beat，mock 全片約 6 分 12 秒）；MiMo 配音待使用者同意。
   - **重現：** 先跑 [`paper/q7/SCRIPT.md`](paper/q7/SCRIPT.md) 裡的 mock 指令，再在 `paper/` 下 `npm run q7`（`out/q7_mock.mp4`）、`npm run q7:stills`（`out/q7_stills/`）。
+  - **片頭改中文（2026-09-26 使用者要求）：** `logo` 副標改為「115 學年度北區人才培育計畫入學考第七題」，`exam` 上半頁考卷卡整張改中文（題號、國立臺灣大學、北區高中學生科學研究人才培育計畫、數學組・115 學年度入學考試、學年度／測驗日期／題號），拿掉民國紀年註腳；英文題目頁加頁腳註 *Translated from the Chinese original.* 旁白仍為英文、未改。中文字型＝Noto Serif TC 思源宋體（`@fontsource/noto-serif-tc` 5.3.0，OFL），只打包用到的 unicode-range 分片（14 檔、約 639 KiB），render 前以 `delayRender` 等字載完並驗證確實是 Noto 在畫字；做法見 [`paper/STYLE.md`](paper/STYLE.md)「中文字型」。s31、act3 不載這套字型，開場幀逐像素不變。
   - **新元件在 `src/q7/`，不動共用元件：** `geo.ts`（三角波摺疊、精確的反彈折線）、`kit.tsx`（`Table`、`Pocket`、`Rolling`、翻頁式 `Unfold`；計時、TeX 與標籤守門直接沿用 §3.1 的 `s31/kit.tsx`）。
 - 尚未做：真實書頁捲曲的翻頁效果；鏡頭推近時裁到頁眉、旁註；定為模板。
 
