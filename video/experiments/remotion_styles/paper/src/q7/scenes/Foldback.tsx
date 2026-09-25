@@ -146,7 +146,14 @@ export const Foldback: React.FC = () => {
       <Txt x={120} y={736} w={660} size={type.caption} p={p("count", 26, 60)}>
         {r(T.crosses)}
       </Txt>
-      <M x={120} y={880} t={`${T.countTex}{\\color{${EDGE}}3}`} size={52} p={p("count", 30, 90)} />
+      {T.countLine ? (
+        // zh: 「反彈次數」 is words, not \text{} (MathJax cannot measure Chinese): prose + inline TeX
+        <Txt x={120} y={832} w={700} size={48} lh={1.2} p={p("count", 30, 90)}>
+          {r(T.countLine)}
+        </Txt>
+      ) : (
+        <M x={120} y={880} t={`${T.countTex}{\\color{${EDGE}}3}`} size={52} p={p("count", 30, 90)} />
+      )}
     </Sheet>
   );
 };

@@ -123,3 +123,20 @@ npm run q7          # out/q7_mock.mp4
 npm run q7:stills   # out/q7_stills/
 ```
 真配音（MiMo，**需先徵得使用者同意**）：`--backend mimo --unit scene --output-dir …/public/audio/q7_scene`，再 `npx remotion render build Q7 out/q7.mp4 --codec=h264 --crf=20 --props='{"manifest":"audio/q7_scene/manifest.json"}'`，最後 `python scripts/loudnorm.py`。
+
+## 中文版（`Q7ZH`，2026-09-26）
+- **同一套動畫、另一張字串表：** 畫面字串在 `../src/q7/i18n/zh.ts`（與 `en.ts` 同形狀），排版規則見 [`../STYLE.md`](../STYLE.md)「中文版排版」；用字照 [`GLOSSARY.zh.md`](GLOSSARY.zh.md)（回到中心、鏡像桌、偶數偶數點／奇數奇數點、洞／掉進洞裡、中點測試），每拍畫面文字對照中文旁白 [`q7.zh.yml`](q7.zh.yml)。`writeup` 是台灣考卷的中文證明寫法（「證明：」四步、「故」、∎），不是英文四步的直譯，數學內容與英文版一致。
+- **中文專屬欄位：** 英文 TeX 裡帶 `\text{bounces}`／`\text{direction}`／`(\text{even},\text{even})` 的三條，中文改排「中文＋行內 TeX」（`foldback.countLine`、`angles.dirLine`、`twist.testLine`）；`recap` 的大 ∞ 用 TeX `\infty`（Pagella），不落到系統字型。`exam` 中文題目頁的段落間距另算（3＋1＋3＋3 行、段距一律 48 px）；`unfold` 的「回到中心」標在鏡像桌中心的正上方（中文比 home 寬，放右下會壓到桌框）。英文版逐像素不變。
+- **配音：** MiMo `mimo-v2.5-tts`、voice 冰糖、`--unit beat`（中文沒有逐字對齊；英文版靠 `atWord` 卡字的三處，在中文分鏡是獨立的拍：angles 的 `tan`／`vert`、halfway 的 `list`）。2026-09-26 成品：54 次呼叫、0 次重試；1080p、loudnorm −19 LUFS（TP −2.8 dBTP），全片 6 分 45 秒，`out/q7zh_final.mp4`（音訊在 `public/audio/q7zh_beat/`，不進版控）。
+```bash
+# 真配音（MiMo 計費，需先徵得使用者同意）
+python video/pipeline/tts.py --storyboard video/experiments/remotion_styles/paper/q7/q7.zh.yml \
+  --scene all --backend mimo --unit beat --output-dir video/experiments/remotion_styles/paper/public/audio/q7zh_beat
+# 在 paper/ 下
+npx remotion bundle
+npx remotion render build Q7ZH out/q7zh_raw.mp4 --codec=h264 --crf=20 --props='{"manifest":"audio/q7zh_beat/manifest.json"}'
+python scripts/loudnorm.py out/q7zh_raw.mp4 out/q7zh_final.mp4
+# 任意幀（帶 props）
+PROPS='{"manifest":"audio/q7zh_beat/manifest.json"}' node scripts/frames.mjs out/q7zh_stills Q7ZH:1768,2568
+```
+改了 `zh.ts` 要先跑 `node scripts/cjk-subsets.mjs`（重挑 Noto Serif TC 分片）。render log 的 `[cjk] Noto Serif TC 400/500/600 in use` 證明是打包的字型在畫字；標籤守門與英文版同一套，違規就不出片。

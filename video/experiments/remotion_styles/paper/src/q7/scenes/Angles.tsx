@@ -20,7 +20,7 @@ const edge = (d: V): V => {
 
 export const Angles: React.FC = () => {
   const { f, fps, at, p, pf, atWord, has, guard } = useS();
-  const { t } = useT();
+  const { t, r } = useT();
   const T = t.angles;
   // "When p is not zero, tangent theta is q over p. And p equal to zero is the straight up-and-down shot."
   // Beats `tan` / `vert` where the storyboard has them (the zh cut: beat-unit TTS, no word timing), else the spoken phrase.
@@ -83,7 +83,14 @@ export const Angles: React.FC = () => {
       <Kicker x={120} y={150} p={p("start", 22)}>
         {T.kicker}
       </Kicker>
-      <M x={120} y={296} t={T.dirTex} size={64} p={p("start", 26, 10)} />
+      {T.dirLine ? (
+        // zh: the word is set as text beside the TeX, never inside \text{}
+        <Txt x={120} y={236} w={700} size={56} lh={1.2} p={p("start", 26, 10)}>
+          {r(T.dirLine)}
+        </Txt>
+      ) : (
+        <M x={120} y={296} t={T.dirTex} size={64} p={p("start", 26, 10)} />
+      )}
       <Txt x={120} y={316} w={700} size={type.caption} italic c={color.ink2} p={p("start", 24, 40)}>
         {T.coprime}
       </Txt>

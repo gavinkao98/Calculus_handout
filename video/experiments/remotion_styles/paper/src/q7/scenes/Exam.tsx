@@ -46,8 +46,15 @@ const DashedArrowPath: React.FC<{ W: World; pts: V[]; p: number }> = ({ W, pts, 
 
 export const Exam: React.FC = () => {
   const { f, at, p, pf, guard } = useS();
-  const { t, r } = useT();
+  const { t, r, zh: isZh } = useT();
   const T = t.exam;
+  // paragraph tops. The zh statement sets in 3 + 1 + 3 + 3 lines (56 px each): one even 48 px gap between
+  // paragraphs, where the English slots (4 + 1 + 2–3 + 2 lines) would leave uneven holes.
+  const ZL = 56;
+  const ZG = 48;
+  const Y = isZh
+    ? { setup: 1230, theta: 1230 + 3 * ZL + ZG, a: 1230 + 4 * ZL + 2 * ZG, b: 1230 + 7 * ZL + 3 * ZG }
+    : { setup: 1230, theta: 1466, a: 1590, b: 1790 };
   const C = T.card;
   const cjk = useCjkReady();
   const S = at("setup");
@@ -167,10 +174,10 @@ export const Exam: React.FC = () => {
           </Txt>
         </>
       )}
-      {para(1230, p("setup", 60, 40), r(T.setup))}
-      {para(1466, th, r(T.theta))}
-      {para(1590, pa, r(T.parta), T.labelA)}
-      {para(1790, pb, r(T.partb), T.labelB)}
+      {para(Y.setup, p("setup", 60, 40), r(T.setup))}
+      {para(Y.theta, th, r(T.theta))}
+      {para(Y.a, pa, r(T.parta), T.labelA)}
+      {para(Y.b, pb, r(T.partb), T.labelB)}
 
       <Layer h={2160}>
         {/* figure 1: the ball's path, with θ */}

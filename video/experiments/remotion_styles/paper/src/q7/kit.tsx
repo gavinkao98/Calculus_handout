@@ -255,10 +255,21 @@ export const Caps: React.FC<{ children: React.ReactNode; size?: number; color?: 
         ...style,
       }}
     >
-      {children}
+      {typeof children === "string" ? untrackLatin(children) : children}
     </span>
   );
 };
+/** tracking is for the ideographs: Latin runs in a zh label ("(a)", "7") keep their own fit — 「(a)」 not 「( a )」 */
+const untrackLatin = (s: string): React.ReactNode =>
+  s.split(/([!-~]+)/).map((part, i) =>
+    i % 2 ? (
+      <span key={i} style={{ letterSpacing: "0.02em" }}>
+        {part}
+      </span>
+    ) : (
+      part
+    ),
+  );
 
 export const Kicker: React.FC<React.ComponentProps<typeof BaseKicker>> = (props) => {
   const { zh } = useT();
