@@ -1,0 +1,124 @@
+# 115 學年度臺大北區高中學生科學研究人才培育計畫 數學組入學考 第 7 題（正方形撞球桌）——中文旁白版。
+# 紙本風格（Remotion）。英文版旁白源＝q7.yml；本檔是中文口語重寫（非逐句直譯），scene／beat id 與英文版一致，
+# 另加三拍：angles 的 tan、vert，halfway 的 list（畫面需在 src/q7/ 對應補上這三個 reveal）。
+# 這是給 MiMo TTS 直接朗讀的文字：不可有 LaTeX 或數學符號，數學一律寫成念法；念法與術語見 GLOSSARY.zh.md。
+# 每拍寫成一行（narration.py 會把換行壓成空白，中文句中不要斷行）。
+#   mock:  python video/pipeline/tts.py --storyboard video/experiments/remotion_styles/paper/q7/q7.zh.yml \
+#            --scene all --backend mock --unit beat --output-dir <repo 外的 scratch 目錄>
+#   注意：mock 時長用 narration.estimate_seconds（以空白切詞計字），對中文不準，只能驗 beat 結構。
+meta:
+  id: q7_billiards_zh
+  title: 正方形撞球桌
+  language: zh
+  voice: Dean  # 待試音決定（中文旁白要不要換聲線）
+
+scenes:
+  - id: logo
+    kind: intro
+    duration: 4.0
+
+  - id: exam
+    kind: content
+    say: |
+      這是一百一十五學年度，也就是二零二六年，國立臺灣大學北區高中學生科學研究人才培育計畫，數學組入學考的第七題，考試在九月六日舉行。
+      {show setup} 考慮一張正方形的撞球桌，四個角落各有一個洞。我們在桌面正中央放一顆球，把它看成一個質點。球被擊出以後沿著直線前進，碰到桌邊就依照反射定律反彈；一旦掉進洞裡，運動就結束。
+      {show theta} 我們用 theta 表示擊球方向和桌子底邊的夾角。
+      {show parta} a 小題：我們的目標是，把球擊出之後，讓它在掉進洞之前，能夠回到桌子的中心。請證明，滿足這個要求的擊球角度有無窮多個。
+      {show partb} b 小題：桌面一樣是正方形，但是除了四個角落，四個邊的中點也各多了一個洞。這時候，滿足 a 小題要求的擊球角度，總共有幾個？
+
+  - id: hook
+    kind: content
+    say: |
+      我們先試打幾球看看。
+      {show corner} 瞄準角落，球直接就掉進洞裡。瞄得再陡一點，它反彈一次，最後還是掉進角落的洞。
+      {show wander} 這一球彈啊彈、彈啊彈，一直停不下來。
+      {show home} 可是這一球，碰了三面牆之後，剛好滾回桌子的中心。
+      {show question} 所以，到底哪些擊球方向能回到中心？一次一次去追反彈，根本追不完。我們需要換個看法。
+
+  - id: mirror
+    kind: content
+    say: |
+      先看一次反彈就好。
+      {show equal} 進來的角度，等於出去的角度，也就是入射角等於反射角。
+      {show image} 所以反彈之後的路徑，剛好就是：假如沒有這面牆，球原本會走的那條路，對著牆翻過來的鏡像。把它沿著牆翻過去，就和原本的直線接成一直線。
+
+  - id: unfold
+    kind: content
+    say: |
+      這是剛才回到中心的那一球。反彈很難追，但直線很簡單。
+      {show first} 在第一次反彈的地方，把整張桌子沿著右邊的牆做鏡像。反彈之後的那一段跟著翻過來，就變成直線的延續。
+      {show second} 下一次反彈，碰的是上面的牆。再鏡像一次。
+      {show third} 再來一次，對著下一面牆翻過去。
+      {show line} 反彈全部不見了。只剩一條直線，穿過四張桌子，停在其中一張複本的中心。這就代表，球回到中心了。
+      {show plane} 往每個方向都這樣鏡像下去，這些複本就會鋪滿整個平面。每一次擊球，都變成一條從原點出發的直線。
+
+  - id: dictionary
+    kind: content
+    say: |
+      幫它加上座標。原本的桌子從負一到一，所以每一張複本的寬度都是二。
+      {show centers} 中心的複本，落在兩個座標都是偶數的點上，我們叫它偶偶點。直線碰到偶偶點，球就回到中心。
+      {show corners} 四個角落的複本，落在兩個座標都是奇數的點上，叫它奇奇點。直線碰到奇奇點，球就掉進洞裡。
+      {show question} 所以整個問題就變成：從原點出發的直線，會不會在碰到奇奇點之前，先碰到另一個偶偶點？
+
+  - id: halfway
+    kind: content
+    say: |
+      要回到中心，就要瞄準一個偶偶點，把它叫做二 p、二 q。
+      {show first} 取射線上的第一個偶偶點。那麼 p 跟 q 就互質。
+      {show only} 所以，射線上的第一個格點是 p、q，下一個才是二 p、二 q。
+      {show list} 這條線段上的格點只有三個：起點、中點 p、q，還有終點。
+      {show mid} 關鍵全在這個中點。
+      {show odd} 如果 p 跟 q 都是奇數，中點就是角落的洞，球在半路就掉進洞裡。沿對角線打的那一球，一、一，就是這樣。
+      {show mixed} 如果一個是奇數、一個是偶數，中點就沒有洞，球可以一路回到中心。至於兩個都是偶數，不可能，因為 p 跟 q 互質。
+
+  - id: foldback
+    kind: content
+    say: |
+      試試看一、零。直線會跑到二、零。
+      {show fold1} 把它摺回原本的桌子。在右邊的牆反彈一次，就回到中心。
+      {show next} 再來是二、一。直線會跑到四、二。
+      {show fold2} 一次摺一面牆，把它摺回去。摺三次，就是反彈三次。這正是我們一開始看到、回到中心的那一球。
+      {show count} 一般來說，只要是能回到中心的擊球，這條直線會穿過 p 的絕對值那麼多道鉛直的牆，還有 q 的絕對值那麼多道水平的牆。所以球反彈的次數，就是 p 的絕對值加 q 的絕對值。
+
+  - id: angles
+    kind: content
+    say: |
+      回到角度。擊球的方向是 p、q，p 跟 q 互質，而且一個奇數、一個偶數。
+      {show tan} 當 p 不等於零，tangent theta 等於 p 分之 q。
+      {show vert} 至於 p 等於零，就是鉛直方向、直上直下的那一球。
+      {show family} 取 p 等於一，q 是任何一個偶數，二 k。每一個 k 都給出不同的角度，所以角度有無窮多個。a 小題就證完了。
+      {show irrational} 另外，如果斜率是無理數，直線除了原點，再也碰不到任何格點。球永遠不會掉進洞裡，但也永遠回不到中心。
+
+  - id: twist
+    kind: content
+    say: |
+      接著是 b 小題。在每個邊的中點，都加一個洞。
+      {show copies} 這些洞的複本，座標都是一個奇數、一個偶數。這下子，除了偶偶點以外，每一個格點都是洞。
+      {show test} 用中點測試來看：p 跟 q 互質，所以中點 p、q 永遠不會是偶偶點，它一定是洞。每一趟回到中心的路，都在半路被截斷。
+      {show revisit} 我們最容易成功的那一球，一、零，現在直接掉進右邊中點的洞。而二、一那一球，摺回去之後，會落進上邊中點的洞。
+      {show answer} 所以在 b 小題，沒有任何角度做得到。答案是零個。
+
+  - id: recap
+    kind: content
+    say: |
+      整理一下：a 小題有無窮多個角度，b 小題一個都沒有。
+      {show ideas} 整題靠的就是兩個想法。展開，把反彈變成一條直線；中點測試，把這條直線變成奇偶的問題。
+
+  - id: writeup
+    kind: content
+    say: |
+      考試的時候，寫四步就夠了。
+      {show s1} 第一步，把桌子展開成一整片由複本鋪成的平面。
+      {show s2} 第二步，中心落在偶偶點，角落的洞落在奇奇點。
+      {show s3} 第三步，瞄準二 p、二 q，檢查中點 p、q。
+      {show s4} 最後下結論：a 小題有無窮多個角度，b 小題一個都沒有。
+
+  - id: epilogue
+    kind: content
+    say: |
+      最後再多說一件事，這已經超出這一題了。
+      {show dense} 用根號二的斜率打出去。這條直線除了原點，再也碰不到任何格點，所以如果洞只是理想的點，球就永遠停不下來。讓它一直跑下去，它的軌跡會任意接近桌面上的每一個點。
+
+  - id: outro
+    kind: outro
+    duration: 6.0
