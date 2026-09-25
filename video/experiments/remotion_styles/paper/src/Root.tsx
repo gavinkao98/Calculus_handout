@@ -9,11 +9,22 @@ import { Act3, ActProps, SceneComp } from "./act3/Act3";
 import { DEFAULT_MANIFEST, ORDER, loadAct } from "./act3/timing";
 import { S31, S31Props, S31_DEFAULTS, S31_ORDER } from "./s31/S31";
 import { loadShow } from "./s31/timing";
+import { Q7, Q7Props, Q7_DEFAULTS, Q7_ORDER } from "./q7/Q7";
+import { loadShow as loadQ7 } from "./q7/timing";
 
 // §3.1 unguided cut (src/s31/): its own manifest-driven timing.
 //   npx remotion render build S31 out/s31.mp4 --props='{"manifest":"audio/s31_mimo/manifest.json"}'
 const s31Meta: CalculateMetadataFunction<S31Props> = async ({ props }) => {
   const show = await loadShow(props.manifest);
+  const s = props.id ? show.scenes.find((x) => x.id === props.id) : null;
+  if (props.id && !s) throw new Error(`no scene ${props.id}`);
+  return { durationInFrames: s ? s.dur : show.total, props: { ...props, show } };
+};
+
+// NTU 2026 exam, Problem 7 (src/q7/): same manifest-driven timing as §3.1.
+//   npx remotion render build Q7 out/q7.mp4 --props='{"manifest":"audio/q7_mimo/manifest.json"}'
+const q7Meta: CalculateMetadataFunction<Q7Props> = async ({ props }) => {
+  const show = await loadQ7(props.manifest);
   const s = props.id ? show.scenes.find((x) => x.id === props.id) : null;
   if (props.id && !s) throw new Error(`no scene ${props.id}`);
   return { durationInFrames: s ? s.dur : show.total, props: { ...props, show } };
@@ -79,6 +90,22 @@ export const RemotionRoot: React.FC = () => (
           durationInFrames={300}
           defaultProps={{ ...S31_DEFAULTS, id }}
           calculateMetadata={s31Meta}
+        />
+      ))}
+    </Folder>
+    <Folder name="Q7">
+      <Composition id="Q7" component={Q7} width={1920} height={1080} fps={30} durationInFrames={300} defaultProps={Q7_DEFAULTS} calculateMetadata={q7Meta} />
+      {Q7_ORDER.map((id) => (
+        <Composition
+          key={id}
+          id={`Q7-${id}`}
+          component={Q7}
+          width={1920}
+          height={1080}
+          fps={30}
+          durationInFrames={300}
+          defaultProps={{ ...Q7_DEFAULTS, id }}
+          calculateMetadata={q7Meta}
         />
       ))}
     </Folder>
