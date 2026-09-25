@@ -31,6 +31,10 @@
   - **配音：** MiMo `--unit scene` 共 29 次呼叫；14 場中 12 場整場對齊成功，areas、warnings 退回逐 beat。
   - **成片：** 約 8 分鐘，逐字對時版為 `out/s31_words_final.mp4`。
   - **重現：** `tts.py --storyboard video/experiments/remotion_styles/paper/s31/s31.yml --scene all --backend mimo --unit scene --output-dir video/experiments/remotion_styles/paper/public/audio/s31_scene`，接著 `npx remotion render build S31 … --props='{"manifest":"audio/s31_scene/manifest.json"}'`，最後跑 `python scripts/loudnorm.py`。
+- **2026-09-26：解題影片 Q7（`paper/q7/`、`paper/src/q7/`）。** 2026 臺大北區科學人才培育計畫數學組入學考第 7 題（正方形撞球桌），英文旁白、依使用者核准的教學計畫製作：考卷卡 → 四發試射 → 反射＝鏡像 → 一拍一次反射地展開桌子（下一張桌子以牆為軸像書頁翻過來）→ 格點奇偶字典 → 中點測試證 (a) → 摺回真桌＋反彈計數 → tan θ = 2k 家族 → (b) 答案 0 → 回顧、考場寫法、√2 斜率填滿桌面的延伸。
+  - **只做了 mock 時序**（14 場、12 個有旁白的場、51 個 beat，mock 全片約 6 分 12 秒）；MiMo 配音待使用者同意。
+  - **重現：** 先跑 [`paper/q7/SCRIPT.md`](paper/q7/SCRIPT.md) 裡的 mock 指令，再在 `paper/` 下 `npm run q7`（`out/q7_mock.mp4`）、`npm run q7:stills`（`out/q7_stills/`）。
+  - **新元件在 `src/q7/`，不動共用元件：** `geo.ts`（三角波摺疊、精確的反彈折線）、`kit.tsx`（`Table`、`Pocket`、`Rolling`、翻頁式 `Unfold`；計時、TeX 與標籤守門直接沿用 §3.1 的 `s31/kit.tsx`）。
 - 尚未做：真實書頁捲曲的翻頁效果；鏡頭推近時裁到頁眉、旁註；定為模板。
 
 各方向資料夾是獨立的 Remotion 專案：`npm ci` 還原依賴，`npx remotion studio` 預覽；`out/` 與 `node_modules/` 不進版控。

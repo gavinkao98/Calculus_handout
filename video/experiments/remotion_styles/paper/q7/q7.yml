@@ -1,0 +1,123 @@
+# NTU Northern Taiwan Science Talent Program, 2026 math entrance exam, Problem 7 (square billiards).
+# Paper style (Remotion). Spoken English only (no LaTeX: MiMo reads the text literally).
+# Each {show <id>} starts a beat; the Remotion scenes look beats up by these ids (src/q7/).
+# Timing comes from tts.py's manifest.
+#   mock:  python video/pipeline/tts.py --storyboard video/experiments/remotion_styles/paper/q7/q7.yml \
+#            --scene all --backend mock --unit beat --output-dir video/experiments/remotion_styles/paper/public/audio/q7_mock
+meta:
+  id: q7_billiards
+  title: Square Billiards
+  language: en
+  voice: Dean
+
+scenes:
+  - id: logo
+    kind: intro
+    duration: 4.0
+
+  - id: exam
+    kind: content
+    say: |
+      This is problem seven from the twenty twenty-six math entrance exam of National Taiwan University's
+      Northern Taiwan High School Science Talent Program, held on September sixth.
+      {show setup} A square billiard table has a pocket at each corner. A ball, treated as a point, starts at the exact center.
+      It rolls in straight lines, bounces off the edges by the law of reflection, and stops once it falls into a pocket.
+      {show theta} Theta is the angle between the shot and the bottom edge.
+      {show parta} Part a. Prove that infinitely many angles bring the ball back to the center before it falls into any pocket.
+      {show partb} Part b. Add a pocket at the midpoint of every edge. How many angles work now?
+
+  - id: hook
+    kind: content
+    say: |
+      Let's try a few shots.
+      {show corner} Aim at a corner, and the ball drops straight in. Aim a little steeper, and it bounces once, then finds a corner anyway.
+      {show wander} This one bounces, and bounces, and never settles.
+      {show home} But this one hits three walls, and rolls right back to the center.
+      {show question} So which shots come home? Chasing bounces one by one is hopeless. We need a better picture.
+
+  - id: mirror
+    kind: content
+    say: |
+      Start with a single bounce.
+      {show equal} The angle coming in equals the angle going out.
+      {show image} So the bounced path is the mirror image of where the ball would have gone if the wall were not there.
+      Flip it across the wall, and it lines up with the straight line.
+
+  - id: unfold
+    kind: content
+    say: |
+      Here is the shot that came home. Bounces are hard to follow. Straight lines are easy.
+      {show first} At the first bounce, mirror the whole table across the right wall. The bounced segment flips over, and becomes the straight continuation.
+      {show second} Next bounce, the top wall. Mirror again.
+      {show third} And once more, across the next wall.
+      {show line} No bounces are left. Just one straight line across four copies of the table, ending at the center of a copy. That is the ball, home.
+      {show plane} Mirror in every direction, and the copies tile the plane. Every shot becomes a straight line from the origin.
+
+  - id: dictionary
+    kind: content
+    say: |
+      Put coordinates on it. The real table runs from minus one to one, so every copy is two units wide.
+      {show centers} Copies of the center sit where both coordinates are even. Land on one, and the ball is home.
+      {show corners} Copies of the corners sit where both coordinates are odd. Land on one, and the ball falls in.
+      {show question} So here is the whole problem. Does the line from the origin hit an even, even point before an odd, odd point?
+
+  - id: halfway
+    kind: content
+    say: |
+      To come home, aim at an even, even point. Call it two p, two q.
+      {show first} Take the first one on the ray. Then p and q share no common factor,
+      {show only} so the only lattice points on the segment are the start, the end, and the midpoint, p, q.
+      {show mid} Everything hangs on that midpoint.
+      {show odd} If p and q are both odd, the midpoint is a corner, and the ball is pocketed halfway. The diagonal shot, one, one, does exactly this.
+      {show mixed} If one is odd and the other is even, the midpoint is harmless, and the ball makes it home. And they can't both be even.
+
+  - id: foldback
+    kind: content
+    say: |
+      Try one, zero. The line runs to two, zero.
+      {show fold1} Fold it back onto the real table. One bounce off the right wall, and home.
+      {show next} Now two, one. The line runs to four, two.
+      {show fold2} Fold it back, one wall at a time. Three folds, three bounces. It is the shot we saw come home.
+      {show count} In general, the line crosses p vertical walls and q horizontal walls, so the ball bounces p plus q times.
+
+  - id: angles
+    kind: content
+    say: |
+      Back to the angle. Tangent theta is q over p, with no common factor, one odd and one even.
+      {show family} Take p equal to one, and q any even number, two k. Every k gives a different angle, so there are infinitely many. That proves part a.
+      {show irrational} And an irrational slope never hits a lattice point at all. The ball never falls in, but it never comes home either.
+
+  - id: twist
+    kind: content
+    say: |
+      Now part b. Add a pocket at the middle of every edge.
+      {show copies} Their copies have one odd and one even coordinate. Now every lattice point is a pocket, except the even, even ones.
+      {show test} The halfway test: the midpoint p, q is never even, even, so it is always a pocket. Every trip home is cut off halfway.
+      {show revisit} Our easiest success, one, zero, now drops into the pocket on the right edge. And two, one folds back onto the pocket at the top.
+      {show answer} So in part b, no angle works. The answer is zero.
+
+  - id: recap
+    kind: content
+    say: |
+      So, part a has infinitely many angles. Part b has none.
+      {show ideas} Two ideas did all the work. Unfolding turns bounces into a straight line. The halfway test turns that line into a question of even and odd.
+
+  - id: writeup
+    kind: content
+    say: |
+      On the exam, four lines are enough.
+      {show s1} Unfold the table into a plane of copies.
+      {show s2} Centers sit at even, even points, and corner pockets at odd, odd points.
+      {show s3} Aim at two p, two q, and check the midpoint, p, q.
+      {show s4} Conclude. Infinitely many angles in part a, and none in part b.
+
+  - id: epilogue
+    kind: content
+    say: |
+      One more thing, beyond this problem.
+      {show dense} Shoot at a slope of the square root of two. The ball never hits a lattice point, so it never stops.
+      Let it run, and its path slowly fills in the whole table.
+
+  - id: outro
+    kind: outro
+    duration: 6.0
