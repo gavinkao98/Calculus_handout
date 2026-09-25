@@ -107,11 +107,15 @@ export const en = {
     crosses: "It crosses {edge:|p| vertical} and {edge:|q| horizontal} walls:",
     /** followed by the coloured 3 */
     countTex: "\\text{bounces} = |p|+|q| = 2+1 = ",
+    /** zh only: the count as prose + inline TeX, in place of countTex ("" = use countTex) */
+    countLine: "",
   },
   angles: {
     title: "Back to the angle",
     kicker: "Back to the angle",
     dirTex: "\\text{direction}\\ \\ (p,\\,q)",
+    /** zh only: prose + inline TeX in place of dirTex ("" = use dirTex) */
+    dirLine: "",
     coprime: "no common factor; one odd, one even",
     proved: "Infinitely many angles. (a) is proved.",
     irrational: "An irrational slope never meets another lattice point: never pocketed, never home.",
@@ -125,6 +129,8 @@ export const en = {
     every: "Now every lattice point is a pocket, except {home:(even, even)}.",
     /** right-hand side of  gcd(p,q)=1 ⇒ (p,q) ≠ … */
     evenTex: "(\\text{even},\\text{even})",
+    /** zh only: the whole test line as prose + inline TeX, in place of the formula ending in evenTex ("" = formula) */
+    testLine: "",
     cut: "The midpoint is always a pocket: every trip home is cut halfway.",
     answer: "angles in (b):",
   },
@@ -134,6 +140,8 @@ export const en = {
     b: "(b) Eight pockets",
     many: "infinitely many angles",
     none: "no angle at all",
+    /** the big ∞ set in TeX instead of text ("" = the text ∞) */
+    infTex: "",
     idea1: "{i:Unfolding} turns bounces into a straight line.",
     idea2: "{i:The halfway test} turns the line into a question of even and odd.",
   },

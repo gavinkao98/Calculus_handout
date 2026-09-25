@@ -15,7 +15,7 @@ const PATH = realPath(shot([1, Math.SQRT2], 150));
 
 export const Epilogue: React.FC = () => {
   const { f, dur, at, p } = useS();
-  const { t } = useT();
+  const { t, zh } = useT();
   const T = t.epilogue;
   const W: World = { ox: 1180, oy: 580, u: 350 };
   const t0 = at("dense");
@@ -42,13 +42,23 @@ export const Epilogue: React.FC = () => {
       <Txt x={120} y={410} w={560} size={type.caption} italic c={color.ink2} p={p("dense", 26, 60)}>
         {T.irrational}
       </Txt>
-      <Txt x={120} y={560} w={560} size={type.caption} italic c={color.ink2} p={interpolate(f, [t0 + 200, t0 + 230], [0, 1], clamp)}>
+      <Txt x={120} y={zh ? 588 : 560} w={560} size={type.caption} italic c={color.ink2} p={interpolate(f, [t0 + 200, t0 + 230], [0, 1], clamp)}>
         {T.dense}
       </Txt>
-      <Txt x={120} y={700} w={560} size={type.label} c={color.ink3} p={interpolate(f, [t0 + 60, t0 + 80], [0, 1], clamp)} style={{ fontFeatureSettings: "'lnum' 1, 'tnum' 1" }}>
+      <Txt x={120} y={zh ? 716 : 700} w={560} size={type.label} c={color.ink3} p={interpolate(f, [t0 + 60, t0 + 80], [0, 1], clamp)} style={{ fontFeatureSettings: "'lnum' 1, 'tnum' 1" }}>
         {fmt(T.count, { n: Math.max(0, bounces) })}
       </Txt>
-      <Txt x={120} y={900} w={560} size={30} italic c={color.ink3} p={interpolate(f, [t0 + 260, t0 + 290], [0, 1], clamp)}>
+      {/* zh: an opening 「（」 hangs half an em so the ideographs align with the column (STYLE.md 中文版排版 4) */}
+      <Txt
+        x={120}
+        y={900}
+        w={560}
+        size={30}
+        italic
+        c={color.ink3}
+        p={interpolate(f, [t0 + 260, t0 + 290], [0, 1], clamp)}
+        style={zh && T.torus.startsWith("（") ? { textIndent: "-0.5em" } : undefined}
+      >
         {T.torus}
       </Txt>
     </Sheet>

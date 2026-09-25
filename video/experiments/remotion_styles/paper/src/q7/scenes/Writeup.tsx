@@ -27,7 +27,9 @@ export const Writeup: React.FC = () => {
               {`${i + 1}.`}
             </Txt>
             <Txt x={220} y={300 + i * 168} w={1560} size={40} lh={1.38} p={q}>
-              <span style={{ fontWeight: 600, fontFamily: zh ? ZH_FONT : font.serif }}>{head}</span> {r(body)}
+              <span style={{ fontWeight: 600, fontFamily: zh ? ZH_FONT : font.serif }}>{head}</span>
+              {zh ? "" : " "/* the zh head ends in a full-width 「：」, which carries its own space */}
+              {r(body)}
             </Txt>
           </React.Fragment>
         );

@@ -3,7 +3,7 @@ import React from "react";
 import { interpolate } from "remotion";
 import { color, features, font, type } from "../../theme";
 import { clamp } from "../../components/Type";
-import { Ball, Caps, EDGE, HOMEC, Layer, POCKET, Pocket, Sheet, Table, Txt, World, dOf, useS, useT, wipe } from "../kit";
+import { Ball, Caps, EDGE, HOMEC, Layer, M, POCKET, Pocket, Sheet, Table, Txt, World, dOf, useS, useT, wipe } from "../kit";
 import { polyAt, realPath, shot } from "../geo";
 
 const HOMEPATH = realPath(shot([2, 1], 2));
@@ -69,7 +69,12 @@ export const Recap: React.FC = () => {
       <div style={{ position: "absolute", left: 1160, top: 170, width: 400, textAlign: "center", ...wipe(tin, 0) }}>
         <Caps color={color.ink2}>{T.b}</Caps>
       </div>
-      {big(560, "∞", HOMEC, p("start", 30, 40))}
+      {T.infTex ? (
+        // zh: ∞ in Pagella (MathJax paths) — the Garamond cut has no ∞, and it must not fall to a system font
+        <M x={560} y={674} t={T.infTex} size={200} align="center" c={HOMEC} p={p("start", 30, 40)} />
+      ) : (
+        big(560, "∞", HOMEC, p("start", 30, 40))
+      )}
       {big(1360, "0", POCKET, p("start", 30, 60))}
       <Txt x={560} y={712} w={500} align="center" size={type.caption} italic c={color.ink2} p={p("start", 26, 60)}>
         {T.many}

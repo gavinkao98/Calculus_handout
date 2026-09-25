@@ -17,7 +17,7 @@ const smooth = (x: number) => 0.5 - 0.5 * Math.cos(Math.PI * Math.max(0, Math.mi
 
 export const Unfolding: React.FC = () => {
   const { f, at, p, guard } = useS();
-  const { t, r, tLbl } = useT();
+  const { t, r, tLbl, zh } = useT();
   const T = t.unfold;
   const F1 = at("first");
   const cam = camPath(f, { cx: 960, cy: 690, s: 1.6 }, [[F1, { cx: 960, cy: 540, s: 1 }, 46]]);
@@ -39,7 +39,10 @@ export const Unfolding: React.FC = () => {
   if (stage === 0 && roll > 0) ball = polyAt(realPath(S), roll).p;
   if (run > 0) ball = polyAt([[0, 0], [4, 2]], run).p;
 
-  const homeLbl = { s: T.home, x: px(W, [4, 2])[0] + 22, y: px(W, [4, 2])[1] + 20 };
+  // zh: 「回到中心」 is wider than the copy's half-width: centred above the centre (the line arrives from below-left)
+  const homeLbl = zh
+    ? { s: T.home, x: px(W, [4, 2])[0], y: px(W, [4, 2])[1] - 74, align: "center" as const, w: 200 }
+    : { s: T.home, x: px(W, [4, 2])[0] + 22, y: px(W, [4, 2])[1] + 20, align: "left" as const, w: 200 };
   const realLbl = { s: T.real, x: W.ox, y: W.oy + W.u + 28 };
   const marks: Mark[] = [
     ...tableMarks(W, "real table"),
@@ -47,7 +50,7 @@ export const Unfolding: React.FC = () => {
     { name: "straight line", pts: pxs(W, [[0, 0], [4, 2]]), w: 4, on: stage >= 3 },
   ];
   guard(marks, [
-    tLbl(homeLbl.s, homeLbl.x, homeLbl.y, type.label, interpolate(arrive, [10, 30], [0, 1], clamp), 1, { italic: true }),
+    tLbl(homeLbl.s, homeLbl.x, homeLbl.y, type.label, interpolate(arrive, [10, 30], [0, 1], clamp), 1, { italic: true, align: homeLbl.align }),
     tLbl(realLbl.s, realLbl.x, realLbl.y, type.label, p("first", 24, 50), 1, { italic: true, align: "center" }),
   ]);
 
@@ -106,7 +109,7 @@ export const Unfolding: React.FC = () => {
           <circle cx={px(W, [4, 2])[0]} cy={px(W, [4, 2])[1]} r={20} fill="none" stroke={HOMEC} strokeWidth={3} opacity={interpolate(arrive, [6, 20], [0, 1], clamp)} />
         )}
       </Layer>
-      <Txt x={homeLbl.x} y={homeLbl.y} w={200} size={type.label} italic c={HOMEC} p={interpolate(arrive, [10, 30], [0, 1], clamp)}>
+      <Txt x={homeLbl.x} y={homeLbl.y} w={homeLbl.w} align={homeLbl.align} size={type.label} italic c={HOMEC} p={interpolate(arrive, [10, 30], [0, 1], clamp)}>
         {homeLbl.s}
       </Txt>
       <Txt x={realLbl.x} y={realLbl.y} w={320} align="center" size={type.label} italic c={color.ink2} p={p("first", 24, 50)}>

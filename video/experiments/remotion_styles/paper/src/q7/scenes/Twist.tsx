@@ -134,7 +134,14 @@ export const Twist: React.FC = () => {
       <Txt x={120} y={334} w={860} size={type.caption} p={p("copies", 24, 40)}>
         {r(X.every)}
       </Txt>
-      <M x={120} y={440} t={`\\gcd(p,q)=1\\ \\Rightarrow\\ {\\color{${EDGE}}(p,q)}\\neq${X.evenTex}`} size={46} p={p("test", 26)} />
+      {X.testLine ? (
+        // zh: 「不是偶數偶數點」 is words beside the TeX, never inside \text{}
+        <Txt x={120} y={398} w={860} size={44} lh={1.2} p={p("test", 26)}>
+          {r(X.testLine)}
+        </Txt>
+      ) : (
+        <M x={120} y={440} t={`\\gcd(p,q)=1\\ \\Rightarrow\\ {\\color{${EDGE}}(p,q)}\\neq${X.evenTex}`} size={46} p={p("test", 26)} />
+      )}
       <Txt x={120} y={470} w={860} size={type.caption} italic c={POCKET} p={p("test", 24, 50)}>
         {X.cut}
       </Txt>
