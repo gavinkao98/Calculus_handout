@@ -189,6 +189,7 @@ python -m pip install --upgrade whisper-timestamped stable-ts
   **Node ≥21**（global WebSocket/fetch）＋ **Google Chrome**。Chrome 路徑現在會先讀 `CHROME` 環境變數、
   再退回常見安裝位置（不再寫死單一路徑）。
 - standalone HTML **檢視時需連網**載 MathJax/KaTeX CDN（非安裝需求）。
+- **Remotion 官方 Agent Skills（2026-09-25 裝，Remotion 試作用，選用）：** 已 copy 進 `.claude/skills/remotion-*` 並進版控，換機免重裝；來源與雜湊鎖在根目錄 `skills-lock.json`。要更新時執行 `npx skills update -p`；要從 lock 還原時執行 `npx skills experimental_install`。
 
 ### ⑤ codex — 審核工具（Mode B 講義審核 / video gate2）
 
