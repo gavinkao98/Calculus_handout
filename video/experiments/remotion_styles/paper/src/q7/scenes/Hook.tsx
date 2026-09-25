@@ -6,8 +6,9 @@
 import React from "react";
 import { interpolate } from "remotion";
 import { color, type } from "../../theme";
-import { SmallCaps, clamp } from "../../components/Type";
-import { Flash, HOMEC, Layer, POCKET, Rolling, Sheet, Table, Txt, World, useS, wipe } from "../kit";
+import { clamp } from "../../components/Type";
+import { Caps, Flash, HOMEC, Layer, POCKET, Rolling, Sheet, Table, Txt, World, useS, useT, wipe } from "../kit";
+import { fmt } from "../i18n";
 import { V, polyAt, polyLen, realPath, shot } from "../geo";
 
 const SPEED = 0.055; // math units per frame
@@ -25,24 +26,14 @@ const U = 150;
 
 export const Hook: React.FC = () => {
   const { f, at, p } = useS();
+  const { t, r } = useT();
+  const T = t.hook;
   const starts = [at("corner", 0.02), at("corner", 0.5), at("wander", 0.02), at("home", 0.02)];
   const plates = p("start", 30, 4);
   const q = p("question", 30);
   const q2 = p("question", 26, 60);
-  const captions = [
-    <>
-      straight into a <span style={{ color: POCKET }}>corner</span>
-    </>,
-    <>
-      one bounce, then a <span style={{ color: POCKET }}>corner</span>
-    </>,
-    <>still going …</>,
-    <>
-      <span style={{ color: HOMEC }}>home</span>, after three bounces
-    </>,
-  ];
   return (
-    <Sheet folio={8} title="A few shots">
+    <Sheet folio={8} title={T.title}>
       <Layer>
         {SHOTS.map((s, i) => {
           const W: World = { ox: XS[i], oy: OY, u: U };
@@ -79,19 +70,19 @@ export const Hook: React.FC = () => {
         return (
           <React.Fragment key={i}>
             <div style={{ position: "absolute", left: x - 150, top: OY - U - 70, ...wipe(interpolate(plates, [i * 0.12, 0.5 + i * 0.12], [0, 1], clamp), 0) }}>
-              <SmallCaps color={color.ink3}>{`Shot ${i + 1}`}</SmallCaps>
+              <Caps color={color.ink3}>{fmt(T.shot, { n: i + 1 })}</Caps>
             </div>
             <Txt x={x} y={OY + U + 34} w={400} align="center" size={type.label} italic c={color.ink2} p={interpolate(f, [resolved, resolved + 20], [0, 1], clamp)}>
-              {captions[i]}
+              {r(T.captions[i])}
             </Txt>
           </React.Fragment>
         );
       })}
       <Txt x={960} y={800} w={1500} align="center" size={76} italic p={q}>
-        Which shots come <span style={{ color: HOMEC }}>home</span>?
+        {r(T.question)}
       </Txt>
       <Txt x={960} y={912} w={1500} align="center" size={type.caption} italic c={color.ink2} p={q2}>
-        Chasing bounces one by one is hopeless — we need a better picture.
+        {T.hopeless}
       </Txt>
     </Sheet>
   );

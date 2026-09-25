@@ -9,7 +9,7 @@ import { Act3, ActProps, SceneComp } from "./act3/Act3";
 import { DEFAULT_MANIFEST, ORDER, loadAct } from "./act3/timing";
 import { S31, S31Props, S31_DEFAULTS, S31_ORDER } from "./s31/S31";
 import { loadShow } from "./s31/timing";
-import { Q7, Q7Props, Q7_DEFAULTS, Q7_ORDER } from "./q7/Q7";
+import { Q7, Q7Props, Q7ZH_DEFAULTS, Q7_DEFAULTS, Q7_ORDER } from "./q7/Q7";
 import { loadShow as loadQ7 } from "./q7/timing";
 
 // §3.1 unguided cut (src/s31/): its own manifest-driven timing.
@@ -23,6 +23,7 @@ const s31Meta: CalculateMetadataFunction<S31Props> = async ({ props }) => {
 
 // NTU 2026 exam, Problem 7 (src/q7/): same manifest-driven timing as §3.1.
 //   npx remotion render build Q7 out/q7.mp4 --props='{"manifest":"audio/q7_mimo/manifest.json"}'
+// Q7ZH = the same animation set from the Chinese string table (lang "zh"), on its own manifest.
 const q7Meta: CalculateMetadataFunction<Q7Props> = async ({ props }) => {
   const show = await loadQ7(props.manifest);
   const s = props.id ? show.scenes.find((x) => x.id === props.id) : null;
@@ -95,6 +96,7 @@ export const RemotionRoot: React.FC = () => (
     </Folder>
     <Folder name="Q7">
       <Composition id="Q7" component={Q7} width={1920} height={1080} fps={30} durationInFrames={300} defaultProps={Q7_DEFAULTS} calculateMetadata={q7Meta} />
+      <Composition id="Q7ZH" component={Q7} width={1920} height={1080} fps={30} durationInFrames={300} defaultProps={Q7ZH_DEFAULTS} calculateMetadata={q7Meta} />
       {Q7_ORDER.map((id) => (
         <Composition
           key={id}

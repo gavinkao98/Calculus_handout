@@ -24,6 +24,9 @@ import { Recap } from "./scenes/Recap";
 import { Writeup } from "./scenes/Writeup";
 import { Epilogue } from "./scenes/Epilogue";
 import { Outro } from "./scenes/Outro";
+import { Lang, LangCtx } from "./i18n";
+import { ZH_FONT } from "./kit";
+import { useCjkReady } from "./cjk";
 
 export const Q7_SCENES: Record<string, React.FC> = {
   logo: Logo,
@@ -43,10 +46,28 @@ export const Q7_SCENES: Record<string, React.FC> = {
 };
 export const Q7_ORDER = Object.keys(Q7_SCENES);
 
-export type Q7Props = { manifest: string; show?: Show; id?: string };
-export const Q7_DEFAULTS: Q7Props = { manifest: DEFAULT_MANIFEST };
+/** `lang`: which string table the sheets are set from (i18n/); the animation is the same */
+export type Q7Props = { manifest: string; lang?: Lang; show?: Show; id?: string };
+export const Q7_DEFAULTS: Q7Props = { manifest: DEFAULT_MANIFEST, lang: "en" };
+export const Q7ZH_DEFAULTS: Q7Props = { manifest: "audio/q7zh_mock/manifest.json", lang: "zh" };
 
-const SheetSlot: React.FC<{ s: SceneT; first: boolean; last: boolean }> = ({ s, first, last }) => {
+/** zh: hold every sheet until Noto Serif TC is in (a sheet never renders Chinese in a fallback font) */
+const CjkGate: React.FC<{ children: React.ReactNode }> = ({ children }) => (useCjkReady() ? <>{children}</> : null);
+
+/**
+ * zh scope: the Chinese stack on everything and no synthesized italic/bold
+ * anywhere — a safety net under the lang-aware Txt/Caps/Kicker (kit.tsx), so a
+ * shared component that sets Garamond (running head, small caps) cannot draw
+ * an ideograph in a system font or slant one.
+ */
+const ZhScope: React.FC<{ children: React.ReactNode }> = ({ children }) => (
+  <AbsoluteFill className="q7-zh" lang="zh-Hant">
+    <style>{`.q7-zh, .q7-zh * { font-family: ${ZH_FONT} !important; font-synthesis: none !important; }`}</style>
+    {children}
+  </AbsoluteFill>
+);
+
+const SheetSlot: React.FC<{ s: SceneT; first: boolean; last: boolean; zh: boolean }> = ({ s, first, last, zh }) => {
   const f = useCurrentFrame();
   const Comp = Q7_SCENES[s.id];
   const tin = first ? 1 : interpolate(f, [0, OVER], [0, 1], { ...clamp, easing: ease.camera });
@@ -59,7 +80,7 @@ const SheetSlot: React.FC<{ s: SceneT; first: boolean; last: boolean }> = ({ s, 
         boxShadow: tin < 1 ? `-30px 0 60px rgba(30,20,10,${0.35 * (1 - tin * 0.6)})` : undefined,
       }}
     >
-      <SceneCtx.Provider value={{ id: s.id, beats: s.beats, dur: s.dur, words: s.words }}>{Comp ? <Comp /> : null}</SceneCtx.Provider>
+      <SceneCtx.Provider value={{ id: s.id, beats: s.beats, dur: s.dur, words: s.words }}>{Comp ? zh ? <CjkGate><Comp /></CjkGate> : <Comp /> : null}</SceneCtx.Provider>
       {tout > 0 && <AbsoluteFill style={{ background: `rgba(40,28,12,${0.28 * tout})` }} />}
       {s.audio && (
         <Sequence from={LEAD} layout="none">
@@ -70,16 +91,18 @@ const SheetSlot: React.FC<{ s: SceneT; first: boolean; last: boolean }> = ({ s, 
   );
 };
 
-export const Q7: React.FC<Q7Props> = ({ show, id }) => {
+export const Q7: React.FC<Q7Props> = ({ show, id, lang = "en" }) => {
   if (!show) return null;
+  const zh = lang === "zh";
   const list = id ? show.scenes.filter((s) => s.id === id) : show.scenes;
-  return (
+  const sheets = (
     <AbsoluteFill style={{ backgroundColor: "#2F2A24" }}>
       {list.map((s, i) => (
         <Sequence key={s.id} from={id ? 0 : s.from} durationInFrames={s.dur} name={s.id}>
-          <SheetSlot s={s} first={i === 0} last={i === list.length - 1} />
+          <SheetSlot s={s} first={i === 0} last={i === list.length - 1} zh={zh} />
         </Sequence>
       ))}
     </AbsoluteFill>
   );
+  return <LangCtx.Provider value={lang}>{zh ? <ZhScope>{sheets}</ZhScope> : sheets}</LangCtx.Provider>;
 };

@@ -2,8 +2,8 @@
 import React from "react";
 import { interpolate } from "remotion";
 import { color, features, font, type } from "../../theme";
-import { SmallCaps, clamp } from "../../components/Type";
-import { Ball, EDGE, HOMEC, Layer, POCKET, Pocket, Sheet, Table, Txt, World, dOf, useS, wipe } from "../kit";
+import { clamp } from "../../components/Type";
+import { Ball, Caps, EDGE, HOMEC, Layer, POCKET, Pocket, Sheet, Table, Txt, World, dOf, useS, useT, wipe } from "../kit";
 import { polyAt, realPath, shot } from "../geo";
 
 const HOMEPATH = realPath(shot([2, 1], 2));
@@ -11,6 +11,8 @@ const CUT = realPath(shot([2, 1], 1)); // (b): the same shot, cut at the top poc
 
 export const Recap: React.FC = () => {
   const { f, p } = useS();
+  const { t, r } = useT();
+  const T = t.recap;
   const A: World = { ox: 560, oy: 390, u: 125 };
   const B: World = { ox: 1360, oy: 390, u: 125 };
   const tin = p("start", 30);
@@ -41,7 +43,7 @@ export const Recap: React.FC = () => {
   );
 
   return (
-    <Sheet folio={16} title="Recap">
+    <Sheet folio={16} title={T.title}>
       <Layer>
         <Table W={A} real draw={tin} />
         {tin >= 1 && (
@@ -62,26 +64,26 @@ export const Recap: React.FC = () => {
         <line x1={960} y1={170} x2={960} y2={760} stroke={color.rule} strokeWidth={1.5} opacity={tin} />
       </Layer>
       <div style={{ position: "absolute", left: 360, top: 170, width: 400, textAlign: "center", ...wipe(tin, 0) }}>
-        <SmallCaps color={color.ink2}>(a) Four corner pockets</SmallCaps>
+        <Caps color={color.ink2}>{T.a}</Caps>
       </div>
       <div style={{ position: "absolute", left: 1160, top: 170, width: 400, textAlign: "center", ...wipe(tin, 0) }}>
-        <SmallCaps color={color.ink2}>(b) Eight pockets</SmallCaps>
+        <Caps color={color.ink2}>{T.b}</Caps>
       </div>
       {big(560, "∞", HOMEC, p("start", 30, 40))}
       {big(1360, "0", POCKET, p("start", 30, 60))}
       <Txt x={560} y={712} w={500} align="center" size={type.caption} italic c={color.ink2} p={p("start", 26, 60)}>
-        infinitely many angles
+        {T.many}
       </Txt>
       <Txt x={1360} y={712} w={500} align="center" size={type.caption} italic c={color.ink2} p={p("start", 26, 80)}>
-        no angle at all
+        {T.none}
       </Txt>
 
       <div style={{ position: "absolute", left: 360, top: 806, width: 1200, height: 2, background: color.rule, opacity: ideas }} />
       <Txt x={960} y={836} w={1500} align="center" size={type.body} p={ideas}>
-        <i>Unfolding</i> turns bounces into a straight line.
+        {r(T.idea1)}
       </Txt>
       <Txt x={960} y={906} w={1500} align="center" size={type.body} p={ideas2}>
-        <i>The halfway test</i> turns the line into a question of even and odd.
+        {r(T.idea2)}
       </Txt>
     </Sheet>
   );
