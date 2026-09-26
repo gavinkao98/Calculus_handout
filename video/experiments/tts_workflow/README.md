@@ -28,6 +28,12 @@ python video/pipeline/tts_gemini_scene_trial.py run --output-dir video/output/tt
 node_modules/.bin/remotion.cmd render build Q7ZH out/q7zh_gemini_iapetus_scene_trial_raw_20260926.mp4 --codec=h264 --crf=20 --concurrency=8 --props=out/q7zh_gemini_iapetus_scene_trial.props.json
 ```
 
+**2026-09-26 本批完成紀錄。** `gemini-3.8-flash-tts`／Iapetus **14／14 場成功**，累計 **14 次 HTTP attempts、0 重試**；raw 音訊合計 **567.4 秒**。receipt 合計文字輸入 **2,090 tokens**、音訊輸出 **18,166 tokens**；按上列 Standard 單價估 **USD 0.1645**，未核帳。原始批次在 `video/output/tts_workflow/q7zh_gemini_iapetus_scene_20260926/`，與 MiMo 批次分開保存。
+
+中文對齊產出 **16 scenes（14 配音＋2 silent）、65 cue**；其中 **5 個 estimated cue、18 個低機率 cue**（兩類可能重疊），這些是待人工核點的提示，**不是正式音鎖**。manifest 位於 `video/experiments/remotion_styles/paper/public/audio/q7zh_gemini_iapetus_scene_trial/manifest.json`；原始 take 未因對齊或成片音量處理而覆寫。
+
+[Gemini Iapetus 中文全片試片](../remotion_styles/paper/out/q7zh_gemini_iapetus_scene_trial_20260926.mp4)已完成：**1920×1080、30 fps、17,766 frames**；容器 `format duration` **592.256 秒**、檔案 **58,355,785 bytes**。成片實測 **−19.0 LUFS／−5.2 dBTP**；FFmpeg 全片影片解碼成功，70／285／540 秒抽幀視覺正常。這是全片解碼與抽樣檢查，不等於人耳全片、cue ±0.1 秒或正式停格門檻驗收。
+
 依 [2026-09-26 設計](../../_audit/REVIEW-tts-workflow-2026-09-26.html) 先準備聲音／時間來源小樣；同日使用者另指示「先用我們原本的 MIMO 跑一次全片」。兩個批次分開：**三家 × 三段的 9 次 pilot 仍只有離線計畫**；**MiMo 全片試聽另用 14 場完整 scene 的受控 runner**，不消耗或冒用前者的計畫與授權。尚未選出三家勝出者，也未改接正式產線。
 
 ## Gemini 官方預設音色：三段同稿試聽（2026-09-26）
@@ -42,7 +48,7 @@ node_modules/.bin/remotion.cmd render build Q7ZH out/q7zh_gemini_iapetus_scene_t
 
 按[官方 Standard 付費價](https://ai.google.dev/gemini-api/docs/pricing#gemini-3.8-flash-tts)（2026-09-26 查核、優惠至 2026-12-31），文字輸入 USD 0.50／百萬 tokens、音訊輸出 USD 9／百萬 tokens。合成前按每段 45–60 秒與 25 audio tokens／秒估音訊 USD 0.030375–0.0405＋文字；**本次 receipt 實際共 525 個文字輸入 tokens、4,608 個音訊輸出 tokens**，故改按 modality 用量估 **USD 0.0417345**（文字 0.0002625＋音訊 0.041472），**未核帳**。實際音訊 tokens 與 25／秒估法不同，不能用估計秒數覆蓋 receipt。使用者自述 API 尚有付費餘額，但本輪未核對帳務與餘額適用性。
 
-本機 repo `.env` 已有非空 `GEMINI_API_KEY`（不記值），全局／`.venv` 的 `google-genai` 分別為 2.7.0／2.8.0；本批 runner 使用 stdlib HTTP，不安裝／升級套件，不使用舊 SDK 的 Gemini 3.1 接線。[歷史紀錄](../../_archive/REBUILD_LOG-2026-05-to-07.md)曾採用 `gemini-3.1-flash-tts-preview`＋Charon 的 3 beat／41.4 秒試聽；**使用者於本輪更正：當時影片全英文，不能推論中文適用性**。2026-06-16 退場是使用者裁決統一 MiMo，亦非 Gemini 中文音質不佳的證據。新版官方預設音色的中文三樣本已交付；上方 Gemini 全片受控接線尚待執行，不代表正式音鎖。
+本機 repo `.env` 已有非空 `GEMINI_API_KEY`（不記值），全局／`.venv` 的 `google-genai` 分別為 2.7.0／2.8.0；本批 runner 使用 stdlib HTTP，不安裝／升級套件，不使用舊 SDK 的 Gemini 3.1 接線。[歷史紀錄](../../_archive/REBUILD_LOG-2026-05-to-07.md)曾採用 `gemini-3.1-flash-tts-preview`＋Charon 的 3 beat／41.4 秒試聽；**使用者於本輪更正：當時影片全英文，不能推論中文適用性**。2026-06-16 退場是使用者裁決統一 MiMo，亦非 Gemini 中文音質不佳的證據。新版官方預設音色的中文三樣本與上方 Iapetus 全片試片均已交付，不代表正式音鎖。
 
 合成前曾用現有 key 做 4 次 metadata GET：`models/gemini-3.8-flash-tts` 與 voices endpoint 均 HTTP 200，但處理 camelCase／snake_case 欄位後，中文 tag 精確篩選未取得可確認的 prebuilt 中文候選；未篩語言的首頁有 1,000 筆及下一頁，未全遍歷，不能據此判定不支援中文。其後本批三個官方預設音色生成成功；模型支援中文、請求成功與中文自然度仍是不同證據，最後一項留給使用者實聽。
 
