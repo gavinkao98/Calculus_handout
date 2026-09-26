@@ -1,5 +1,33 @@
 # Q7 配音工作流試驗
 
+## Gemini Iapetus 中文全片批次
+
+此批從既有 MiMo 14 場 `plan.json` 複製**同一份完整 scene 文字與 cue**，另凍結 `gemini-3.8-flash-tts`／Iapetus 的 14 個請求；每場一次，無 style、無自動重試。它是獨立試片批次，`audio_locked=false`、`nfa_status=not_verified`，不覆寫 MiMo take、原片或 Q7ZH 預設 manifest。使用者已授權這次最多 14 次合成；實際執行前仍須核對本次 plan 的 14 場文字與 hash 符合該授權。
+
+從儲存庫根目錄建立凍結計畫（若 MiMo 批次未在本機，先按下方離線 `tts_scene_trial.py plan` 步驟建立來源 plan；此步不合成）：
+
+```powershell
+python video/pipeline/tts_gemini_scene_trial.py plan --source-plan video/output/tts_workflow/q7zh_mimo_scene_20260926/plan.json --output-dir video/output/tts_workflow/q7zh_gemini_iapetus_scene_20260926
+```
+
+確認輸出的 `plan_snapshot_hash` 後執行一次。runner 每次 HTTP 前先持久化 `started`，成功後保存完整 `response.json`、原始 `raw.wav`、`receipt.json` 與 hash 才標 `completed`。任何逾時或未完成紀錄均標 unknown 並阻止補送；再次執行已完成批次只驗檔與沿用，新增 HTTP 為零。`run.lock` 留下時須先人工確認程序已停與帳本狀態。
+
+```powershell
+python video/pipeline/tts_gemini_scene_trial.py run --output-dir video/output/tts_workflow/q7zh_gemini_iapetus_scene_20260926 --approve-plan <本次plan_snapshot_hash>
+```
+
+14 場全部有已驗 receipt 後，使用既有中文對齊器與本機 Whisper `small.pt`。輸出專用目錄避免覆寫 MiMo manifest；cue 仍須人耳核點。
+
+```powershell
+& 'C:/Users/Kao/AppData/Local/Programs/Python/Python312/python.exe' video/pipeline/tts_trial_align.py --trial-dir video/output/tts_workflow/q7zh_gemini_iapetus_scene_20260926 --output-dir video/experiments/remotion_styles/paper/public/audio/q7zh_gemini_iapetus_scene_trial --model-path C:/Users/Kao/.cache/whisper/small.pt
+```
+
+在 `video/experiments/remotion_styles/paper/` 內建立 `out/q7zh_gemini_iapetus_scene_trial.props.json`，內容為 `{"manifest":"audio/q7zh_gemini_iapetus_scene_trial/manifest.json","lang":"zh"}`，再用 `npm.cmd run build` 與下列指令輸出 1080p 全片。沿用下方既有 `scripts/loudnorm.py` 成片處理步驟；原始 take 與 manifest WAV 不處理音量。
+
+```powershell
+node_modules/.bin/remotion.cmd render build Q7ZH out/q7zh_gemini_iapetus_scene_trial_raw_20260926.mp4 --codec=h264 --crf=20 --concurrency=8 --props=out/q7zh_gemini_iapetus_scene_trial.props.json
+```
+
 依 [2026-09-26 設計](../../_audit/REVIEW-tts-workflow-2026-09-26.html) 先準備聲音／時間來源小樣；同日使用者另指示「先用我們原本的 MIMO 跑一次全片」。兩個批次分開：**三家 × 三段的 9 次 pilot 仍只有離線計畫**；**MiMo 全片試聽另用 14 場完整 scene 的受控 runner**，不消耗或冒用前者的計畫與授權。尚未選出三家勝出者，也未改接正式產線。
 
 ## Gemini 官方預設音色：三段同稿試聽（2026-09-26）
@@ -14,7 +42,7 @@
 
 按[官方 Standard 付費價](https://ai.google.dev/gemini-api/docs/pricing#gemini-3.8-flash-tts)（2026-09-26 查核、優惠至 2026-12-31），文字輸入 USD 0.50／百萬 tokens、音訊輸出 USD 9／百萬 tokens。合成前按每段 45–60 秒與 25 audio tokens／秒估音訊 USD 0.030375–0.0405＋文字；**本次 receipt 實際共 525 個文字輸入 tokens、4,608 個音訊輸出 tokens**，故改按 modality 用量估 **USD 0.0417345**（文字 0.0002625＋音訊 0.041472），**未核帳**。實際音訊 tokens 與 25／秒估法不同，不能用估計秒數覆蓋 receipt。使用者自述 API 尚有付費餘額，但本輪未核對帳務與餘額適用性。
 
-本機 repo `.env` 已有非空 `GEMINI_API_KEY`（不記值），全局／`.venv` 的 `google-genai` 分別為 2.7.0／2.8.0；本批 runner 使用 stdlib HTTP，不安裝／升級套件，不使用舊 SDK 的 Gemini 3.1 接線。[歷史紀錄](../../_archive/REBUILD_LOG-2026-05-to-07.md)曾採用 `gemini-3.1-flash-tts-preview`＋Charon 的 3 beat／41.4 秒試聽；**使用者於本輪更正：當時影片全英文，不能推論中文適用性**。2026-06-16 退場是使用者裁決統一 MiMo，亦非 Gemini 中文音質不佳的證據。本次僅交付新版官方預設音色的中文試聽，尚未將 Gemini 接入全片或正式音鎖。
+本機 repo `.env` 已有非空 `GEMINI_API_KEY`（不記值），全局／`.venv` 的 `google-genai` 分別為 2.7.0／2.8.0；本批 runner 使用 stdlib HTTP，不安裝／升級套件，不使用舊 SDK 的 Gemini 3.1 接線。[歷史紀錄](../../_archive/REBUILD_LOG-2026-05-to-07.md)曾採用 `gemini-3.1-flash-tts-preview`＋Charon 的 3 beat／41.4 秒試聽；**使用者於本輪更正：當時影片全英文，不能推論中文適用性**。2026-06-16 退場是使用者裁決統一 MiMo，亦非 Gemini 中文音質不佳的證據。新版官方預設音色的中文三樣本已交付；上方 Gemini 全片受控接線尚待執行，不代表正式音鎖。
 
 合成前曾用現有 key 做 4 次 metadata GET：`models/gemini-3.8-flash-tts` 與 voices endpoint 均 HTTP 200，但處理 camelCase／snake_case 欄位後，中文 tag 精確篩選未取得可確認的 prebuilt 中文候選；未篩語言的首頁有 1,000 筆及下一頁，未全遍歷，不能據此判定不支援中文。其後本批三個官方預設音色生成成功；模型支援中文、請求成功與中文自然度仍是不同證據，最後一項留給使用者實聽。
 
