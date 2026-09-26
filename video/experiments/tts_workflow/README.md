@@ -2,6 +2,18 @@
 
 依 [2026-09-26 設計](../../_audit/REVIEW-tts-workflow-2026-09-26.html) 先準備聲音／時間來源小樣；同日使用者另指示「先用我們原本的 MIMO 跑一次全片」。兩個批次分開：**三家 × 三段的 9 次 pilot 仍只有離線計畫**；**MiMo 全片試聽另用 14 場完整 scene 的受控 runner**，不消耗或冒用前者的計畫與授權。尚未選出三家勝出者，也未改接正式產線。
 
+## 下一候選：優先研究 Gemini 官方預設音色（2026-09-26）
+
+使用者希望下一個優先研究／試聽 Gemini，並自述已有付費 API 餘額；本輪未核對帳務或可用額度。**目前配音試驗各家都先用官方預設音色**，暫不做 voice cloning／voice design。這是候選研究，尚未生成 Gemini 音訊，不代表新的合成批次已獲同意；原 MiMo 全片試聽與三家 × 三段離線 pilot 均保留，後者仍未執行。
+
+今日核對[官方模型頁](https://ai.google.dev/gemini-api/docs/models/gemini-3.8-flash-tts)，現行研究型號為 `gemini-3.8-flash-tts`，模型層支援繁體及簡體中文。[官方 TTS 文件](https://ai.google.dev/gemini-api/docs/speech-generation#prebuilt-voices)列出 30 個 curated prebuilt voices，但不能把模型語言支援或一般音色描述當成特定 voice 的中文自然度證據。**中文候選尚未選定**：待查官方 prebuilt 的中文語言／地區標記後再凍結，之後以同稿試聽判斷自然度；目前未試聽新版，也不保證台灣口音。
+
+按[官方 Standard 付費價](https://ai.google.dev/gemini-api/docs/pricing#gemini-3.8-flash-tts)（2026-09-26 查核、優惠至 2026-12-31），文字輸入 USD 0.50／百萬 tokens、音訊輸出 USD 9／百萬 tokens；音訊按 25 tokens／秒換算，約 **USD 0.0135／分鐘**。待選音色的估算方案為三個音色各一次、同一份約 45–60 秒試稿；若各次實際產出落在此範圍，共 3 次請求／135–180 秒，**音訊估 USD 0.030375–0.0405，文字另計**。這是時長假設下的估算，非固定報價或已支出；音色、試稿、文字 tokens、可用模型／帳號與完整批次快照確定後才另報量徵同意，不含重試、clone 或 voice design。
+
+本機唯讀查核：repo `.env` 已有非空 `GEMINI_API_KEY`（不記值），全局／`.venv` 的 `google-genai` 分別為 2.7.0／2.8.0；尚未驗證新 3.8 schema 或帳號餘額／權限，未安裝或改接程式。[歷史紀錄](../../_archive/REBUILD_LOG-2026-05-to-07.md)曾採用 `gemini-3.1-flash-tts-preview`＋Charon 的 3 beat／41.4 秒試聽；**使用者於本輪更正：當時影片全英文，不能推論中文適用性**。2026-06-16 退場是使用者裁決統一 MiMo，亦非 Gemini 中文音質不佳的證據。既有中文 FA／Remotion 可沿用，生成請求、WAV 回應與 receipt 仍需適配：官方模型頁保留 GenerateContent 的 `part.speech_metadata` 入口，3.8 非串流預設回完整 WAV，不能只替換舊模型名稱。
+
+同日用現有 key 做 4 次 metadata GET：`models/gemini-3.8-flash-tts` 與 voices endpoint 均 HTTP 200，但處理 camelCase／snake_case 欄位後，中文 tag 精確篩選仍未取得可確認的 prebuilt 中文候選；未篩語言的首頁有 1,000 筆及下一頁，未全遍歷，不能據此判定不支援中文；未驗生成權限／額度、未生成語音，模型文件支援繁中與特定 voice 中文自然度仍是不同證據。
+
 ## MiMo 全片試聽：14 場獨立批次
 
 來源為 `../remotion_styles/paper/q7/q7.zh.yml`，14 個有旁白 scene、2,796 字元；每場一次 `mimo-v2.5-tts`／冰糖，無 style prompt。合成前報量約 8–13 分鐘、最多 14 次 HTTP 嘗試，2026-09-26 查核官網限時免費，使用者同意本批後執行。原有 beat 配音與原片保留。這是供人耳試看的 `trial`：`audio_locked=false`、`nfa_status=not_verified`，不代表稿鎖或正式音鎖驗收。
