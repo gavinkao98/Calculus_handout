@@ -6,6 +6,8 @@
 
 ## 現役路線（2026-07-07）
 
+- **配音工作流提案（2026-09-26，未實作／待審）**：[可操作審閱稿](_audit/REVIEW-tts-workflow-2026-09-26.html)／[設計契約](DESIGN.md#tts-workflow-proposal-2026-09-26)；僅設計交付，尚無 API 批次同意，下列現役狀態不變。
+
 - **TTS**：MiMo `mimo-v2.5-tts` builtin voice **Dean**（唯一真旁白路線；Gemini/Charon 2026-06-16 退場、voice-design／Calm Professor 2026-07-05 退役）。**scene-level TTS＋forced alignment 為正式路線**：計時源＝stable-ts transcript-constrained FA（whisper-timestamped 降級 QA 探針）；`tts.py --unit auto` 涵蓋全部 content template；fallback ladder＝arbiter(small.en)→resynth→sentence-chunk→beats（chunk 受 `--fallback-budget` 自檢）。
 - **文字渲染**：Route A（全 LaTeX/pdflatex；內文/標題 **Instrument Sans**（2026-09-13 共用層 v1 T1 由 IBM Plex Sans 換過來，vendored 在 `pipeline/fonts/instrument-sans/`）、eyebrow IBM Plex Mono、數學 Latin Modern）2026-06-25 落地，Pango 路徑已移除。
 - **模板／版面**：Lectern grid＋navy spine；Step 0 型階 pass＋容量契約 v2（G1–G6，advisory lint）2026-07-05 落地。

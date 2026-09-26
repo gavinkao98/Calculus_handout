@@ -1808,3 +1808,28 @@ MiMo（`mimo-v2.5-tts`，唯一 TTS 路線）不讀 inline LaTeX，需「數學�
   預設裁 beat 頭尾靜音（留 0.08s）。公測免費、仍屬外部 API（批次前依 CLAUDE.md 徵
   同意）。**非決定性**：同文字每 take ±~10% 長度，定版後勿重合成。（Gemini 路線及
   其 `build.py`／`mux.py` 已於 2026-06-16 退場。）
+
+<a id="tts-workflow-proposal-2026-09-26"></a>
+## 配音工作流提案（2026-09-26；未實作，待使用者審閱）
+
+**這是提案，不取代上方正式 MiMo／manifest schema 2 契約，也不改動現行 fallback 行為。** 完整候選契約與八種可操作情境見 [配音工作流審閱稿](_audit/REVIEW-tts-workflow-2026-09-26.html)。本輪零 API 呼叫／安裝／真合成；旁白與動畫未修改。使用者偏好＝口音不限，像真人優先。
+
+- **範圍**：從已認可內容的旁白口語化，到可跨機取回的鎖定音軌；不設計「丟 LaTeX 自動生成整部影片」。
+- **流程**：共用念法／lint → NFA＋稿鎖 → 該批計畫與費用同意 → 自然語段合成並立即存 take → 獨立念法 QA／對齊／選 take → 剪裁／停頓／音量處理 → 核對最後交付音檔時序 → 音鎖與既有 manifest 相容匯出。
+- **人工接觸點**：確認稿、同意該批用量與費用、鎖音前完整試聽一次（最後一項尚待拍板）。外部 NFA／第二意見仍須逐次報量同意。
+- **狀態語義**：提案為 `draft → script_locked → reviewing → audio_locked`；入口保留既有 `CONTENT_APPROVED`／source lock。`script_locked` 指口語合成輸入通過 NFA 的快照，不改既有 NFA 在 source 鎖稿後審查的契約。
+- **三種單位**：自然語段負責合成；語言專屬文字 span／穩定 cue ID 負責定位；scene／beat 負責相容匯出。短 scene 可整段，長 scene 自然斷；中英各自分段，不強制相同 beat 數。show marker 不自動成為 TTS 切點。
+- **重用身分**：request identity 包含實際送出的文字（保留標點）、供應商／模型／voice／參數，排除畫面順序與 cue 位置。詞庫版次記來源，但展開後輸入不變不付費重配。
+- **Take 保存**：take ID／原始 hash 與 request identity 分開，同請求可多 take；每個成功 take 與 receipt 立即保存，對齊失敗不丟音檔。預設重用，新增 take 明確選擇；ASR／對齊失敗不自動合成，鎖音檔遺失先取回。
+- **版本邊界**：處理配方／交付 hash／timing 各有版本。cue 映射只更新時序與匯出、重驗必要 cue；新 take 或任何音訊後製使舊音鎖失效。改時長後重新變換／對齊並驗證，只改音量也更新交付 hash。
+- **QA 與時序**：先驗供應商時間，再選本機限稿 FA；自由 ASR 只找疑點，不當數學／字幕真相。正規化不得抹去負號、變數、分子分母與否定詞。插值標 `estimated`，必要 cue 可人工校點並留來源。
+- **鎖音條件**：附 NFA、念法、聽感與時序裁決；可豁免項目需記人與理由。未裁決錯讀或必要 cue `unresolved` 不得鎖音，不能以泛用豁免繞過。
+- **批次同意**：plan 快照綁定文字、語段、模型、voice、參數與上限，內容變更即重新報量；使用者不必手抄 hash。列重用命中、字數／估計分鐘、計費單位／單價來源日期、請求數與上限；本提案費用待報價。
+- **帳本**：初版無自動付費重試；HTTP 嘗試也納入硬上限。結果不明標 `unknown`、查 receipt／帳務，不假裝零費用。試音／正式／重配共用累計帳本，不以最後 manifest receipt 冒充總帳；mock／live 隔離。0 次 TTS 不等於零外部費用，雲端 ASR／外部 NFA 另報。
+- **音鎖交付物**：spoken revision／語言／段 ID／scene 映射；選定 take、原始／交付 hash、時長與採樣資訊；文字 span／詞句／cue 時序與 source／quality；後製配方／offset；QA 證據與 receipts；相對路徑與跨機資產索引。音檔可不進 Git，但須另存可恢復位置，不靠 TTS 重生。
+- **Remotion 接口**：沿用 `buildShow`／`words.ts` 與 manifest 消費端，只讀鎖音產物；預覽／render 不直接合成。不先造完整 visual events DSL。
+- **Q7 候選試驗**：MiniMax Speech 2.8 HD、ElevenLabs v3、MiMo 基準；Fish S2.1 Pro／Gemini 候補。先選 voice／相同口語語段，以 `mirror`（或 `hook`）、`halfway`、`recap` 各試一段。候選最多 3 家 × 3 段 × 1 take＝9 次初始合成；voice 試音／重試另報，字數與估計秒數待量稿，尚未執行／未獲該批同意。已有 MiMo beat 音檔只作現況 baseline；公平同語段比較的新 MiMo 呼叫算進這 9 次。
+- **試驗驗收建議**：等響度、無 BGM 盲聽；錯讀硬門檻，記自然度、接續、人工修改工時與 cue 誤差。暫提必要 cue 人工確認 ≤0.10s（待審、非模型保證）；勝出後長段穩定試驗另報。沒有捏造品質分數或勝出結果。
+- **三階段落地**：先評聲音／時序來源；再做 plan／reuse／take／review／lock；最後補中文詞庫／span／cue 與 manifest adapter。既有工具責任映射詳見 HTML，允許人工校點，不先造全自動引擎。
+- **依賴**：缺套件／模型先提方案徵同意，不自裝或手刻替代；批准新增後同步 `ENVIRONMENT.md`、`tools/doctor.py` 與版本鎖。本輪零依賴變更。
+- **來源**：HTML 列官方能力文件與 repo 現況，查核日 2026-09-26；文件能力不是 Q7 實測，所選模型的參數相容性與費用仍待執行前核對。
