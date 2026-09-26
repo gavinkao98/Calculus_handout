@@ -244,6 +244,8 @@ copy tools\agy.cmd "%APPDATA%\npm\agy.cmd"
 
 - **裝法（每台機器一次，全局）：** `python -m pip install --upgrade whisper-timestamped stable-ts`。pip 會安裝 `whisper_timestamped` CLI、`openai-whisper`、`dtw-python`、`numba`、`tiktoken`、`torchaudio` 等依賴。
 - **模型快取：** 兩者共用 openai-whisper 的 model cache（`base.en` 約 139 MB，第一次跑會下載；之後可離線重用）。模型下載不是計費 API，但仍需要網路。
+- **Q7 中文試片對齊（2026-09-26 使用者批准下載）：** 沿用上述全局套件，另加多語 Whisper `small` 權重；英文限定的 `base.en`／`small.en` 不適用中文。檔案＝`~/.cache/whisper/small.pt`（設定 `XDG_CACHE_HOME` 時隨該快取根目錄），**483617219 bytes**（約 484 MB）；SHA256＝`9ecf779972d90ba49c06d968637d720dd632c55bbf19d441fb42bf17a411e794`。[官方權重](https://openaipublic.azureedge.net/main/whisper/models/9ecf779972d90ba49c06d968637d720dd632c55bbf19d441fb42bf17a411e794/small.pt)。換機重現已議定環境可用全局 Python 執行 `python -c "import stable_whisper; stable_whisper.load_model('small', device='cpu')"` 下載一次，再跑 `tools/doctor.py` 驗大小與 checksum。沒有新增套件或更改套件版本。
+  - 本機全局直譯器＝`C:\Users\Kao\AppData\Local\Programs\Python\Python312\python.exe`；`.venv` 未包含 stable-ts。`tts_trial_align.py --trial-dir <批次目錄> --output-dir <public/audio/試片目錄> --model-path <small.pt絕對路徑>` 僅接受已存在、checksum 正確的本機權重，`language='zh'`、CPU 8 threads，無模型下載或 TTS API 呼叫。先核驗整批成功 take、再對齊；原 WAV 不剪裁，cue 對照與原始對齊另存，manifest 明標 trial／未音鎖，需人工確認必要 cue 至 ±0.1 秒。一般影片線的英文 `scene_align.py` 不受影響。
 - **目前驗證版本：** `whisper-timestamped 1.15.9`、`openai-whisper 20250625`、`stable-ts 2.19.1`（連帶裝 `torchaudio 2.11.0`）。
 - **上游狀態注意：** `stable-ts` 上游（jianfch/stable-ts）已於 2026-05-30 封存（read-only、無後繼專案）。本機已驗證可用，故釘住上述版本組合；若未來 whisper／torch 升版造成不相容，備援路線是 `torchaudio` 的 CTC forced alignment（torchaudio 已隨 stable-ts 進環境）。
 

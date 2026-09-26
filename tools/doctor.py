@@ -17,6 +17,7 @@
 """
 from __future__ import annotations
 
+import hashlib
 import json
 import os
 import platform
@@ -300,6 +301,27 @@ def check_forced_alignment() -> None:
         record(WARN, "forced-alignment", "stable-ts (stable_whisper) not importable",
                "Optional; transcript-constrained timing source for scene-level TTS; "
                "install with python -m pip install --upgrade stable-ts")
+
+
+def check_chinese_alignment_model() -> None:
+    """Local checksum only: never let Whisper auto-download during doctor."""
+    path = Path(os.environ.get("XDG_CACHE_HOME", str(Path.home() / ".cache"))) / "whisper/small.pt"
+    expected = "9ecf779972d90ba49c06d968637d720dd632c55bbf19d441fb42bf17a411e794"
+    if not path.is_file():
+        record(WARN, "forced-alignment", "中文 Whisper small 權重未快取",
+               f"Q7 中文試片離線對齊需要 {path}（483617219 bytes）；安裝方式見 ENVIRONMENT.md §⑤c")
+        return
+    try:
+        hasher = hashlib.sha256()
+        with path.open("rb") as stream:
+            for chunk in iter(lambda: stream.read(1024 * 1024), b""):
+                hasher.update(chunk)
+        digest = hasher.hexdigest()
+        valid = path.stat().st_size == 483617219 and digest == expected
+        record(PASS if valid else WARN, "forced-alignment", "中文 Whisper small 本機權重完整性",
+               f"{path}；SHA256={digest}" + ("；可供離線載入" if valid else "；大小或 checksum 不符，不可使用"))
+    except OSError as exc:
+        record(WARN, "forced-alignment", "中文 Whisper small 權重無法讀取", str(exc))
 
 
 def check_assets() -> None:
@@ -641,6 +663,7 @@ def main() -> int:
     check_agy()
     check_vale()
     check_forced_alignment()
+    check_chinese_alignment_model()
     check_assets()
     check_fonts()
     check_vendored_text_font()
