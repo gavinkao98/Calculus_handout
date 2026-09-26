@@ -1,4 +1,4 @@
-"""Offline Chinese scene alignment for a MiMo trial, never an audio lock.
+"""Offline Chinese scene alignment for MiMo or Gemini trials, never an audio lock.
 
 Run with the global Python that has stable-ts installed. Only explicit local
 Whisper weights are accepted; this tool never synthesizes or downloads audio.
@@ -136,8 +136,14 @@ def wav_seconds(path: Path) -> float:
 
 def validate_trial(trial_dir: Path) -> tuple[dict, dict]:
     """Verify the complete immutable ledger before loading any model."""
-    from pipeline.tts_scene_trial import read_plan, read_ledger, wav_info
+    from pipeline.tts_scene_trial import read_ledger, wav_info
     stored = read_json(trial_dir / "plan.json")
+    if stored.get("mode") == "scene_trial":
+        from pipeline.tts_scene_trial import read_plan
+    elif stored.get("mode") == "gemini_scene_trial":
+        from pipeline.tts_gemini_scene_trial import read_plan
+    else:
+        raise TrialAlignmentError("unsupported trial plan mode")
     plan = read_plan(trial_dir, stored["plan_snapshot_hash"])
     _, completed = read_ledger(trial_dir, plan)
     if set(completed) != {r["scene_id"] for r in plan["requests"]}:
@@ -167,6 +173,8 @@ def align_trial(trial_dir: Path, output_dir: Path, model_path: Path) -> dict:
     manifest_path = output_dir / "manifest.json"
     if manifest_path.exists() and read_json(manifest_path).get("trial_plan_hash") != plan["plan_snapshot_hash"]:
         raise TrialAlignmentError("output directory already belongs to a different trial")
+    if manifest_path.exists() and read_json(manifest_path).get("backend") != ("gemini" if plan["mode"] == "gemini_scene_trial" else "mimo"):
+        raise TrialAlignmentError("output directory already belongs to a different provider")
 
     import stable_whisper
     import torch
@@ -250,7 +258,8 @@ def align_trial(trial_dir: Path, output_dir: Path, model_path: Path) -> dict:
                "scenes": report}
     write_json(output_dir / "cue-quality.json", quality)
     manifest = {"schema": 2, "deck_id": plan["source_snapshot"]["meta"]["id"],
-                "backend": "mimo", "model": plan["model"], "voice": plan["voice"],
+                "backend": "gemini" if plan["mode"] == "gemini_scene_trial" else "mimo",
+                "model": plan["model"], "voice": plan["voice"],
                 "language": "zh", "trial": True, "audio_locked": False, "nfa_status": "not_verified",
                 "trial_plan_hash": plan["plan_snapshot_hash"], "scenes": scenes,
                 "alignment_model_sha256": SMALL_SHA256, "cue_quality_file": "cue-quality.json"}
