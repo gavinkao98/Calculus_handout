@@ -1,0 +1,140 @@
+{
+  "version": 1,
+  "pilot_id": "q7-zh-tts-pilot-2026-09-26",
+  "language": "zh-TW",
+  "scenes": [
+    "mirror",
+    "halfway",
+    "recap"
+  ],
+  "glossary_revision": "af73ed132eb2dd321c7df3bbbb4c9674ff38e6789ebb6f7ae8d027d77bdf24db",
+  "calibration": {
+    "status": "baseline_reference_only",
+    "note": "既有冰糖 beat 串接，文字逐字相同；含既有裁切／停頓，只作估時參考，不是本輪整段合成或 timing 驗收。通用混合語言估算未套用校準係數。",
+    "measured_total_seconds": 76.26375,
+    "samples": [
+      {
+        "scene_id": "mirror",
+        "text_sha256": "f02c8dce1f5ad203935b168829ab1c8de25ffe0cc09221687d3e4f3049c1c7d1",
+        "audio_file": "video/experiments/remotion_styles/paper/public/audio/q7zh_beat/scenes/04_mirror.wav",
+        "audio_sha256": "53a716a0890566f3cd5eb373408652d7510c2c6d678f9f55ca30cd50f3a11d89",
+        "sample_rate": 24000,
+        "sample_count": 487680,
+        "measured_seconds": 20.32,
+        "mode": "existing_beat_concat",
+        "text_matches": true
+      },
+      {
+        "scene_id": "halfway",
+        "text_sha256": "ba74c033404146cf071c79346dfc027d7ca5e238a1d15e37820fe405c6592cfb",
+        "audio_file": "video/experiments/remotion_styles/paper/public/audio/q7zh_beat/scenes/07_halfway.wav",
+        "audio_sha256": "02ea7d01185ab8289fc30f226a8c53a836ed9c87df710ca70dd9ff530479f4dc",
+        "sample_rate": 24000,
+        "sample_count": 1016389,
+        "measured_seconds": 42.34954166666667,
+        "mode": "existing_beat_concat",
+        "text_matches": true
+      },
+      {
+        "scene_id": "recap",
+        "text_sha256": "fab3c399ad48d161e59f3ed5b254ffb789773688620e51e5d6fb372abf91c364",
+        "audio_file": "video/experiments/remotion_styles/paper/public/audio/q7zh_beat/scenes/11_recap.wav",
+        "audio_sha256": "2cdaf733f9eb7fa58f6a20266fd3865b8da7d08b98efe6d6c439d9d6a61a3f40",
+        "sample_rate": 24000,
+        "sample_count": 326261,
+        "measured_seconds": 13.594208333333333,
+        "mode": "existing_beat_concat",
+        "text_matches": true
+      }
+    ]
+  },
+  "providers": [
+    {
+      "id": "minimax",
+      "model": "speech-2.8-hd",
+      "voice": "Chinese (Mandarin)_Gentleman",
+      "voice_source": "https://platform.minimax.io/docs/faq/system-voice-id",
+      "parameters": {
+        "stream": false,
+        "language_boost": "Chinese",
+        "output_format": "hex",
+        "voice_setting": {
+          "speed": 1,
+          "vol": 1,
+          "pitch": 0
+        },
+        "audio_setting": {
+          "sample_rate": 32000,
+          "format": "wav",
+          "channel": 1
+        },
+        "subtitle_enable": true,
+        "subtitle_type": "word"
+      },
+      "billing": {
+        "rule": "han_double",
+        "unit_price": 100,
+        "per_units": 1000000,
+        "currency": "USD",
+        "source": "https://platform.minimax.io/docs/guides/pricing-paygo",
+        "checked_on": "2026-09-26",
+        "note": "官網牌價 $100／百萬 characters。此計畫將漢字每字算 2、其餘含空白標點算 1，作保守預算假設，非已核實的供應商計字規則；實際依 usage_characters／帳務核對。"
+      }
+    },
+    {
+      "id": "elevenlabs",
+      "model": "eleven_v3",
+      "voice": "hZTuv9Zqrq4yHYrEmF1r",
+      "voice_source": "https://elevenlabs.io/text-to-speech/mandarin-chinese",
+      "parameters": {
+        "output_format": "mp3_44100_128",
+        "voice_settings": {
+          "stability": 0.5
+        }
+      },
+      "billing": {
+        "rule": "all_characters",
+        "unit_price": 0.1,
+        "per_units": 1000,
+        "currency": "USD",
+        "source": "https://elevenlabs.io/pricing/api",
+        "checked_on": "2026-09-26",
+        "note": "候選 voice＝Adam Li - Deep, Steady and Calm；ID 來自官方中文頁可見 radio 選項的 value。以公開 v3 $0.10／千字符估計；尚未核對帳號方案、Voice Library API 資格及此 voice 是否有加價，確認前不可執行。"
+      }
+    },
+    {
+      "id": "mimo",
+      "model": "mimo-v2.5-tts",
+      "voice": "冰糖",
+      "voice_source": "https://platform.xiaomimimo.com/docs/en-US/news/previous-news/v2.5-tts-release",
+      "parameters": {
+        "audio": {
+          "format": "wav"
+        },
+        "style": ""
+      },
+      "billing": {
+        "rule": "free",
+        "unit_price": 0,
+        "per_units": 1,
+        "currency": "USD",
+        "source": "https://mimo.mi.com/docs/zh-CN/price/pay-as-you-go",
+        "checked_on": "2026-09-26",
+        "note": "官網列限時免費；仍為外部生成式 API，需本批同意。執行當日重新核價。"
+      }
+    }
+  ],
+  "preflight_notes": [
+    "候選音色以官方清單與既有 baseline 選入，尚未以共同試稿試聽；不宣稱自然度已驗證。",
+    "本機 repo .env 僅確認 MiMo 設定存在；MiniMax／ElevenLabs 未見設定，未讀出或記錄 key 值。",
+    "本批未合成、未取得 API 同意。先完成稿鎖／NFA 證據與帳號價格核對；需外部 NFA 時另徵同意。",
+    "最多 9 次初始 HTTP 嘗試，不自動重試；逾時結果不明即停查帳。",
+    "試聽比較沿用 −19 LUFS、無背景音樂、隱藏供應商標籤。錯讀／漏字先裁決，再比較自然度與銜接；必要 cue 目標誤差 ≤0.10s，屬待實測的驗收目標。",
+    "本輪只有離線報量入口。累計帳本／不可覆寫 take／live runner／lock 與相容匯出依試驗結果接續，不使用舊 tts.py fallback ladder 直接執行這份新計畫。"
+  ],
+  "preflight_blockers": [
+    "MiniMax／ElevenLabs API 金鑰與帳號模型權限尚待本機設定及唯讀核對。",
+    "ElevenLabs Voice Library 的 API 方案資格與 Adam Li 加價尚未核實；公開估價不是帳號實價。",
+    "本次自然語段的稿鎖／NFA 證據尚未建立；本工具不自動認可稿件。"
+  ]
+}

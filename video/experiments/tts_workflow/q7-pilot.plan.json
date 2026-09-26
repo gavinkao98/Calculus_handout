@@ -1,0 +1,760 @@
+{
+  "version": 1,
+  "pilot_id": "q7-zh-tts-pilot-2026-09-26",
+  "language": "zh-TW",
+  "mode": "offline_plan_only",
+  "source_path": "video/experiments/remotion_styles/paper/q7/q7.zh.yml",
+  "source_snapshot_hash": "8d3710b88c405483ced7fd0d93b47f792c7ed18c26600bfef0ffaff996a51646",
+  "config_snapshot": {
+    "version": 1,
+    "pilot_id": "q7-zh-tts-pilot-2026-09-26",
+    "language": "zh-TW",
+    "scenes": [
+      "mirror",
+      "halfway",
+      "recap"
+    ],
+    "glossary_revision": "af73ed132eb2dd321c7df3bbbb4c9674ff38e6789ebb6f7ae8d027d77bdf24db",
+    "calibration": {
+      "status": "baseline_reference_only",
+      "note": "既有冰糖 beat 串接，文字逐字相同；含既有裁切／停頓，只作估時參考，不是本輪整段合成或 timing 驗收。通用混合語言估算未套用校準係數。",
+      "measured_total_seconds": 76.26375,
+      "samples": [
+        {
+          "scene_id": "mirror",
+          "text_sha256": "f02c8dce1f5ad203935b168829ab1c8de25ffe0cc09221687d3e4f3049c1c7d1",
+          "audio_file": "video/experiments/remotion_styles/paper/public/audio/q7zh_beat/scenes/04_mirror.wav",
+          "audio_sha256": "53a716a0890566f3cd5eb373408652d7510c2c6d678f9f55ca30cd50f3a11d89",
+          "sample_rate": 24000,
+          "sample_count": 487680,
+          "measured_seconds": 20.32,
+          "mode": "existing_beat_concat",
+          "text_matches": true
+        },
+        {
+          "scene_id": "halfway",
+          "text_sha256": "ba74c033404146cf071c79346dfc027d7ca5e238a1d15e37820fe405c6592cfb",
+          "audio_file": "video/experiments/remotion_styles/paper/public/audio/q7zh_beat/scenes/07_halfway.wav",
+          "audio_sha256": "02ea7d01185ab8289fc30f226a8c53a836ed9c87df710ca70dd9ff530479f4dc",
+          "sample_rate": 24000,
+          "sample_count": 1016389,
+          "measured_seconds": 42.34954166666667,
+          "mode": "existing_beat_concat",
+          "text_matches": true
+        },
+        {
+          "scene_id": "recap",
+          "text_sha256": "fab3c399ad48d161e59f3ed5b254ffb789773688620e51e5d6fb372abf91c364",
+          "audio_file": "video/experiments/remotion_styles/paper/public/audio/q7zh_beat/scenes/11_recap.wav",
+          "audio_sha256": "2cdaf733f9eb7fa58f6a20266fd3865b8da7d08b98efe6d6c439d9d6a61a3f40",
+          "sample_rate": 24000,
+          "sample_count": 326261,
+          "measured_seconds": 13.594208333333333,
+          "mode": "existing_beat_concat",
+          "text_matches": true
+        }
+      ]
+    },
+    "providers": [
+      {
+        "id": "minimax",
+        "model": "speech-2.8-hd",
+        "voice": "Chinese (Mandarin)_Gentleman",
+        "voice_source": "https://platform.minimax.io/docs/faq/system-voice-id",
+        "parameters": {
+          "stream": false,
+          "language_boost": "Chinese",
+          "output_format": "hex",
+          "voice_setting": {
+            "speed": 1,
+            "vol": 1,
+            "pitch": 0
+          },
+          "audio_setting": {
+            "sample_rate": 32000,
+            "format": "wav",
+            "channel": 1
+          },
+          "subtitle_enable": true,
+          "subtitle_type": "word"
+        },
+        "billing": {
+          "rule": "han_double",
+          "unit_price": 100,
+          "per_units": 1000000,
+          "currency": "USD",
+          "source": "https://platform.minimax.io/docs/guides/pricing-paygo",
+          "checked_on": "2026-09-26",
+          "note": "官網牌價 $100／百萬 characters。此計畫將漢字每字算 2、其餘含空白標點算 1，作保守預算假設，非已核實的供應商計字規則；實際依 usage_characters／帳務核對。"
+        }
+      },
+      {
+        "id": "elevenlabs",
+        "model": "eleven_v3",
+        "voice": "hZTuv9Zqrq4yHYrEmF1r",
+        "voice_source": "https://elevenlabs.io/text-to-speech/mandarin-chinese",
+        "parameters": {
+          "output_format": "mp3_44100_128",
+          "voice_settings": {
+            "stability": 0.5
+          }
+        },
+        "billing": {
+          "rule": "all_characters",
+          "unit_price": 0.1,
+          "per_units": 1000,
+          "currency": "USD",
+          "source": "https://elevenlabs.io/pricing/api",
+          "checked_on": "2026-09-26",
+          "note": "候選 voice＝Adam Li - Deep, Steady and Calm；ID 來自官方中文頁可見 radio 選項的 value。以公開 v3 $0.10／千字符估計；尚未核對帳號方案、Voice Library API 資格及此 voice 是否有加價，確認前不可執行。"
+        }
+      },
+      {
+        "id": "mimo",
+        "model": "mimo-v2.5-tts",
+        "voice": "冰糖",
+        "voice_source": "https://platform.xiaomimimo.com/docs/en-US/news/previous-news/v2.5-tts-release",
+        "parameters": {
+          "audio": {
+            "format": "wav"
+          },
+          "style": ""
+        },
+        "billing": {
+          "rule": "free",
+          "unit_price": 0,
+          "per_units": 1,
+          "currency": "USD",
+          "source": "https://mimo.mi.com/docs/zh-CN/price/pay-as-you-go",
+          "checked_on": "2026-09-26",
+          "note": "官網列限時免費；仍為外部生成式 API，需本批同意。執行當日重新核價。"
+        }
+      }
+    ],
+    "preflight_notes": [
+      "候選音色以官方清單與既有 baseline 選入，尚未以共同試稿試聽；不宣稱自然度已驗證。",
+      "本機 repo .env 僅確認 MiMo 設定存在；MiniMax／ElevenLabs 未見設定，未讀出或記錄 key 值。",
+      "本批未合成、未取得 API 同意。先完成稿鎖／NFA 證據與帳號價格核對；需外部 NFA 時另徵同意。",
+      "最多 9 次初始 HTTP 嘗試，不自動重試；逾時結果不明即停查帳。",
+      "試聽比較沿用 −19 LUFS、無背景音樂、隱藏供應商標籤。錯讀／漏字先裁決，再比較自然度與銜接；必要 cue 目標誤差 ≤0.10s，屬待實測的驗收目標。",
+      "本輪只有離線報量入口。累計帳本／不可覆寫 take／live runner／lock 與相容匯出依試驗結果接續，不使用舊 tts.py fallback ladder 直接執行這份新計畫。"
+    ],
+    "preflight_blockers": [
+      "MiniMax／ElevenLabs API 金鑰與帳號模型權限尚待本機設定及唯讀核對。",
+      "ElevenLabs Voice Library 的 API 方案資格與 Adam Li 加價尚未核實；公開估價不是帳號實價。",
+      "本次自然語段的稿鎖／NFA 證據尚未建立；本工具不自動認可稿件。"
+    ]
+  },
+  "span_convention": "Python Unicode codepoint offsets [start,end); source_say_span refers to decoded YAML say; text_span refers to normalized request text",
+  "normalization": "移除 show 標記並壓縮空白；保留所有標點；每個完整 scene 一次合成。",
+  "segments": [
+    {
+      "id": "mirror",
+      "scene_id": "mirror",
+      "text": "先看一次反彈就好。 進來的角度，等於出去的角度，也就是入射角等於反射角。 所以反彈之後的路徑，剛好就是：假如沒有這面牆，球原本會走的那條路，對著牆翻過來的鏡像。把它沿著牆翻過去，就和原本的直線接成一直線。",
+      "text_hash": "f02c8dce1f5ad203935b168829ab1c8de25ffe0cc09221687d3e4f3049c1c7d1",
+      "scene_text_span": [
+        0,
+        102
+      ],
+      "source_say": "先看一次反彈就好。\n{show equal} 進來的角度，等於出去的角度，也就是入射角等於反射角。\n{show image} 所以反彈之後的路徑，剛好就是：假如沒有這面牆，球原本會走的那條路，對著牆翻過來的鏡像。把它沿著牆翻過去，就和原本的直線接成一直線。\n",
+      "source": null,
+      "cues": [
+        {
+          "cue_id": "mirror.opening",
+          "scene_id": "mirror",
+          "reveal": null,
+          "text_span": [
+            0,
+            9
+          ],
+          "source_say_span": [
+            0,
+            10
+          ],
+          "text": "先看一次反彈就好。",
+          "timing_status": "unresolved"
+        },
+        {
+          "cue_id": "mirror.equal",
+          "scene_id": "mirror",
+          "reveal": "equal",
+          "text_span": [
+            10,
+            36
+          ],
+          "source_say_span": [
+            22,
+            50
+          ],
+          "text": "進來的角度，等於出去的角度，也就是入射角等於反射角。",
+          "timing_status": "unresolved"
+        },
+        {
+          "cue_id": "mirror.image",
+          "scene_id": "mirror",
+          "reveal": "image",
+          "text_span": [
+            37,
+            102
+          ],
+          "source_say_span": [
+            62,
+            129
+          ],
+          "text": "所以反彈之後的路徑，剛好就是：假如沒有這面牆，球原本會走的那條路，對著牆翻過來的鏡像。把它沿著牆翻過去，就和原本的直線接成一直線。",
+          "timing_status": "unresolved"
+        }
+      ],
+      "characters": 102,
+      "nonwhitespace_characters": 100,
+      "duration_estimate": {
+        "han_characters": 89,
+        "english_words": 0,
+        "seconds_range": [
+          17.8,
+          29.67
+        ],
+        "calibrated": false,
+        "status": "uncalibrated",
+        "method": "Han 3–5 字／秒＋英文 2–3 詞／秒；未以既有音訊校準，標點停頓與數字未另建模；實際時長須量音檔。"
+      }
+    },
+    {
+      "id": "halfway",
+      "scene_id": "halfway",
+      "text": "要回到中心，就要瞄準一個偶數偶數點，把它叫做二 p、二 q。 取射線上的第一個偶數偶數點。那麼 p 跟 q 就互質。 所以，射線上的第一個格點是 p、q，下一個才是二 p、二 q。 這條線段上的格點只有三個：起點、中點 p、q，還有終點。 關鍵全在這個中點。 如果 p 跟 q 都是奇數，中點就是角落的洞，球在半路就掉進洞裡。沿對角線打的那一球，一、一，就是這樣。 如果一個是奇數、一個是偶數，中點就沒有洞，球可以一路回到中心。至於兩個都是偶數，不可能，因為 p 跟 q 互質。",
+      "text_hash": "ba74c033404146cf071c79346dfc027d7ca5e238a1d15e37820fe405c6592cfb",
+      "scene_text_span": [
+        0,
+        239
+      ],
+      "source_say": "要回到中心，就要瞄準一個偶數偶數點，把它叫做二 p、二 q。\n{show first} 取射線上的第一個偶數偶數點。那麼 p 跟 q 就互質。\n{show only} 所以，射線上的第一個格點是 p、q，下一個才是二 p、二 q。\n{show list} 這條線段上的格點只有三個：起點、中點 p、q，還有終點。\n{show mid} 關鍵全在這個中點。\n{show odd} 如果 p 跟 q 都是奇數，中點就是角落的洞，球在半路就掉進洞裡。沿對角線打的那一球，一、一，就是這樣。\n{show mixed} 如果一個是奇數、一個是偶數，中點就沒有洞，球可以一路回到中心。至於兩個都是偶數，不可能，因為 p 跟 q 互質。\n",
+      "source": null,
+      "cues": [
+        {
+          "cue_id": "halfway.opening",
+          "scene_id": "halfway",
+          "reveal": null,
+          "text_span": [
+            0,
+            30
+          ],
+          "source_say_span": [
+            0,
+            31
+          ],
+          "text": "要回到中心，就要瞄準一個偶數偶數點，把它叫做二 p、二 q。",
+          "timing_status": "unresolved"
+        },
+        {
+          "cue_id": "halfway.first",
+          "scene_id": "halfway",
+          "reveal": "first",
+          "text_span": [
+            31,
+            58
+          ],
+          "source_say_span": [
+            43,
+            72
+          ],
+          "text": "取射線上的第一個偶數偶數點。那麼 p 跟 q 就互質。",
+          "timing_status": "unresolved"
+        },
+        {
+          "cue_id": "halfway.only",
+          "scene_id": "halfway",
+          "reveal": "only",
+          "text_span": [
+            59,
+            90
+          ],
+          "source_say_span": [
+            83,
+            116
+          ],
+          "text": "所以，射線上的第一個格點是 p、q，下一個才是二 p、二 q。",
+          "timing_status": "unresolved"
+        },
+        {
+          "cue_id": "halfway.list",
+          "scene_id": "halfway",
+          "reveal": "list",
+          "text_span": [
+            91,
+            119
+          ],
+          "source_say_span": [
+            127,
+            157
+          ],
+          "text": "這條線段上的格點只有三個：起點、中點 p、q，還有終點。",
+          "timing_status": "unresolved"
+        },
+        {
+          "cue_id": "halfway.mid",
+          "scene_id": "halfway",
+          "reveal": "mid",
+          "text_span": [
+            120,
+            129
+          ],
+          "source_say_span": [
+            167,
+            178
+          ],
+          "text": "關鍵全在這個中點。",
+          "timing_status": "unresolved"
+        },
+        {
+          "cue_id": "halfway.odd",
+          "scene_id": "halfway",
+          "reveal": "odd",
+          "text_span": [
+            130,
+            182
+          ],
+          "source_say_span": [
+            188,
+            242
+          ],
+          "text": "如果 p 跟 q 都是奇數，中點就是角落的洞，球在半路就掉進洞裡。沿對角線打的那一球，一、一，就是這樣。",
+          "timing_status": "unresolved"
+        },
+        {
+          "cue_id": "halfway.mixed",
+          "scene_id": "halfway",
+          "reveal": "mixed",
+          "text_span": [
+            183,
+            239
+          ],
+          "source_say_span": [
+            254,
+            312
+          ],
+          "text": "如果一個是奇數、一個是偶數，中點就沒有洞，球可以一路回到中心。至於兩個都是偶數，不可能，因為 p 跟 q 互質。",
+          "timing_status": "unresolved"
+        }
+      ],
+      "characters": 239,
+      "nonwhitespace_characters": 215,
+      "duration_estimate": {
+        "han_characters": 170,
+        "english_words": 14,
+        "seconds_range": [
+          38.67,
+          63.67
+        ],
+        "calibrated": false,
+        "status": "uncalibrated",
+        "method": "Han 3–5 字／秒＋英文 2–3 詞／秒；未以既有音訊校準，標點停頓與數字未另建模；實際時長須量音檔。"
+      }
+    },
+    {
+      "id": "recap",
+      "scene_id": "recap",
+      "text": "整理一下：a 小題有無窮多個角度，b 小題一個都沒有。 整題靠的就是兩個想法。展開，把反彈變成一條直線；中點測試，把這條直線變成奇偶的問題。",
+      "text_hash": "fab3c399ad48d161e59f3ed5b254ffb789773688620e51e5d6fb372abf91c364",
+      "scene_text_span": [
+        0,
+        70
+      ],
+      "source_say": "整理一下：a 小題有無窮多個角度，b 小題一個都沒有。\n{show ideas} 整題靠的就是兩個想法。展開，把反彈變成一條直線；中點測試，把這條直線變成奇偶的問題。\n",
+      "source": null,
+      "cues": [
+        {
+          "cue_id": "recap.opening",
+          "scene_id": "recap",
+          "reveal": null,
+          "text_span": [
+            0,
+            27
+          ],
+          "source_say_span": [
+            0,
+            28
+          ],
+          "text": "整理一下：a 小題有無窮多個角度，b 小題一個都沒有。",
+          "timing_status": "unresolved"
+        },
+        {
+          "cue_id": "recap.ideas",
+          "scene_id": "recap",
+          "reveal": "ideas",
+          "text_span": [
+            28,
+            70
+          ],
+          "source_say_span": [
+            40,
+            84
+          ],
+          "text": "整題靠的就是兩個想法。展開，把反彈變成一條直線；中點測試，把這條直線變成奇偶的問題。",
+          "timing_status": "unresolved"
+        }
+      ],
+      "characters": 70,
+      "nonwhitespace_characters": 67,
+      "duration_estimate": {
+        "han_characters": 57,
+        "english_words": 2,
+        "seconds_range": [
+          12.07,
+          20.0
+        ],
+        "calibrated": false,
+        "status": "uncalibrated",
+        "method": "Han 3–5 字／秒＋英文 2–3 詞／秒；未以既有音訊校準，標點停頓與數字未另建模；實際時長須量音檔。"
+      }
+    }
+  ],
+  "providers": [
+    {
+      "id": "minimax",
+      "model": "speech-2.8-hd",
+      "voice": "Chinese (Mandarin)_Gentleman",
+      "voice_source": "https://platform.minimax.io/docs/faq/system-voice-id",
+      "parameters": {
+        "stream": false,
+        "language_boost": "Chinese",
+        "output_format": "hex",
+        "voice_setting": {
+          "speed": 1,
+          "vol": 1,
+          "pitch": 0
+        },
+        "audio_setting": {
+          "sample_rate": 32000,
+          "format": "wav",
+          "channel": 1
+        },
+        "subtitle_enable": true,
+        "subtitle_type": "word"
+      },
+      "billing": {
+        "rule": "han_double",
+        "unit_price": 100,
+        "per_units": 1000000,
+        "currency": "USD",
+        "source": "https://platform.minimax.io/docs/guides/pricing-paygo",
+        "checked_on": "2026-09-26",
+        "note": "官網牌價 $100／百萬 characters。此計畫將漢字每字算 2、其餘含空白標點算 1，作保守預算假設，非已核實的供應商計字規則；實際依 usage_characters／帳務核對。"
+      },
+      "request_count": 3,
+      "billing_units": 727,
+      "estimated_cost": 0.0727
+    },
+    {
+      "id": "elevenlabs",
+      "model": "eleven_v3",
+      "voice": "hZTuv9Zqrq4yHYrEmF1r",
+      "voice_source": "https://elevenlabs.io/text-to-speech/mandarin-chinese",
+      "parameters": {
+        "output_format": "mp3_44100_128",
+        "voice_settings": {
+          "stability": 0.5
+        }
+      },
+      "billing": {
+        "rule": "all_characters",
+        "unit_price": 0.1,
+        "per_units": 1000,
+        "currency": "USD",
+        "source": "https://elevenlabs.io/pricing/api",
+        "checked_on": "2026-09-26",
+        "note": "候選 voice＝Adam Li - Deep, Steady and Calm；ID 來自官方中文頁可見 radio 選項的 value。以公開 v3 $0.10／千字符估計；尚未核對帳號方案、Voice Library API 資格及此 voice 是否有加價，確認前不可執行。"
+      },
+      "request_count": 3,
+      "billing_units": 411,
+      "estimated_cost": 0.0411
+    },
+    {
+      "id": "mimo",
+      "model": "mimo-v2.5-tts",
+      "voice": "冰糖",
+      "voice_source": "https://platform.xiaomimimo.com/docs/en-US/news/previous-news/v2.5-tts-release",
+      "parameters": {
+        "audio": {
+          "format": "wav"
+        },
+        "style": ""
+      },
+      "billing": {
+        "rule": "free",
+        "unit_price": 0,
+        "per_units": 1,
+        "currency": "USD",
+        "source": "https://mimo.mi.com/docs/zh-CN/price/pay-as-you-go",
+        "checked_on": "2026-09-26",
+        "note": "官網列限時免費；仍為外部生成式 API，需本批同意。執行當日重新核價。"
+      },
+      "request_count": 3,
+      "billing_units": 411,
+      "estimated_cost": 0.0
+    }
+  ],
+  "requests": [
+    {
+      "segment_id": "mirror",
+      "payload": {
+        "provider": "minimax",
+        "model": "speech-2.8-hd",
+        "voice": "Chinese (Mandarin)_Gentleman",
+        "parameters": {
+          "stream": false,
+          "language_boost": "Chinese",
+          "output_format": "hex",
+          "voice_setting": {
+            "speed": 1,
+            "vol": 1,
+            "pitch": 0
+          },
+          "audio_setting": {
+            "sample_rate": 32000,
+            "format": "wav",
+            "channel": 1
+          },
+          "subtitle_enable": true,
+          "subtitle_type": "word"
+        },
+        "text": "先看一次反彈就好。 進來的角度，等於出去的角度，也就是入射角等於反射角。 所以反彈之後的路徑，剛好就是：假如沒有這面牆，球原本會走的那條路，對著牆翻過來的鏡像。把它沿著牆翻過去，就和原本的直線接成一直線。"
+      },
+      "request_hash": "f329e3584fbb15853c3b72d184ff188d232bc603d6a4e1db7adf2de32b49f23f",
+      "take_count": 1,
+      "billing_units": 191,
+      "estimated_cost": 0.0191,
+      "currency": "USD",
+      "status": "planned_only"
+    },
+    {
+      "segment_id": "halfway",
+      "payload": {
+        "provider": "minimax",
+        "model": "speech-2.8-hd",
+        "voice": "Chinese (Mandarin)_Gentleman",
+        "parameters": {
+          "stream": false,
+          "language_boost": "Chinese",
+          "output_format": "hex",
+          "voice_setting": {
+            "speed": 1,
+            "vol": 1,
+            "pitch": 0
+          },
+          "audio_setting": {
+            "sample_rate": 32000,
+            "format": "wav",
+            "channel": 1
+          },
+          "subtitle_enable": true,
+          "subtitle_type": "word"
+        },
+        "text": "要回到中心，就要瞄準一個偶數偶數點，把它叫做二 p、二 q。 取射線上的第一個偶數偶數點。那麼 p 跟 q 就互質。 所以，射線上的第一個格點是 p、q，下一個才是二 p、二 q。 這條線段上的格點只有三個：起點、中點 p、q，還有終點。 關鍵全在這個中點。 如果 p 跟 q 都是奇數，中點就是角落的洞，球在半路就掉進洞裡。沿對角線打的那一球，一、一，就是這樣。 如果一個是奇數、一個是偶數，中點就沒有洞，球可以一路回到中心。至於兩個都是偶數，不可能，因為 p 跟 q 互質。"
+      },
+      "request_hash": "e9f6362d479384c1dcf815e26806a8115e79800d12e6d8e038d236b0f2559806",
+      "take_count": 1,
+      "billing_units": 409,
+      "estimated_cost": 0.0409,
+      "currency": "USD",
+      "status": "planned_only"
+    },
+    {
+      "segment_id": "recap",
+      "payload": {
+        "provider": "minimax",
+        "model": "speech-2.8-hd",
+        "voice": "Chinese (Mandarin)_Gentleman",
+        "parameters": {
+          "stream": false,
+          "language_boost": "Chinese",
+          "output_format": "hex",
+          "voice_setting": {
+            "speed": 1,
+            "vol": 1,
+            "pitch": 0
+          },
+          "audio_setting": {
+            "sample_rate": 32000,
+            "format": "wav",
+            "channel": 1
+          },
+          "subtitle_enable": true,
+          "subtitle_type": "word"
+        },
+        "text": "整理一下：a 小題有無窮多個角度，b 小題一個都沒有。 整題靠的就是兩個想法。展開，把反彈變成一條直線；中點測試，把這條直線變成奇偶的問題。"
+      },
+      "request_hash": "5829edd3ce4e9dc3564ad804253b93ea2dfc41523e06e2d3cace0767f7f48461",
+      "take_count": 1,
+      "billing_units": 127,
+      "estimated_cost": 0.0127,
+      "currency": "USD",
+      "status": "planned_only"
+    },
+    {
+      "segment_id": "mirror",
+      "payload": {
+        "provider": "elevenlabs",
+        "model": "eleven_v3",
+        "voice": "hZTuv9Zqrq4yHYrEmF1r",
+        "parameters": {
+          "output_format": "mp3_44100_128",
+          "voice_settings": {
+            "stability": 0.5
+          }
+        },
+        "text": "先看一次反彈就好。 進來的角度，等於出去的角度，也就是入射角等於反射角。 所以反彈之後的路徑，剛好就是：假如沒有這面牆，球原本會走的那條路，對著牆翻過來的鏡像。把它沿著牆翻過去，就和原本的直線接成一直線。"
+      },
+      "request_hash": "a1467305444d76747d6c11030085559bbefeff6df89f005a141b74c298e20fc9",
+      "take_count": 1,
+      "billing_units": 102,
+      "estimated_cost": 0.0102,
+      "currency": "USD",
+      "status": "planned_only"
+    },
+    {
+      "segment_id": "halfway",
+      "payload": {
+        "provider": "elevenlabs",
+        "model": "eleven_v3",
+        "voice": "hZTuv9Zqrq4yHYrEmF1r",
+        "parameters": {
+          "output_format": "mp3_44100_128",
+          "voice_settings": {
+            "stability": 0.5
+          }
+        },
+        "text": "要回到中心，就要瞄準一個偶數偶數點，把它叫做二 p、二 q。 取射線上的第一個偶數偶數點。那麼 p 跟 q 就互質。 所以，射線上的第一個格點是 p、q，下一個才是二 p、二 q。 這條線段上的格點只有三個：起點、中點 p、q，還有終點。 關鍵全在這個中點。 如果 p 跟 q 都是奇數，中點就是角落的洞，球在半路就掉進洞裡。沿對角線打的那一球，一、一，就是這樣。 如果一個是奇數、一個是偶數，中點就沒有洞，球可以一路回到中心。至於兩個都是偶數，不可能，因為 p 跟 q 互質。"
+      },
+      "request_hash": "a06634cda085712c1ce64725764ce48aa4a3b2f60e168c5052c52abbdf4779e9",
+      "take_count": 1,
+      "billing_units": 239,
+      "estimated_cost": 0.0239,
+      "currency": "USD",
+      "status": "planned_only"
+    },
+    {
+      "segment_id": "recap",
+      "payload": {
+        "provider": "elevenlabs",
+        "model": "eleven_v3",
+        "voice": "hZTuv9Zqrq4yHYrEmF1r",
+        "parameters": {
+          "output_format": "mp3_44100_128",
+          "voice_settings": {
+            "stability": 0.5
+          }
+        },
+        "text": "整理一下：a 小題有無窮多個角度，b 小題一個都沒有。 整題靠的就是兩個想法。展開，把反彈變成一條直線；中點測試，把這條直線變成奇偶的問題。"
+      },
+      "request_hash": "1e94fbb2ab48c79a7c7bc639196f0ba7ca38e04c2d1c4d3773dc3cb4c9e3c329",
+      "take_count": 1,
+      "billing_units": 70,
+      "estimated_cost": 0.007,
+      "currency": "USD",
+      "status": "planned_only"
+    },
+    {
+      "segment_id": "mirror",
+      "payload": {
+        "provider": "mimo",
+        "model": "mimo-v2.5-tts",
+        "voice": "冰糖",
+        "parameters": {
+          "audio": {
+            "format": "wav"
+          },
+          "style": ""
+        },
+        "text": "先看一次反彈就好。 進來的角度，等於出去的角度，也就是入射角等於反射角。 所以反彈之後的路徑，剛好就是：假如沒有這面牆，球原本會走的那條路，對著牆翻過來的鏡像。把它沿著牆翻過去，就和原本的直線接成一直線。"
+      },
+      "request_hash": "157674b861757f26342f076a1c80588cf4fbc05649535770523fd21d873065a4",
+      "take_count": 1,
+      "billing_units": 102,
+      "estimated_cost": 0.0,
+      "currency": "USD",
+      "status": "planned_only"
+    },
+    {
+      "segment_id": "halfway",
+      "payload": {
+        "provider": "mimo",
+        "model": "mimo-v2.5-tts",
+        "voice": "冰糖",
+        "parameters": {
+          "audio": {
+            "format": "wav"
+          },
+          "style": ""
+        },
+        "text": "要回到中心，就要瞄準一個偶數偶數點，把它叫做二 p、二 q。 取射線上的第一個偶數偶數點。那麼 p 跟 q 就互質。 所以，射線上的第一個格點是 p、q，下一個才是二 p、二 q。 這條線段上的格點只有三個：起點、中點 p、q，還有終點。 關鍵全在這個中點。 如果 p 跟 q 都是奇數，中點就是角落的洞，球在半路就掉進洞裡。沿對角線打的那一球，一、一，就是這樣。 如果一個是奇數、一個是偶數，中點就沒有洞，球可以一路回到中心。至於兩個都是偶數，不可能，因為 p 跟 q 互質。"
+      },
+      "request_hash": "297772ef788c11cae52f7764503f244bb33767a5d40e39a6b683e69d0abfe1c3",
+      "take_count": 1,
+      "billing_units": 239,
+      "estimated_cost": 0.0,
+      "currency": "USD",
+      "status": "planned_only"
+    },
+    {
+      "segment_id": "recap",
+      "payload": {
+        "provider": "mimo",
+        "model": "mimo-v2.5-tts",
+        "voice": "冰糖",
+        "parameters": {
+          "audio": {
+            "format": "wav"
+          },
+          "style": ""
+        },
+        "text": "整理一下：a 小題有無窮多個角度，b 小題一個都沒有。 整題靠的就是兩個想法。展開，把反彈變成一條直線；中點測試，把這條直線變成奇偶的問題。"
+      },
+      "request_hash": "4432a2711b3dd01b7cc52d56a1c88841dc4e3d250c0886164e94d36092600400",
+      "take_count": 1,
+      "billing_units": 70,
+      "estimated_cost": 0.0,
+      "currency": "USD",
+      "status": "planned_only"
+    }
+  ],
+  "summary": {
+    "segment_count": 3,
+    "provider_count": 3,
+    "planned_requests": 9,
+    "hard_cap_requests": 9,
+    "takes_per_request": 1,
+    "automatic_retry": false,
+    "reuse_count": 0,
+    "take_registry": "not_implemented",
+    "reuse_note": "既有 MiMo beat 音檔不是本次完整語段的相同請求；本輪不宣稱命中，take registry 尚未建立。",
+    "characters_once": 411,
+    "seconds_range_once": [
+      68.54,
+      113.34
+    ],
+    "minutes_range_all_requests": [
+      3.43,
+      5.67
+    ],
+    "duration_calibrated": false
+  },
+  "approval": {
+    "status": "pending",
+    "approved_requests": 0
+  },
+  "script_lock": {
+    "status": "pending",
+    "nfa_status": "not_verified",
+    "evidence": null
+  },
+  "blockers": [
+    "本批外部呼叫尚未取得同意",
+    "本次合成輸入的稿鎖與 NFA 尚未驗證",
+    "MiniMax／ElevenLabs API 金鑰與帳號模型權限尚待本機設定及唯讀核對。",
+    "ElevenLabs Voice Library 的 API 方案資格與 Adam Li 加價尚未核實；公開估價不是帳號實價。",
+    "本次自然語段的稿鎖／NFA 證據尚未建立；本工具不自動認可稿件。"
+  ],
+  "plan_snapshot_hash": "6831d57c8fedced5ce636311bfd1f4c2387bb57efaa2c8afef516e96f5eb5a0c"
+}

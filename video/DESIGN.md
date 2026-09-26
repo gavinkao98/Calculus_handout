@@ -1810,9 +1810,11 @@ MiMo（`mimo-v2.5-tts`，唯一 TTS 路線）不讀 inline LaTeX，需「數學�
   其 `build.py`／`mux.py` 已於 2026-06-16 退場。）
 
 <a id="tts-workflow-proposal-2026-09-26"></a>
-## 配音工作流提案（2026-09-26；未實作，待使用者審閱）
+## 配音工作流設計（2026-09-26；已指示開工，第一階段準備中）
 
-**這是提案，不取代上方正式 MiMo／manifest schema 2 契約，也不改動現行 fallback 行為。** 完整候選契約與八種可操作情境見 [配音工作流審閱稿](_audit/REVIEW-tts-workflow-2026-09-26.html)。本輪零 API 呼叫／安裝／真合成；旁白與動畫未修改。使用者偏好＝口音不限，像真人優先。
+**2026-09-26 開工更新：** 使用者依審閱稿指示開工，照「先 Q7 試驗」的順序新增離線 `pipeline/tts_pilot_plan.py`；[試驗入口](experiments/tts_workflow/README.md)與[批次報量頁](_audit/REVIEW-tts-pilot-plan-2026-09-26.html)保存完整語段、候選 voice／參數、公開估價限制、文字 span 與 request／plan hash。新工具沒有 live 合成能力；稿鎖、帳號實價與本批外部呼叫同意仍 pending，不能把產生計畫視為批准。下列正式 MiMo／fallback 契約仍維持原狀；完整 take／帳本／音鎖引擎及中文 adapter 留待第一階段實測後接續。
+
+**以下保留原設計範圍，不取代上方正式 MiMo／manifest schema 2 契約，也不改動現行 fallback 行為。** 完整候選契約與八種可操作情境見 [配音工作流審閱稿](_audit/REVIEW-tts-workflow-2026-09-26.html)。本輪零生成式 API 呼叫／安裝／真合成；旁白與動畫未修改。使用者偏好＝口音不限，像真人優先。
 
 - **範圍**：從已認可內容的旁白口語化，到可跨機取回的鎖定音軌；不設計「丟 LaTeX 自動生成整部影片」。
 - **流程**：共用念法／lint → NFA＋稿鎖 → 該批計畫與費用同意 → 自然語段合成並立即存 take → 獨立念法 QA／對齊／選 take → 剪裁／停頓／音量處理 → 核對最後交付音檔時序 → 音鎖與既有 manifest 相容匯出。

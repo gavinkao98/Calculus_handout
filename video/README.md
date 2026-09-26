@@ -90,6 +90,8 @@ video/
 
 ## 狀態
 
+**配音工作流試驗（2026-09-26 開工）**：[Q7 離線報量入口](experiments/tts_workflow/README.md)已可產生完整三段稿／三家候選的批次快照與 HTML。尚未執行 API 試驗；下列正式 MiMo 路線與 fallback 未更動，完整 take／帳本／音鎖功能仍待後續實測決定。
+
 **目前檢查點（2026-07-07）：產線工具鏈穩定；ch03 §3.1 為首個走完整條 MiMo 真旁白路線的正典節（clean Dean 成片），§3.2 內容稿已 LOCKED。**
 逐節進度與跨對話狀態以 [REBUILD_STATUS.md](REBUILD_STATUS.md) 頂部現況快照為準（本檔不重複）。
 

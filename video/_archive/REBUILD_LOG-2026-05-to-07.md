@@ -3,6 +3,12 @@
 
 # 講義 → 影片產線重建 — 進度與待辦
 
+## 2026-09-26 配音工作流開工：Q7 離線報量準備
+
+使用者依 `REVIEW-tts-workflow-2026-09-26.html` 指示開工，採設計的三階段順序。新增 `pipeline/tts_pilot_plan.py` 與自測、`experiments/tts_workflow/` 的候選設定／計畫快照及繁中操作說明、`_audit/REVIEW-tts-pilot-plan-2026-09-26.html`。完整自然語段 `mirror`／`halfway`／`recap` 共 411 字元；三家各三段、9 次初始請求，尚未執行。既有冰糖 beat 串接 WAV 實測共 76.264 秒，hash／取樣數與文字相符證據記於 config，僅作估時參考。
+
+公開價用量估算 USD 0.1138：MiniMax USD 0.0727（漢字雙計是保守假設，非供應商已核實規則）、ElevenLabs USD 0.0411（帳號資格與音色加價待核）、MiMo 官網限免但仍須同意。無生成式 API 呼叫、無安裝、無音訊或原旁白改動。下一閘為帳號／金鑰核對、NFA 稿鎖與本批同意；此 planner 沒有 live 能力，不可把報表成功當成可執行。正式 take／累計帳本／音鎖／中文 adapter 仍待試驗後接續，舊 TTS 的 fallback 未被改動。操作與驗收紀錄見 `experiments/tts_workflow/README.md`。
+
 > 本檔是跨對話的進度錨。完整施工計畫在 `.claude/plans/`(gitignored,撈不回),故重點留存於此。
 
 > ⚠️（2026-06-03 預告 → **2026-06-10 已發生**）講義生成流程重構已落地為 HTML handout kit（`handout/`，experiment/seed-converge 分支），影片產線輸入已隨之換源——決策與影響見下方「**2026-06-10 輸入換源**」節。gen-2 工具鏈主體沿用；`review_pack.py` 的 `.tex` parser 如預期作廢。（**→ 2026-06-16 更新：** 最終**不**改 HTML parser，改**收斂為 engineering 鏡＋脫鉤 `.tex`**——三內容鏡已歸 CONTENT-SIXLENS；見最上方「審核重構收尾」節。「advisory ＋ 四級人工過濾 ＋ 計費閘門」做法不變。）
