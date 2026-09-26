@@ -1,0 +1,85 @@
+<!doctype html>
+<html lang="zh-Hant">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Gemini 中文音色試聽</title>
+  <style>
+    :root { color-scheme:light; --ink:#25332f; --muted:#68726c; --line:#dcded6; --accent:#35604d; }
+    * { box-sizing:border-box; }
+    body { margin:0; background:#f5f4ee; color:var(--ink); font:17px/1.8 system-ui,"Microsoft JhengHei",sans-serif; }
+    main { width:min(1080px,100%); margin:auto; padding:42px 24px 60px; }
+    .eyebrow { color:var(--accent); font-size:13px; letter-spacing:.1em; }
+    h1 { font-size:clamp(30px,5vw,43px); line-height:1.3; margin:12px 0; }
+    h2 { font-size:23px; line-height:1.4; margin:5px 0 10px; }
+    p { margin:10px 0; }
+    .intro { max-width:780px; }
+    .cards { display:grid; grid-template-columns:repeat(3,1fr); gap:16px; margin:28px 0; }
+    .card,details { border:1px solid var(--line); border-radius:12px; background:#fff; padding:22px; }
+    .number { color:var(--accent); font-size:13px; letter-spacing:.08em; }
+    .duration,.small { color:var(--muted); font-size:14px; }
+    audio { display:block; width:100%; margin-top:20px; }
+    a { color:var(--accent); text-underline-offset:3px; }
+    .state { padding:12px 18px; background:#fffae9; border-left:3px solid #aa8a39; }
+    details { margin:16px 0; }
+    summary { cursor:pointer; font-weight:600; }
+    .script { padding-top:10px; line-height:2; }
+    code { font-size:.85em; overflow-wrap:anywhere; }
+    @media(max-width:740px) { .cards { grid-template-columns:1fr; } main { padding:28px 16px 44px; } }
+  </style>
+</head>
+<body>
+<main>
+  <p class="eyebrow">2026-09-26 · Q7 同稿試聽</p>
+  <h1>三個 Gemini 音色，說同一段中文</h1>
+  <p class="intro">先聽哪個聲音最自然，再比較 p、q 的念法、停頓與收尾。三段使用同一份 239 字元試稿，不另加語氣指令；播放其中一段時，其他段會自動暫停。</p>
+  <p class="state" id="batch-status">三段已完成，共 3 次請求、沒有重試；音量統一以 −19 LUFS 為目標，方便直接比較。</p>
+  <div class="cards">
+    <section class="card">
+      <span class="number">01 · 官方預設音色</span>
+      <h2>Iapetus</h2>
+      <p>清晰</p>
+      <p class="duration" id="duration-Iapetus">47.08 秒</p>
+      <audio controls preload="metadata" aria-label="Iapetus 中文試聽"><source src="../output/tts_workflow/q7zh_gemini_samples_20260926/listen/01_Iapetus.wav" type="audio/wav">瀏覽器無法播放，請使用下方連結。</audio>
+      <p class="small"><a href="../output/tts_workflow/q7zh_gemini_samples_20260926/listen/01_Iapetus.wav">開啟音檔</a></p>
+    </section>
+    <section class="card">
+      <span class="number">02 · 官方預設音色</span>
+      <h2>Sulafat</h2>
+      <p>溫暖</p>
+      <p class="duration" id="duration-Sulafat">45.12 秒</p>
+      <audio controls preload="metadata" aria-label="Sulafat 中文試聽"><source src="../output/tts_workflow/q7zh_gemini_samples_20260926/listen/02_Sulafat.wav" type="audio/wav">瀏覽器無法播放，請使用下方連結。</audio>
+      <p class="small"><a href="../output/tts_workflow/q7zh_gemini_samples_20260926/listen/02_Sulafat.wav">開啟音檔</a></p>
+    </section>
+    <section class="card">
+      <span class="number">03 · 官方預設音色</span>
+      <h2>Schedar</h2>
+      <p>平穩</p>
+      <p class="duration" id="duration-Schedar">51.76 秒</p>
+      <audio controls preload="metadata" aria-label="Schedar 中文試聽"><source src="../output/tts_workflow/q7zh_gemini_samples_20260926/listen/03_Schedar.wav" type="audio/wav">瀏覽器無法播放，請使用下方連結。</audio>
+      <p class="small"><a href="../output/tts_workflow/q7zh_gemini_samples_20260926/listen/03_Schedar.wav">開啟音檔</a></p>
+    </section>
+  </div>
+  <p class="small">「清晰／溫暖／平穩」是<a href="https://ai.google.dev/gemini-api/docs/speech-generation#prebuilt-voices">官方音色分類</a>，中文自然度請以這次實際聲音判斷，不保證台灣口音。舊 Charon 試聽只有英文，未拿來推論中文效果。</p>
+  <details>
+    <summary>展開共同試稿 · 中點測試</summary>
+    <p class="script" id="common-script">要回到中心，就要瞄準一個偶數偶數點，把它叫做二 p、二 q。 取射線上的第一個偶數偶數點。那麼 p 跟 q 就互質。 所以，射線上的第一個格點是 p、q，下一個才是二 p、二 q。 這條線段上的格點只有三個：起點、中點 p、q，還有終點。 關鍵全在這個中點。 如果 p 跟 q 都是奇數，中點就是角落的洞，球在半路就掉進洞裡。沿對角線打的那一球，一、一，就是這樣。 如果一個是奇數、一個是偶數，中點就沒有洞，球可以一路回到中心。至於兩個都是偶數，不可能，因為 p 跟 q 互質。</p>
+  </details>
+  <details>
+    <summary>批次與音訊處理紀錄</summary>
+    <p>模型 <code>gemini-3.8-flash-tts</code>。2026-09-26 使用者同意本次三個官方預設音色、各一次請求，不重試；未使用聲音複製或音色設計。</p>
+    <p id="audio-treatment">三段合計 143.96 秒。試聽副本經兩階段音量處理；實測 Iapetus −18.99、Sulafat −19.11、Schedar −19.00 LUFS。原始聲音另存，不剪接、不加背景音樂；副本與原音時長一致。</p>
+    <p>回應記錄 525 個文字輸入 tokens、4,608 個音訊輸出 tokens；依當日公開單價估 USD 0.0417345（約 4.2 美分），尚未核帳。未以預估時長代替實際用量。</p>
+    <p>試稿取自既有 MiMo 批次 <code>halfway</code> 完整文字，SHA256：<code>ba74c033404146cf071c79346dfc027d7ca5e238a1d15e37820fe405c6592cfb</code>。</p>
+    <p class="small"><a href="../output/tts_workflow/q7zh_gemini_samples_20260926/listen/normalization.json">音量量測紀錄</a> · <a href="../experiments/tts_workflow/README.md">工具與批次紀錄</a> · <a href="REVIEW-tts-mimo-full-trial-2026-09-26.html">保留的 MiMo 全片試聽</a></p>
+  </details>
+  <p class="small">這是候選音色試聽，尚未選定正式配音。跨機使用時需一併攜帶三個音檔；播放本頁不會重新生成聲音。</p>
+</main>
+<script>
+  const players = [...document.querySelectorAll('audio')];
+  players.forEach(player => player.addEventListener('play', () => {
+    players.forEach(other => { if (other !== player) other.pause(); });
+  }));
+</script>
+</body>
+</html>
