@@ -79,7 +79,6 @@ export const extZh = {
     lattice: "立方格子（示意，未依比例）",
     firstVertex: "第一個三個座標都是 12 的倍數的點",
     sLine: "$7s$、$5s$都要是 12 的倍數$\\ \\Rightarrow\\ s=12$",
-    answer: "題目要的是 $m+n=230$",
   },
 };
 export type ExtStrings = typeof extZh;

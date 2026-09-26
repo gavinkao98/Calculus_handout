@@ -4,8 +4,8 @@
  * proved (unfolded, it is a straight line on a torus).
  *
  * `ExtDense` (zh only, the last scene of the extension) is the same sheet on a
- * shorter clock: the slope is set on the `start` beat, the run is squeezed to
- * end HOLD frames before the sheet leaves, and the later lines follow the
+ * shorter clock: the slope is set on the `start` beat, the run lasts until the
+ * sheet leaves (as in en), and the later lines follow the
  * `dense` beat by fraction instead of fixed frame offsets.
  */
 import React from "react";
@@ -15,7 +15,6 @@ import { clamp } from "../../components/Type";
 import { Ball, Kicker, Layer, M, Sheet, Table, Txt, World, dOf, useS, useT } from "../kit";
 import { fmt } from "../i18n";
 import { polyAt, realPath, shot } from "../geo";
-import { HOLD } from "../timing";
 
 const PATH = realPath(shot([1, Math.SQRT2], 150));
 
@@ -26,7 +25,8 @@ const Sqrt2Sheet: React.FC<Clock> = ({ folio, short }) => {
   const T = t.epilogue;
   const W: World = { ox: 1180, oy: 580, u: 350 };
   const t0 = at("dense");
-  const end = short ? dur - 24 - HOLD.zh.ext_dense : dur - 24;
+  // the run lasts until the sheet leaves (zh too): stopping it HOLD frames early left a dead ~3 s before the outro
+  const end = dur - 24;
   const late = (frac: number, fixed: number) => (short ? at("dense", frac) : t0 + fixed);
   const set = short ? p("start", 26, 10) : p("dense", 26, 16);
   // accelerating: slow enough at first to follow the ball, then a blur of bounces

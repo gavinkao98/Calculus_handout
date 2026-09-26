@@ -359,9 +359,6 @@ export const ExtFamily: React.FC = () => {
         <M x={120} y={640} t="12\times(12,7,5)=" size={44} p={pf(at("same", 0.4), 24)} />
         <M x={120 + texW("12\\times(12,7,5)=", 44) + 12} y={640} t="(144,\,84,\,60)" size={44} c={POCKET} p={pf(at("same", 0.4) + 16, 24)} />
         <M x={120} y={740} t="L=12\sqrt{144+49+25}=12\sqrt{218}" size={44} p={pf(at("same", 0.62), 24)} />
-        <Txt x={120} y={790} w={600} size={type.caption} c={color.ink2} p={pf(at("same", 0.8), 22)}>
-          {r(T.answer)}
-        </Txt>
       </div>
     </Sheet>
   );

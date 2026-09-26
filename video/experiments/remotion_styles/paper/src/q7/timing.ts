@@ -16,7 +16,7 @@ export const DEFAULT_MANIFEST = "audio/q7_mock/manifest.json";
 /** extra frames at the end of a scene (after its narration), per language (each has its own scene list) */
 export const HOLD: Record<Lang, Record<string, number>> = {
   en: { epilogue: 120, recap: 20, writeup: 45 },
-  // ext_dense: the √2 run (Epilogue, shortened) ends ~3 s before the sheet leaves
+  // ext_dense: the √2 run (Epilogue, shortened) keeps going through the hold until the sheet leaves
   zh: { recap: 20, ext_design: 20, ext_room: 30, ext_family: 20, ext_dense: 90 },
 };
 

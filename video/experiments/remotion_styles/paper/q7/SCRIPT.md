@@ -154,3 +154,11 @@ python scripts/loudnorm.py out/q7zh_raw.mp4 out/q7zh_final.mp4
 PROPS='{"manifest":"audio/q7zh_beat/manifest.json"}' node scripts/frames.mjs out/q7zh_stills Q7ZH:1768,2568
 ```
 改了 `zh.ts` 要先跑 `node scripts/cjk-subsets.mjs`（重挑 Noto Serif TC 分片）。render log 的 `[cjk] Noto Serif TC 400/500/600 in use` 證明是打包的字型在畫字；標籤守門與英文版同一套，違規就不出片。
+
+### 局部重渲（只改後段時不必整片重渲，2026-09-26 實測）
+改動只影響某幾場、且**場景時長不變**（旁白沒改、`HOLD` 沒改）時，只渲改動那段再接回成品，音軌沿用原成品（已 loudnorm）：
+1. 算出受影響第一場的起始幀（`timing.ts` 的 buildShow＋`HOLD` 規則：`from = 前一場結束 − OVER`），在它之前找原成品的關鍵幀：`ffprobe -v error -select_streams v -skip_frame nokey -show_entries frame=pts_time -of csv=p=0 out/q7zh_final.mp4`（×30 換成幀號）。
+2. 從那個關鍵幀渲到片尾、不帶音：`npx remotion render build Q7ZH out/seg_tail.mp4 --codec=h264 --crf=20 --muted --frames=<K>-<總幀數−1> --props='{"manifest":"audio/q7zh_beat/manifest.json"}'`。
+3. 原成品前段 stream copy 取 K 幀（`-an -c:v copy -frames:v <K>`），與新段用 concat demuxer `-c copy` 接起，再 `-map 0:v -map 1:a -c copy` 套回原成品音軌。
+4. 驗收：總幀數與原成品相同、接縫前後幀連續、改動處抽幀確認。
+實例：刪 `ext_family` 的「m+n=230」＋修 `ext_dense` 片尾停頓，從關鍵幀 14033 渲到 16482（2450 幀，約 1 分多鐘，整片重渲約 10 分鐘）。若旁白或 `HOLD` 改了導致時長變動，後段音訊也會變，就回到整片渲染＋loudnorm。
