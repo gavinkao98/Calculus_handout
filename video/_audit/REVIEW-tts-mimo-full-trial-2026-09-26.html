@@ -1,0 +1,70 @@
+<!doctype html>
+<html lang="zh-Hant">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Q7 中文全片試聽 · MiMo</title>
+  <style>
+    :root { color-scheme: light; --ink:#243247; --muted:#626d7b; --line:#ddd8cf; --accent:#375e55; }
+    * { box-sizing:border-box; }
+    body { margin:0; background:#f6f4ef; color:var(--ink); font:17px/1.8 system-ui,"Microsoft JhengHei",sans-serif; }
+    main { width:min(1120px,100%); margin:auto; padding:42px 24px 60px; }
+    .eyebrow { color:var(--accent); font-size:13px; letter-spacing:.12em; margin:0; }
+    h1 { font-size:clamp(28px,5vw,44px); line-height:1.25; margin:12px 0; font-weight:650; }
+    .intro { max-width:760px; margin:16px 0 24px; }
+    video { width:100%; aspect-ratio:16/9; display:block; background:#18202c; border-radius:10px; }
+    a { color:#285b7d; text-underline-offset:3px; }
+    .links { margin:12px 0 26px; font-size:15px; }
+    .stats { display:grid; grid-template-columns:repeat(3,1fr); gap:14px; }
+    .card { background:white; border:1px solid var(--line); border-radius:10px; padding:18px 22px; }
+    .number { font-size:27px; font-weight:650; line-height:1.35; margin:0 0 5px; }
+    .label { color:var(--muted); font-size:14px; margin:0; }
+    section { margin-top:26px; }
+    h2 { font-size:21px; line-height:1.4; margin:0 0 12px; }
+    p { margin:10px 0; }
+    .note { border-left:4px solid #ba8844; padding:15px 20px; background:#fffbf1; }
+    .small { font-size:14px; color:var(--muted); }
+    button { font:inherit; background:white; color:#285b7d; border:1px solid #b3c4ce; padding:6px 12px; border-radius:6px; cursor:pointer; margin:4px 8px 4px 0; }
+    code { font-size:.86em; overflow-wrap:anywhere; }
+    @media(max-width:620px) { main { padding:26px 16px 40px; } .stats { grid-template-columns:1fr; } }
+  </style>
+</head>
+<body>
+<main>
+  <p class="eyebrow">2026-09-26 · Q7 中文配音工作流試驗</p>
+  <h1>原本的 MiMo，整段重新說一次</h1>
+  <p class="intro">沿用冰糖音色與原中文稿，把 14 場旁白各自完整合成，再接回既有畫面。這次先看完整影片的自然度、語句銜接，以及畫面提示是否跟得上。</p>
+  <video id="trial-video" controls preload="metadata" aria-label="Q7 中文 MiMo 全片試聽">
+    <source src="../experiments/remotion_styles/paper/out/q7zh_mimo_scene_trial_20260926.mp4" type="video/mp4">
+    瀏覽器無法直接播放，請使用下方連結開啟影片。
+  </video>
+  <p class="links"><a href="../experiments/remotion_styles/paper/out/q7zh_mimo_scene_trial_20260926.mp4">直接開啟影片</a> · <a href="../experiments/remotion_styles/paper/out/q7zh_final.mp4">原片對照</a> · <a href="../experiments/tts_workflow/README.md">工具與批次紀錄</a></p>
+  <div class="stats">
+    <div class="card"><p class="number">14 場</p><p class="label">2,796 字元 · 每場連續配音</p></div>
+    <div class="card"><p class="number">9:43.6</p><p class="label">實際片長 · 1080p / 30 fps</p></div>
+    <div class="card"><p class="number">冰糖</p><p class="label">MiMo mimo-v2.5-tts · 成片 −19 LUFS</p></div>
+  </div>
+  <section class="card">
+    <h2>這一版的處理</h2>
+    <p>14 場合成與中文對齊已完成：共 14 次請求、沒有重試，原始旁白合計 9 分 18.72 秒。原始聲音、回應與請求紀錄逐場保存；原有配音和原片保留。已確認影片尺寸、幀數與音量，抽幀未見中文字、公式或版面異常。</p>
+    <p>中文時間由本機 Whisper small 限稿對齊；65 個畫面提示中，有 6 個時刻標為估計，仍需人耳核點。模型對齊成功不代表每個提示都已經過人工確認。<a href="../experiments/remotion_styles/paper/public/audio/q7zh_scene_trial/cue-quality.json">查看完整提示品質紀錄</a></p>
+  </section>
+  <section class="note">
+    <h2>試看版，尚未正式定稿</h2>
+    <p>這次供你聽完整效果，待確認自然度、錯讀／漏字與提示時刻。三家 × 三段的比較試驗仍未執行，本片不代表供應商比較結果。</p>
+    <p>試片可播放，尚未通過正式的 12 秒停格門檻：兩處畫面分別停留 14.2 秒與 12.8 秒，待你看後裁決。</p>
+    <button type="button" data-jump="20.767">看第一處 · 0:20.8</button>
+    <button type="button" data-jump="269.2">看第二處 · 4:29.2</button>
+  </section>
+  <p class="small">本頁播放本機生成的影片；跨機使用時需一併攜帶影片與原始批次。影片播放及本機對齊不會自動呼叫 TTS。</p>
+</main>
+<script>
+  const video = document.getElementById('trial-video');
+  document.querySelectorAll('[data-jump]').forEach(button => button.addEventListener('click', () => {
+    video.currentTime = Number(button.dataset.jump);
+    video.scrollIntoView({behavior:'smooth', block:'center'});
+    video.play().catch(() => {});
+  }));
+</script>
+</body>
+</html>

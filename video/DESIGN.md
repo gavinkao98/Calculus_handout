@@ -1810,11 +1810,15 @@ MiMo（`mimo-v2.5-tts`，唯一 TTS 路線）不讀 inline LaTeX，需「數學�
   其 `build.py`／`mux.py` 已於 2026-06-16 退場。）
 
 <a id="tts-workflow-proposal-2026-09-26"></a>
-## 配音工作流設計（2026-09-26；已指示開工，第一階段準備中）
+## 配音工作流設計（2026-09-26；三家 pilot 準備／MiMo 全片試聽）
 
-**2026-09-26 開工更新：** 使用者依審閱稿指示開工，照「先 Q7 試驗」的順序新增離線 `pipeline/tts_pilot_plan.py`；[試驗入口](experiments/tts_workflow/README.md)與[批次報量頁](_audit/REVIEW-tts-pilot-plan-2026-09-26.html)保存完整語段、候選 voice／參數、公開估價限制、文字 span 與 request／plan hash。新工具沒有 live 合成能力；稿鎖、帳號實價與本批外部呼叫同意仍 pending，不能把產生計畫視為批准。下列正式 MiMo／fallback 契約仍維持原狀；完整 take／帳本／音鎖引擎及中文 adapter 留待第一階段實測後接續。
+**2026-09-26 開工更新：** 離線 `pipeline/tts_pilot_plan.py` 的三家 × 三段＝9 次計畫仍未執行；[試驗入口](experiments/tts_workflow/README.md)與[批次報量頁](_audit/REVIEW-tts-pilot-plan-2026-09-26.html)保存候選語段、voice／參數、估價限制與 hash。使用者同日另指示先用原本 MiMo 跑 Q7 中文全片，另立 14 個完整 scene 的試聽批次；新增 `tts_scene_trial.py` 與離線中文 `tts_trial_align.py`，不共用或冒用 9 次 pilot 授權。正式 `tts.py`／fallback 契約不變，完整多供應商 take 管理、選音、音鎖引擎仍待後續。
 
-**以下保留原設計範圍，不取代上方正式 MiMo／manifest schema 2 契約，也不改動現行 fallback 行為。** 完整候選契約與八種可操作情境見 [配音工作流審閱稿](_audit/REVIEW-tts-workflow-2026-09-26.html)。本輪零生成式 API 呼叫／安裝／真合成；旁白與動畫未修改。使用者偏好＝口音不限，像真人優先。
+**MiMo scene trial 的已實作邊界：** `plan.json` 凍結完整來源、含無旁白場景的順序、文字／cue、HTTP payload、voice／model／參數與 plan hash；`run --approve-plan` 核對既有同意綁定的 hash，每場最多一次 HTTP、無 retry／redirect。`ledger.jsonl` 在送出前 fsync `started`，每個 UUID take 保存原始回應、原 WAV、payload 與含檔案 hash／取樣資訊的 receipt，完成後才 fsync `completed`。未知結果封鎖整批續送；成功重跑須驗檔，只重用不重配。這是單批試聽帳本，尚不是跨試音／正式／重配的完整總帳。
+
+**中文試片匯出邊界：** 明確本機多語 Whisper `small` 權重 SHA256 驗證後，以 stable-ts `language=zh` 對完整 take 對齊。逐字序列須一致；詞內 cue 插值標 `estimated`，低機率／零時長詞留品質紀錄。全部場景成功才寫 schema 2 manifest，WAV 位元不改，保留既有 Remotion `Q7ZH` manifest prop 接口。所有產物標 `trial`／`audio_locked=false`／`nfa_status=not_verified`；人耳試看不等於正式鎖稿、音鎖或必要 cue 已人工驗到 ±0.1 秒。
+
+**以下保留原設計範圍，不取代上方正式 MiMo／manifest schema 2 契約，也不改動現行 fallback 行為。** 完整候選契約與八種可操作情境見 [配音工作流審閱稿](_audit/REVIEW-tts-workflow-2026-09-26.html)。最初設計／離線報量階段零生成式 API 呼叫；其後 MiMo 全片試聽的授權、用量與產物另記於[試驗入口](experiments/tts_workflow/README.md)。使用者偏好＝口音不限，像真人優先。
 
 - **範圍**：從已認可內容的旁白口語化，到可跨機取回的鎖定音軌；不設計「丟 LaTeX 自動生成整部影片」。
 - **流程**：共用念法／lint → NFA＋稿鎖 → 該批計畫與費用同意 → 自然語段合成並立即存 take → 獨立念法 QA／對齊／選 take → 剪裁／停頓／音量處理 → 核對最後交付音檔時序 → 音鎖與既有 manifest 相容匯出。

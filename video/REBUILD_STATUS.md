@@ -6,7 +6,7 @@
 
 ## 現役路線（2026-07-07）
 
-- **配音工作流（2026-09-26，已開工／Q7 第一階段準備）**：[批次報量頁](_audit/REVIEW-tts-pilot-plan-2026-09-26.html)／[試驗入口](experiments/tts_workflow/README.md)；離線 planner 已接完整三段稿、三家 voice／參數／公開估價及 snapshot，9 次初始請求尚未執行。下一閘＝帳號實價／金鑰、NFA 稿鎖、該批同意；take／帳本／live runner／lock／adapter 尚未接線。下列正式 MiMo 行為維持不變。
+- **配音工作流（2026-09-26，Q7 中文 MiMo 全片試聽）**：[播放／對照頁](_audit/REVIEW-tts-mimo-full-trial-2026-09-26.html)／[工具與紀錄](experiments/tts_workflow/README.md)。14 場／2,796 字元、`mimo-v2.5-tts`／冰糖；14 HTTP attempts 全成功、重試 0，raw 共 558.72 秒；多語 small 中文 FA 全成功，65 cue 中 6 estimated、18 低機率（可重疊）。成片 583.600 秒／17,508 frames／1080p30、−19.0 LUFS；原音／原片保留。試片可播放，**尚未通過正式 12 秒停格門檻**：exam 14.2 秒、foldback 12.8 秒，兩處待看後裁決；14 場抽幀與兩場全尺寸畫面未見中文字／公式／版面異常。`audio_locked=false`、NFA 未驗；工具有凍結 plan／不可覆寫 take／帳本／unknown 停止，非正式音鎖引擎。raw＝`output/tts_workflow/q7zh_mimo_scene_20260926`，manifest＝`experiments/remotion_styles/paper/public/audio/q7zh_scene_trial`，片＝`experiments/remotion_styles/paper/out/q7zh_mimo_scene_trial_20260926.mp4`。**三家 × 三段的 9 次 pilot 仍未執行**（[報量頁](_audit/REVIEW-tts-pilot-plan-2026-09-26.html)），帳號實價／金鑰、稿鎖與該批同意仍 pending；下列正式 MiMo 行為不變。
 
 - **TTS**：MiMo `mimo-v2.5-tts` builtin voice **Dean**（唯一真旁白路線；Gemini/Charon 2026-06-16 退場、voice-design／Calm Professor 2026-07-05 退役）。**scene-level TTS＋forced alignment 為正式路線**：計時源＝stable-ts transcript-constrained FA（whisper-timestamped 降級 QA 探針）；`tts.py --unit auto` 涵蓋全部 content template；fallback ladder＝arbiter(small.en)→resynth→sentence-chunk→beats（chunk 受 `--fallback-budget` 自檢）。
 - **文字渲染**：Route A（全 LaTeX/pdflatex；內文/標題 **Instrument Sans**（2026-09-13 共用層 v1 T1 由 IBM Plex Sans 換過來，vendored 在 `pipeline/fonts/instrument-sans/`）、eyebrow IBM Plex Mono、數學 Latin Modern）2026-06-25 落地，Pango 路徑已移除。
