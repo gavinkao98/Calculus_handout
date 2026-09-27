@@ -171,6 +171,19 @@
 **不要一件一輪。** §3.1 的 ⑭–㉑ 八輪跑掉 **8 次全片 1080p render**、每輪派工到 R2 結果約 2–3 小時牆鐘時間；
 派工制本身沒問題（24 件改動 19 件一次過），貴的是輪數。
 
+**一輪裡的人閘要簽在對的那一份（G0 相關；2026-09-14 §3.2 實測）：** 內容稿 `.md` 的 `narration:` **不是出片旁白**，
+storyboard 的 `say:` 才是——Stage 2 會為口說重新撰寫，兩者措辭**全節不同**（NFA N1-01；§3.1 已裁定這是
+known pre-existing doc-sync advisory、非 blocking，**忠實度一律對 `say:` 判**）。由此有兩個後果：
+
+- **把停等點寫成「`_narration.html` 重新 sign-off」是不夠的**：使用者以為簽的是出片旁白，實際上簽的是內容稿。
+  而且 `narration_review.py` 只讀 `## meta` 條列與 `### unit:` 區塊、**不讀 header**——§3.2 的 A1 是零跟改、
+  只動 header 兩行，`_narration.html` 重編後**逐位元組相同**（連 `git status` 都列不到它），對它 sign-off 是空的。
+  ⇒ **零跟改時 sign-off 的對象是對齊報告**，不是 narration HTML。
+- **真正的旁白人閘有兩個，兩個都要排進輪次**：① **合成前**的 storyboard `say:` 簽核稿（§3.2 新增；由 A4 gate-2
+  的框架層反對促成、使用者裁決採納，見 6.2），② **A5-3 的 `listening_pack` 聽感**（聽到的就是出片的）。
+  §3.2 實測有三處「由耳移到眼」（Definition 3.1 的式子、`m_2=f'(g(x_0))`、`alpha_1` 之名都不再被念出），
+  這種改動只有在 `say:` 那一份上才看得見。
+
 ### 6.2 輪內審 vs 里程碑審（G2）
 
 | | **輪內**（每輪） | **里程碑**（一節收斂時） |
@@ -194,6 +207,31 @@
 **退回內容階段**（§二 第 7 條的內容鎖），不要繼續拋光。依據：⑲ 的五條 must 全是 Task D 拉長旁白後的畫面缺口，
 剔除後趨勢是 2 → 2 → 1，本來就是收斂的。
 
+**Phase A（內容階段）的 must 怎麼算（2026-09-14 定案；答 [`KICKOFF-s32-chain-rule.md`](KICKOFF-s32-chain-rule.md)
+§7.3 觀察點 2「內容階段的 must 怎麼算，§六沒寫」）：** **Phase A 的 must ＝ 該輪 gate-1 的 blocking 數**；
+**advisory 由指揮者逐條裁決，不計入上限。** 依據（§3.2 實測）：pedagogy gate 跑四輪，
+blocking **3 → 1 → 1 → 0**、advisory **5 → 5 → 1 → 2**——advisory 每輪重新生成，與上文「生成式 advisory
+是每輪重新生成的」是同一個現象，拿它當上限會誤觸退回。
+**另一個代價要先知道：** 有些 gate-1 blocking 只能靠**改場結構**關閉，而場結構會動到 TTS 計費——§3.2 的 PD1-2
+`decomposition_strategy` 在凍結的 `procedure_steps` 容量下四條出路全堵，唯一出路是 `part:` 分頁＝content 場 +1
+＝ **billed call 22 → 23**。⇒ **這類「只能用分場修」的 blocking 必須在 A5（TTS）之前關完**，
+否則代價從「多一次呼叫」變成「整場重合成」。
+
+**「某閘 blocking ＝ 0」不等於驗過——武裝前提要一起寫（§3.2 實測）：** A2 的判準寫「SC-honesty blocking ＝ 0」，
+但那時 deck 一份 `screen_contract` 都沒有，SC1／SC2／SC-honesty **全部空轉**，綠燈是 **vacuous pass**。
+⇒ **凡以「某閘 blocking ＝ 0」為判準，必須同時寫明該閘的武裝前提**（契約已撰寫／旗標已開／有負向對照證明閘會噴，
+見 6.5），否則每一節都會拿到假綠。
+
+**gate-2 的 prompt 必須含一個「反對這份 brief 的框架本身」的欄位（§3.2 實測；SOP v1 的 gate-2 模板固定含這一欄）：**
+§3.2 的 gate-2（agy Gemini 3.1 Pro High）就是從 `disagreements_with_premise` 那一欄提出**框架層**反對
+（內容稿 vs storyboard `say:` 的 SSOT 問題），直接促成使用者新增一個簽核關卡（裁決＝選 B：合成前補 `say:` 簽核點，
+見 6.1）。**只會附和第一讀者的第二讀者沒有價值。**
+
+**gate-2 的價值不只是「抓 gate-1 的遺漏」，是「不接受第一讀者與指揮者共同的灰區」（§3.2 實測）：**
+N2-01 那條 D2 blocking，gate-1（Claude Opus 5）判 **0 blocking**，而**主對話看過同一處、判為灰區放過**；
+gate-2 判它是 blocking，且給的修法（修根因、把指數搬進 LaTeX）比主對話原本採用的（在口語端繞過）**更好**
+（修完 23 場 `scene_text_hash` 零變動，commit `201281d`）。⇒ **異家族第二讀者每節必跑是對的。**
+
 ### 6.3 停止條件（G3；**開工前就寫死，不是事後判斷**）
 
 **四條同時滿足即收工**，剩下的 `should` 進 backlog：
@@ -208,6 +246,12 @@
 4. `[sync]` ＝ 0、`run_selftests` 全綠、`sizecheck` 0 error
 
 > 依這條，§3.1 **在第 ㉑ 輪就該停**（㉑ 的 21 場 fine 逐場 ±0.0，沒有動到任何驗收指標）。
+
+> **一節的第一輪沒有「上一次里程碑審」怎麼判（2026-09-14 定案；答
+> [`KICKOFF-s32-chain-rule.md`](KICKOFF-s32-chain-rule.md) §7.3 觀察點 3「第一節沒有上一次」）：**
+> **第一輪只看第 1、3、4 條；第 2 條從第二輪起生效。** 理由：第 2 條的字面要件是「上一次里程碑審的 must
+> 全部關閉」，第一節／第一輪根本沒有上一次，照字面讀永遠無法滿足——與上面條件 3 分 (a)/(b) 的修訂是同一個毛病：
+> **協定不該自己製造一輪空轉。**
 
 ### 6.4 開工清單（G4：工具先於內容；**每節開工前逐項打勾再動內容**）
 
@@ -226,6 +270,12 @@
 - [ ] **兩道硬閘在**：`[sync]`（§一 層 6）與 `[still-gate]`（§一 層 7），render 後必跑
 - [ ] `rewatch_pack --scene <子集>` **一律另給 `--out`**（2026-09-14 起：不給 exit 2；`--out` 已存在
       且其 `pack.json` 非 subset 也 exit 2——子集一律不得覆寫全包的 `INDEX.md`／`pack.json`）
+- [ ] **會建 TeX 的工具，同一個工作目錄一次只跑一支**——不只 `sizecheck.py` 之間：`make.py` 內含自己的
+      sizecheck preflight，`critic.py`／`scratch_frames.py` 亦然。**互斥範圍是 cwd，不是全域**
+      （`config.media_dir = ./media` 相對 cwd，每個 worktree 各有自己的 `media/Tex`）⇒ **跨 worktree 不需排隊**，
+      寫成全域限制會在並行階段白白序列化所有子代理
+- [ ] **閘的輸出完整落檔再讀，禁止 `| tail -N`**（`sizecheck` 的摘要印在**最前面**，見下）
+- [ ] 本節 kickoff §2「現況快照」已標明**量測當日的 main tip hash**（見下）
 
 > **在 worktree 裡跑第一項要注意（2026-09-13 實跑）：** `tools/doctor.py --smoke` 的 deck 閘走 `<repo>/.venv`，
 > 而 `<repo>` 是**當前工作樹**——worktree 沒有 `.venv`，那一段會直接 `[info] 略過`，**打勾等於沒跑**。
@@ -233,11 +283,56 @@
 > `python video/pipeline/schema.py <sb>`、`lint.py <sb>`、`sizecheck.py <sb>`、`derive_spoken.py --deck <deck> --check`。
 > `run_selftests.py` 不受影響（不吃 `.venv`）。
 
+> **TeX 互斥已由工具鎖接管（工具線 r2 Task H，2026-09-14；`pipeline/texlock.py`）：** 鎖檔＝`<media_dir>/Tex.lock`，
+> **刻意不放在 `Tex/` 裡**——manim 每次 Tex→SVG 後呼叫的 `delete_nonsvg_files()` 會把 `media/Tex` 裡非 `.svg`／`.tex`
+> 的檔**全部掃掉**，鎖放進去會被它守護的那個 build 自己清走（2026-09-14 實測：第二支約 1 s 後就拿到「空的」鎖、
+> 兩支照舊互撞）。同 cwd 的第二支現在會每 10 s 印一次
+> `[texlock] waiting for pid N (<reason>) ... Ns` **等待**，不再吐假的 `SIZE … could not build scene`（`.dvi` 讀不到）。
+> ⇒ **看到那行是正常等待、不是 hang**；等待上限 **30 分鐘**（足以等完一次全片 render），
+> 要縮短用環境變數 `TEXLOCK_TIMEOUT`（秒）——已落地（`texlock.py:136–149`，`DEFAULT_TIMEOUT = 1800.0`
+> 不變，`TEXLOCK_TIMEOUT` 設正數才覆寫）。
+>
+> **這一條本身就是「快照會作廢」的實例（值得留著當教材）：** 回寫本節時 `TEXLOCK_TIMEOUT` 還不存在
+> （`grep` 零命中），於是先寫成「尚未落地」；同一天工具線併入 `294a9b1` 之後，那句註記**自己過期了**。
+> ⇒ **§六 描述別條線的工具行為時，要附「當日 main tip」與可自驗的 grep**，不要只寫結論。
+> 依據：**文件叮嚀擋不住看不見的那一支**——主對話親自撞出三個假 error，因為使用者看不到 `make.py` 裡面也有一支 preflight。
+
+> **`| tail -N` 為什麼寫成硬規則（2026-09-14 一天內兩次誤讀）：** `sizecheck.py` 先印
+> `[sizecheck] <deck>: N error(s), M warning(s)`，**再**逐條印 `SIZE `／`WARN ` 明細——`tail` 只留得到尾巴。
+> 主對話一度把「32 warning」誤讀成「掉到 8」；同一天 A4 的執行代理用 `tail -12` 踩了同一個坑（它自己發現並更正）。
+> **一天內兩次＝該進協定的訊號。**
+
+> **kickoff §2「現況快照」必須標量測當日的 main tip hash（2026-09-14 實測）：** 別條線的 merge 會讓整段快照作廢——
+> 共用層 v1 動了字體／字級與 `sizecheck` 六條規則，2026-09-13 量的 `run_selftests` 支數（當時 42）與 sizecheck 基線
+> **全部過期**。沒有 hash，讀者無從判斷快照還算不算數（§3.2 的護欄也吃過同類的虧：kickoff §5 要求
+> `git log main | grep shared-layer`，但共用層 v1 的 commit subject 全是中文「共用層」⇒ 護欄回報「未 merge」，
+> 實際已凍結於 `6c72163`。**護欄的判準不要綁 commit message 的英文字串**，綁 kickoff 的 checkbox 或 tag）。
+
 ### 6.5 契約進測試（G6）
 
 任何「**本來就該成立但壞掉**」的事，修之前**一律先寫紅測試**——見根 [`../CLAUDE.md`](../CLAUDE.md) Karpathy §4
 （「修 bug」→「先寫能重現的測試再讓它過」）。§3.1 後段做對了（`_selftest_figure_labels`、`focus` 的 hollow 案例先紅後綠），
 前段沒有：`focus` 還原、耗時誠實、標籤相交、`DashedLine` 盲點全部是先在幀裡肉眼看到、才回頭補 selftest。
+
+**契約類宣告（`screen_contract` 等）寫完，必須做兩件事才算「閘看得到」（2026-09-14 §3.2 親踩）：**
+
+1. **正向**——用**閘走的同一條路**解析一次並**數條數**：`review_pack.parse_content_script(<md>)`
+   ＋ `_screen_contract.required_steps()`（§3.2 收斂在契約 **11 份**、`required_steps` **36 條**）。
+2. **負向對照**——故意從 storyboard 拿掉一個 `covers` id，**必須噴 `ERROR [SC1]`**。沒噴就是閘沒武裝。
+
+**理由：`_screen_contract.parse_block()` 是 fail-closed。** 契約只要有一個 YAML 語法錯誤（§3.2 實例：`tex:` 用**雙引號**
+而值裡有 `\c` 這種非法轉義）→ `yaml.safe_load` 拋錯 → `parse_block` 回 `None` → 閘看到的是「這個 unit **沒有**契約」，
+在 enforce 下吐 `has no screen_contract`，訊息把人導向「**去寫一份**」而不是「**你寫的那份解不開**」。
+**「我寫了契約」與「閘看得到契約」因此脫鉤。** 工具線 r2 Task I 已加分流（解析失敗回 `ParseError`，`step_coverage`
+印獨立的 `[SC] <unit>: screen_contract failed to parse -- <原始例外>`，**恆 error**、不受 `enforce` 旗標影響；
+紅測試 `_selftest_coverage.test_unparseable_contract`）——**但上面兩步仍是撰稿端的義務**，
+不能因為工具現在會報就省掉負向對照。
+
+**連帶的順序（§3.2 實測）：`coverage_enforce` 不是一行 meta，是「先寫完 `screen_contract` 才能開」的最後一步。**
+`step_coverage.coverage_issues(..., enforce=True)` 對每個 `theorem_proof`／`derivation` 場所屬、
+而內容稿沒寫 `screen_contract` 的 unit **直接吐 error**；§3.2 有 10 個這類場、契約 0 份 ⇒ 照原 kickoff
+把它當「一行 meta 補齊」做會當場炸 10 個 error。**派工契約要把「寫契約 → 正向數條數 → 負向對照 → 才開 `enforce`」
+的順序寫死。**
 
 ### 6.6 多 session 紀律（G7）
 
@@ -248,9 +343,87 @@
 - 其餘照根 [`../CLAUDE.md`](../CLAUDE.md) §任務分派的**並行紀律**（開工先 `git status`、別人 dirty 的 hunk 不碰、
   render／tts 的時間窗互相通知、子代理各自 worktree）
 
+**§3.2 × 工具線 r1／r2 併行實測補（2026-09-14）：**
+
+- **上游線 merge 時有義務附「影響清單」**——說明哪一類閘會被作廢：哪些只是規劃值（不必重驗）、哪些會動版面
+  （`sizecheck`／`[stillness]` 要重驗）、哪些是新 warn。工具線 r1／r2 都主動列了，下游才能**只重驗會被作廢的那幾類**：
+  r1 併入後下游據此判定「`[sync]` 不受影響、`sizecheck`／`[stillness]` 要重驗」，再用**三場定點 render**
+  （而不是 15 分鐘整片）驗掉「`run_time` 不變」那句話；實測 §3.2 四支閘數字全部相同、兩條新規則未觸發、`[sync]` clean。
+  **沒有那份清單，下游只剩「全部重跑」。**
+- **`main` ≠ 最新。** 工具線 Task I 併入後 **main 紅、下游分支綠**——因為下游早在 A2 就補了 `ref:`、
+  在補綠輪寫了 `screen_contract` 與 `coverage_enforce`。**上游只對 main 驗收自己的改動時，會看到下游早已解決的問題，
+  也可能漏看只有下游才踩得到的問題。** ⇒ 上游驗收時要順手對**至少一個活躍下游分支**跑一次。
+- **審子代理的改動用 `git show <commit>`，不要用 `git diff HEAD..<branch>`**：兩點 diff 會把「該分支單純**沒有**
+  你的某個 commit」誤顯成「它**還原**了你的改動」。主對話一度據此誤判 A2b 會回退 A1 的 `source_rev` stamp。
+  正解＝看該 commit 自己的 diff（`git show <sha> -- <path>`）或 merge base。並行多分支時這個陷阱會反覆出現。
+- **下游先做了上游改動所需的前置工作時，要主動告知上游並承擔 merge 衝突。** 實例：main 加一行 `ref:`
+  與下游同一位置的三行（`part:`／`ref:`／`covers:`）⇒ add/add 衝突，下游宣告「**取超集、衝突由我吸收**」。
+  同時**明確擋掉**「把 `ref:` 加到 scene 尾端避開衝突」這種繞法——那會造成同一 scene 兩個 `ref:` 鍵，
+  而 `yaml.safe_load` 對重複鍵是**後者覆蓋、不報錯**，一個看得見的衝突會變成靜默的錯值。
+- **含反引號／`$` 的中文 commit body 一律 `git commit -F <檔>`**，不要用 `-m "..."`——shell 的命令替換會把整段吃掉。
+  本節主對話踩過一次（merge commit 的 G0 驗證那三行被吃掉），事後 `--amend` 補回。
+
 ### 6.7 什麼**不是**浪費（避免矯枉過正）
 
 **派工制有效**——24 件改動裡 19 件一次過，問題不在派工，在輪數。**拒絕照單全收值得**——
 R2 的兩處處方被否決（會在畫面留下假等式、會破壞跨場 `carry`），這種判斷不能為了省輪次而放棄。
 真正不可避免的只有**「一個缺陷遮住另一個缺陷」**（鬼影遮住 `focus` 還原、多報抵銷低報），那是狀態空間的性質，
 只能一層一層來；**由排序造成的洋蔥不算在內，那是流程的錯**（kickoff §2.5／§5）。
+
+### 6.8 派工契約紀律（2026-09-14 §3.2 首次實測；含工具線 r1／r2 教訓）
+
+> **前提在別處：** 根 [`../CLAUDE.md`](../CLAUDE.md) §任務分派已訂「契約先於派工」「主模型只做拍板／審核／難題」
+> 「有檔案改動一律 `isolation: worktree`、一個 task 一個 commit」。**本節只補 §3.2 實跑後才看得見的失效模式。**
+
+**① 指揮者寫錯的契約會被子代理忠實放大。** §3.2 兩次實例：(a) A4 gate-2 的 prompt 把「核准源」填成**內容稿**——
+**付費**閘因此拿到與 `.md` 檔頭相反的指示（R2-01，回歸輪才抓到）；(b) `screen_contract` 的 `tex:` 引號風格寫成雙引號
+——會讓契約**靜默失效**（見 6.5）。**兩次都是子代理實測後停手回報才沒釀事。**
+⇒ **派工契約裡要子代理「逐字照抄」的內容，指揮者必須先自己驗一次可解析**，尤其 YAML／LaTeX 混排的字串。
+
+**② 契約裡要明確授權「與實況不符就停下來回報，不要自行改判」，並在驗收時把「停手回報」視為正確行為、不是未完成。**
+§3.2 靠這一條避免做錯三次：
+
+- `worked_example` **不遷移**——[`DESIGN.md`](DESIGN.md)「既有 9 個 `derivation`＋`prompt:` 例題場（§3.1 四場、
+  §3.2 五場）＝不遷移」（2026-09-13 裁決：遷移要重 derive `_mimo`、reveal id 改名會讓 beat 級 TTS reuse 失配），
+  而 §3.2 kickoff §4 A2 第 4 點寫的是「例題場改 `worked_example` 模板」——**兩份同日 kickoff 對同一件事給相反指示**。
+  ⇒ 凍結一份共用層／模板時，**要回頭改受影響的節 kickoff**，或在 kickoff 之間寫明誰 supersede 誰。
+- `meta.assumptions` 只能寫一筆——`scaffold.flag` 是**純量**，`pedagogy` 要求 flag 與 scene 1:1（`flag` 有值就必須
+  對得到一筆 `meta.assumptions`，反之亦然）。
+- `tex:` 的引號風格（同 ①(b)）。
+
+**③ 擋路的交付物不要與不擋路的文件綁在同一輪。** §3.2 實例：把「NFA 版控 REPORT ＋ ledger 修正 ＋ 旁白簽核 HTML」
+包成一輪，結果**唯一擋住付費 TTS 的簽核 HTML 被兩份文件拖了 3.5 小時**（子代理三件都寫完了，卻卡在重跑重閘）。
+⇒ **G5 的批次化邊界要按「擋不擋路」切，不是按「是不是同一個步驟」切。**
+
+**④ 子代理卡住時，先看它的 worktree 有沒有已完成但未 commit 的成果，能搶救就搶救，不要直接重派一輪。**
+§3.2 上面那一輪的收場方式（比重派省得多）：`git -C <worktree> status` 確認三個交付物其實都已寫完（未 commit）→
+`TaskStop` → 從它的 worktree `cp` 出三個新檔與一個改動檔 → 在主分支重跑 `derive_spoken.py` 重生衍生檔 →
+指揮者自己複驗閘與 `scene_text_hash` → **由指揮者 commit**。**重派一輪會把已完成的工作整份重做。**
+
+**⑤ 派工時明說「哪些閘我已經驗過、你不用跑」。** 否則子代理會出於謹慎重跑 `sizecheck`（cold TeX 約 6 分）
+與 `run_selftests`（約 9 分），而且**每個子代理各付一次**。
+
+**⑥ 子代理各自用 scratchpad 的子目錄，不要共用根目錄**（出處＝**工具線 r1**，記於
+[`KICKOFF-toolline-backlog-r2.md`](KICKOFF-toolline-backlog-r2.md) §1；非本節量測）——r1 六個 task 共用根目錄時
+**互撞過檔名**。產物一律放 `<scratchpad>/task<X>/`。
+
+**⑦ 背景長工作寫成單一 Python 驅動器，不要 `bash "<path>.sh"` 包一層**（出處同 ⑥，工具線 r1 實測）——
+那種形式**偶發會啟兩份 process tree**。
+
+### 6.9 口徑與量測紀律（2026-09-14 §3.1／§3.2 實測）
+
+**① TTS 報價的字數與語速必須是同一個口徑。** §3.1 實測：canonical **2,229 字**／口語版 **2,731 字**
+（膨脹 **1.225×**）／實際音訊 **963.6 s** ⇒ **canonical 138.8 wpm、口語 170.1 wpm**。
+**交叉使用**（拿口語版字數去配 canonical wpm）會**高估約 24%**。
+⇒ **報價表必須標明用的是哪一個口徑。** §3.2 兩路交叉驗證一致：canonical 路 **722.8 s** vs 口語路 **730.9 s**。
+
+**② mock 的 `modes` 是假象，不是對真合成的預測。** `tts.py --backend mock` 寫的是**靜音**，forced alignment
+無從對齊 ⇒ manifest 會顯示 `scene_aligned: 0 / beats: N`、**全部降級**。§3.2 的 `--backend mimo --dry-run`
+顯示 23 場**全走 scene-level**。**驗 manifest／時序可以用 mock，判 alignment 模式不行。**
+
+**③ `--backend mock` 會污染真音檔目錄。** 它預設把靜音 WAV 與 mock manifest 寫進 `audio_mimo/`
+（`_mimo` deck 的預設音訊子目錄）——**真合成要去的同一個目錄**。
+⇒ **真合成前必須先清掉該目錄，或帶 `--force-backend-switch`**（不帶會被 backend 不符擋下）。
+
+**④ `[still-gate]` 不在 `make.py`，在 `rewatch_pack.py`。** 6.4 把「兩道硬閘」並列，容易讓人以為 render 完
+就兩道都有；實際 `make.py` 只給 `[sync]`，**`[still-gate]` 要另外跑一包 `rewatch_pack`** 才會出現。

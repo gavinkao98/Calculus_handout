@@ -33,6 +33,18 @@ meta:
   otf_enforce: true        # SP2: provenance gating (0 surface after backfill)
   pedagogy_enforce: true   # SP2: PD2/3/4 gating (0 surface after backfill)
   fontfloor_enforce: true  # SP2: font-floor gating (0 surface)
+  coverage_enforce: true   # A2b: SC step-coverage gating -- 10 units now carry
+                           # screen_contract.required_steps and every scoped scene
+                           # declares covers:. Flipped LAST, after warn-only ran 0 finding.
+  # PD4 借用前提登錄。講義 chapter3.tex:213 把兩個借用結果寫在同一句、並以「We take both as
+  # established」一併宣告，所以登錄成一筆；PD4 的 first_use_unit 要對上該場的 scaffold.flag，
+  # 而 flag 是純量（pedagogy.py:41-45），兩筆共用同一個 first_use_unit 會讓第二筆必然報 error。
+  assumptions:
+    - id: borrowed_ch2
+      # No leading "assumed": _common.py:497 already labels the aside ASSUMES.
+      text: "from Chapter 2: the product rule, and differentiable $\\Rightarrow$ continuous"
+      first_use_unit: proof_strategy_bridge
+      source: "chapter3-print-standalone.html SS3.2 . opening (two Chapter 2 results used freely)"
   video: { w: 3840, h: 2160, fps: 60 }   # 4K60 delivery; --quality high renders 1080p for QA
   sections:
     - { id: "3.1", title: "Derivatives of the Sine and Cosine Functions" }
@@ -50,7 +62,6 @@ scenes:
   # 1 --------------------------------------------- divider: Act 1 opener
   - id: divider_rule
     kind: divider
-    accent: definition
     eyebrow: "Stage 1"
     title: "The Rule You Can Use"
     subtitle: "State it first, then put it to work."
@@ -64,7 +75,6 @@ scenes:
   - id: why_composition_is_missing
     kind: content
     template: definition_math
-    accent: definition
     scene_role: motivation          # exposition beat -> chipless (not a definition)
     ref: md:why_composition_is_missing
     source: "chapter3-print-standalone.html SS3.2 . opening prose (the missing rule)"
@@ -88,7 +98,6 @@ scenes:
   - id: rates_multiply_intuition
     kind: content
     template: definition_math
-    accent: definition
     scene_role: intuition           # exposition beat -> chipless (not a definition)
     ref: md:rates_multiply_intuition
     source: "chapter3-print-standalone.html SS3.2 . opening prose (rates multiply, tangent-line idea)"
@@ -137,7 +146,6 @@ scenes:
     kind: content
     template: graph
     mode: single
-    accent: definition
     hook: "animations.ch03_chain_rule_hooks:composed_mapping"
     source: "chapter3-print-standalone.html SS3.2 . Figure 3.5 (composed-mapping)"
     title: "Two Stretches in a Row"
@@ -188,7 +196,9 @@ scenes:
     kind: content
     template: procedure_steps
     accent: procedure
+    part: { current: 1, total: 2 }
     ref: md:decomposition_strategy
+    covers: [outermost, name_inside, outer_at_inner, times_inner]
     source: "chapter3-print-standalone.html SS3.2 . Strategy 3.1 (differentiating a composition)"
     title: "Differentiating a Composition"
     say: |
@@ -199,19 +209,44 @@ scenes:
       {show math.1} Whatever it's applied to is the inner function $u=g(x)$.
       {show math.2} Differentiate the outside at the inside, keeping the inside
       whole.
-      {show math.3} Then multiply by the inner derivative -- and if the inside is
-      itself a composition, just run the steps again. So $\sqrt{1+x^2}$ has outer
-      root and inner $1+x^2$; $\sin(x^2)$ has outer sine and inner $x^2$.
+      {show math.3} Then multiply by the inner derivative.
     steps:
       - { text: "Find the outermost operation.", math: "f(\\,\\cdot\\,)" }
       - { text: "Name the inside.", math: "u=g(x)" }
       - { text: "Differentiate the outside at the inside.", math: "f'(g(x))" }
       - { text: "Multiply by the inner derivative.", math: "f'(g(x))\\cdot g'(x)" }
 
+  # 7b ------------- Strategy 3.1 (2/2): the recursion + the two decomposition examples
+  # PD1 fix (2026-09-14): handout step 5 (tex:239) and the two worked decompositions
+  # (tex:241) had no room on page 1 -- a 5th step row is over the 3-4 budget, a longer
+  # step-4 text wraps into the `worked:` strip, and `procedure_steps` reads no scaffold.
+  # Paginated per DESIGN.md:820, following ch01's invert_a_rational 1/2 + 2/2 (same
+  # `source:`, same `ref:`, `covers:` split). `definition_math`, NOT procedure_steps:
+  # that template's numeral is f"{i+1:02d}" (procedure_steps.py:66), so a continuation
+  # page would relabel Strategy 3.1's FIFTH step as "01".
+  - id: decomposition_strategy_repeat
+    kind: content
+    template: definition_math
+    accent: procedure
+    part: { current: 2, total: 2 }
+    ref: md:decomposition_strategy
+    covers: [repeat_per_layer, decompose_sqrt, decompose_sin]
+    source: "chapter3-print-standalone.html SS3.2 . Strategy 3.1 (differentiating a composition)"
+    title: "Differentiating a Composition"
+    say: |
+      {show statement} And if the inside is
+      itself a composition, just run the steps again.
+      {show math.0} So $\sqrt{1+x^2}$ has outer
+      root and inner $1+x^2$;
+      {show math.1} $\sin(x^2)$ has outer sine and inner $x^2$.
+    statement: "If the inside is itself a composition, repeat steps 1--4 on it --- every layer contributes one slope factor, and the factors multiply."
+    math:
+      - "$\\sqrt{1+x^{2}}:\\quad f(u)=\\sqrt{u},\\ g(x)=1+x^{2}$"
+      - { tex: "$\\sin(x^{2}):\\quad f(u)=\\sin u,\\ g(x)=x^{2}$", anim: highlight }
+
   # 8 --------------------------------------------- divider: Act 2 opener
   - id: divider_why
     kind: divider
-    accent: definition
     eyebrow: "Stage 2"
     title: "Why the Rule Is True"
     subtitle: "Local linear approximations, and how they compose."
@@ -225,8 +260,8 @@ scenes:
   - id: proof_strategy_bridge
     kind: content
     template: definition_math
-    accent: definition
     scene_role: bridge              # exposition beat -> chipless (not a definition)
+    scaffold: { flag: borrowed_ch2 }   # PD4: first use of the two borrowed Chapter 2 results
     ref: md:proof_strategy_bridge
     source: "chapter3-print-standalone.html SS3.2 . Why the rule is true (bridge) + borrowed tools"
     title: "Repackaging the Derivative"
@@ -234,7 +269,8 @@ scenes:
       The rule is already usable -- now let's earn it.
       {show statement} To prove the two slopes really multiply, we handle both
       functions' tangent-line approximations at once -- and for that we repackage
-      what differentiable means. Two facts we'll lean on without re-proving: the
+      what differentiable means.
+      {show scaffold.flag.borrowed_ch2} Two facts we'll lean on without re-proving: the
       product rule, and that a differentiable function is continuous.
       {show math.0} We earlier called $f$ differentiable at $x_0$ when its
       difference quotient has a limit -- and that limit is $f'(x_0)$.
@@ -272,7 +308,6 @@ scenes:
     kind: content
     template: graph
     mode: single
-    accent: definition
     hook: "animations.ch03_chain_rule_hooks:remainder_tangent"
     source: "chapter3-print-standalone.html SS3.2 . Figure 3.6 (remainder-tangent)"
     title: "The Error Shrinks Faster"
@@ -301,6 +336,7 @@ scenes:
     accent: proposition
     label: "[ proposition ]"
     ref: md:two_forms_equivalent
+    covers: [define_R, forward, backward]
     scaffold: { motive: "Check the remainder form is the old derivative, just rewritten." }
     source: "chapter3-print-standalone.html SS3.2 . Proposition 3.3 + Proof (both directions)"
     title: "The Two Forms Agree"
@@ -310,13 +346,16 @@ scenes:
       {show statement} The claim: the limit form and the remainder form are
       equivalent, with the same $m$.
       {show proof.0} One direction -- if the difference quotient tends to $m$,
-      set $R(h)=f(x_0+h)-f(x_0)-mh$; then $R(h)/h$ is that quotient minus $m$,
+      set $R(h)=f(x_0+h)-f(x_0)-mh$;
+      {show proof.1} then $R(h)/h$ is that quotient minus $m$,
       which goes to zero.
-      {show proof.1} The other way runs backward: divide the remainder equation
+      {show proof.2} The other way runs backward: divide the remainder equation
       by $h$ and the quotient becomes $m+R(h)/h$, which goes to $m$.
       {show qed} Same property, same derivative -- two ways of saying one thing.
-    statement: "Limit form $\\Longleftrightarrow$ remainder form, same $m=f'(x_0)$."
+    statement: "Limit form $\\Longleftrightarrow$ remainder form, same $m=f'(x_0)$ in both forms."
     proof:
+      # PD1-adv fix: the definition of R(h) was spoken but never shown (tex:267).
+      - "$R(h):=f(x_0+h)-f(x_0)-m\\,h$"
       - "$\\tfrac{R(h)}{h}=\\tfrac{f(x_0+h)-f(x_0)}{h}-m\\ \\longrightarrow\\ 0$"
       - "$\\tfrac{f(x_0+h)-f(x_0)}{h}=m+\\tfrac{R(h)}{h}\\ \\longrightarrow\\ m$"
     qed: "same property, same derivative"
@@ -329,6 +368,7 @@ scenes:
     label: "[ proof of the chain rule ]"
     part: { current: 1, total: 4 }
     ref: md:proof_setup_substitution
+    covers: [g_remainder, f_remainder, collect_R3]
     scaffold: { motive: "Let the remainder form do the lifting — substitute both, collect." }
     source: "chapter3-print-standalone.html SS3.2 . Proof of Theorem 3.3 (substitution, collect, R_3)"
     title: "Why the Slopes Multiply"
@@ -346,8 +386,14 @@ scenes:
     statement: "Substitute the remainder forms."
     proof:
       - "$g(x_0+h)=g(x_0)+m_1 h+R_1(h),\\quad m_1=g'(x_0)$"
-      - "$P(x_0+h)=f(g(x_0))+m_2\\!\\left[m_1 h+R_1(h)\\right]+R_2\\!\\left(m_1 h+R_1(h)\\right)$"
-      - "$=P(x_0)+\\bigl(g'(x_0)f'(g(x_0))\\bigr)h+R_3(h)$"
+      # `m_2=f'(g(x_0))` added 2026-09-14: it was named here and used as a constant in
+      # the next scene, but never defined on screen (tex:292) -- unlike m_1 on proof.0.
+      - "$P(x_0+h)=f(g(x_0))+m_2\\!\\left[m_1 h+R_1(h)\\right]+R_2\\!\\left(m_1 h+R_1(h)\\right),\\quad m_2=f'(g(x_0))$"
+      # SC-adv fix: R_3 was named but never defined on screen, yet the next scene
+      # splits R_3(h)/h into exactly these two pieces. Appended to this row rather
+      # than added as a 4th row (which clipped `qed` off-frame); the handout shows
+      # both lines as ONE aligned display anyway (tex:294-297).
+      - "$=P(x_0)+\\bigl(g'(x_0)f'(g(x_0))\\bigr)h+R_3(h),\\quad R_3(h)=m_2R_1(h)+R_2\\bigl(m_1 h+R_1(h)\\bigr)$"
     qed: "remains: $\\tfrac{R_3(h)}{h}\\to 0$"
 
   # 14 --------------------- Proof of Theorem 3.3 (2/4): split off the easy piece
@@ -358,6 +404,7 @@ scenes:
     label: "[ proof of the chain rule ]"
     part: { current: 2, total: 4 }
     ref: md:proof_easy_piece
+    covers: [split_R3, easy_zero, inner_to_zero]
     scaffold: { motive: "Split $R_3/h$ in two — dispatch the easy piece first." }
     source: "chapter3-print-standalone.html SS3.2 . Proof of Theorem 3.3 (split R_3/h; easy piece; inner -> 0)"
     title: "Why the Slopes Multiply"
@@ -369,7 +416,7 @@ scenes:
       itself goes to zero, since both $m_1 h$ and $R_1(h)$ do.
       {show qed} So the easy piece is settled; everything delicate now lives in
       the second piece.
-    statement: "Split the quotient; the first piece is easy."
+    statement: "Split the quotient; the easy piece is settled."
     proof:
       - "$\\tfrac{R_3(h)}{h}=m_2\\,\\tfrac{R_1(h)}{h}+\\tfrac{R_2(m_1 h+R_1(h))}{h}$"
       - "$m_2\\,\\tfrac{R_1(h)}{h}\\to 0\\quad(m_2\\text{ const},\\ \\tfrac{R_1(h)}{h}\\to 0)$"
@@ -384,6 +431,7 @@ scenes:
     label: "[ proof of the chain rule ]"
     part: { current: 3, total: 4 }
     ref: md:proof_delicate_choices
+    covers: [choose_delta, choose_alpha, zero_case]
     scaffold: { motive: "The delicate piece: an $\\varepsilon$–$\\delta$ argument, choose the windows." }
     source: "chapter3-print-standalone.html SS3.2 . Proof of Theorem 3.3 (choose delta, alpha; zero case)"
     title: "Why the Slopes Multiply"
@@ -413,6 +461,7 @@ scenes:
     label: "[ proof of the chain rule ]"
     part: { current: 4, total: 4 }
     ref: md:proof_delicate_bound
+    covers: [factor_split, triangle_bound]
     scaffold: { motive: "Bound the delicate piece; $\\varepsilon$ is arbitrary, so it vanishes." }
     source: "chapter3-print-standalone.html SS3.2 . Proof of Theorem 3.3 (factor, triangle bound, alpha_1; QED)"
     title: "Why the Slopes Multiply"
@@ -430,13 +479,16 @@ scenes:
     statement: "Bound the nonzero case; $\\varepsilon$ was arbitrary, so it vanishes."
     proof:
       - "$\\tfrac{|R_2(m_1 h+R_1(h))|}{|h|}=\\tfrac{|m_1 h+R_1(h)|}{|h|}\\cdot\\tfrac{|R_2(m_1 h+R_1(h))|}{|m_1 h+R_1(h)|}$"
-      - "$\\le\\left(|m_1|+\\tfrac{|R_1(h)|}{|h|}\\right)\\varepsilon\\ <\\ (|m_1|+1)\\,\\varepsilon$"
+      # PD1 fix, WITHOUT adding a row: the triangle-inequality middle step (tex:317)
+      # was missing on screen. Folded into this existing row in slash form -- a third
+      # proof row clips `qed` off-frame, and a 5th `part:` is barred by the locked
+      # "full epsilon-delta split into 4 parts" decision.
+      - "$\\bigl|m_1+R_1(h)/h\\bigr|\\le|m_1|+|R_1(h)|/|h|\\ \\Rightarrow\\ \\text{piece}<(|m_1|+1)\\,\\varepsilon$"
     qed: "so $\\tfrac{R_3(h)}{h}\\to 0$ --- proved"
 
   # 17 --------------------------------------------- divider: Act 3 opener
   - id: divider_use
     kind: divider
-    accent: definition
     eyebrow: "Stage 3"
     title: "Using the Rule"
     subtitle: "Compositions, layer by layer."
@@ -452,6 +504,7 @@ scenes:
     template: derivation
     accent: example
     ref: md:example_single_composition
+    covers: [sqrt_chain, sin_chain]
     scaffold: { motive: "Use the rule on two quick composites: $\\sqrt{1+x^2}$, $\\sin(x^2)$." }
     source: "chapter3-print-standalone.html SS3.2 . Example 3.4 (sqrt(1+x^2), sin(x^2))"
     title: "A Single Composition"
@@ -475,6 +528,8 @@ scenes:
     kind: content
     template: callout
     type: caution
+    accent: caution          # 對位 chapter3.tex:342 的 envcaution（紅）。宣告用；callout.py:74
+                             # 由 `type:` 覆寫 accent，所以這行不改渲染，只讓語意軸在源碼上可稽核。
     ref: md:caution_inner_derivative
     source: "chapter3-print-standalone.html SS3.2 . Caution (forgetting the inner derivative)"
     title: "Never Drop the Inner Derivative"
@@ -484,7 +539,7 @@ scenes:
       function and then stop -- to write the derivative of $\sin(g(x))$ as just
       $\cos(g(x))$. That's wrong; the right answer carries the inner factor
       $g'(x)$. The $2x$ back in $\sin(x^2)$ is never optional.
-    body: "Wrong: $\\dfrac{d}{dx}\\sin(g(x))=\\cos(g(x))$. Right: $\\dfrac{d}{dx}\\sin(g(x))=\\cos(g(x))\\cdot g'(x)$. The inner factor $g'(x)$ --- the $2x$ in $\\sin(x^{2})$ --- is never optional."
+    body: "Wrong: $\\tfrac{d}{dx}\\sin(g(x))=\\cos(g(x))$. Right: $\\tfrac{d}{dx}\\sin(g(x))=\\cos(g(x))\\cdot g'(x)$. The inner factor $g'(x)$ --- the $2x$ in $\\sin(x^{2})$ --- is never optional."
 
   # 20 ----------------------------- Example 3.5: a three-layer nested composition
   - id: example_nested_three_layers
@@ -492,6 +547,7 @@ scenes:
     template: derivation
     accent: example
     ref: md:example_nested_three_layers
+    covers: [outer_root, inner_again, answer]
     scaffold: { motive: "Let the inside be a composition too — three layers." }
     source: "chapter3-print-standalone.html SS3.2 . Example 3.5 (sqrt(1+sin^2 x))"
     title: "Three Layers Deep"
@@ -516,24 +572,36 @@ scenes:
     template: derivation
     accent: example
     ref: md:example_chain_times_quotient
+    covers: [outer_root, quotient_inner, tidy_front, answer]
     scaffold: { motive: "When the inner derivative is its own problem — chain meets quotient." }
     source: "chapter3-print-standalone.html SS3.2 . Example 3.6 (sqrt((x-1)/(x+2)), x>1)"
     title: "When the Inside Is Its Own Problem"
-    prompt: "Differentiate $\\sqrt{\\dfrac{x-1}{x+2}}$ for $x>1$."
+    prompt: "Differentiate $\\sqrt{\\tfrac{x-1}{x+2}}$ for $x>1$."
     say: |
       Sometimes the inner derivative is a small problem of its own.
       {show step.0} The outer is the square root, the inner is the fraction -- so
       the chain rule gives one over twice the root, times the derivative of the
       fraction.
       {show step.1} And that derivative is a quotient rule: it comes out to three
-      over $(x+2)$ squared.
-      {show result} Tidy the front factor and multiply -- the answer is three
+      over $(x+2)^2$.
+      {show step.2} Tidy the front factor and multiply --
+      {show result} the answer is three
       over twice the product. The chain rule started the job; the quotient rule
       finished the inside.
     steps:
       - { math: "\\frac{d}{dx}\\sqrt{\\frac{x-1}{x+2}} = \\frac{1}{2\\sqrt{(x-1)/(x+2)}}\\cdot\\frac{d}{dx}\\!\\left(\\frac{x-1}{x+2}\\right)", reason: "outer: square root" }
-      - { math: "\\frac{d}{dx}\\!\\left(\\frac{x-1}{x+2}\\right) = \\frac{(x+2)-(x-1)}{(x+2)^{2}} = \\frac{3}{(x+2)^{2}}", reason: "quotient rule" }
-    result: { math: "= \\frac{\\sqrt{x+2}}{2\\sqrt{x-1}}\\cdot\\frac{3}{(x+2)^{2}} = \\frac{3}{2\\sqrt{x-1}\\,(x+2)^{3/2}}\\quad(x>1)" }
+      # \tfrac on the two intermediate rows (setup and answer keep full-size \frac):
+      # the stacked spellings pushed `result` off-frame once the tidy row was added.
+      # `\cdot 1` restored 2026-09-14 (tex:373): it is the u'v-uv' skeleton -- without it
+      # a first learner cannot see where the numerator comes from.
+      - { math: "\\tfrac{d}{dx}\\!\\left(\\tfrac{x-1}{x+2}\\right) = \\tfrac{(x+2)\\cdot 1-(x-1)\\cdot 1}{(x+2)^{2}} = \\tfrac{3}{(x+2)^{2}}", reason: "quotient rule" }
+      # PD1 fix: the front-factor tidy step (tex:375) was only spoken, never shown.
+      # \tfrac, not \frac: the stacked spelling made the row tall enough to clip
+      # `result` off-frame.
+      - { math: "\\tfrac{1}{2\\sqrt{(x-1)/(x+2)}} = \\tfrac{\\sqrt{x+2}}{2\\sqrt{x-1}}", reason: "tidy the front factor" }
+      # Leading `=` dropped: with the tidy row above, the previous line's RHS is now
+      # the front factor alone, so `= ...` would read as a false equation chain.
+    result: { math: "\\frac{\\sqrt{x+2}}{2\\sqrt{x-1}}\\cdot\\frac{3}{(x+2)^{2}} = \\frac{3}{2\\sqrt{x-1}\\,(x+2)^{3/2}}\\quad(x>1)" }
 
   # 22 ------------------------ Example 3.7: chain rule times the product rule
   - id: example_chain_times_product
@@ -541,6 +609,7 @@ scenes:
     template: derivation
     accent: example
     ref: md:example_chain_times_product
+    covers: [product_rule, chain_on_cos2, answer]
     scaffold: { motive: "The chain rule teams up with the product rule." }
     source: "chapter3-print-standalone.html SS3.2 . Example 3.7 ((1+x^2) cos^2 x)"
     title: "Two Rules Cooperate"
@@ -564,10 +633,11 @@ scenes:
     template: derivation
     accent: example
     ref: md:example_leibniz_rates
+    covers: [link_signs, leibniz_chain, answer]
     scaffold: { motive: "Leibniz form earning its keep — signs along a chain." }
     source: "chapter3-print-standalone.html SS3.2 . Example 3.8 (kelp/urchin/otter, Leibniz)"
     title: "Signs Along a Chain"
-    prompt: "Kelp $K$ depends on urchins $U$, and $U$ on otters $O$. Is $\\dfrac{dK}{dO}$ positive or negative?"
+    prompt: "Kelp $K$ depends on urchins $U$, and $U$ on otters $O$. Is $\\tfrac{dK}{dO}$ positive or negative?"
     say: |
       Here's the Leibniz form earning its keep. Kelp $K$ depends on the urchins
       $U$ that eat it, and $U$ on the otters $O$ that eat them.
@@ -586,7 +656,6 @@ scenes:
   - id: toward_section_3_3
     kind: content
     template: definition_math
-    accent: definition
     scene_role: forward-ref         # exposition beat -> chipless (not a definition)
     ref: md:toward_section_3_3
     source: "chapter3-print-standalone.html SS3.2 . closing prose (forward-ref: ln, arcsin, arctan, x^x)"
@@ -624,7 +693,7 @@ scenes:
       slopes multiply.
     points:
       - "Chain rule: $P'(x_0)=f'(g(x_0))\\,g'(x_0)$ --- outer derivative at the inner function, times the inner derivative."
-      - "Leibniz form: $\\dfrac{dy}{dx}=\\dfrac{dy}{du}\\cdot\\dfrac{du}{dx}$ --- the rates multiply."
+      - "Leibniz form: $\\tfrac{dy}{dx}=\\tfrac{dy}{du}\\cdot\\tfrac{du}{dx}$ --- the rates multiply."
       - "Decompose from the outside in; every layer contributes one slope factor."
       - "Pitfall: never drop the inner derivative $g'(x)$. Why it works: locally each function is its tangent line."
     formulas:

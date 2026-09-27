@@ -1,0 +1,478 @@
+<!DOCTYPE html>
+<html lang="zh-Hant">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>§3.2 The Chain Rule — Phase A applied 總帳</title>
+<script>
+  window.MathJax = {
+    tex: { inlineMath: [['$','$']], displayMath: [['$$','$$']] },
+    svg: { fontCache: 'global' },
+    options: { skipHtmlTags: ['script','noscript','style','textarea','pre','code'] }
+  };
+</script>
+<script src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-svg.js" id="MathJax-script" async></script>
+<style>
+
+:root{
+  --bg:#f6f7f9; --paper:#ffffff; --ink:#191f28; --soft:#5d6876; --faint:#8a94a3;
+  --line:#e2e6ec; --line2:#eef1f5;
+  --accent:#2f5fe0; --accentsoft:#eaf0ff; --accentline:#c3d4fb;
+  --hot:#b4341f; --hotsoft:#fdf0ec; --hotline:#f0c3b8;
+  --act:#0f766e; --actsoft:#e7f5f2; --actline:#a9dcd4;
+  --codebg:#f0f2f6;
+}
+@media (prefers-color-scheme: dark){
+  :root{
+    --bg:#14171c; --paper:#1b1f26; --ink:#e6e9ee; --soft:#a3adbb; --faint:#7c8695;
+    --line:#2b3139; --line2:#232830;
+    --accent:#7ba2ff; --accentsoft:#1d2739; --accentline:#31456b;
+    --hot:#ff9d85; --hotsoft:#2c1f1b; --hotline:#5c382e;
+    --act:#5fd3c2; --actsoft:#14262a; --actline:#27524d;
+    --codebg:#242a33;
+  }
+}
+*{box-sizing:border-box}
+html{-webkit-text-size-adjust:100%}
+body{
+  margin:0; background:var(--bg); color:var(--ink);
+  font:16.5px/1.75 -apple-system,"Segoe UI",Roboto,"Noto Sans TC","Microsoft JhengHei",sans-serif;
+}
+.wrap{max-width:880px;margin:0 auto;padding:44px 20px 100px}
+code{font-family:"Cascadia Code",Consolas,"SF Mono",monospace;font-size:.88em;
+  background:var(--codebg);padding:1px 5px;border-radius:4px;word-break:break-word}
+.mono{font-family:"Cascadia Code",Consolas,monospace;font-size:13px;
+  font-variant-numeric:tabular-nums}
+.muted{color:var(--soft);font-size:14.5px}
+
+.top{border-bottom:2px solid var(--line);padding-bottom:18px;margin-bottom:26px}
+.eyebrow{margin:0 0 8px;font-size:12.5px;font-weight:700;letter-spacing:.08em;
+  text-transform:uppercase;color:var(--accent)}
+h1{font-size:28px;line-height:1.3;margin:0 0 8px;letter-spacing:.01em}
+.deck{margin:0;color:var(--soft);font-size:13.5px}
+
+.lede{background:var(--paper);border:1px solid var(--line);border-left:4px solid var(--accent);
+  border-radius:10px;padding:18px 22px;margin:0 0 26px}
+.lede p{margin:0 0 11px}
+.lede p:last-child{margin-bottom:0}
+
+.h2{font-size:20px;margin:48px 0 6px;padding-top:15px;border-top:2px solid var(--line);font-weight:700}
+.hot-h2{border-top-color:var(--hot)}
+.h2sub{margin:0 0 20px;color:var(--soft);font-size:14px}
+.h2sub b{color:var(--ink)}
+.h3{font-size:16px;font-weight:700;margin:30px 0 8px;color:var(--ink)}
+
+.deliv{display:grid;grid-template-columns:repeat(auto-fit,minmax(240px,1fr));gap:12px;margin:0 0 6px}
+.dcard{background:var(--paper);border:1px solid var(--line);border-radius:10px;padding:14px 16px}
+.dname{display:block;font-weight:700;font-size:15px;color:var(--accent);text-decoration:none;
+  margin-bottom:5px;line-height:1.4}
+.dname:hover{text-decoration:underline}
+.drole{font-size:13px;color:var(--soft);line-height:1.6}
+.dstate{font-size:12.5px;color:var(--faint);margin-top:7px;padding-top:7px;border-top:1px dashed var(--line)}
+
+.step{background:var(--paper);border:1px solid var(--line);border-radius:11px;
+  padding:17px 21px 15px;margin:14px 0}
+.shead{display:flex;align-items:center;gap:10px;flex-wrap:wrap;margin-bottom:12px;
+  padding-bottom:10px;border-bottom:1px solid var(--line2)}
+.sbadge{font-weight:700;font-size:13px;color:#fff;background:var(--accent);
+  border-radius:6px;padding:2px 9px;letter-spacing:.02em;white-space:nowrap}
+.stitle{font-size:17px;font-weight:700}
+.skey{font-size:11.5px;font-weight:700;letter-spacing:.06em;text-transform:uppercase;
+  color:var(--faint);margin:14px 0 6px}
+.skey:first-of-type{margin-top:0}
+ul.did{margin:0;padding-left:20px}
+ul.did li{margin-bottom:7px;font-size:15px;line-height:1.72}
+ul.did li:last-child{margin-bottom:0}
+
+table.crit{width:100%;border-collapse:collapse;font-size:14px}
+table.crit td{padding:6px 8px;border-top:1px solid var(--line2);vertical-align:top}
+table.crit tr:first-child td{border-top:none}
+td.cm{width:62px;white-space:nowrap}
+td.ct{width:37%}
+td.ch{color:var(--soft);font-size:13.5px}
+.ok{color:var(--act);font-weight:700;font-size:12.5px}
+.pend{color:var(--hot);font-weight:700;font-size:12.5px}
+
+.ev{margin:0;font-size:13.5px}
+.evl{color:var(--soft);font-size:12.5px}
+.note{background:var(--accentsoft);border:1px solid var(--accentline);border-radius:9px;
+  padding:12px 15px;margin-top:14px;font-size:14px;line-height:1.7;color:var(--soft)}
+.note b{color:var(--ink)}
+
+.claim{background:var(--paper);border:1px solid var(--line);border-left:4px solid var(--hot);
+  border-radius:10px;padding:16px 20px;margin:16px 0 22px}
+.ok-claim{border-left-color:var(--act)}
+.claim p{margin:0 0 10px}
+.claim p:last-child{margin-bottom:0}
+.perunit{font-size:12.5px;color:var(--soft);line-height:2.1}
+
+table.tbl{width:100%;border-collapse:collapse;font-size:14.5px;margin:10px 0 6px;
+  background:var(--paper);border:1px solid var(--line);border-radius:10px;overflow:hidden}
+table.tbl th{background:var(--line2);text-align:left;padding:9px 13px;font-size:12.5px;
+  font-weight:700;letter-spacing:.04em;color:var(--soft);text-transform:uppercase}
+table.tbl td{padding:9px 13px;border-top:1px solid var(--line2);vertical-align:top;line-height:1.65}
+table.hash td{padding:5px 13px;font-size:13px}
+.sid{color:var(--accent)}
+.hotnum{color:var(--hot);font-weight:700}
+.tagb{display:inline-block;background:var(--hotsoft);border:1px solid var(--hotline);color:var(--hot);
+  font-size:10.5px;font-weight:700;padding:0 6px;border-radius:5px;margin-left:6px;
+  font-family:-apple-system,"Segoe UI",sans-serif;vertical-align:1px}
+
+.stats{display:grid;grid-template-columns:repeat(auto-fit,minmax(170px,1fr));gap:11px;margin:12px 0 18px}
+.stat{background:var(--paper);border:1px solid var(--line);border-radius:10px;padding:13px 15px}
+.sv{font-size:24px;font-weight:700;letter-spacing:-.01em;font-variant-numeric:tabular-nums;line-height:1.2}
+.sl{font-size:13px;color:var(--ink);margin-top:2px;font-weight:600}
+.sn{font-size:11.5px;color:var(--faint);margin-top:4px;line-height:1.55}
+
+.eye{background:var(--paper);border:1px solid var(--line);border-radius:10px;
+  padding:15px 19px;margin:12px 0;border-left:4px solid var(--act)}
+.no-eye{border-left-color:var(--hot)}
+.ehead{display:flex;align-items:center;gap:10px;flex-wrap:wrap;margin-bottom:8px}
+.ebadge{font-size:11.5px;font-weight:700;letter-spacing:.05em;color:var(--act);
+  background:var(--actsoft);border:1px solid var(--actline);border-radius:5px;padding:1px 8px}
+.no-eye .ebadge{color:var(--hot);background:var(--hotsoft);border-color:var(--hotline)}
+.esid{font-family:"Cascadia Code",Consolas,monospace;font-size:12.5px;color:var(--soft)}
+.ewhat{margin:0 0 8px;font-size:16px;font-weight:600}
+.edetail{margin:0;font-size:14.5px;color:var(--soft);line-height:1.75}
+.edetail b{color:var(--ink)}
+
+.nd{background:var(--paper);border:1px solid var(--line);border-radius:10px;padding:14px 18px;margin:11px 0}
+.ndwhat{font-weight:700;font-size:15.5px;margin-bottom:7px}
+.ndwhy{font-size:14.5px;color:var(--soft);line-height:1.75}
+.ndwhy b{color:var(--ink)}
+
+.act{background:var(--actsoft);border:1px solid var(--actline);border-radius:11px;
+  padding:17px 20px;margin:18px 0;text-align:center}
+.act-eyebrow{font-size:11.5px;font-weight:700;letter-spacing:.1em;text-transform:uppercase;color:var(--act)}
+.act-title{font-size:20px;font-weight:700;margin:5px 0 5px}
+.act-sub{font-size:15px;color:var(--soft)}
+.act-note{font-size:12.5px;color:var(--faint);margin-top:9px}
+
+.foot{margin-top:56px;padding-top:16px;border-top:1px solid var(--line);
+  font-size:12.5px;color:var(--faint);line-height:1.8}
+.foot p{margin:0 0 5px}
+
+</style>
+</head>
+<body>
+<div class="wrap">
+<header class="top">
+  <p class="eyebrow">applied 報告 · 這一輪到底改了什麼</p>
+  <h1>§3.2 The Chain Rule — Phase A 總帳</h1>
+  <p class="deck">deck <code>ch03_chain_rule</code> · 內容線 A1–A5 收案 · 2026-09-14 · <b>不是新的稽核稿</b></p>
+</header>
+<div class="lede">
+<p><b>一句話結論：</b>Phase A 的 A1–A5 全部收案——講義對齊零跟改、storyboard 升到現行契約、口語單一源 parity 首跑即過、NFA 雙閘 blocking 歸零、23 場真音檔已合成（<b>30 / 35</b> 次呼叫、0 retry、704.5 s ＝ 11.74 分）、真音檔 1080p 成片已跑完（<b>786.5 s ＝ 13.1 分</b>，兩道 <code>[sync]</code> 硬閘全過）；<b>全程 23 場 <code>scene_text_hash</code> 零變動</b>，所有畫面／契約／唸法的改動都沒有讓任何一次 TTS 白花。<b>唯一待辦是 A5-3 的聽感人閘</b>。</p>
+<p class='muted'>本頁是 applied 總帳：逐步「做了什麼／判準有沒有達成／證據是哪一個 commit」。逐條 finding 的可讀版在各閘自己的審核稿（下方交付物清單）。</p>
+</div>
+<div class="h2">交付物清單（本輪產出）</div>
+<p class="h2sub">前三份是<b>給您過目／裁決</b>的 HTML，第四份是<b>版控結案紀錄</b>，本檔是總帳。</p>
+<div class="deliv">
+  <div class="dcard">
+    <a class="dname" href="REVIEW-ch03_chain_rule-s32-a1-alignment.html">A1 講義對齊報告</a>
+    <div class="drole">A1 的停等點——24 單元逐一跟改／不跟改，含兩個裁決項</div>
+    <div class="dstate">✅ 使用者已 sign-off</div>
+  </div>
+  <div class="dcard">
+    <a class="dname" href="REVIEW-ch03_chain_rule-s32-narration-signoff.html">旁白簽核稿（合成前人閘）</a>
+    <div class="drole">23 場 <code>say:</code> 以「旁白」身分送簽；由 gate-2 的框架層反對促成</div>
+    <div class="dstate">✅ 已簽，A5-2 才開跑</div>
+  </div>
+  <div class="dcard">
+    <a class="dname" href="../../output/ch03/s3.2/audio_mimo/REVIEW-ch03_chain_rule_mimo-listening.html">聽感人閘 listening pack</a>
+    <div class="drole">每場 <code>&lt;audio&gt;</code>＋WPM＋validation／fallback＋LUFS，依風險排序</div>
+    <div class="dstate">⏳ <b>待您裁決</b>（非版控，在 output 目錄）</div>
+  </div>
+  <div class="dcard">
+    <a class="dname" href="REPORT-ch03_chain_rule-narration-faithfulness.md">NFA 版控結案報告</a>
+    <div class="drole">兩道閘的 findings、裁決與 commit 索引（<code>git log --grep="NFA"</code>）</div>
+    <div class="dstate">✅ 已寫完</div>
+  </div>
+</div>
+<div class="h2">A1–A5 逐步：做了什麼／判準／證據</div>
+<p class="h2sub">判準取自 <code>KICKOFF-s32-chain-rule.md</code> §4 每一步自己的「完成判準」。<b>未達成的一項用紅色標出</b>，不藏。</p>
+<div class="step">
+  <div class="shead">
+    <span class="sbadge">A1</span>
+    <span class="stitle">內容稿對 <code>chapter3.tex</code> §3.2 做 §8 對齊</span>
+  </div>
+  <div class="skey">做了什麼</div>
+  <ul class='did'>
+    <li>把 <code>source_rev</code> stamp 從凍結的 legacy HTML fragment 換到 <code>handout/latex/src/ch03/chapter3.tex</code>。</li>
+    <li>24 個教學單元逐一與 <code>chapter3.tex:208–416</code> 的環境對照，寫出跟改／不跟改表——<b>結果是 24 單元零跟改</b>。</li>
+    <li>兩個裁決項維持不跟改：#8（skip-permission 句）、#22（“key that unlocks” 比喻）——都是影片版刻意的教學鋪陳，講義沒有不代表要刪。</li>
+  </ul>
+  <div class="skey">判準</div>
+  <table class="crit"><tbody>
+    <tr><td class='cm'><span class="ok">達成</span></td><td class='ct'><code>[source_rev]</code> WARN 消失</td><td class='ch'><code>schema.py</code> 不再印 <code>[source_rev] 1 finding(s)</code></td></tr>
+    <tr><td class='cm'><span class="ok">達成</span></td><td class='ct'>逐單元跟改／不跟改表寫完</td><td class='ch'>24 筆，全在 A1 對齊報告</td></tr>
+    <tr><td class='cm'><span class="ok">達成</span></td><td class='ct'>scoped 回歸 blocking 0</td><td class='ch'>零跟改 ⇒ 無受影響單元可審</td></tr>
+    <tr><td class='cm'><span class="ok">達成</span></td><td class='ct'>使用者 sign-off</td><td class='ch'><b>對象是對齊報告，不是 <code>_narration.html</code></b>——零跟改時後者重編後逐位元組相同</td></tr>
+  </tbody></table>
+  <div class="skey">證據</div>
+  <p class="ev">
+    <code>7eb7c34</code> <span class='evl'>A1 §8 對齊</span> · <code>e51f2ba</code> <span class='evl'>merge</span>
+  </p>
+  <div class="note">A1 排在最前面是 §3.1 Task D 的學費：§3.1 是在四原語鋪滿 27 場<b>之後</b>才對齊講義，五個場的拍子被拉長 6–35 秒、外加 15 次 billed TTS 重合成。<b>在花錢、動畫面之前做完對齊，這一整類成本就不存在。</b></div>
+</div>
+<div class="step">
+  <div class="shead">
+    <span class="sbadge">A2</span>
+    <span class="stitle">storyboard 更新到現行契約</span>
+  </div>
+  <div class="skey">做了什麼</div>
+  <ul class='did'>
+    <li><code>accent:</code> 依語意軸全面複審——<code>definition</code> 由 <b>10 場收到 1 場</b>（只留 <code>remainder_form_definition</code>，它對位 <code>chapter3.tex:246</code> 的 <code>def:3.1</code>）；<code>caution_inner_derivative</code> 補上 <code>accent: caution</code>（對位 <code>:342</code> 的 <code>envcaution</code>）；6 個散文／Figure 場與 3 個 divider 拿掉 accent（幕級家具無可對位的講義環境）。</li>
+    <li>lint <b>6 warning → clean</b>（<code>\dfrac</code> 改 <code>\tfrac</code>、兩處 widow line 重寫句尾）。⚠ kickoff §2.3 立檔時寫 5 條，重跑實為 6 條——漏記 <code>caution_inner_derivative.body</code>。</li>
+    <li>PD1-2 用 <code>part:</code> 分頁修掉——<code>decomposition_strategy</code> 在凍結的 <code>procedure_steps</code> 容量下四條出路全堵，唯一出路是拆兩場。<b>代價＝content 場 22 → 23＝billed call +1</b>，而這件事必須在 A5 之前做完，否則代價從「多一次呼叫」變成「整場重合成」。</li>
+    <li><b>10 份 <code>screen_contract</code> ＋ 29 條 <code>required_steps</code> ＋ <code>coverage_enforce</code> 上線</b>——SC 閘從此不再空轉（見下方負向對照）。</li>
+  </ul>
+  <div class="skey">判準</div>
+  <table class="crit"><tbody>
+    <tr><td class='cm'><span class="ok">達成</span></td><td class='ct'>四支確定性閘 0 error</td><td class='ch'>schema／lint／sizecheck／<code>derive --check</code></td></tr>
+    <tr><td class='cm'><span class="ok">達成</span></td><td class='ct'>pedagogy gate-1 PD／OF／SC blocking ＝ 0</td><td class='ch'>四輪 blocking <b>3 → 1 → 1 → 0</b>；advisory 5 → 5 → 1 → 2（每輪重新生成）</td></tr>
+    <tr><td class='cm'><span class="ok">達成</span></td><td class='ct'><code>accent</code> 複審表逐場有結論</td><td class='ch'>23 content 場＋3 divider 逐場</td></tr>
+  </tbody></table>
+  <div class="skey">證據</div>
+  <p class="ev">
+    <code>f8ed626</code> <span class='evl'>A2 契約升級</span> · <code>23dd48e</code> <span class='evl'>A2b `part:` 分頁＋SC 上線</span>
+  </p>
+  <div class="note"><b>判準本身被這一步推翻過一次：</b> A2 原訂判準寫「SC-honesty blocking ＝ 0」，但那時 deck 一份 <code>screen_contract</code> 都沒有，SC1／SC2／SC-honesty <b>全部空轉</b>，綠燈是 vacuous pass。已回寫 <code>REVIEW_GATES.md</code> §六 6.2：凡以「某閘 blocking ＝ 0」為判準，<b>必須同時寫明該閘的武裝前提</b>。</div>
+</div>
+<div class="step">
+  <div class="shead">
+    <span class="sbadge">A2 後補</span>
+    <span class="stitle"><code>decomposition_strategy</code> 第 11 份契約</span>
+  </div>
+  <div class="skey">做了什麼</div>
+  <ul class='did'>
+    <li>補上第 11 份 <code>screen_contract</code>（<b>7 條 <code>required_steps</code></b>），搶在工具線 r2 Task I 把 <code>procedure_steps</code> 納入 <code>_SCOPED_TEMPLATES</code> 之前補綠——否則 r2 併入 main 的當下，§3.2 會立刻紅一條。</li>
+  </ul>
+  <div class="skey">判準</div>
+  <table class="crit"><tbody>
+    <tr><td class='cm'><span class="ok">達成</span></td><td class='ct'>契約總數 10 → 11、<code>required_steps</code> 29 → 36</td><td class='ch'>見下方即時重算表</td></tr>
+    <tr><td class='cm'><span class="ok">達成</span></td><td class='ct'>上游 r2 併入後 §3.2 仍綠</td><td class='ch'>main 紅、下游分支綠——因為下游先補了</td></tr>
+  </tbody></table>
+  <div class="skey">證據</div>
+  <p class="ev">
+    <code>30c5358</code> <span class='evl'>搶在 r2 前補綠</span>
+  </p>
+  <div class="note">這是 §六 6.6「<code>main</code> ≠ 最新」那一條的來源：<b>上游只對 main 驗收自己的改動時，會看到下游早已解決的問題</b>，也可能漏看只有下游才踩得到的問題。</div>
+</div>
+<div class="step">
+  <div class="shead">
+    <span class="sbadge">A3</span>
+    <span class="stitle">口語單一源 <code>.spoken.yml</code> ＋ <code>derive_spoken</code></span>
+  </div>
+  <div class="skey">做了什麼</div>
+  <ul class='did'>
+    <li>手寫口語單一源 <code>content_scripts/ch03_chain_rule.spoken.yml</code>（A3 首版 <b>363 行</b>；經 NFA 兩輪修正後現為 377 行）。</li>
+    <li><code>derive_spoken.py --check</code> <b>首跑即 <code>parity OK</code></b>——每個 content <code>say:</code> 都有 spoken 對應、<code>{show}</code> marker 逐一對齊、口語端無 <code>$</code> LaTeX 外洩。</li>
+    <li>23 場散文逐字相同驗證 <b>0 failures</b>（D2 的硬條件：英文散文逐字相同，只有 <code>$…$</code> 裡的 LaTeX 可以被拼成口語）。</li>
+  </ul>
+  <div class="skey">判準</div>
+  <table class="crit"><tbody>
+    <tr><td class='cm'><span class="ok">達成</span></td><td class='ct'><code>parity OK</code></td><td class='ch'>首跑即過，零迭代</td></tr>
+    <tr><td class='cm'><span class="ok">達成</span></td><td class='ct'><code>_mimo.yml</code> 生成</td><td class='ch'><code>storyboards/ch03_chain_rule_mimo.yml</code>（DO NOT EDIT）</td></tr>
+    <tr><td class='cm'><span class="ok">達成</span></td><td class='ct'>口語版通讀無 LaTeX 漏出</td><td class='ch'><code>--check</code> 的 <code>$</code> 掃描 ＋ 人工通讀</td></tr>
+  </tbody></table>
+  <div class="skey">證據</div>
+  <p class="ev">
+    <code>1cbff24</code> <span class='evl'>A3 口語單一源＋derive</span>
+  </p>
+  <div class="note"><code>parity OK</code> 首跑即過的原因是 A2 已經把散文定稿了——<b>口語源是照著定稿的 <code>say:</code> 寫的</b>，不是另外寫一份再去對。順序對了，parity 就不是一道要迭代的閘。</div>
+</div>
+<div class="step">
+  <div class="shead">
+    <span class="sbadge">A4</span>
+    <span class="stitle">NFA 旁白忠實稽核（雙閘）</span>
+  </div>
+  <div class="skey">做了什麼</div>
+  <ul class='did'>
+    <li><b>gate-1</b>（<code>narration-faithfulness-audit</code> subagent，Claude Opus 5，免費）：<b>0 blocking／3 advisory</b>，三條全部採納；D5 新慣例（分母整體被平方的分數 → “the square of the quantity …”）入 rubric。</li>
+    <li><b>R2-01</b>（gate-1 回歸輪抓到）：gate-2 的 prompt 與 <code>.md</code> 檔頭判準<b>相反</b>——成因是<b>主對話派工契約寫錯</b>，把「核准源」欄填成內容稿，於是<b>付費</b>閘拿到相反指示。由主對話修正。</li>
+    <li><b>gate-2</b>（agy <code>gemini-3.1-pro-high</code>，計費，使用者 2026-09-14 核准）：<b>1 blocking</b>（N2-01，D2 parity）、0 advisory；13 條高風險唸法逐條 PASS。修根因（把指數搬進 LaTeX）後回歸 <b>0/0</b>。</li>
+    <li><b>gate-2 另在 <code>disagreements_with_premise</code> 提出框架層反對</b>——使用者簽的是內容稿，真正被合成的是從未以「旁白」身分送簽的 <code>say:</code>。使用者裁決＝<b>選 B：合成前補一個 <code>say:</code> 的簽核點</b>。</li>
+  </ul>
+  <div class="skey">判準</div>
+  <table class="crit"><tbody>
+    <tr><td class='cm'><span class="ok">達成</span></td><td class='ct'>gate-1 blocking 0</td><td class='ch'>3 advisory 全採納，回歸後殘留 1（R2-01）已修</td></tr>
+    <tr><td class='cm'><span class="ok">達成</span></td><td class='ct'>gate-2 blocking 0</td><td class='ch'>N2-01 修後回歸 0/0</td></tr>
+    <tr><td class='cm'><span class="ok">達成</span></td><td class='ct'>回歸再審確認沒改過頭／漏檔</td><td class='ch'>全 deck 掃同型破口（<code>$…$</code> 外的散文數學字被改寫）<b>0 處</b></td></tr>
+    <tr><td class='cm'><span class="ok">達成</span></td><td class='ct'>版控 REPORT 寫完</td><td class='ch'><code>REPORT-ch03_chain_rule-narration-faithfulness.md</code></td></tr>
+  </tbody></table>
+  <div class="skey">證據</div>
+  <p class="ev">
+    <code>ae840f3</code> <span class='evl'>gate-1 三條 advisory＋D5 入契約</span> · <code>52962e0</code> <span class='evl'>R2-01 prompt 判準對齊</span> · <code>201281d</code> <span class='evl'>N2-01 指數搬進 LaTeX</span>
+  </p>
+  <div class="note"><b>gate-2 的價值不只是補 gate-1 的遺漏，是不接受第一讀者與指揮者共同的灰區。</b> N2-01 那一處 gate-1 判 0 blocking、<b>主對話也看過同一處、判為灰區放過</b>；gate-2 判它是 blocking，而且給的修法比主對話原本採用的更好（修根因 ⇒ 口語端一字不改 ⇒ 23 場 hash 零變動）。</div>
+</div>
+<div class="step">
+  <div class="shead">
+    <span class="sbadge">A5</span>
+    <span class="stitle">TTS（唯一的大額計費點）</span>
+  </div>
+  <div class="skey">做了什麼</div>
+  <ul class='did'>
+    <li><b>A5-0 mock 驗時序</b>（零計費）：<code>[sync] clean</code>、mock 整片 909.9 s。⚠ mock 的 <code>modes</code> 顯示 <code>scene_aligned: 0 / beats: 23</code> 是<b>假象</b>（靜音無從 forced-align），<code>--backend mimo --dry-run</code> 顯示 23 場全走 scene-level。</li>
+    <li><b>A5-1 報價</b>：canonical 路 722.8 s vs 口語路 730.9 s，兩路交叉驗證一致；使用者<b>核准上限 35</b>。</li>
+    <li><b>A5-2 真合成</b>：<code>backend_calls: 30</code>／<code>backend_retries: 0</code>（23 場 planned ＋ 7 次 fallback），<b>30 ≤ 35 核准上限</b>。modes＝22 scene_aligned／1 beats／5 silent（家具）；3 場走過 fallback。</li>
+    <li>音訊 <b>704.5 s ＝ 11.74 分</b>，比 mock 對同 23 場的估時（828 s）<b>短約 15%</b>（逐場 −14%～−19%）——見下方「本輪學到」。</li>
+    <li><b>真音檔 1080p 全片 render</b>：成片 <b>786.5 s ＝ 13.1 分</b>、30.3 MiB；<b>兩道 <code>[sync]</code> 硬閘全過</b>（<code>beat timing clean</code> ＋ <code>render/audio lengths clean</code>），28 場<b>零</b>「narration over video」。</li>
+  </ul>
+  <div class="skey">判準</div>
+  <table class="crit"><tbody>
+    <tr><td class='cm'><span class="ok">達成</span></td><td class='ct'><code>manifest.json</code> 生成且 freshness 過</td><td class='ch'><code>make.py --reuse-audio</code> 接受</td></tr>
+    <tr><td class='cm'><span class="ok">達成</span></td><td class='ct'>billed call ≤ 核准數</td><td class='ch'><b>30 ≤ 35</b></td></tr>
+    <tr><td class='cm'><span class="ok">達成</span></td><td class='ct'><code>[sync]</code> 兩道硬閘 clean</td><td class='ch'>28 場零 narration-over-video</td></tr>
+    <tr><td class='cm'><span class="pend">未達成</span></td><td class='ct'><code>listening_pack</code> 使用者聽過並認可</td><td class='ch'><b>待使用者</b>——這是 Phase A 最後一個停等點，見下方「待您裁決」</td></tr>
+  </tbody></table>
+  <div class="note"><b>真合成前必須先清掉 <code>audio_mimo/</code>，或帶 <code>--force-backend-switch</code></b>——A5-0 的 mock 預設把靜音 WAV 與 mock manifest 寫進<b>真合成要去的同一個目錄</b>。本輪把 mock 產物移到 <code>audio_mock_pre_tts/</code> 留底。</div>
+</div>
+<div class="h2 hot-h2">G0 內容鎖的證據鏈 — 本輪最重要的一件事</div>
+<p class="h2sub"><b>命題：</b>Phase A 從頭到尾，23 個 content 場的 <code>scene_text_hash</code> <b>一次都沒有變過</b>。所以畫面欄位、契約宣告、數學唸法的每一次改動，都<b>沒有讓任何一次 TTS 白花</b>。</p>
+<div class="claim">
+<p><b>為什麼這件事值得單獨成節：</b>§3.1 的學費是 <b>15 次 billed call 重合成</b>——因為對齊講義排在鋪原語之後，旁白被拉長了。§3.2 把對齊排在 A1、把「只能靠改場結構關閉的 gate-1 blocking」排在 A5 之前，於是唯一一次真正的內容變動（PD1-2 的 <code>part:</code> 分頁）只讓 planned call 從 22 變成 23，<b>而不是重合成一整場</b>。</p>
+<p class='muted'>驗法＝比對 <code>scene_text_hash</code>（剝掉 marker 後的口語全文 hash）。<b>不要離線直接呼叫 <code>scene_reuse_ok</code></b>——那會繞過 CLI 閘、給出與實際相反的預測（§3.1 ⑬ 花掉 13 次 billed call 的成因）。</p>
+</div>
+<div class="h3">被驗證的四個時刻</div>
+<table class="tbl"><thead><tr><th>時刻</th><th>commit</th><th>為什麼 hash 不變</th></tr></thead><tbody>
+<tr><td><b>A2 的 <code>say:</code> 逐字</b></td><td class='mono'>f8ed626 ／ 23dd48e</td><td><code>accent</code>／<code>part:</code>／<code>screen_contract</code> 全部是<b>畫面與契約</b>欄位；<code>part:</code> 分頁處只動標點與首字母大小寫（<code>derivative -- and</code> → <code>derivative. And</code>），<b>沒有增字、沒有刪字</b>。</td></tr>
+<tr><td><b>A2b 的 <code>part:</code> 分頁</b></td><td class='mono'>23dd48e</td><td><code>decomposition_strategy</code> 拆成兩場後，兩場 <code>say:</code> 合起來的 token 序列與拆前相同。</td></tr>
+<tr><td><b>A4 gate-1 三條 advisory 落地</b></td><td class='mono'>ae840f3</td><td>N1-02／N1-03 只改<b>數學的唸法</b>（<code>$…$</code> 內），散文一字不動；N1-01 的裁決是兩個產物都不動、只加 doc-sync 標註。</td></tr>
+<tr><td><b>A4 gate-2 N2-01 修根因</b></td><td class='mono'>201281d</td><td>把 <code>squared</code> 從散文搬進 LaTeX（<code>$(x+2)$ squared</code> → <code>$(x+2)^2$</code>）⇒ <b>口語文字一字不改</b>，兩邊散文回到逐字相同。</td></tr>
+</tbody></table>
+<div class="h3">現行 23 場的 hash（產生本頁時由版控檔即時重算）</div>
+<p class="h2sub">走的是 TTS 自己那條路：<code>narration.parse_say</code> → 串起 beat 文字 → <code>timing.text_hash</code>。<b>2026-09-14 收尾當日與真 <code>manifest.json</code> 逐場相同</b>（22 場 scene-level 逐位元組相同；第 23 場 <code>composed_mapping_figure</code> 走 beats 模式，manifest 無 scene 級 hash，reuse key 是 <b>beat 級</b> <code>text_hash</code>＋輸出檔路徑）。</p>
+<table class="tbl hash"><thead><tr><th>#</th><th>scene id</th><th>beats</th><th>scene_text_hash</th></tr></thead><tbody>
+<tr><td class='mono'>01</td><td class='mono sid'>why_composition_is_missing</td><td class='mono'>4</td><td class='mono'>0f297439898c8c91</td></tr>
+<tr><td class='mono'>02</td><td class='mono sid'>rates_multiply_intuition</td><td class='mono'>4</td><td class='mono'>82f016044af3e243</td></tr>
+<tr><td class='mono'>03</td><td class='mono sid'>chain_rule_statement</td><td class='mono'>4</td><td class='mono'>fe3fc4d9f067ea0f</td></tr>
+<tr><td class='mono'>04</td><td class='mono sid'>composed_mapping_figure <span class='tagb'>beats 模式</span></td><td class='mono'>5</td><td class='mono'>ded8dc238f1d936b</td></tr>
+<tr><td class='mono'>05</td><td class='mono sid'>leibniz_form</td><td class='mono'>4</td><td class='mono'>ce42d1314dcc2535</td></tr>
+<tr><td class='mono'>06</td><td class='mono sid'>decomposition_strategy</td><td class='mono'>5</td><td class='mono'>3488f623c18da972</td></tr>
+<tr><td class='mono'>07</td><td class='mono sid'>decomposition_strategy_repeat</td><td class='mono'>3</td><td class='mono'>525f7cd242927a60</td></tr>
+<tr><td class='mono'>08</td><td class='mono sid'>proof_strategy_bridge</td><td class='mono'>5</td><td class='mono'>9b184f1a37d5fd94</td></tr>
+<tr><td class='mono'>09</td><td class='mono sid'>remainder_form_definition</td><td class='mono'>4</td><td class='mono'>d781dab08c4a3ba1</td></tr>
+<tr><td class='mono'>10</td><td class='mono sid'>remainder_tangent_figure</td><td class='mono'>4</td><td class='mono'>ab74b984995a5182</td></tr>
+<tr><td class='mono'>11</td><td class='mono sid'>two_forms_equivalent</td><td class='mono'>6</td><td class='mono'>dfdb18d9d13992ee</td></tr>
+<tr><td class='mono'>12</td><td class='mono sid'>proof_setup_substitution</td><td class='mono'>5</td><td class='mono'>c50c3ffb62122ecd</td></tr>
+<tr><td class='mono'>13</td><td class='mono sid'>proof_easy_piece</td><td class='mono'>4</td><td class='mono'>03b92d8b227a6060</td></tr>
+<tr><td class='mono'>14</td><td class='mono sid'>proof_delicate_choices</td><td class='mono'>5</td><td class='mono'>6e7681147e143197</td></tr>
+<tr><td class='mono'>15</td><td class='mono sid'>proof_delicate_bound</td><td class='mono'>4</td><td class='mono'>5cea484f5aa0a512</td></tr>
+<tr><td class='mono'>16</td><td class='mono sid'>example_single_composition</td><td class='mono'>4</td><td class='mono'>2d4fde07e8a6c3df</td></tr>
+<tr><td class='mono'>17</td><td class='mono sid'>caution_inner_derivative</td><td class='mono'>2</td><td class='mono'>68fb516e66788dd7</td></tr>
+<tr><td class='mono'>18</td><td class='mono sid'>example_nested_three_layers</td><td class='mono'>4</td><td class='mono'>08248ad93ee63ece</td></tr>
+<tr><td class='mono'>19</td><td class='mono sid'>example_chain_times_quotient</td><td class='mono'>5</td><td class='mono'>c758c54cdc84787c</td></tr>
+<tr><td class='mono'>20</td><td class='mono sid'>example_chain_times_product</td><td class='mono'>4</td><td class='mono'>ac54c763961a579d</td></tr>
+<tr><td class='mono'>21</td><td class='mono sid'>example_leibniz_rates</td><td class='mono'>4</td><td class='mono'>3dcef266cab892f6</td></tr>
+<tr><td class='mono'>22</td><td class='mono sid'>toward_section_3_3</td><td class='mono'>2</td><td class='mono'>7eea0b94fed972df</td></tr>
+<tr><td class='mono'>23</td><td class='mono sid'>recap</td><td class='mono'>5</td><td class='mono'>c99796fe2bec06b6</td></tr>
+</tbody></table>
+<div class="h3">同時被改掉的東西（都沒有動到 hash）</div>
+<div class="stats">
+  <div class="stat">
+    <div class="sv">28</div><div class="sl">storyboard 場數</div>
+    <div class="sn">content 23 ／ divider 3 ／ intro 1 ／ outro 1</div>
+  </div>
+  <div class="stat">
+    <div class="sv">11</div><div class="sl">screen_contract 份數</div>
+    <div class="sn">required_steps 共 36 條</div>
+  </div>
+  <div class="stat">
+    <div class="sv">8</div><div class="sl">accent 語意值種類</div>
+    <div class="sn">caution 1 ／ definition 1 ／ example 5 ／ procedure 2 ／ proposition 1 ／ recap 1 ／ remark 1 ／ theorem 5</div>
+  </div>
+  <div class="stat">
+    <div class="sv">6</div><div class="sl"><code>part:</code> 分頁場數</div>
+    <div class="sn">PD1-2（2 頁）＋ 證明鏈（4 頁）</div>
+  </div>
+  <div class="stat">
+    <div class="sv">2</div><div class="sl">客製 hook 數</div>
+    <div class="sn">composed_mapping_figure ／ remainder_tangent_figure</div>
+  </div>
+  <div class="stat">
+    <div class="sv">4</div><div class="sl">meta enforce 旗標</div>
+    <div class="sn">otf_enforce ／ pedagogy_enforce ／ fontfloor_enforce ／ coverage_enforce</div>
+  </div>
+</div>
+<div class="claim ok-claim">
+<p><b>SC 閘確實武裝了（不是 vacuous pass）：</b>正向——用閘走的同一條路解析，得 <b>11 份契約／36 條 <code>required_steps</code></b>（逐 unit 條數見下）；負向對照——故意從 storyboard 拿掉一個 <code>covers</code> id，<b>閘噴 <code>ERROR [SC1]</code></b>。兩步都做過才敢說「閘看得到契約」。</p>
+<p class='muted'>理由：<code>_screen_contract.parse_block()</code> 是 <b>fail-closed</b>——契約只要有一個 YAML 語法錯誤（本輪實例：<code>tex:</code> 用雙引號、值裡有 <code>\c</code> 這種非法轉義），閘看到的是「這個 unit <b>沒有</b>契約」，訊息把人導向「去寫一份」而不是「你寫的那份解不開」。<b>「我寫了契約」與「閘看得到契約」因此脫鉤。</b></p>
+<p class="perunit">
+  <code>decomposition_strategy</code> 7 · <code>two_forms_equivalent</code> 3 · <code>proof_setup_substitution</code> 3 · <code>proof_easy_piece</code> 3 · <code>proof_delicate_choices</code> 3 · <code>proof_delicate_bound</code> 2 · <code>example_single_composition</code> 2 · <code>example_nested_three_layers</code> 3 · <code>example_chain_times_quotient</code> 4 · <code>example_chain_times_product</code> 3 · <code>example_leibniz_rates</code> 3
+</p>
+</div>
+<div class="h2">三處「由耳移到眼」</div>
+<p class="h2sub">NFA 查出：這三處的內容<b>聽不到、只看得到</b>（或兩邊都沒有）。列在這裡是因為<b>只有在 <code>say:</code> 那一份上才看得見</b>——內容稿 <code>narration:</code> 是 Stage 1 的文字，不是出片旁白。</p>
+<div class="eye ok-eye">
+  <div class="ehead"><span class="ebadge">畫面上有</span><span class="esid">remainder_form_definition</span></div>
+  <p class="ewhat">Definition 3.1 的式子 $f(x_0+h)=f(x_0)+m\,h+R(h)$ 與 $\lim_{h\to 0}R(h)/h=0$</p>
+  <p class="edetail">旁白只說 “…with <b>this equation</b>, where the remainder over $h$ goes to zero.”——式子本身沒有被逐項唸出，“this equation” 是<b>指示詞、指向畫面</b>。完整式子在該場 <code>statement:</code>，隨 <code>{show statement}</code> 上畫面。</p>
+</div>
+<div class="eye ok-eye">
+  <div class="ehead"><span class="ebadge">畫面上有</span><span class="esid">proof_setup_substitution ／ proof_easy_piece</span></div>
+  <p class="ewhat">$m_2=f'(g(x_0))$ 的<b>定義</b></p>
+  <p class="edetail">耳朵從頭到尾沒聽到 $m_2$ 是什麼——上一場只說 “apply its remainder form too”，下一場直接說 “$m_2$ is a constant”。<b>A2b 已把 $m_2=f'(g(x_0))$ 接在 <code>proof.1</code> 那一列的式尾</b>，補上這個「被命名、被當常數用，卻從未在畫面上定義」的缺口。</p>
+</div>
+<div class="eye no-eye">
+  <div class="ehead"><span class="ebadge">畫面上也沒有</span><span class="esid">proof_delicate_bound</span></div>
+  <p class="ewhat">$\alpha_1$ 這個<b>名字</b>（第二次縮小窗口所取的門檻）</p>
+  <p class="edetail">gate-1 N1-02 把唸法改為 “shrinking the window once more so $\lvert R_1(h)/h\rvert$ is less than one”——數學等價，但 $\alpha_1$ 不再被點名，<b>畫面兩列 <code>proof</code> 也沒有它</b>。對影片聽眾這是簡化不是缺漏（該步驟的內容耳朵聽得到），但<b>若您認為證明的可追溯性需要這個名字，這一場就要改</b>。</p>
+</div>
+<div class="h2">本輪學到（會影響未來每一節的報價）</div>
+<p class="h2sub">這一條不是 finding，是<b>口徑事實</b>——它會改變每一節 A5-1 報價的算法，所以寫在 applied 總帳裡而不只是 commit body。</p>
+<div class="claim">
+<p><b>mock 估時器系統性高估約 15%。</b>A5-0 的 mock 對同樣 23 場估 <b>828 s</b>，真 Dean 音檔是 <b>704.5 s</b>——短 <b>15%</b>，而且<b>逐場都短</b>（−14%～−19%），不是少數幾場拉低平均。</p>
+<p>成因：<code>narration.estimate_seconds</code> 用 <b>150 wpm 吃口語版字數</b>，而 Dean 本節實測是 <b>167–194 wpm</b>。⇒ <b>拿 mock 的秒數去報 TTS 的量會系統性高估</b>；A5-1 該用的是 §3.1 實測語速換算的兩路交叉驗證（canonical 722.8 s vs 口語 730.9 s，本節實測 704.5 s，誤差 &lt;4%）。</p>
+<p class='muted'>對應紀律已在 <code>REVIEW_GATES.md</code> §六 6.9 ①：<b>字數與語速必須同一個口徑</b>，交叉使用（口語版字數配 canonical wpm）會高估約 24%。本條是它的姊妹條：<b>mock 的秒數不是第三個口徑，是一個會高估的估計器</b>。</p>
+</div>
+<div class="h2">本輪沒做的，與為什麼</div>
+<p class="h2sub">三項都是<b>刻意不做</b>，不是漏做。</p>
+<div class="nd">
+  <div class="ndwhat"><code>worked_example</code> 模板遷移（5 個 <code>example_*</code> 場維持 <code>derivation</code>）</div>
+  <div class="ndwhy"><b><code>DESIGN.md:532</code> 已裁決不遷</b>（2026-09-13）：遷移要重 derive <code>_mimo</code>，而 reveal id 改名會讓 beat 級 TTS reuse 失配。§3.2 kickoff §4 A2 第 4 點寫的卻是「例題場改 <code>worked_example</code> 模板」——<b>兩份同日 kickoff 對同一件事給相反指示</b>，子代理停下來回報才沒做錯。⇒ 已回寫 §六 6.8：凍結一份共用層／模板時要回頭改受影響的節 kickoff。</div>
+</div>
+<div class="nd">
+  <div class="ndwhat">Phase B 全部（B1 原語鋪滿／B2 render＋兩道硬閘／B3 回歸輪）</div>
+  <div class="ndwhy"><b>使用者指示停在 A5-3。</b> 前置條件其實已備齊（共用層 v1 已凍結於 <code>6c72163</code>、工具線 r1／r2 已併入 main），但 Phase A 的最後一道人閘（聽感）未過，G0 的門還沒關上。</div>
+</div>
+<div class="nd">
+  <div class="ndwhat"><code>derive_spoken.py</code> 的 <code>MD_CONFIG_AND_CONVENTIONS</code> §二 慣例摘錄表未收 D5 新列</div>
+  <div class="ndwhy">那張表是 <code>_narration_spoken.md</code> 的檔頭樣板，屬 <b>pipeline 共用 code</b>；改它會讓 §3.1 <code>ch03_trig_derivatives</code> 的生成檔一併漂移，而本輪的工作範圍不得碰 §3.1。<b>權威表（rubric:51）已收，摘錄表落後一列</b>；下次動到共用層時一併補，並同輪重生兩節的衍生檔。</div>
+</div>
+<div class="h2 hot-h2">待您裁決 — A5-3 聽感人閘</div>
+<div class="act">
+  <div class="act-eyebrow">Phase A 的最後一個停等點</div>
+  <div class="act-title">聽過 listening pack 之後，請給一個判斷</div>
+  <div class="act-sub"><b>Go</b>（Phase A 收工、G0 的門關上、Phase B 可開）　／　<b>指名重合成哪一場</b>（逐場計費，先報量）</div>
+  <div class="act-note">MiMo 非決定性——同一段文字每次合成是不同 take（±~10% 長度）。<b>滿意的 take 不要重合成。</b></div>
+</div>
+<div class="h3">風險提示（聽的時候特別注意這幾場）</div>
+<table class="tbl"><thead><tr><th>場</th><th>為什麼要注意</th></tr></thead><tbody>
+<tr><td class='mono'>composed_mapping_figure</td><td><b>全片唯一的 beats 場</b>（4 次 fallback 後降級）。beats 模式是逐 beat 合成再串接，接縫處的語氣與呼吸與 scene-level 不同——這一場最該用耳朵確認。</td></tr>
+<tr><td class='mono'>caution_inner_derivative</td><td><b>重合成過一次</b>（fallback history 2 筆）。重合成＝不同 take，與相鄰場的語氣連貫性值得聽一次。</td></tr>
+<tr><td class='mono'>proof_delicate_bound</td><td>走過 1 次 fallback（resynth）。同時它是全片符號密度最高的一場（$\lvert R_1(h)/h\rvert &lt; 1$、$(\lvert m_1\rvert+1)\varepsilon$）。</td></tr>
+</tbody></table>
+<div class="h3">語速最快的四場</div>
+<p class="h2sub">§3.1 的實測基準是 <b>口語口徑 170 wpm</b>（canonical 口徑 138.8 wpm）。下表的 wpm ＝ <b>canonical 字數 ÷ 音訊分鐘</b>——<b>兩個口徑不可交叉使用</b>（交叉會差 24%）。</p>
+<table class="tbl"><thead><tr><th>場</th><th>音訊</th><th>字（canonical）</th><th>wpm</th></tr></thead><tbody>
+<tr><td class='mono'>leibniz_form</td><td class='mono'>33.7 s</td><td class='mono'>109</td><td class='mono hotnum'>194</td></tr>
+<tr><td class='mono'>example_single_composition</td><td class='mono'>29.7 s</td><td class='mono'>95</td><td class='mono hotnum'>192</td></tr>
+<tr><td class='mono'>chain_rule_statement</td><td class='mono'>24.7 s</td><td class='mono'>79</td><td class='mono hotnum'>192</td></tr>
+<tr><td class='mono'>caution_inner_derivative</td><td class='mono'>21.6 s</td><td class='mono'>67</td><td class='mono hotnum'>186</td></tr>
+</tbody></table>
+<p class='h2sub'>四場都在 186–194 wpm，明顯高於基準——<b>不是錯，是 Dean 這幾段唸得快</b>。如果聽起來趕，指名重合成即可（該場一次 billed call）。</p>
+<div class="h3">成片的響度：整合值正中目標，但 true peak 餘裕變緊</div>
+<table class="tbl"><thead><tr><th>量</th><th>真音檔成片</th><th>mock 成片</th><th>判讀</th></tr></thead><tbody>
+<tr><td>integrated loudness</td><td class='mono'>-19.0 LUFS</td><td class='mono'>−19.0 LUFS</td><td><b>正中目標</b>，不需處理。</td></tr>
+<tr><td>true peak</td><td class='mono hotnum'>-2.2 dBTP</td><td class='mono'>-7.5 dBTP</td><td>真人聲的瞬時峰值本來就比靜音 mock 高，<b>−2.2 dBTP 仍在安全區</b>（未破 0），但餘裕從 7.5 dB 掉到 2.2 dB。</td></tr>
+</tbody></table>
+<p class='h2sub'><b>給 Phase B 的注意事項：</b>這一節的 house audio 目前只有 intro／outro bed 與 divider stinger；<b>Phase B 若要再疊任何音效，要先確認不會把 true peak 推破 0</b>——現在只剩 2.2 dB 餘裕，不是隨手加一層就沒事的狀態。</p>
+<div class="foot">
+<p>產生器 <code>video/content_scripts/_audit/_gen/build_s32_phaseA_applied_html.py</code>（可重跑；場結構／契約條數／hash 為即時重算，稽核與實跑數字在該檔常數區、各自標證據）。</p>
+<p>驗收定義的 SSOT 是 <code>video/REVIEW_GATES.md</code> §六；本節的執行計畫是 <code>video/KICKOFF-s32-chain-rule.md</code>；抽成模板的是 <code>video/KICKOFF-section-template.md</code>。</p>
+</div>
+</div>
+</body>
+</html>

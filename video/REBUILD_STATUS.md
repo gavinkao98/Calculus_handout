@@ -24,7 +24,7 @@
 | 節 | deck | 狀態 |
 |---|---|---|
 | ch03 §3.1 | `ch03_trig_derivatives` | ✅ **全流程完成**：clean Dean 成片 `output/ch03/s3.1/ch03_trig_derivatives_mimo.mp4`（~16.2 分、1080p）；NFA 雙閘過（gate-2 抓 1 D3 已修）；§3.1 單景 backlog 8 項打磨完（V blocking=0）。3 場 FA 降級 beats（`continuity_argument`／`derivative_of_cosine`／`shm_stacked_graphs`）＝使用者裁決「先不用」修，**勿自行重試 scene-level**（燒 billed API）。真 4K final 另議。**品質補強試點＝整節重做**（2026-07-19 定案，見 open items）。**2026-09-14 里程碑六鏡審＋批次輪後依 §六 6.3 判定收斂**（視覺 blocking 0／七條 must 全關／`[sync]` 0；成片＝共用層 v1 版）。should 進 backlog，4K final 另議。 |
-| ch03 §3.2 | `ch03_chain_rule` | Stage-1 **LOCKED**（內容稿＋六鏡＋copyedit＋sign-off）；**2026-09-13 解凍**（使用者裁決：原語路線推廣全書、A/B 裁決稿取消）；開工檔＝[`KICKOFF-s32-chain-rule.md`](KICKOFF-s32-chain-rule.md)（首個全程照 REVIEW_GATES §六 走的節；Phase A 內容線即開、Phase B 視覺線等共用層 v1）。 |
+| ch03 §3.2 | `ch03_chain_rule` | **Phase A 完成（2026-09-14，A1–A5 全部收案；待使用者 A5-3 聽感人閘）；Phase B 未開。** Stage-1 **LOCKED**（內容稿＋六鏡＋copyedit＋sign-off）；2026-09-13 解凍；開工檔＝[`KICKOFF-s32-chain-rule.md`](KICKOFF-s32-chain-rule.md)（**首個全程照 REVIEW_GATES §六 走的節**，協定觀察已回寫 §六、新增 6.8／6.9）。**A1** §8 對齊＝24 單元零跟改、stamp 換 `chapter3.tex`、使用者 sign-off｜**A2** accent 語意軸（`definition` 10→1 場）、lint 清零、`part:` 分頁、**11 份 `screen_contract`＋36 條 `required_steps`＋`coverage_enforce` 上線**（負向對照證明 SC 閘不再空轉）｜**A3** `.spoken.yml` `parity OK`｜**A4** NFA gate-1 0 blocking、**gate-2（agy Gemini 3.1 Pro）1 blocking→修根因→0**，版控 REPORT 已寫｜**A5** 真 TTS **30/35 次**、兩道 `[sync]` 硬閘全過、成片 786.5 s／13.1 分。前置條件：共用層 v1 已凍結、工具線 r1／r2 已併入。成本量測見下方「每節成本量測」表（**即時記錄**）。 |
 | ch01 §1.1 | `ch01_inverse_functions` | 版面回歸 deck（舊練習產物已刪；正式 ch01 影片屆時從講義重跑）。 |
 
 ## Open items
@@ -106,4 +106,36 @@
 | 節 | audit/撰稿 tokens | render 次數 | 客製 hook 數 | 真 TTS calls | 回歸輪數 |
 |---|---|---|---|---|---|
 | §3.1（基線，事後估） | 單景打磨 8 項×80–216k | 多輪（Step 0／capacity v2 回歸含 48 場） | 8 | ~36（21 場＋fallback＋重合成） | 3+ |
-| §3.2 | 待記 | 待記 | 待記 | 待記 | 待記 |
+| **§3.2 Phase A**（2026-09-14，**即時記錄非事後估**） | **≈ 2.96 M**（in-house 逐代理累計，見下方分項）＋ **167.5 k** 外部計費（agy gate-2） | **2 次全片**（A5-0 mock 驗時序／A5-2 真音檔）＋1 次三場定點 | **2**（開工基線未變；Phase B 未開） | **30**（核准上限 35；0 retry） | **7 輪**（pedagogy 4／NFA gate-1 2／gate-2 1＋回歸 1） |
+
+> **§3.2 Phase A 成本分項（2026-09-14 收工實記；§3.1 那一列是事後估，兩者不可直接比較）**
+>
+> **in-house tokens（逐代理最終累計值，不重複計同一代理的多輪）：**
+> A1 偵察 160,475｜A2 偵察 124,758｜A1 執行 201,623｜A2＋A2b（同代理續辦）414,527｜
+> A3 180,135｜gate-2 prompt 備檔（sonnet）121,818｜A4 gate-1 NFA 159,059｜A4 advisory 落地 218,460｜
+> N2-01 修根因 130,408｜r2 搶先補契約 165,910｜§六 回寫 151,891 ＝ **小計 2,029,064**
+> ＋ 巢狀 gate-1 子代理：pedagogy ×4 ＝ 534,811、NFA 回歸 ×2 ＝ 200,921 ＝ **小計 735,732**
+> ＋ 簽核 HTML／NFA REPORT 那一輪：**未計**（跑 3.5 h 後 TaskStop，成果由主對話搬移提交；量級約 2×10⁵）
+> ⇒ **合計 ≈ 2.96 M**。
+>
+> **外部計費：** NFA gate-2 走 **agy `gemini-3.1-pro-high`**（使用者 2026-09-14 改裁，原訂 Codex）——
+> input 127,089／output 40,411／thinking 31,243／cache_read 1,783,091／**total 167,500**，1 次呼叫。
+>
+> **真 TTS（MiMo `mimo-v2.5-tts`、voice Dean）：** `backend_calls: 30`／`backend_retries: 0`；
+> 23 場中 **22 場 scene_aligned、1 場降級 beats**（`composed_mapping_figure`：arbiter fail → resynth fail →
+> chunk 因 `--fallback-budget 2` 被拒 → beats 終端）、3 場用到 fallback ladder。
+> **音訊 704.5 s（11.74 分），比 mock 估的 828 s 短約 15%（逐場 −14%～−19%）——mock 估時器系統性高估，
+> 報價時要知道。** 成片 786.5 s（13.1 分）、30.3 MiB、I=−19.0 LUFS／TP=−2.2 dBTP。
+>
+> **§3.1 沒有的三個數字（kickoff §7.1 要求，並行階段排程用）：**
+> - **牆鐘：** Phase A 全程在 **2026-09-14 一天內**完成，期間與工具線 r1／r2 並行。
+> - **停等／同意點共 4 個：** A1 對齊 sign-off｜A4 gate-2 徵同意（使用者改裁為 agy）｜A5-1 TTS 報價（核准上限 35）｜
+>   **A5-1.5 旁白簽核（本節新增**——gate-2 在 `disagreements_with_premise` 提出「storyboard `say:` 才是出片旁白、
+>   使用者簽的卻是內容稿」，使用者裁決補此關卡）。前四點皆同輪回覆、等待極短；A5-3 聽感人閘收工時仍待使用者。
+> - **並行摩擦：** merge 衝突 **1**（main 補 `ref:` 與本線三行 add/add，取超集吸收）｜TeX cache race **1**
+>   （主對話自撞：背景 `sizecheck.py` ＋ `make.py` 內建 preflight 同 cwd）｜與工具線往返 **11 則訊息**｜
+>   **等 render／tts 時間窗 0 次**（`media_dir` 相對 cwd 證實後跨 worktree 不需排隊）。
+>
+> **零 TTS 浪費的證據：** 全程 **23 場 `scene_text_hash` 零變動被驗證 4 次**（A2 的 say 逐字、A2b 的 `part:` 分頁、
+> A4 的 advisory 落地、N2-01 的修根因）⇒ 所有畫面／契約／唸法改動都沒有讓任何一次合成作廢。
+> 30 次呼叫全部用在第一次合成與 fallback，**無一次是重做**。
