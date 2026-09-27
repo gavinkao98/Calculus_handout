@@ -189,6 +189,9 @@ python -m pip install --upgrade whisper-timestamped stable-ts
   **Node ≥21**（global WebSocket/fetch）＋ **Google Chrome**。Chrome 路徑現在會先讀 `CHROME` 環境變數、
   再退回常見安裝位置（不再寫死單一路徑）。
 - standalone HTML **檢視時需連網**載 MathJax/KaTeX CDN（非安裝需求）。
+- **終端機的 `claude` CLI（2026-09-27）：一律用官方原生安裝版，不要用 npm 版。** 裝法：`irm https://claude.ai/install.ps1 | iex`（裝到 `%USERPROFILE%\.local\bin\claude.exe`，要把該目錄加進使用者 PATH），裝完用 `claude doctor` 確認 `install method: native`、`Auto-updates: enabled`。
+  本機曾經 npm 版（`@anthropic-ai/claude-code`）壓在 PATH 前面、`~/.claude.json` 又是 `"autoUpdates": false`，停在 2.1.185 落後近百版（`/model` 看不到新模型）；已移除 npm 版、改原生版並打開 autoUpdates。
+  注意：Claude **桌面 App** 用自己內建的 CLI，並對它開的 session 注入 `DISABLE_AUTOUPDATER=1`——在桌面 App 的 shell 裡跑 `claude doctor` 會顯示 auto-update disabled，屬正常；要用一般終端機驗證。
 - **Remotion 官方 Agent Skills（2026-09-27 拍板：改走 claude CLI 的 user-scope plugin，選用；取代 2026-09-25 的 project-copy 做法——`.claude/skills/remotion-*` 與根目錄 `skills-lock.json` 已刪除）：** 裝一次即對機器上所有專案生效，不必逐專案 vendor。裝法：
   ```powershell
   claude plugin marketplace add remotion-dev/claude-code-plugin
