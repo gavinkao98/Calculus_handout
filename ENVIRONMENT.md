@@ -189,7 +189,15 @@ python -m pip install --upgrade whisper-timestamped stable-ts
   **Node ≥21**（global WebSocket/fetch）＋ **Google Chrome**。Chrome 路徑現在會先讀 `CHROME` 環境變數、
   再退回常見安裝位置（不再寫死單一路徑）。
 - standalone HTML **檢視時需連網**載 MathJax/KaTeX CDN（非安裝需求）。
-- **Remotion 官方 Agent Skills（2026-09-25 裝，Remotion 試作用，選用）：** 已 copy 進 `.claude/skills/remotion-*` 並進版控，換機免重裝；來源與雜湊鎖在根目錄 `skills-lock.json`。要更新時執行 `npx skills update -p`；要從 lock 還原時執行 `npx skills experimental_install`。
+- **Remotion 官方 Agent Skills（2026-09-27 拍板：改走 claude CLI 的 user-scope plugin，選用；取代 2026-09-25 的 project-copy 做法——`.claude/skills/remotion-*` 與根目錄 `skills-lock.json` 已刪除）：** 裝一次即對機器上所有專案生效，不必逐專案 vendor。裝法：
+  ```powershell
+  claude plugin marketplace add remotion-dev/claude-code-plugin
+  claude plugin install remotion@remotion --scope user
+  ```
+  `tools/setup.ps1` 會在 `claude plugin list` 不含 `remotion@remotion` 時自動跑這兩行；`tools/doctor.py` 檢查同一件事（缺＝WARN，不擋產線）。
+  **已知坑：** plugin install 走 SSH clone（`git@github.com:`），機器沒有 GitHub SSH host key 時會 `Host key verification failed`。修法（`setup.ps1` 已內建，不碰全域 git/ssh 設定）：只在這次 install 的 process 環境臨時設
+  `GIT_CONFIG_COUNT=1`、`GIT_CONFIG_KEY_0=url.https://github.com/.insteadOf`、`GIT_CONFIG_VALUE_0=git@github.com:`，
+  裝完立刻清掉這三個環境變數。
 
 ### ⑤ codex — 審核工具（Mode B 講義審核 / video gate2）
 

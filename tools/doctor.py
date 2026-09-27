@@ -236,6 +236,27 @@ def check_agy() -> None:
                r"由 Antigravity IDE 安裝 CLI（落在 %LOCALAPPDATA%\agy\bin），再部署 tools\agy.cmd；見 ENVIRONMENT.md ⑤c")
 
 
+# ── ⑤d Remotion Agent Skills plugin（claude CLI user-scope plugin；選用）───────
+
+def check_remotion_plugin() -> None:
+    """Remotion Agent Skills 已從 project-copy（.claude/skills/remotion-*＋skills-lock.json）
+    改成 claude CLI 的 user-scope plugin（2026-09-27 拍板，見 ENVIRONMENT.md ④），tools/setup.ps1
+    會在缺的時候自動裝。缺它不擋核心產線（只影響 Remotion 影片製作的 skill 觸發），WARN 不 FAIL。"""
+    claude = shutil.which("claude")
+    if not claude:
+        record(WARN, "remotion-skills", "claude CLI 未安裝，略過 Remotion plugin 檢查",
+               "選用；裝 Claude Code 後跑 tools/setup.ps1 會自動裝 plugin")
+        return
+    rc, out = _run([claude, "plugin", "list"], timeout=30)
+    if rc == 0 and "remotion@remotion" in out:
+        record(PASS, "remotion-skills", "remotion@remotion plugin 已裝（user scope）", "")
+    else:
+        record(WARN, "remotion-skills", "remotion@remotion plugin 未裝",
+               "跑 tools/setup.ps1（會自動裝），或手動："
+               "claude plugin marketplace add remotion-dev/claude-code-plugin && "
+               "claude plugin install remotion@remotion --scope user")
+
+
 # ── ⑤b Vale prose linter（去 AI 味 lint 引擎；PLAN-deai-flavor；選用、flag-only）──
 
 def check_vale() -> None:
@@ -661,6 +682,7 @@ def main() -> int:
     check_node_and_chrome()
     check_codex()
     check_agy()
+    check_remotion_plugin()
     check_vale()
     check_forced_alignment()
     check_chinese_alignment_model()

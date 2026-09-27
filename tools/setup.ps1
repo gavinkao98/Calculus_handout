@@ -6,8 +6,9 @@
 # 做什麼：
 #   1) 沒有 repo 根 .venv 就用全域 python 建一個
 #   2) 從 requirements.lock 裝鎖定版本的 Python 依賴（精確可重現）
-#   3) 把 repo 內 vendored 的 Instrument Sans（影片文字字型）註冊給本機 MiKTeX（使用者層級）
-#   4) 跑 tools/doctor.py，把系統層缺漏（ffmpeg／LaTeX／Node／Chrome）連同補法印出來
+#   3) 裝 Remotion Agent Skills 的官方 plugin（claude plugin install remotion@remotion，user scope）
+#   4) 把 repo 內 vendored 的 Instrument Sans（影片文字字型）註冊給本機 MiKTeX（使用者層級）
+#   5) 跑 tools/doctor.py，把系統層缺漏（ffmpeg／LaTeX／Node／Chrome）連同補法印出來
 #
 # 不碰計費 API、不裝系統軟體（系統層由 doctor 給 winget 指令，由你決定何時裝）。
 $ErrorActionPreference = "Stop"
@@ -41,6 +42,32 @@ $agyExe = Join-Path $env:LOCALAPPDATA "agy\bin\agy.exe"
 if ((Test-Path $agyExe) -and -not (Get-Command agy -ErrorAction SilentlyContinue) -and (Test-Path $npmDir)) {
     Copy-Item (Join-Path $repo "tools\agy.cmd") (Join-Path $npmDir "agy.cmd") -Force
     Write-Host "[setup] 已部署 agy shim → $npmDir\agy.cmd" -ForegroundColor Cyan
+}
+
+# 裝 Remotion Agent Skills 的官方 plugin（user scope，換機自動補齊；取代舊的 project-copy 做法，見 ENVIRONMENT.md ④）。
+# 冪等：`claude plugin list` 已含 remotion@remotion 就跳過。
+# 已知坑（2026-09-27）：plugin install 走 SSH clone（git@github.com:），機器沒有 GitHub SSH host key 時
+# 會 "Host key verification failed"。修法：只在這次 install 的 process 環境臨時把 git@github.com: 轉成
+# https://github.com/（GIT_CONFIG_* 三變數），裝完立刻清掉，不碰全域 git/ssh 設定。
+if (Get-Command claude -ErrorAction SilentlyContinue) {
+    $pluginList = & claude plugin list 2>&1 | Out-String
+    if ($pluginList -notmatch "remotion@remotion") {
+        Write-Host "[setup] 裝 Remotion Agent Skills plugin ..." -ForegroundColor Cyan
+        $env:GIT_CONFIG_COUNT = "1"
+        $env:GIT_CONFIG_KEY_0 = "url.https://github.com/.insteadOf"
+        $env:GIT_CONFIG_VALUE_0 = "git@github.com:"
+        try {
+            & claude plugin marketplace add remotion-dev/claude-code-plugin
+            & claude plugin install remotion@remotion --scope user
+        } finally {
+            Remove-Item Env:\GIT_CONFIG_COUNT -ErrorAction SilentlyContinue
+            Remove-Item Env:\GIT_CONFIG_KEY_0 -ErrorAction SilentlyContinue
+            Remove-Item Env:\GIT_CONFIG_VALUE_0 -ErrorAction SilentlyContinue
+        }
+        Write-Host "[setup] 已裝 remotion@remotion plugin（user scope）" -ForegroundColor Cyan
+    }
+} else {
+    Write-Host "[setup] 找不到 claude CLI，略過 Remotion Agent Skills plugin（選用，Remotion 影片製作才需要）" -ForegroundColor Yellow
 }
 
 # 影片文字字型 Instrument Sans：vendored 在 repo，但 dvisvgm 只讀它預設找到的第一個 map 檔，
