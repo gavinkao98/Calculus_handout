@@ -44,26 +44,22 @@ if ((Test-Path $agyExe) -and -not (Get-Command agy -ErrorAction SilentlyContinue
     Write-Host "[setup] 已部署 agy shim → $npmDir\agy.cmd" -ForegroundColor Cyan
 }
 
+# 把「所有 Claude Code plugin 都自動更新」的設定冪等合併進 ~/.claude/settings.json（見 ENVIRONMENT.md ④）。
+Write-Host "[setup] 同步 Claude Code plugin 自動更新設定 ..." -ForegroundColor Cyan
+& $py (Join-Path $repo "tools\claude_plugin_settings.py")
+
 # 裝 Remotion Agent Skills 的官方 plugin（user scope，換機自動補齊；取代舊的 project-copy 做法，見 ENVIRONMENT.md ④）。
 # 冪等：`claude plugin list` 已含 remotion@remotion 就跳過。
-# 已知坑（2026-09-27）：plugin install 走 SSH clone（git@github.com:），機器沒有 GitHub SSH host key 時
-# 會 "Host key verification failed"。修法：只在這次 install 的 process 環境臨時把 git@github.com: 轉成
-# https://github.com/（GIT_CONFIG_* 三變數），裝完立刻清掉，不碰全域 git/ssh 設定。
+# 已知坑（2026-09-27，已解法：CLAUDE_CODE_PLUGIN_PREFER_HTTPS，取代舊的 GIT_CONFIG_* SSH→HTTPS hack）：
+# plugin install 走 SSH clone（git@github.com:），機器沒有 GitHub SSH host key 時會
+# "Host key verification failed"。CLAUDE_CODE_PLUGIN_PREFER_HTTPS=1 讓 plugin clone 一律走 HTTPS。
 if (Get-Command claude -ErrorAction SilentlyContinue) {
     $pluginList = & claude plugin list 2>&1 | Out-String
     if ($pluginList -notmatch "remotion@remotion") {
         Write-Host "[setup] 裝 Remotion Agent Skills plugin ..." -ForegroundColor Cyan
-        $env:GIT_CONFIG_COUNT = "1"
-        $env:GIT_CONFIG_KEY_0 = "url.https://github.com/.insteadOf"
-        $env:GIT_CONFIG_VALUE_0 = "git@github.com:"
-        try {
-            & claude plugin marketplace add remotion-dev/claude-code-plugin
-            & claude plugin install remotion@remotion --scope user
-        } finally {
-            Remove-Item Env:\GIT_CONFIG_COUNT -ErrorAction SilentlyContinue
-            Remove-Item Env:\GIT_CONFIG_KEY_0 -ErrorAction SilentlyContinue
-            Remove-Item Env:\GIT_CONFIG_VALUE_0 -ErrorAction SilentlyContinue
-        }
+        $env:CLAUDE_CODE_PLUGIN_PREFER_HTTPS = "1"
+        & claude plugin marketplace add remotion-dev/claude-code-plugin
+        & claude plugin install remotion@remotion --scope user
         if ($LASTEXITCODE -eq 0) { Write-Host "[setup] 已裝 remotion@remotion plugin（user scope）" -ForegroundColor Cyan }
         else { Write-Host "[setup] Remotion plugin 安裝失敗（exit $LASTEXITCODE），見 ENVIRONMENT.md ④" -ForegroundColor Yellow }
     }

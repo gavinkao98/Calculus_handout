@@ -195,9 +195,23 @@ python -m pip install --upgrade whisper-timestamped stable-ts
   claude plugin install remotion@remotion --scope user
   ```
   `tools/setup.ps1` 會在 `claude plugin list` 不含 `remotion@remotion` 時自動跑這兩行；`tools/doctor.py` 檢查同一件事（缺＝WARN，不擋產線）。
-  **已知坑：** plugin install 走 SSH clone（`git@github.com:`），機器沒有 GitHub SSH host key 時會 `Host key verification failed`。修法（`setup.ps1` 已內建，不碰全域 git/ssh 設定）：只在這次 install 的 process 環境臨時設
-  `GIT_CONFIG_COUNT=1`、`GIT_CONFIG_KEY_0=url.https://github.com/.insteadOf`、`GIT_CONFIG_VALUE_0=git@github.com:`，
-  裝完立刻清掉這三個環境變數。
+  **已知坑（已解法：`CLAUDE_CODE_PLUGIN_PREFER_HTTPS`）：** plugin install 走 SSH clone（`git@github.com:`），機器沒有 GitHub SSH host key 時會 `Host key verification failed`。`setup.ps1` 在裝之前設
+  `$env:CLAUDE_CODE_PLUGIN_PREFER_HTTPS = "1"`，讓 plugin clone（install／marketplace update／背景自動更新）一律走 HTTPS；取代舊的 `GIT_CONFIG_*` 三變數一次性 hack。
+
+- **所有 Claude Code plugin 自動更新（2026-09-27 使用者裁決）：** 官方文件（code.claude.com/docs/en/plugins/loading）：每個 marketplace 的自動更新由 `~/.claude/settings.json` 裡 `extraKnownMarketplaces.<name>.autoUpdate` 決定（`claude-plugins-official` 預設開，第三方如 `remotion` 預設關）；`DISABLE_AUTOUPDATER=1`／`DISABLE_UPDATES=1` 會關掉整個 plugin 自動更新流程，除非 `FORCE_AUTOUPDATE_PLUGINS=1`——**Claude 桌面 App 會對它啟動的 session 注入 `DISABLE_AUTOUPDATER=1`**（不寫進 user/machine 環境變數，`doctor` 探測不到，只能靠這個 override）。因此 `~/.claude/settings.json` 要有：
+  ```json
+  {
+    "env": {
+      "FORCE_AUTOUPDATE_PLUGINS": "1",
+      "CLAUDE_CODE_PLUGIN_PREFER_HTTPS": "1"
+    },
+    "extraKnownMarketplaces": {
+      "remotion": { "source": {"source": "github", "repo": "remotion-dev/claude-code-plugin"}, "autoUpdate": true },
+      "claude-plugins-official": { "source": {"source": "github", "repo": "anthropics/claude-plugins-official"}, "autoUpdate": true }
+    }
+  }
+  ```
+  `tools/setup.ps1` 在裝 Remotion plugin 前先跑 [`tools/claude_plugin_settings.py`](tools/claude_plugin_settings.py)，冪等把這幾個 key 合併進去（保留其他既有設定，任何既有 marketplace 也一併補上 `autoUpdate:true`，換機／新裝的 marketplace 都涵蓋）；`tools/doctor.py` 的 `check_plugin_autoupdate_settings` 檢查同一件事（缺＝WARN，提示跑 `tools/setup.ps1`）。**取捨：** 開自動更新代表 plugin 版本不再釘住（換機時間點不同可能裝到不同版本）；若 Remotion 產出行為突然變了，**先跑 `claude plugin list` 看版本號**再排查。
 
 ### ⑤ codex — 審核工具（Mode B 講義審核 / video gate2）
 

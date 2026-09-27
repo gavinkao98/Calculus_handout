@@ -257,6 +257,39 @@ def check_remotion_plugin() -> None:
                "claude plugin install remotion@remotion --scope user")
 
 
+def check_plugin_autoupdate_settings() -> None:
+    """所有 Claude Code plugin 都應自動更新（2026-09-27 使用者裁決，見 ENVIRONMENT.md ④）：
+    ~/.claude/settings.json 要有 FORCE_AUTOUPDATE_PLUGINS／CLAUDE_CODE_PLUGIN_PREFER_HTTPS 兩個
+    env，且每個 extraKnownMarketplaces 都要 autoUpdate:true。缺件不擋核心產線，故 WARN 不 FAIL。"""
+    path = Path.home() / ".claude" / "settings.json"
+    if not path.exists():
+        record(WARN, "plugin-autoupdate", "~/.claude/settings.json 不存在，略過 plugin 自動更新設定檢查",
+               "跑 tools/setup.ps1 會建立並補齊")
+        return
+    try:
+        data = json.loads(path.read_text(encoding="utf-8"))
+    except Exception as exc:  # noqa: BLE001
+        record(WARN, "plugin-autoupdate", f"~/.claude/settings.json 讀不出來：{exc}", "跑 tools/setup.ps1")
+        return
+
+    env = data.get("env", {}) or {}
+    missing = [k for k in ("FORCE_AUTOUPDATE_PLUGINS", "CLAUDE_CODE_PLUGIN_PREFER_HTTPS") if env.get(k) != "1"]
+    marketplaces = data.get("extraKnownMarketplaces", {}) or {}
+    stale = [name for name, entry in marketplaces.items()
+             if isinstance(entry, dict) and entry.get("autoUpdate") is not True]
+
+    if not missing and not stale:
+        record(PASS, "plugin-autoupdate", "plugin 自動更新設定齊全（env＋所有 marketplace）", "")
+    else:
+        parts = []
+        if missing:
+            parts.append("缺 env：" + "、".join(missing))
+        if stale:
+            parts.append("autoUpdate 非 true 的 marketplace：" + "、".join(stale))
+        record(WARN, "plugin-autoupdate", "plugin 自動更新設定不齊全（" + "；".join(parts) + "）",
+               "跑 tools/setup.ps1（會冪等補齊 ~/.claude/settings.json）")
+
+
 # ── ⑤b Vale prose linter（去 AI 味 lint 引擎；PLAN-deai-flavor；選用、flag-only）──
 
 def check_vale() -> None:
@@ -683,6 +716,7 @@ def main() -> int:
     check_codex()
     check_agy()
     check_remotion_plugin()
+    check_plugin_autoupdate_settings()
     check_vale()
     check_forced_alignment()
     check_chinese_alignment_model()
