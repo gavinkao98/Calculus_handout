@@ -64,7 +64,8 @@ if (Get-Command claude -ErrorAction SilentlyContinue) {
             Remove-Item Env:\GIT_CONFIG_KEY_0 -ErrorAction SilentlyContinue
             Remove-Item Env:\GIT_CONFIG_VALUE_0 -ErrorAction SilentlyContinue
         }
-        Write-Host "[setup] 已裝 remotion@remotion plugin（user scope）" -ForegroundColor Cyan
+        if ($LASTEXITCODE -eq 0) { Write-Host "[setup] 已裝 remotion@remotion plugin（user scope）" -ForegroundColor Cyan }
+        else { Write-Host "[setup] Remotion plugin 安裝失敗（exit $LASTEXITCODE），見 ENVIRONMENT.md ④" -ForegroundColor Yellow }
     }
 } else {
     Write-Host "[setup] 找不到 claude CLI，略過 Remotion Agent Skills plugin（選用，Remotion 影片製作才需要）" -ForegroundColor Yellow
