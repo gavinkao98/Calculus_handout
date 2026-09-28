@@ -14,7 +14,7 @@
 本 spec 補這股缺的力量，分**兩種失效、兩種機制**（見 §2）。凡此皆**非新增內容**：要展開的細節**講義本來就有**，是流程把它弄丟了或沒 surface。
 
 **實證錨（`derivative_of_sine`）：**
-- storyboard `proof:`（[`ch03_trig_derivatives.yml`](storyboards/ch03_trig_derivatives.yml:400)）＝ `d/dx sin x = lim cos(x+h/2)·sin(h/2)/(h/2)` → 兩因子 → `cos x`。
+- storyboard `proof:`（[`ch03_trig_derivatives.yml`](../legacy/manim_video/storyboards/ch03_trig_derivatives.yml:400)）＝ `d/dx sin x = lim cos(x+h/2)·sin(h/2)/(h/2)` → 兩因子 → `cos x`。
 - 但 cited `.md` `visual_need`（[`ch03_trig_derivatives.md`](content_scripts/ch03_trig_derivatives.md:396)）**明列 4 行**，第 1 行是定義行 `d/dx sin x = lim (sin(x+h)−sin x)/h`。
 - handout（[`sec-3-1.html`](../legacy/html_handout/fragments/ch03/sec-3-1.html:181)）也顯示該定義行。
 - → **storyboard 在最後一跳 `.md`→yml 掉了定義橋接行**；且它 cash-in 了 ~10 場前 `difference_quotient_for_sine` 的代數而**畫面無 recap**（線性影片翻不回去 → product form 像憑空出現）。
@@ -170,7 +170,7 @@ screen_contract:
 - [`PEDAGOGY-FIRSTLEARNER-RUBRIC.md`](content_scripts/_audit/PEDAGOGY-FIRSTLEARNER-RUBRIC.md)：新增 SC 家族（SC1/SC2 確定性、SC-adv/SC-honesty gate-1）+ §10 邊界列 + **VERDICT 計數約定（Codex R2，明確不混入 PD/OF）**：首行擴為 `VERDICT: <P> PD, <O> OF, <S> SC, <A> advisory`；`<S>` **只計 gate-1 自有的 SC-honesty blocking**；SC1/SC2 為確定性層（`schema.py`→`step_coverage.py`，`coverage_enforce` gating），以 `[Surface SC1-det|SC2-det]` 前綴列出、**不計入 VERDICT 整數**（同 OF2／PD2-4 待遇）；SC-adv 計入 advisory。
 - pedagogy-firstlearner-audit agent 定義：加載 `screen_contract`、surface SC1/SC2、擁有 SC-adv/SC-honesty。
 - [`CONTENT_METHODOLOGY.md`](CONTENT_METHODOLOGY.md)：`screen_contract` authoring 規則、`covers:` 慣例、合併/不掉原則、correctness-caution→假設。
-- [`DESIGN.md`](DESIGN.md)：`covers:` 承載、authoring checklist。
+- [`DESIGN.md`](../legacy/manim_video/DESIGN.md)：`covers:` 承載、authoring checklist。
 - [`REVIEW_GATES.md`](REVIEW_GATES.md)：SC 進閘序、AMP 進 amplification 稽核序。
 - `.md` schema／storyboard schema：如 §7。
 

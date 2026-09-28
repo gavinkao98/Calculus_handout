@@ -1,5 +1,10 @@
 # KICKOFF：影片線流程改革（§3.1 的輪次檢討與下一節的做法）
 
+> **2026-09-28 加註：** 影片線已統一走 Remotion、Manim gen-2 封存（[`KICKOFF-remotion-unification.md`](KICKOFF-remotion-unification.md)）。
+> 本檔的輪次協定結論（G0–G7）已落在 [`REVIEW_GATES.md`](REVIEW_GATES.md) §六，與渲染器無關、照舊有效；文中引用的 Manim 工具
+> （`make.py`、`sizecheck`、`critic.py`、hook、TeX cache 等）與「寫進 `DESIGN.md`」一類待辦是當時的紀錄，Manim 版 `DESIGN.md` 在
+> [`../legacy/manim_video/DESIGN.md`](../legacy/manim_video/DESIGN.md)。
+
 > **用途：** §3.1 一個小節跑了二十一輪才收斂，使用者判斷「太誇張」，要求檢討流程。
 > 本文把**實際數據**、**根因**、**下一節的具體做法**寫在一起，供**新對話直接開跑**——
 > 不需要讀 §3.1 的對話歷史。原始輪次紀錄在 [`REBUILD_STATUS.md`](REBUILD_STATUS.md) ⑭–⑳，
@@ -197,7 +202,7 @@ Task D（對齊講義 `chapter3.tex` §3.1）在四原語鋪滿 27 場**之後**
 ## 4. 新對話的第一步
 
 1. 讀 §3 的 G0–G7，請使用者裁決要不要調整
-2. 把 **G3 的停止條件**與 **G1 的硬閘**寫進 [`DESIGN.md`](DESIGN.md)（或 `handout/PIPELINE.md`
+2. 把 **G3 的停止條件**與 **G1 的硬閘**寫進 [`DESIGN.md`](../legacy/manim_video/DESIGN.md)（或 `handout/PIPELINE.md`
    的對應位置），成為**所有小節共用**的驗收定義——不要每節重新發明
 3. 下一節開工時，**G4 清單逐項打勾再動內容**
 

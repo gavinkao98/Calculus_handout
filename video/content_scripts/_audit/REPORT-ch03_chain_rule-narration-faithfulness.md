@@ -14,12 +14,12 @@
 
 | 角色 | 檔案 | 說明 |
 |---|---|---|
-| **忠實度判準源（source of truth）** | [`../../storyboards/ch03_chain_rule.yml`](../../storyboards/ch03_chain_rule.yml) | 23 個 content 場的 `say:`。**這就是會被合成、會出片的旁白。** 28 場＝intro 1／divider 3／content 23／outro 1 |
+| **忠實度判準源（source of truth）** | [`../../storyboards/ch03_chain_rule.yml`](../../../legacy/manim_video/storyboards/ch03_chain_rule.yml) | 23 個 content 場的 `say:`。**這就是會被合成、會出片的旁白。** 28 場＝intro 1／divider 3／content 23／outro 1 |
 | **受審工件（Version B，口語單一源）** | [`../ch03_chain_rule.spoken.yml`](../ch03_chain_rule.spoken.yml) | 手寫口語稿；D2／D3／D4 對它判 |
 | 受審工件（Version B 投影） | [`../ch03_chain_rule_narration_spoken.md`](../ch03_chain_rule_narration_spoken.md) | 由 `derive_spoken.py` 機械生成的人讀版 |
 | 受審工件（Version A） | [`../ch03_chain_rule_narration.html`](../ch03_chain_rule_narration.html) | 內容稿 `narration:` 的 MathJax 渲染版 |
 | 交叉參照（非判準） | [`../ch03_chain_rule.md`](../ch03_chain_rule.md) | 內容稿 24 單元的 `narration:`（LOCKED，2026-06-29 sign-off） |
-| 機械投影（context） | [`../../storyboards/ch03_chain_rule_mimo.yml`](../../storyboards/ch03_chain_rule_mimo.yml) | `say := spoken`，送 TTS 的 deck |
+| 機械投影（context） | [`../../storyboards/ch03_chain_rule_mimo.yml`](../../../legacy/manim_video/storyboards/ch03_chain_rule_mimo.yml) | `say := spoken`，送 TTS 的 deck |
 
 **Tier 0 前提（兩閘開跑前即綠）：** `python video/pipeline/derive_spoken.py --deck ch03_chain_rule --check`
 → `parity OK`（每個 content `say` 都有 spoken 對應、`{show}` marker 逐一對齊、口語端無 `$` LaTeX 外洩）。
@@ -160,7 +160,7 @@ prompt 表列 11 條，加上 gate-1 這一輪新改動的 2 條（`3/(x+2)^2`�
     + over $(x+2)^2$.
 
 `squared` 於是不再是散文字，**口語文字一字不改**，兩邊散文回到逐字相同。
-現況見 [`../../storyboards/ch03_chain_rule.yml`](../../storyboards/ch03_chain_rule.yml):584。
+現況見 [`../../storyboards/ch03_chain_rule.yml`](../../../legacy/manim_video/storyboards/ch03_chain_rule.yml):584。
 commit `201281d`。
 
 **這一條 gate-1 沒抓到。** 而且成因正是 gate-1 自己的 N1-03 修法——為了關 D3 的右界，

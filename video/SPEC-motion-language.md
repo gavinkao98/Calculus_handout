@@ -2,15 +2,17 @@
 
 > **2026-09-13 立檔。依據**＝四支參考影片的逐幀拆解 [`content_scripts/_audit/REVIEW-reference-videos-A1A2B1C1.html`](content_scripts/_audit/REVIEW-reference-videos-A1A2B1C1.html)（32 張對照卡，每卡左＝參考影片三幀動作條、右＝我方 §3.1 同概念的幀）與六鏡看片 [`REVIEW-ch03_s31-rewatch-multilens.html`](content_scripts/_audit/REVIEW-ch03_s31-rewatch-multilens.html)。**裁決**＝使用者 2026-09-13「五條規則都進規格」。研究過程與替代方案見附錄 A，參考影片清單見附錄 B，工具見附錄 C。
 >
-> **定位。** 本檔是 motion primitive 的**設計語言層**：規定畫面「該怎麼動」與「為什麼」。[`DESIGN.md`](DESIGN.md)「motion primitive」各節是**實作契約層**（storyboard 欄位、Block、anim、零行為改變）。驗收歸 [`REVIEW_GATES.md`](REVIEW_GATES.md) 與 [`REWATCH-REVIEW-RUBRIC.md`](content_scripts/_audit/REWATCH-REVIEW-RUBRIC.md)。衝突時**本檔定原則、DESIGN.md 定欄位**：欄位做不到原則就回來改欄位，不反過來降原則。
+> **2026-09-28 加註（影片線統一走 Remotion，[`KICKOFF-remotion-unification.md`](KICKOFF-remotion-unification.md)）：** 五條規則是設計語言，與渲染器無關，Remotion 線照舊適用（Remotion 的動態語彙見 [`experiments/remotion_styles/paper/STYLE.md`](experiments/remotion_styles/paper/STYLE.md)）。下文「已有機制」「驗收接線」描述的是 **Manim gen-2 的實作**（`storyboard` 欄位、`make.py`、`schema`／`sizecheck`、`critic.py`），已隨引擎封存；Remotion 版的實作契約層待定。
+>
+> **定位。** 本檔是 motion primitive 的**設計語言層**：規定畫面「該怎麼動」與「為什麼」。Manim gen-2 的**實作契約層**＝[`legacy/manim_video/DESIGN.md`](../legacy/manim_video/DESIGN.md)「motion primitive」各節（storyboard 欄位、Block、anim、零行為改變；2026-09-28 隨引擎封存）。驗收歸 [`REVIEW_GATES.md`](REVIEW_GATES.md) 與 [`REWATCH-REVIEW-RUBRIC.md`](content_scripts/_audit/REWATCH-REVIEW-RUBRIC.md)。衝突時**本檔定原則、DESIGN.md 定欄位**：欄位做不到原則就回來改欄位，不反過來降原則。
 >
 > **不改的既有裁決。** 水位「模板層普遍有動」（品質補強輪 ⑦）、原語清單 1–7（③＋⑬；本檔把參考影片裡的新手法**歸進既有原語**，不新增編號）、驗收線「每個 content 場 `longest_still_seconds` ≤ 12 s」（⑧）、「模板不是病灶」的證據（⑧）。
 >
-> **適用範圍。** 新稿 **MUST** 遵守；既有 deck 依 DESIGN.md 的 opt-in 欄位逐場採用、預設路徑零行為改變；§3.1 放大階段以本檔為驗收依據。RFC 2119 用語同 [`CONTENT_METHODOLOGY.md`](CONTENT_METHODOLOGY.md)。
+> **適用範圍。** 新稿 **MUST** 遵守；既有 deck 依（Manim gen-2）DESIGN.md 的 opt-in 欄位逐場採用、預設路徑零行為改變；§3.1 放大階段以本檔為驗收依據。RFC 2119 用語同 [`CONTENT_METHODOLOGY.md`](CONTENT_METHODOLOGY.md)。
 
 ## 0. 一頁摘要
 
-| # | 規則 | 一句話 | 已有機制（DESIGN.md） | 缺口（待建） | 驗收信號 |
+| # | 規則 | 一句話 | 已有機制（Manim gen-2 實作，見 legacy DESIGN.md） | 缺口（待建） | 驗收信號 |
 |---|---|---|---|---|---|
 | 1 | **一場一張畫布** | 承重物件在一幕裡只建一次，換步驟用位移／縮放／複製搬去新佈局；臨時標註縮小加淡出退場 | `color_role`（顏色延續）、`{show scaffold.*}`（版面不變、晚到）、**`carry:`（keep／飛去角落）＋場界零淡黑＋`exit:`（2026-09-13 落地）** | 收尾歸位＝手工用 `carry` 帶回 recap 場；交叉溶接不做（硬切＋同位置已達目的） | 每幕至少一個承重物件跨場延續；R2 ML1 finding＝0 |
 | 2 | **畫出來，只動變的 token** | 曲線由點走出、文字逐字寫、式子只動變的 token；整行 FadeOut 再 FadeIn 是反模式 | `anim: transform`、`paced:`（隨旁白書寫）、`seconds: beat`、**`{{…}}` 分段＋對位 `TransformMatchingTex`＋`anim: cancel` 兩段式消去（2026-09-13 落地）**；graph function plot 本就 `create`；**theorem_proof 的 `proof[]` dict 列也收 `anim: transform`，transform 列在 `paced:` 裡時 morph 後 rail 隨讀（鋪滿輪 T1）** | hook 自建的 MathTex 不經 `math_line`，不吃分段（規則進 METHODOLOGY §5） | 新稿 derivation 場整塊淡入 ≤ 1 次（首列）；R2 ML2 finding＝0 |
@@ -118,10 +120,10 @@ B1 證明只用四種動作（cross-dissolve、appear、箭頭 wipe、單段平�
 - ✅ REWATCH rubric：finding 可標規則代號 **`rule: ML1`–`ML5`**（motion language；`R1–R5` 是鏡頭編號、`G1–G6` 是容量契約，故另取前綴；選填，R2 導演鏡 MUST 標、其他鏡 MAY），定義表在 [`REWATCH-REVIEW-RUBRIC.md`](content_scripts/_audit/REWATCH-REVIEW-RUBRIC.md)「輸出格式」的 `rule` 小節並逐字注入每鏡 prompt；`rewatch-findings.schema.json`／`rewatch_merge.py`（`by_rule`，不計 refuted／dup）／`rewatch_multilens.gen.py`（finding × 規則小表＋chip）同步。
 - ✅ `visual-frame-audit`：規則 5 的色一致性＝VISUAL-FRAME **V10**（結論式 token 色對不上圖上物件＝blocking）；agent 提示、REVIEW_GATES、`critic.py` 的 V 範圍同步到 V1–V10。
 - ✅ 規則 4 的未宣告靜止 advisory＝`make.py` `[stillness]`（`pipeline/stillness.py`，6 s，warn-only；DESIGN.md「motion primitive：`pauses:`」節）。
-- ✅ 規則 1 的攜帶宣告存在性：`carry:` 落地後由 `schema._carry_issues`（形狀、幕／相鄰）＋ `sizecheck`（block 存在、`as` 不撞 id）把關（[`KICKOFF-motion-language-gaps.md`](KICKOFF-motion-language-gaps.md) T4-4）。
-- **鋪滿階段（2026-09-13，[`KICKOFF-motion-language-rollout.md`](KICKOFF-motion-language-rollout.md)）：** 四原語鋪到 §3.1 全部 21 個 content 場，逐場落點在該 kickoff §4 表；驗收數字在其 §5。
+- ✅ 規則 1 的攜帶宣告存在性：`carry:` 落地後由 `schema._carry_issues`（形狀、幕／相鄰）＋ `sizecheck`（block 存在、`as` 不撞 id）把關（[`KICKOFF-motion-language-gaps.md`](../legacy/manim_video/KICKOFF-motion-language-gaps.md) T4-4）。
+- **鋪滿階段（2026-09-13，[`KICKOFF-motion-language-rollout.md`](../legacy/manim_video/KICKOFF-motion-language-rollout.md)）：** 四原語鋪到 §3.1 全部 21 個 content 場，逐場落點在該 kickoff §4 表；驗收數字在其 §5。
 - `rewatch_pack`：兩個門檻（0.2%／0.05%）並列輸出，已在 ⑬ 註明。
-- **code 缺口（規則 1 到 3、規則 5 的變數色表）＝[`KICKOFF-motion-language-gaps.md`](KICKOFF-motion-language-gaps.md)**（T1 色表、T2 inset／框選／閃爍、T3 token 級變形與兩段式消去、T4 跨場攜帶、T5 三門檻對齊）。
+- **code 缺口（規則 1 到 3、規則 5 的變數色表）＝[`KICKOFF-motion-language-gaps.md`](../legacy/manim_video/KICKOFF-motion-language-gaps.md)**（T1 色表、T2 inset／框選／閃爍、T3 token 級變形與兩段式消去、T4 跨場攜帶、T5 三門檻對齊）。
 
 ## 附錄 A　替代方案研究摘要（2026-09-12）
 
@@ -129,13 +131,13 @@ B1 證明只用四種動作（cross-dissolve、appear、箭頭 wipe、單段平�
 
 | 家族 | 代表 | 對視覺層的意義 | 裁決 |
 |---|---|---|---|
-| A 換引擎 | Motion Canvas／Revideo（TypeScript、即時編輯器、tex 分段 morph）、Remotion（React、授權待查） | 買到迭代速度與鏡頭；代價是視覺層重寫、MathJax 取代 pdflatex | 保留為選項 |
+| A 換引擎 | Motion Canvas／Revideo（TypeScript、即時編輯器、tex 分段 morph）、Remotion（React、授權待查） | 買到迭代速度與鏡頭；代價是視覺層重寫、MathJax 取代 pdflatex | 保留為選項（**2026-09-28 採用 Remotion**） |
 | B narrated slides | Beamer／Touying 直接吃 `.tex`，TTS 時間戳驅動 highlight（arXiv 2505.02966） | 最忠實最便宜，但正是六鏡批評的靜態語法 | 否決（不夠精緻） |
 | C agent 起草 | TheoremExplainAgent、Code2Video、ManimAgent（2026-06） | 買到每小時嘗試次數；沒有規格時只會更快產出靜止畫面 | 保留為選項 |
 | D 生成式影片／虛擬講者 | NotebookLM Cinematic Video Overviews、Veo 3.1／Sora 2、HeyGen／Synthesia | 式子渲染不可靠，只適合 B-roll | 否決（成本） |
 | E 真人 | 講師錄旁白、手寫板、講課錄影 | 對齊產線不挑聲源，可直接換聲源；但不可版控 | 否決（成本） |
 
-**引擎相關事實。** Manim Community 2026-08 起大重構、暫不收新功能（README）；四支參考影片顯示規則在 Manim 裡都有現成原語。**若日後證明瓶頸是迭代慢**（render 才看得到），先試 A′：留在 Manim、把 `scratch_frames.py` 做成場級秒回預覽或用 manimgl 互動模式；A′ 不夠再考慮 Motion Canvas。**A 與 C 正交**：A 管引擎與迭代迴圈，C 管誰來寫；兩者都需要本檔這份規格。
+**引擎相關事實。** Manim Community 2026-08 起大重構、暫不收新功能（README）；四支參考影片顯示規則在 Manim 裡都有現成原語。**若日後證明瓶頸是迭代慢**（render 才看得到），先試 A′：留在 Manim、把 `scratch_frames.py` 做成場級秒回預覽或用 manimgl 互動模式；A′ 不夠再考慮 Motion Canvas。（**2026-09-28 已裁決直接走 A 家族的 Remotion、放棄 Manim**，見 [`KICKOFF-remotion-unification.md`](KICKOFF-remotion-unification.md)；本段保留為當時的判斷。）**A 與 C 正交**：A 管引擎與迭代迴圈，C 管誰來寫；兩者都需要本檔這份規格。
 
 頂級頻道的工具：3Blue1Brown＝Manim（互動迭代）；Mathologer＝Keynote 加 Illustrator；Kurzgesagt＝Illustrator 加 After Effects（一支 10 分鐘約 1200 小時）；Primer＝Blender 加 Unity；Mathemaniac＝PowerPoint、GeoGebra、Mathematica（頻道自述）；Ghrist＝PowerPoint 加 Illustrator。共同點是即時預覽下的大量迭代、一雙設計師的眼睛、每分鐘投入的小時數，不是引擎。
 

@@ -1,6 +1,6 @@
 # 看片多鏡評審 — REWATCH（成片品質評審，五鏡並審）
 
-> 本檔是「看片多鏡評審（rewatch multi-lens review）」的契約與**單一真相來源（SSOT）**。被審物是**已 render 的成片**，以觀眾的方式看：時間、停留、畫面有沒有動、跟不跟得上。它補的是評估報告（[`../../_audit/REVIEW-pipeline-assessment-2026-09-07.html`](../../_audit/REVIEW-pipeline-assessment-2026-09-07.html) F8）點出的缺口：既有視覺閘審靜幀、教學閘審 storyboard 結構，**沒有任何一閘看過影片本身**。
+> 本檔是「看片多鏡評審（rewatch multi-lens review）」的契約與**單一真相來源（SSOT）**。被審物是**已 render 的成片**，以觀眾的方式看：時間、停留、畫面有沒有動、跟不跟得上。它補的是評估報告（[`../../_audit/REVIEW-pipeline-assessment-2026-09-07.html`](../../../legacy/manim_video/_audit/REVIEW-pipeline-assessment-2026-09-07.html) F8）點出的缺口：既有視覺閘審靜幀、教學閘審 storyboard 結構，**沒有任何一閘看過影片本身**。
 >
 > **性質：品質評審、advisory、propose-not-act、永不 blocking。** 忠實（NFA）、數學正確（L5／D7）、上畫面文字回溯（OF）各有 owner，本審**不重審**。輸出是給使用者裁決「重做水位」的證據，不是擋稿。
 >

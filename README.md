@@ -11,8 +11,8 @@
 依你手上的任務，開啟對應的連結檔案。
 
 - **撰寫或修訂章節。** 先看 [`CONTENT_QUICKSTART.md`](CONTENT_QUICKSTART.md)。當快速指南無法回答你的問題時，再回頭查 [`CONTENT_SPEC.md`](CONTENT_SPEC.md)。開始新的一章前，先看 [`CONTENT_ROADMAP.md`](CONTENT_ROADMAP.md)，並依 [`CONTENT_AUTHORING_WORKFLOW.md`](CONTENT_AUTHORING_WORKFLOW.md) 認清撰稿變體（Ch1–4 手稿變體／Ch5 起無手稿 canon 變體）與 Mode A／B／C 規則。每節內容的方向流程（方向 brief ＋ 六階方向層）見 [`CONTENT_DIRECTION.md`](CONTENT_DIRECTION.md)。
-- **製作影片**（目前的主要路徑：第二代 Manim 產線）。先看 [`video/README.md`](video/README.md)，再看 [`video/DESIGN.md`](video/DESIGN.md) 了解分鏡契約與目前的模板決策。較舊的 `MANIM_*` 文件已封存於 [`legacy/`](legacy/)，保留作為第一代參考資料。
-- **靜態投影片 MP4**（已凍結的舊路徑）。使用 [`legacy/LEGACY_SLIDE_PIPELINE.md`](legacy/LEGACY_SLIDE_PIPELINE.md)。此路徑不再有新開發——新工作請改用 Manim。
+- **製作影片**（2026-09-28 起唯一路徑：Remotion，契約＝[`video/KICKOFF-remotion-unification.md`](video/KICKOFF-remotion-unification.md)）。先看 [`video/README.md`](video/README.md)，再看 [`video/DESIGN.md`](video/DESIGN.md) 了解資料流與旁白契約；現役製作處與畫面契約在 [`video/experiments/remotion_styles/`](video/experiments/remotion_styles/README.md)。第二代 Manim 產線已封存於 [`legacy/manim_video/`](legacy/manim_video/README.md)，更早的第一代 `MANIM_*` 文件在 [`legacy/`](legacy/)，皆保留作為參考資料。
+- **靜態投影片 MP4**（已凍結的舊路徑）。使用 [`legacy/LEGACY_SLIDE_PIPELINE.md`](legacy/LEGACY_SLIDE_PIPELINE.md)。此路徑不再有新開發——新工作請改用 Remotion 影片線。
 - **為課文補教學範例（從開放題庫選題）。** 見 [`CONTENT_SOURCING.md`](CONTENT_SOURCING.md)。講義本體不收習題——習題將以獨立習題本呈現（[`CONTENT_SPEC.md`](CONTENT_SPEC.md) §14，2026-06-12 定案）。
 - **換電腦／環境出問題。** 見 [`ENVIRONMENT.md`](ENVIRONMENT.md)（每台機器要備什麼的權威清單）；跑 `python tools/doctor.py` 一行看出這台缺什麼、`tools/setup.ps1` 一鍵備妥 Python 端。
 
@@ -32,17 +32,18 @@
 
 ## Golden path（黃金路徑）
 
-目前的影片工作位於 `video/` 下的第二代產線（權威流程與閘地圖見 [`video/README.md`](video/README.md)、[`video/REVIEW_GATES.md`](video/REVIEW_GATES.md)）：
+目前的影片工作位於 `video/`，2026-09-28 起渲染一律走 Remotion（權威流程與閘地圖見 [`video/README.md`](video/README.md)、[`video/REVIEW_GATES.md`](video/REVIEW_GATES.md)；資料流見 [`video/DESIGN.md`](video/DESIGN.md)）：
 
 ```text
 handout/latex/src/chNN/chapterN.tex（定稿講義的一節；閱讀版＝dist/chNN/chapterN.pdf）
-  --> video/content_scripts/<deck>.md（Stage-1 內容稿）＋ <deck>.spoken.yml（口語單一源）
-  --> video/storyboards/<deck>.yml（Stage-2 工程稿；schema/lint/sizecheck render 前把關）
-  --> python video/make.py --storyboard …（parse → synth → render → compose）
-  --> video/output/ch<NN>/s<X.Y>/….mp4（真旁白走 MiMo：tts.py --backend mimo → make.py --reuse-audio）
+  --> video/content_scripts/<deck>.md（Stage-1 內容稿）
+  --> Remotion 分鏡 <片>.yml（`say` 寫口語、{show} 切 beat；現行在 video/experiments/remotion_styles/paper/<片>/）
+  --> python video/pipeline/tts.py …（MiMo TTS → manifest；mock 離線不計費）
+  --> npx remotion render …（composition 讀 manifest 對時）→ scripts/loudnorm.py（house −19 LUFS）
+  --> video/experiments/remotion_styles/paper/out/<片>_final.mp4
 ```
 
-先定稿章節內容，再寫內容稿與旁白（lock 後 derive 口語版、MiMo TTS），最後模板化 storyboard 與 render。第一代 Manim 產線與 gen-0 投影片產線已封存於 `legacy/`（索引與還原說明見 [`legacy/README.md`](legacy/README.md)），並非活躍開發路徑。
+先定稿章節內容，再寫內容稿與旁白（lock 後口語化、NFA、MiMo TTS），最後做 Remotion 場景與 render。第二代 Manim 產線（`make.py`＋模板＋storyboard）已於 2026-09-28 封存到 [`legacy/manim_video/`](legacy/manim_video/README.md)（回退錨點＝tag `archive/2026-09-28-manim-gen2-final`）；第一代 Manim 產線與 gen-0 投影片產線也封存於 `legacy/`（索引與還原說明見 [`legacy/README.md`](legacy/README.md)），皆非活躍開發路徑。
 
 ---
 
@@ -59,8 +60,9 @@ handout/latex/src/chNN/chapterN.tex（定稿講義的一節；閱讀版＝dist/c
 | 內容方向 | [`CONTENT_DIRECTION.md`](CONTENT_DIRECTION.md) | 每節擴寫的方向層：方向 brief、六階流程、人閘（驗證紀錄在 `authoring/direction_layer/`） |
 | 講義閘序 | [`handout/PIPELINE.md`](handout/PIPELINE.md) | 完成一章的完整閘序與各章狀態 dashboard |
 | HTML 契約 | [`legacy/html_handout/CONTRACT-html-writing.md`](legacy/html_handout/CONTRACT-html-writing.md) | 權威性 HTML 標記契約 |
-| 影片產線 | [`video/README.md`](video/README.md) | 目前第二代 Manim 產線的狀態、指令、交接註記 |
-| 影片設計 | [`video/DESIGN.md`](video/DESIGN.md) | 目前的分鏡契約、場景種類、模板決策 |
+| 影片產線 | [`video/README.md`](video/README.md) | Remotion 影片線的沿革、結構、狀態、指令 |
+| 影片設計 | [`video/DESIGN.md`](video/DESIGN.md) | 資料流、旁白 `say`／`{show}` 與 TTS manifest 契約、配音工作流、語意色對照 |
+| 影片畫面 | [`video/experiments/remotion_styles/paper/STYLE.md`](video/experiments/remotion_styles/paper/STYLE.md) | Remotion 紙本編輯排版的 token、字型、版面、動態語彙 |
 | 影片內容方法論 | [`video/CONTENT_METHODOLOGY.md`](video/CONTENT_METHODOLOGY.md) | Stage-1 內容稿撰寫方法論（拆解、narration、視覺決策） |
 | 影片閘地圖 | [`video/REVIEW_GATES.md`](video/REVIEW_GATES.md) | 七產物層審核閘一覽（索引，home doc 為權威） |
 | 影片進度錨 | [`video/REBUILD_STATUS.md`](video/REBUILD_STATUS.md) | 跨對話進度快照（歷史輪次在 `video/_archive/`） |
@@ -69,6 +71,7 @@ handout/latex/src/chNN/chapterN.tex（定稿講義的一節；閱讀版＝dist/c
 | manim v1 方法論 | [`legacy/MANIM_STORYBOARD.md`](legacy/MANIM_STORYBOARD.md) | 第一代 LaTeX 轉 YAML 翻譯手冊（已封存） |
 | 凍結舊版 | [`legacy/LEGACY_SLIDE_PIPELINE.md`](legacy/LEGACY_SLIDE_PIPELINE.md) | 靜態投影片／PDF + TTS + MP4（已封存，不再有新開發） |
 | 封存總覽 | [`legacy/README.md`](legacy/README.md) | gen-0／gen-1 凍結產線的封存索引與還原說明 |
+| Manim gen-2 封存 | [`legacy/manim_video/README.md`](legacy/manim_video/README.md) | 2026-09-28 封存的第二代 Manim 影片產線（引擎、模板、storyboard、舊 `DESIGN.md` 與工單）與對照表 |
 
 ---
 
@@ -84,12 +87,12 @@ handout/latex/src/chNN/chapterN.tex（定稿講義的一節；閱讀版＝dist/c
 - `authoring/` — 撰稿方法論與機制 R&D。六階方向層流程已畢業為頂層 [`CONTENT_DIRECTION.md`](CONTENT_DIRECTION.md)；`authoring/direction_layer/` 保留其端到端驗證紀錄（`ch01/`、`test/`），`authoring/seed_converge/` 為機制 R&D（`SYNTHESIS.md`、`PLAN_codex_subscription_loop.md`、`run.py`、`figure_critic.py`、`figure_fix.py`、`rules.md`）。
 - `problem_banks/` — 開放授權題庫的本地 clone 區（內容 gitignored，僅 README 進版控）。選題工作流程見 [`CONTENT_SOURCING.md`](CONTENT_SOURCING.md)。
 - `legacy/tex_handout/` — 已凍結的 **LaTeX 講義樹**（`main.tex`、`preamble/`、`chapters/*.tex`、`refs/references.bib`，以及 `tools/book_style_lint.py`／`book_preamble_smoketest.py`／`book_docs_lint.py`）。此樹不再是生產路徑，僅供歷史參考；下方的 *Preamble 對照* 節描述的即是這棵 legacy 樹。
-- `legacy/` — 已封存的凍結媒體產線（gen-0 投影片、gen-1 Manim 及其橋接實驗）：`legacy/scripts/`（腳本）、`legacy/MANIM_*.md` 與 `legacy/LEGACY_SLIDE_PIPELINE.md`（方法論文件）、`legacy/schemas/`、`legacy/inputs/`、`legacy/artifacts/`（gitignored 的大型算繪輸出仍存於磁碟，git 追蹤的例外為 narration／final／tex）。詳見 [`legacy/README.md`](legacy/README.md)。
+- `legacy/` — 已封存的凍結媒體產線（gen-0 投影片、gen-1 Manim 及其橋接實驗、gen-2 Manim 影片產線）：`legacy/manim_video/`（gen-2，2026-09-28 封存，`video/<相對路徑>` 原樣搬入）、`legacy/scripts/`（腳本）、`legacy/MANIM_*.md` 與 `legacy/LEGACY_SLIDE_PIPELINE.md`（方法論文件）、`legacy/schemas/`、`legacy/inputs/`、`legacy/artifacts/`（gitignored 的大型算繪輸出仍存於磁碟，git 追蹤的例外為 narration／final／tex）。詳見 [`legacy/README.md`](legacy/README.md)。
 - `.github/workflows/` — CI 檢查。
 
 額外的活躍媒體工作區：
 
-- `video/` — 目前第二代 Manim 課程影片產線，包含分鏡、可重用模板、設計註記，以及 gitignored 的預覽輸出。
+- `video/` — 目前的課程影片產線（2026-09-28 起 Remotion），包含共用層（TTS／對齊／音訊）、內容稿與稽核資產、Remotion 製作處（`experiments/remotion_styles/`），以及 gitignored 的輸出。
 
 ---
 
@@ -129,11 +132,11 @@ python handout/latex/build.py ch08     # 單一單元（或 all＝全部 12 單�
 
 ## 媒體範圍說明
 
-講義本體不收習題（[`CONTENT_SPEC.md`](CONTENT_SPEC.md) §14，2026-06-12 定案），故規劃各節媒體時無習題區塊需要排除；一律從定義、定理、範例與闡述散文來建構投影片 deck、旁白腳本、Manim 分鏡、合成音訊與 render 的影片。
+講義本體不收習題（[`CONTENT_SPEC.md`](CONTENT_SPEC.md) §14，2026-06-12 定案），故規劃各節媒體時無習題區塊需要排除；一律從定義、定理、範例與闡述散文來建構投影片 deck、旁白腳本、影片分鏡、合成音訊與 render 的影片。
 
 ## 備註
 
 - **2026-06-15 結構遷移：** HTML 講義自 `experiments/handout_kit/` 升格為頂層 `handout/`（正式版）；撰稿方法論 `direction_layer`／`seed_converge` 移入 `authoring/`；`legacy_slide_deck` 移入 `legacy/`；`experiments/` 資料夾就此解散。LaTeX 講義樹早於 2026-06-13（commit `b0a89cf`）即移入 `legacy/tex_handout/`，本次同步更新所有指引文檔與路徑引用、並把 CI 由（已移除的）`latex-checks.yml` 改為 `handout-checks.yml`（建置 `legacy/html_handout/build.py`）。
 - 本機快取、虛擬環境與內嵌依賴存於隱藏的儲存庫資料夾，例如 `.cache/`、`.venv/`、`.deps/` 與 `.deps_f5/`。
-- 目前的影片開發在 `video/`，而非已封存的 `legacy/inputs/manim_storyboards`。逐節進度以 [`video/REBUILD_STATUS.md`](video/REBUILD_STATUS.md) 的現況快照為準（首個完整真旁白成片＝ch03 §3.1，MiMo Dean 路線）。
-- 第一代凍結媒體範本（Sec. 1.1／Sec. 1.6 兩份對比分鏡與投影片計畫）與其校準脈絡見 [`legacy/README.md`](legacy/README.md)；新的 gen-2 分鏡放於 `video/storyboards/`。
+- 目前的影片開發在 `video/`（Remotion），而非已封存的 `legacy/manim_video/`（gen-2）或 `legacy/inputs/manim_storyboards`（gen-1）。逐節進度以 [`video/REBUILD_STATUS.md`](video/REBUILD_STATUS.md) 的現況快照為準（首個完整真旁白成片＝ch03 §3.1 的 Manim 版，MiMo Dean 路線，已隨引擎封存；Remotion 版 §3.1 在 `video/experiments/remotion_styles/paper/s31/`）。
+- 第一代凍結媒體範本（Sec. 1.1／Sec. 1.6 兩份對比分鏡與投影片計畫）與其校準脈絡見 [`legacy/README.md`](legacy/README.md)；gen-2 分鏡已隨引擎封存於 `legacy/manim_video/storyboards/`，Remotion 分鏡現行放在 `video/experiments/remotion_styles/paper/<片>/`。

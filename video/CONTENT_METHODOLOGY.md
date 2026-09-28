@@ -6,7 +6,7 @@
 >
 > **血統與定位：** 萃取自 [`legacy/MANIM_STORYBOARD.md`](../legacy/MANIM_STORYBOARD.md)（gen-1, v1.6）的教學精神，**剝離**其 gen-1 工程約束（spoken-math 改寫大表、reveal 策略、9-template catalog、lint／schema），**適配** gen-2（正典 narration 內嵌 LaTeX 只寫一次；真旁白走 MiMo＝逐節輕量口語派生，非大規則表；intro／outro first-class）。它是 gen-1 方法論在 gen-2 的繼任者。
 >
-> **相關文件：** 視覺系統見 [`DESIGN.md`](DESIGN.md) 與 [`pipeline/visuals/theme.py`](pipeline/visuals/theme.py)（Direction D 版面＋Times 字型）；講義環境詞彙（2026-08-09 LaTeX 統一後）定義在 [`../handout/latex/template/calcbook.sty`](../handout/latex/template/calcbook.sty) 語意層（歷史 HTML 契約＝[`../legacy/html_handout/CONTRACT-html-writing.md`](../legacy/html_handout/CONTRACT-html-writing.md)，環境同構：`env-theorem`→`envtheorem`）；本產線總覽見 [`README.md`](README.md)。
+> **相關文件：** 視覺系統（2026-09-28 起 Remotion）見 [`experiments/remotion_styles/paper/STYLE.md`](experiments/remotion_styles/paper/STYLE.md)，資料流與旁白契約見 [`DESIGN.md`](DESIGN.md)（Manim gen-2 的視覺系統已封存：[`legacy/manim_video/DESIGN.md`](../legacy/manim_video/DESIGN.md)、[`pipeline/visuals/theme.py`](../legacy/manim_video/pipeline/visuals/theme.py)）；講義環境詞彙（2026-08-09 LaTeX 統一後）定義在 [`../handout/latex/template/calcbook.sty`](../handout/latex/template/calcbook.sty) 語意層（歷史 HTML 契約＝[`../legacy/html_handout/CONTRACT-html-writing.md`](../legacy/html_handout/CONTRACT-html-writing.md)，環境同構：`env-theorem`→`envtheorem`）；本產線總覽見 [`README.md`](README.md)。
 >
 > **交付物：** 每節一份**內容稿**（格式見 §6）——`.md` 為 source of truth，且**一律附上編譯後的 standalone HTML 審核稿**供使用者閱讀（見 §6「交付形式」，2026-06-14 使用者指示）。
 
@@ -56,7 +56,7 @@
 
 ## 2. 影片的單位與範圍（Scope）
 
-- **一節 = 一支影片。**（gen-2：一節一片；小節之間不另做過場片。**節內導航靠成片 sidecar `<stem>.chapters.txt`**——`make.py` compose 每次都寫，intro 的 tagline 在 0:00＋每個 divider 一個跳轉點，YouTube 章節格式；2026-09-12 裁決**不做**分幕獨立檔，理由與重開條件見 [`PROPOSAL-scope-packaging-coverage.md`](PROPOSAL-scope-packaging-coverage.md) §3。）
+- **一節 = 一支影片。**（gen-2：一節一片；小節之間不另做過場片。**節內導航靠成片的章節點**（YouTube 章節格式；Manim 時代由 `make.py` compose 每次寫 `<stem>.chapters.txt`，Remotion 線由 `paper/scripts/chapters.py` 產生並可嵌入 mp4）；2026-09-12 裁決**不做**分幕獨立檔，理由與重開條件見 [`PROPOSAL-scope-packaging-coverage.md`](PROPOSAL-scope-packaging-coverage.md) §3。）
 - **每支必有 intro 與 outro**（gen-2 first-class，純動畫、**無 narration**）：
   - **intro** — Section Gate 開場（章節地圖 → 聚焦本節 → 標題字卡）。內容稿只需提供本節在章內的定位：章、章名、節、節標題，以及一句引導問題 `tagline`。
   - **outro** — 收尾的品牌字卡（暗轉亮橋接 → 最終 logo 字卡，**無 takeaways**）。Key Takeaways 是獨立的 recap 單元（→ `recap_cards` 場景，有旁白），不在 outro。
@@ -172,7 +172,7 @@
 
 ## 5. 視覺與動畫：內容層的決策
 
-本節只做**內容層決策**（要不要視覺、要什麼、演示哪個教學點），**不做工程實作**（座標、plot、manim code 都屬第二階段——含 Claude 依 `animation_cue` 生成的客製動畫）。
+本節只做**內容層決策**（要不要視覺、要什麼、演示哪個教學點），**不做工程實作**（座標、plot、場景程式碼都屬第二階段——含 Claude 依 `animation_cue` 生成的客製動畫；2026-09-28 起是 Remotion 場景 code，Manim 時代是 manim code）。
 
 - **Redraw, don't reproduce。** 書本圖是「**要顯示什麼**」的權威，不是「**怎麼顯示**」。內容稿描述要顯示的數學物件與教學目的即可。
 - **Animate, not just display。** 書本圖是靜態一頁；影片能讓曲線 trace 出來、測試線 sweep 進來、交點 flash、圖形對 `y=x` 翻摺、極限逐步逼近。**會動的概念就讓它動，讓動態承載一個教學點。**
@@ -187,39 +187,43 @@
 
 ### 動畫的分工（重要）
 
-內容稿**只提動畫建議（自然語言）**，**MUST NOT 寫 manim code**——內容層與工程層的分離不變。但**客製動畫的 manim code 由 Claude 依 `animation_cue` 的自然語言生成**（不再由使用者手畫），生成後接入工程層的 hook 接入點（工程稿的 `# HOOK` 處）。這對應 gen-1 的 `hook`（客製動畫 escape hatch）——模板畫不出來的、需要手控時序的動畫，現由 Claude 從自然語言規格生成。生成的動畫 code 視同 narration：**SHOULD 經使用者過目認可**再定版。
+內容稿**只提動畫建議（自然語言）**，**MUST NOT 寫動畫程式碼**——內容層與工程層的分離不變。但**客製動畫的場景 code 由 Claude 依 `animation_cue` 的自然語言生成**（不再由使用者手畫）：2026-09-28 起是 Remotion 的場景元件（現行在 `experiments/remotion_styles/paper/src/<片>/`；設計與製作派 `motion-designer` 子代理）。（歷史：Manim gen-2 時代生成的是 manim code，接入工程稿的 `# HOOK` 接入點，對應 gen-1 的 `hook` escape hatch——已隨引擎封存。）生成的動畫 code 視同 narration：**SHOULD 經使用者過目認可**再定版。
 
 於是 `animation_cue` 是使用者／內容稿作者交給 Claude 的**動畫規格**，也是 Claude 生成 code 的依據；它的寫法 **SHOULD** 聚焦**教學意圖**而非實作細節（實作細節由 Claude 在生成時決定）：
 
 - 好：「水平線從畫面上方緩緩下移、掃過 parabola；落到 $y=\tfrac14$ 時停住，同時閃示兩個交點 $x=\pm\tfrac12$，凸顯『一個輸出對應兩個輸入』。」
-- 不好：寫座標數值、寫 manim 物件名、寫 `run_time`。
+- 不好：寫座標數值、寫動畫框架的物件／元件名（Remotion 元件、Manim 時代的 mobject）、寫幀數或 `run_time`。
 
-### hook 內的文字一律走 `brand.*`（2026-09-13 鋪滿輪；[`SPEC-motion-language.md`](SPEC-motion-language.md) 規則 5）
+### hook 內的文字一律走 `brand.*`（2026-09-13 鋪滿輪；[`SPEC-motion-language.md`](SPEC-motion-language.md) 規則 5）——〔Manim gen-2，已封存〕
+
+> 本小節綁 Manim 的 `brand` 層與 hook 機制，2026-09-28 隨引擎封存、只存歷史；背後的原則（語意色與字級由共用層統一給，場景 code 不各自硬寫）在 Remotion 線怎麼落實，待模板定案時寫進 [`experiments/remotion_styles/paper/STYLE.md`](experiments/remotion_styles/paper/STYLE.md)。
 
 生成的 hook code **MUST NOT** 直接建 `MathTex`／`Tex`／`Text` 來放教學文字（標籤、式子、註記），一律經
 `brand.math_line`／`brand.prose`／`brand.eyebrow`。原因是產線的語意色（`meta.color_map` 的變數色、`{{…}}`
 分段與 `seg_roles`）與字級表都在 `brand` 這一層落地：試點（品質補強輪 ⑮）06 場的 hook 自建 `MathTex(r"\theta")`
 讓圖上的 θ 是白色、每條式子的 θ 是赭色，被視覺閘 V10 判 blocking；04 場的 `h` 因同一原因至今進不了色表。
 幾何物件（`Line`／`Arc`／`Dot`／`Polygon`）照舊直接用 manim，只有**文字**受此規則約束。`hook-engineering-audit`
-的 E2 慣例項含此條。
+的 E2 慣例項含此條（該閘已於 2026-09-28 隨層 5 退役）。
 
 ### 生成 code 的修補紀律（render 失敗時）
 
-Claude 依 `animation_cue` 生成的客製動畫 code 偶爾 render 失敗。此時 **SHOULD 由小到大逐層修補**，**MUST NOT** 一失敗就整支重生——重生會丟掉已被使用者認可的部分，還得從頭重審。修補階梯：
+Claude 依 `animation_cue` 生成的客製動畫 code 偶爾 render 失敗。**稽核閘待定：** Manim 時代的工程鏡（`hook-engineering-audit`，E1 數學保真＋E2 慣例）已隨引擎退役，Remotion 場景 code 的稽核閘尚未定義（隨 §3.2 Phase B 的 Remotion 版 KICKOFF 定）；在那之前靠 render 後的視覺幀稽核與人工過目。此時 **SHOULD 由小到大逐層修補**，**MUST NOT** 一失敗就整支重生——重生會丟掉已被使用者認可的部分，還得從頭重審。修補階梯：
 
-1. 讀 manim traceback，定位失敗落在生成 code 的哪一行。
+1. 讀 render 的錯誤訊息與 stack trace（Remotion：studio 或 render log；Manim 時代：manim traceback），定位失敗落在生成 code 的哪一行。
 2. **局部修**：只動失敗行與其緊鄰上下文，重跑。
-3. 連續數次局部修仍失敗 → **放大到整個 hook 函式**重寫。
+3. 連續數次局部修仍失敗 → **放大到整個場景元件**（Manim 時代：hook 函式）重寫。
 4. 仍失敗 → **才**從 `animation_cue` 整支重生（回到自然語言規格重新生成）。
 5. 每次修補 **SHOULD** 小到能被使用者**重新過目**——維持「生成 code 視同 narration、經認可才定版」的不變量（見上「動畫的分工」）。
 
-緊迴路用既有的 per-scene mock render（離線、不計費；`make.py` 的 `render()` 已逐場景捕捉例外並印 traceback）：
+緊迴路用 Remotion 的即時預覽或單場 render（離線、不計費；mock manifest 即可對時）：
 
 ```powershell
-python video\make.py --storyboard <yml> --scene <hook場景id> --backend mock --quality low
+cd video\experiments\remotion_styles\paper
+npx remotion studio                                          # 即時預覽、改 code 秒回
+npx remotion render build <片>-<場id> out\<場id>.mp4         # 只渲一場（單場 composition 見 src/Root.tsx，如 Q7-hook）
 ```
 
-（這條是**工程層**的修補節奏，render 機制本身屬第二階段，見 [`DESIGN.md`](DESIGN.md)；§5 在此只定「先局部、保認可、小步可審」這條紀律。借鏡 Code2Video 的 ScopeRefine 分層除錯，細節見 [`CODE2VIDEO_STUDY.md`](CODE2VIDEO_STUDY.md) P2。）
+（這條是**工程層**的修補節奏，render 機制本身屬第二階段，見 [`DESIGN.md`](DESIGN.md)；§5 在此只定「先局部、保認可、小步可審」這條紀律。借鏡 Code2Video 的 ScopeRefine 分層除錯，細節見 [`CODE2VIDEO_STUDY.md`](../legacy/manim_video/CODE2VIDEO_STUDY.md) P2。）
 
 ### symbol-heavy 例外
 
@@ -236,8 +240,8 @@ python video\make.py --storyboard <yml> --scene <hook場景id> --backend mock --
 預設觀眾是**第一次學這段微積分的同學**（storyboard `meta.pedagogy_profile`，預設 `first_time`、可覆寫）。下面四條把「為初學者教」落成可承載、可稽核的畫面決策，對應教學閘 `PEDAGOGY-FIRSTLEARNER-RUBRIC.md` 的 `PD1`–`PD4`。（其強制層見 [`REVIEW_GATES.md`](REVIEW_GATES.md)；結構必填由確定性層 [`pipeline/pedagogy.py`](pipeline/pedagogy.py) 計算，落地當下 warn-only，詳見下節「落地行為」。）
 
 - **P1 證明／推導粒度（一 beat 一承重動作）。** 對初學者，**一個 beat／reveal 只扛一個承重的代數／邏輯動作**，不過度壓縮——寧可多分一段，也不要把兩個推導步驟塞進同一次揭示。拆步粒度讀 `meta.pedagogy_profile`（預設 `first_time` 的慢節奏）。這是 audience-sensitive 的語意判斷，無確定性必填欄位；判斷層 = `PD1`（與 `L2`「一單元兩**概念**」分工：`PD1` 管單一概念單元**內部**一個 beat 多**動作**的過度壓縮）。
-- **P2 動機上畫面（`scaffold.motive`）。** 每個 proof／子結論場景在**畫面上**有一句「為什麼做這個」，寫進 `scaffold.motive`，**不只藏在旁白**。`theorem_proof`／`derivation` 場缺 `scaffold.motive` → 確定性層 `schema.py` warn（`PD2`；唯有 opt-in `meta.pedagogy_enforce` 才升 gating）；`definition_math` 的 motive 屬語意、**非確定性必填**，由 gate-1 以 advisory 浮現。motive 渲為標題下一行**較小的 `text` role**（不可 `muted`——見 [`DESIGN.md`](DESIGN.md)；de-emphasis 靠字級／位置，非調暗）。
-- **P3 divider 講具體問題（`scaffold.problem`）。** section divider 講出正在解的**問題／式子**（`scaffold.problem`），不只給概念標題。承載與渲染契約（divider 的 `problem` 渲為顯示公式行）見 [`DESIGN.md`](DESIGN.md)，**本檔不重述渲染細節**；確定性必填（`kind: divider` 場缺 `scaffold.problem` → warn）與判斷見 `PD3`。
+- **P2 動機上畫面（`scaffold.motive`）。** 每個 proof／子結論場景在**畫面上**有一句「為什麼做這個」，寫進 `scaffold.motive`，**不只藏在旁白**。`theorem_proof`／`derivation` 場缺 `scaffold.motive` → 確定性層 `schema.py` warn（`PD2`；唯有 opt-in `meta.pedagogy_enforce` 才升 gating）；`definition_math` 的 motive 屬語意、**非確定性必填**，由 gate-1 以 advisory 浮現。motive 渲為標題下一行**較小的 `text` role**（不可 `muted`——見 Manim gen-2 的 [`DESIGN.md`](../legacy/manim_video/DESIGN.md)；de-emphasis 靠字級／位置，非調暗）。
+- **P3 divider 講具體問題（`scaffold.problem`）。** section divider 講出正在解的**問題／式子**（`scaffold.problem`），不只給概念標題。承載與渲染契約（divider 的 `problem` 渲為顯示公式行）見 Manim gen-2 的 [`DESIGN.md`](../legacy/manim_video/DESIGN.md)（Remotion 版待定），**本檔不重述渲染細節**；確定性必填（`kind: divider` 場缺 `scaffold.problem` → warn）與判斷見 `PD3`。
 - **P4 前提首用即標（`scaffold.flag` + `meta.assumptions`）。** 默默用到的慣例／假設（radians、定義域限制）在**第一次用到**的場景標 `scaffold.flag: <assumption_id>`。每筆假設在 deck 的 **`meta.assumptions[]`** registry 顯式宣告 `id`／`text`／`first_use_unit`／`source`（此 `source` 是該假設的人讀引用，與下節 OTF provenance 的 `ref:`／`refs:` 是兩回事）；**閘不推斷**「是否用到／何處首用」，一律以作者宣告為準。registry 一致性（每筆 assumption 在其 `first_use_unit` 渲出對應 flag、無孤兒 flag）由確定性層檢查（`PD4`）。
 
 ### OTF：上畫面教學文字可回溯核准源
@@ -269,7 +273,7 @@ pedagogy／OTF 閘與 six-lens **界定不重疊的切片**：`.md` 內容是否
 | `kind` | 教學角色：`motivation` / `definition` / `theorem` / `proof` / `proposition` / `example` / `counterexample` / `procedure` / `visual` / `recap` / `forward_ref` … |
 | `narration` | 口語完整稿（英文；數學依 §4 口語化原則；intro／outro 無此欄）。 |
 | `visual_need` | 此單元需要的**靜態視覺**（內容層描述，不指定 template／payload）。 |
-| `animation_cue` | （選用）概念適合**動態演示**時的自然語言動畫建議（＝交給 Claude 的教學意圖規格）→ **Claude 依此生成客製 manim code**，認可後接入工程稿 `# HOOK`。 |
+| `animation_cue` | （選用）概念適合**動態演示**時的自然語言動畫建議（＝交給 Claude 的教學意圖規格）→ **Claude 依此生成客製動畫的場景 code**（2026-09-28 起 Remotion 場景元件；Manim 時代接入工程稿 `# HOOK`），認可後定版。 |
 | `examples` | （選用；EX 層）本單元**教到**的講義例題 label key，逗號或空白分隔：`examples: ex:3.2` / `examples: ex:3.1, ex:3.3`。 |
 | `folds` | （選用；EX 層）**折疊進本單元**的同型例題，block scalar、**一行一筆**、格式 `<ex:key> <理由>`（分隔符 `—`／`-`／`:` 可有可無，理由必填）：<br>`folds: \|`<br>`  ex:3.6 — 同 quotient rule 手法，留給講義練` |
 
@@ -348,7 +352,7 @@ animation_cue: |
 - [ ] 每段環境之間的散文都歸類過（Incorporative／Bridge／Forward-pointing），fold 或 promote，無 silently drop。
 - [ ] 每段 narration：3–7 句（依 `kind` 調整）、開頭是 hook、結尾是 takeaway、未犯 §4 禁則、同型第二例不重述 setup。
 - [ ] 數學在 narration 裡讀得順（直讀 LaTeX 或白話；對齊鏈不重念 LHS）。
-- [ ] 動畫建議用自然語言、聚焦教學意圖（manim code 由 Claude 依此生成、經認可定版，見 §5）。
+- [ ] 動畫建議用自然語言、聚焦教學意圖（場景 code 由 Claude 依此生成、經認可定版，見 §5）。
 - [ ] 每個 `id` 唯一、snake_case、描述教學重點。
 - [ ] **通讀整份 narration**，任何一段聽起來像教科書就重寫。
 - [ ] **散文潤稿 pass**：鎖稿前跑過 redundancy／贅字／讀順度 rubric（SSOT [`content_scripts/_audit/NARRATION-COPYEDIT-RUBRIC.md`](content_scripts/_audit/NARRATION-COPYEDIT-RUBRIC.md)；thin prompt [`PROMPT-narration-copyedit.template.md`](content_scripts/_audit/PROMPT-narration-copyedit.template.md)），冗餘與贅字在 derive 前處理掉（鎖稿後忠實性 NFA 不再動措辭）。
@@ -368,7 +372,7 @@ narration 草稿成形、**鎖稿並 derive 成 HTML／口語版之前**，跑�
 
 當講義源（2026-08-09 起＝`handout/latex/src/<ch>/<name>.tex`；既有 deck 的 stamp 仍指凍結 fragment）改動已寫過內容稿的一節：
 
-0. **觸發器＝`[source_rev]` WARN**（§6 標頭契約）：`schema.py`／`make.py`／`derive_spoken.py --check` 任一 preflight 印出「handout source … changed since the content script was stamped」即進入本節；**不要**關掉 WARN 了事。做完 1–5 後用 `python video/pipeline/source_rev.py <源檔>` 重蓋 stamp（既有 legacy-stamp 的 deck 改蓋 `.tex`）。
+0. **觸發器＝`[source_rev]` WARN**（§6 標頭契約）：`derive_spoken.py --check`（與 Manim 時代已封存的 `schema.py`／`make.py`）任一 preflight 印出「handout source … changed since the content script was stamped」即進入本節；**不要**關掉 WARN 了事。做完 1–5 後用 `python video/pipeline/source_rev.py <源檔>` 重蓋 stamp（既有 legacy-stamp 的 deck 改蓋 `.tex`）。
 1. **Diff 這一節**，認出哪些環境被加／刪／改寫（legacy-stamp 的 deck：`git diff <lock commit> HEAD -- legacy/html_handout/fragments/chNN/sec-N-M.html` 看 lock 後 HTML 的變動，再對照現行 `.tex`）。
 2. **外科式修改**受影響的單元，不要整份重寫。
 3. **重念受影響的 narration**：若記號改了，引用該記號的 narration 也要跟著改。

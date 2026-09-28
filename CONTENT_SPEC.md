@@ -41,8 +41,8 @@
 ### 與其他文件的關係
 
 - [`README.md`](README.md)——repo layout、preamble structure、build instructions。
-- [`video/README.md`](video/README.md)——當前（第二代）影片產線（主要 media path）。
-- [`legacy/MANIM_REFERENCE.md`](legacy/MANIM_REFERENCE.md)、[`legacy/MANIM_STORYBOARD.md`](legacy/MANIM_STORYBOARD.md)、[`legacy/MANIM_CHECKLIST.md`](legacy/MANIM_CHECKLIST.md)——第一代 Manim animation pipeline（凍結；歸檔在 `legacy/` 下）。
+- [`video/README.md`](video/README.md)——當前影片產線（主要 media path；2026-09-28 起 Remotion，第二代 Manim 產線封存於 [`legacy/manim_video/`](legacy/manim_video/README.md)）。
+- [`legacy/MANIM_REFERENCE.md`](legacy/MANIM_REFERENCE.md)、[`legacy/MANIM_STORYBOARD.md`](legacy/MANIM_STORYBOARD.md)、[`legacy/MANIM_CHECKLIST.md`](legacy/MANIM_CHECKLIST.md)——第一代 Manim animation pipeline（凍結；歸檔在 `legacy/` 下；第二代見上一條）。
 - [`legacy/LEGACY_SLIDE_PIPELINE.md`](legacy/LEGACY_SLIDE_PIPELINE.md)——凍結的 static-slide/PDF path（僅供參考）。
 - [`CONTENT_QUICKSTART.md`](CONTENT_QUICKSTART.md)——本檔的精簡日常參考伴侶。
 - [`CONTENT_ROADMAP.md`](CONTENT_ROADMAP.md)——課程弧線、章節順序、prerequisites、per-chapter core skills。
