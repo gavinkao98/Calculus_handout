@@ -3,7 +3,7 @@
 > **2026-09-28 加註（影片線統一走 Remotion，[`KICKOFF-remotion-unification.md`](KICKOFF-remotion-unification.md)）：**
 > **Phase A（內容線）成果有效**——內容稿 LOCKED、口語版、NFA 報告都在 `content_scripts/` 原位；beat 切分成果隨正典 storyboard 封存在
 > `legacy/manim_video/storyboards/ch03_chain_rule{,_mimo}.yml`，Remotion 版要參考就去那裡讀。**Phase B（視覺線）作廢**——它建立在
-> Manim 共用層 v1、模板與 hook 上，這些已整包封存；§3.2 的 Remotion 版另開 KICKOFF。下文所有 `make.py`／模板／`sizecheck`／hook／
+> Manim 共用層 v1、模板與 hook 上，這些已整包封存；§3.2 的 Remotion 版另開 KICKOFF。下文所有 `make.py`／`schema.py`／模板／`sizecheck`／hook／
 > 共用層的步驟與連結（已改指 `legacy/manim_video/`）一律是歷史紀錄。
 
 > **立檔：2026-09-13**（使用者第二次裁決當日）。**這一節有兩個交付目標**：

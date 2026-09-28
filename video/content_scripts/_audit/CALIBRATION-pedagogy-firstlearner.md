@@ -1,5 +1,8 @@
 # CALIBRATION — pedagogy-firstlearner gate（兩軌期望表）
 
+> **2026-09-28 加註：** 下文確定性軌的 `schema.py` 實跑基線是 Manim gen-2 時代的紀錄（該閘已封存）；同一批 fixture 現由
+> [`../../pipeline/check_storyboard.py`](../../pipeline/check_storyboard.py) 驅動 `pedagogy.py`／`provenance.py`，finding 字串不變、只多了每閘的武裝行與 Manim 遺留欄位的 `[structure]` WARN。
+
 > 本檔是 `pedagogy-firstlearner` 閘家族的**期望findings 表**（calibration baseline）。施測對象是兩副校準 deck：
 > - **deck A（approved）**：[`../../storyboards/_fixtures/pedagogy_audit.yml`](../../storyboards/_fixtures/pedagogy_audit.yml)，源 [`../_fixture_pedagogy.md`](../_fixture_pedagogy.md)（`CONTENT_APPROVED=yes`）。
 > - **deck B（draft）**：[`../../storyboards/_fixtures/pedagogy_audit_draft.yml`](../../storyboards/_fixtures/pedagogy_audit_draft.yml)，源 [`../_fixture_pedagogy_draft.md`](../_fixture_pedagogy_draft.md)（`CONTENT_APPROVED=no`）。

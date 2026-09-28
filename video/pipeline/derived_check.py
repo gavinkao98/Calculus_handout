@@ -12,7 +12,7 @@ so the same file is CRLF in a Windows working tree but LF in the git blob -- a
 raw byte hash would false-flag a freshly checked-out deck as stale on an LF
 machine). check_derived_freshness stays layout-free: it resolves each stamped
 path RELATIVE TO the generated deck's own directory, and never touches malformed
-top-level/meta (schema.py owns those diagnostics)."""
+top-level/meta (check_storyboard.py owns those diagnostics)."""
 from __future__ import annotations
 
 import hashlib

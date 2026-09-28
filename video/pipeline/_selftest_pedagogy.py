@@ -72,7 +72,8 @@ def test_pedagogy_issues_non_dict_data():
 
 
 # test_schema_integration (schema.py wiring over storyboards/_fixtures/scaffold.yml) moved
-# 2026-09-28 with schema.py to legacy/manim_video/pipeline/_selftest_pedagogy_schema.py.
+# 2026-09-28 with schema.py to legacy/manim_video/pipeline/_selftest_pedagogy_schema.py; the
+# Remotion-era wiring over the same fixture is _selftest_check_storyboard.py.
 
 
 if __name__ == "__main__":

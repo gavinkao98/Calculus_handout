@@ -1,5 +1,8 @@
 # SPEC — First-Learner **Expansion** Layer（step-coverage ＋ prose-amplification；video 產線）
 
+> **2026-09-28 加註：** 下文 §7 的 `schema.py` 接線是 Manim gen-2 閘，已隨引擎封存；SC1／SC2 現由 [`pipeline/check_storyboard.py`](pipeline/check_storyboard.py)
+> 對 Remotion 分鏡串跑（`ref:`＋`covers:` 文法不變；「單元必須有契約」以 `template` 為閘、Remotion 上不武裝——見 [`SPEC-remotion-storyboard-schema.md`](SPEC-remotion-storyboard-schema.md) §4）。
+
 > 狀態：設計草案 v1（brainstorming → 待 Codex 對抗式 review 收斂 → writing-plans）。日期：2026-07-01。分支：`video/template-redesign-navy-spine`。
 > 來源：使用者對 §3.1 成片 `derivative_of_sine`（Theorem 3.1）投影片的教學回饋——**講義推導很詳細，但影片流程把它壓成 2 行 + qed，初學者看不懂**。經實測（`pedagogy-firstlearner-audit` 對該場跑出 **0 PD blocking, 0 OF blocking**）確認：既有框架只守「別超出源」（over-claiming），對「漏掉源的步驟」（under-showing）**結構性盲**，且「不 re-litigate 已認可教學法」反而保護過簡版本。
 > 關係：本 spec **擴充**（不取代）[`SPEC-pedagogy-firstlearner-framework.md`](SPEC-pedagogy-firstlearner-framework.md)（v3, SHIP）。沿用其 provenance 文法（`ref:`/`refs:`）、warn-default＋per-deck opt-in、scalar 向後相容、確定性/gate-1 分工、§10 邊界紀律。

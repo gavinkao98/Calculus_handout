@@ -49,9 +49,10 @@ out/<片>_final.mp4                    （選用）scripts/chapters.py 產章節
 「`tts.py` → `remotion render` → `loudnorm.py`」三步手動串，每支片的確切指令寫在它的 `SCRIPT.md`（mock 版與真配音版各一段）。
 **換 manifest 就整片重新對時**：mock（依字數估的靜音）與真配音的 manifest 形狀相同，Remotion 只換 `--props` 裡的 manifest 路徑。
 
-**尚未建（TODO，另開輪次；見 KICKOFF-remotion-unification §6）：** Remotion 分鏡 yml 的 schema 與 render 前閘（Manim 時代的
-`schema.py`／`lint.py`／`sizecheck.py` 已封存）；內容層確定性檢查器（`provenance`／`pedagogy`／`step_coverage`／`example_coverage`）接 Remotion 分鏡；
-render 前的 manifest freshness 檢查（Manim 時代由 `make.py --reuse-audio` 做，Remotion 端目前沒有）。（`paper/` 升格為正式目錄 `remotion/` 已於 2026-09-28 完成。）
+**已建（2026-09-28）：** Remotion 分鏡 yml 的 schema＝[`SPEC-remotion-storyboard-schema.md`](SPEC-remotion-storyboard-schema.md)（SSOT），render 前的結構閘＋內容層確定性檢查器
+（`provenance`／`source_rev`／`pedagogy`／`step_coverage`／`example_coverage`）的入口＝[`pipeline/check_storyboard.py`](pipeline/check_storyboard.py)
+（`python video/pipeline/check_storyboard.py <片>.yml`；`tools/doctor.py --smoke` 對 `remotion/*/*.yml` 全跑）。Manim 時代的 `schema.py`／`lint.py`／`sizecheck.py` 仍封存。`paper/` 升格為正式目錄 `remotion/` 亦於 2026-09-28 完成。
+**尚未建（TODO，另開輪次；見 KICKOFF-remotion-unification §6）：** render 前的 manifest freshness 檢查（Manim 時代由 `make.py --reuse-audio` 做，Remotion 端目前沒有）。
 
 ### Alignment：音訊長度就是畫面長度
 
@@ -143,7 +144,7 @@ Remotion 線要不要恢復「正典＋口語」雙軌，隨分鏡 schema 一起
 ## 旁白 `say` 文法與 beat 契約
 
 > 承自 `legacy/manim_video/DESIGN.md` §〈Storyboard 格式〉之〈`say`：narration + inline reveal（核心變更）〉。模板 payload、`accent`、`scene_role`、
-> 容量契約、Lectern 版面一律不承接。
+> 容量契約、Lectern 版面一律不承接。**整份分鏡的欄位契約（必填／選填／不再接受的 Manim 欄位、各閘讀什麼）＝[`SPEC-remotion-storyboard-schema.md`](SPEC-remotion-storyboard-schema.md)；本節只講 `say` 的文法。**
 
 分鏡是 `meta`＋`scenes[]` 的 YAML，形狀以 `pipeline/tts.py` 讀得懂的為準（Remotion 分鏡目前只被 `tts.py` 讀；Remotion 本身只讀 `tts.py` 寫出的 manifest，
 場序與拍 id 靠兩邊對得上，對不上時 composition 會直接報錯，如 `src/act3/timing.ts` 的「manifest has no scene …」）：
@@ -210,9 +211,10 @@ pauses:                      # content 場專用，opt-in
 變換只作用於記憶體中的副本。任何重讀磁碟 manifest 來對成片時間的工具（如 `rewatch_pack.py`）必須先用 `apply_pauses_timing` 折入同樣的停頓。
 旁白文字不動，所以一個 pause 不花 TTS 呼叫。
 
-**2026-09-28 現況：** 套用 `apply_pauses` 的是已封存的 `make.py`，「`after` 指到沒揭示過的 id」的檢查在已封存的 `schema.py`。Remotion 線目前**不讀**
+**2026-09-28 現況：** 套用 `apply_pauses` 的是已封存的 `make.py`；「`after` 指到沒揭示過的 id」的檢查原在已封存的 `schema.py`，**同日起由
+[`pipeline/check_storyboard.py`](pipeline/check_storyboard.py) 接手（error；見 [`SPEC-remotion-storyboard-schema.md`](SPEC-remotion-storyboard-schema.md) §2）**。Remotion 線目前**不讀**
 `pauses:`，改在 composition 的 timing 裡加停留（Q7 的 `HOLD`：每場旁白後多留的幀數）。要不要讓 Remotion 改吃 `pauses:`（好讓 `rewatch_pack` 與渲染端
-共用同一份停頓宣告），隨分鏡 schema 一起定。
+共用同一份停頓宣告）＝SPEC §6 待裁決項 3；schema 本身只保證宣告合法。
 
 ---
 

@@ -240,7 +240,7 @@ npx remotion render build <片>-<場id> out\<場id>.mp4         # 只渲一場�
 預設觀眾是**第一次學這段微積分的同學**（storyboard `meta.pedagogy_profile`，預設 `first_time`、可覆寫）。下面四條把「為初學者教」落成可承載、可稽核的畫面決策，對應教學閘 `PEDAGOGY-FIRSTLEARNER-RUBRIC.md` 的 `PD1`–`PD4`。（其強制層見 [`REVIEW_GATES.md`](REVIEW_GATES.md)；結構必填由確定性層 [`pipeline/pedagogy.py`](pipeline/pedagogy.py) 計算，落地當下 warn-only，詳見下節「落地行為」。）
 
 - **P1 證明／推導粒度（一 beat 一承重動作）。** 對初學者，**一個 beat／reveal 只扛一個承重的代數／邏輯動作**，不過度壓縮——寧可多分一段，也不要把兩個推導步驟塞進同一次揭示。拆步粒度讀 `meta.pedagogy_profile`（預設 `first_time` 的慢節奏）。這是 audience-sensitive 的語意判斷，無確定性必填欄位；判斷層 = `PD1`（與 `L2`「一單元兩**概念**」分工：`PD1` 管單一概念單元**內部**一個 beat 多**動作**的過度壓縮）。
-- **P2 動機上畫面（`scaffold.motive`）。** 每個 proof／子結論場景在**畫面上**有一句「為什麼做這個」，寫進 `scaffold.motive`，**不只藏在旁白**。`theorem_proof`／`derivation` 場缺 `scaffold.motive` → 確定性層 `schema.py` warn（`PD2`；唯有 opt-in `meta.pedagogy_enforce` 才升 gating）；`definition_math` 的 motive 屬語意、**非確定性必填**，由 gate-1 以 advisory 浮現。motive 渲為標題下一行**較小的 `text` role**（不可 `muted`——見 Manim gen-2 的 [`DESIGN.md`](../legacy/manim_video/DESIGN.md)；de-emphasis 靠字級／位置，非調暗）。
+- **P2 動機上畫面（`scaffold.motive`）。** 每個 proof／子結論場景在**畫面上**有一句「為什麼做這個」，寫進 `scaffold.motive`，**不只藏在旁白**。`theorem_proof`／`derivation` 場缺 `scaffold.motive` → 確定性層 `check_storyboard.py` warn（`PD2`；唯有 opt-in `meta.pedagogy_enforce` 才升 gating；**Remotion 分鏡沒有 `template`，PD2 在其上不武裝**，見 [`SPEC-remotion-storyboard-schema.md`](SPEC-remotion-storyboard-schema.md) §4）；`definition_math` 的 motive 屬語意、**非確定性必填**，由 gate-1 以 advisory 浮現。motive 渲為標題下一行**較小的 `text` role**（不可 `muted`——見 Manim gen-2 的 [`DESIGN.md`](../legacy/manim_video/DESIGN.md)；de-emphasis 靠字級／位置，非調暗）。
 - **P3 divider 講具體問題（`scaffold.problem`）。** section divider 講出正在解的**問題／式子**（`scaffold.problem`），不只給概念標題。承載與渲染契約（divider 的 `problem` 渲為顯示公式行）見 Manim gen-2 的 [`DESIGN.md`](../legacy/manim_video/DESIGN.md)（Remotion 版待定），**本檔不重述渲染細節**；確定性必填（`kind: divider` 場缺 `scaffold.problem` → warn）與判斷見 `PD3`。
 - **P4 前提首用即標（`scaffold.flag` + `meta.assumptions`）。** 默默用到的慣例／假設（radians、定義域限制）在**第一次用到**的場景標 `scaffold.flag: <assumption_id>`。每筆假設在 deck 的 **`meta.assumptions[]`** registry 顯式宣告 `id`／`text`／`first_use_unit`／`source`（此 `source` 是該假設的人讀引用，與下節 OTF provenance 的 `ref:`／`refs:` 是兩回事）；**閘不推斷**「是否用到／何處首用」，一律以作者宣告為準。registry 一致性（每筆 assumption 在其 `first_use_unit` 渲出對應 flag、無孤兒 flag）由確定性層檢查（`PD4`）。
 
@@ -291,7 +291,7 @@ pedagogy／OTF 閘與 six-lens **界定不重疊的切片**：`.md` 內容是否
 > **source_rev：** `handout/latex/src/ch03/chapter3.tex` `sha256:<64 hex>` — <自由說明>
 ```
 
-＝這份內容稿**撰稿／lock 時所依講義源檔**的 repo 相對路徑＋其 **LF 正規化 sha256**（與 `derived_check.py` 對 `_mimo.yml` 的 stamp 同一套哈希）。產生：`python video/pipeline/source_rev.py handout/latex/src/ch03/chapter3.tex`，貼進標頭即可。`schema.py`／`make.py`／`derive_spoken.py` 的 preflight 會重算現檔哈希，不符即印 `[source_rev] WARN`（**warn-only、永不擋 render**——講義漂移是內容決策不是 build 錯誤），這就是 §8 的觸發器；LOCKED 卻沒 stamp 也 WARN。既有 §3.1／§3.2 稿的 stamp 指向凍結 legacy fragment 的 lock 時版本（2026-09-12 回補），故現在持續 WARN——§8 對齊到 `.tex` 後改 stamp 該 `.tex`。（動機：產線評估 2026-09-07 F2——兩份 LOCKED 稿的講義源在 lock 後被改三輪、且無任何機制會發現。）
+＝這份內容稿**撰稿／lock 時所依講義源檔**的 repo 相對路徑＋其 **LF 正規化 sha256**（與 `derived_check.py` 對 `_mimo.yml` 的 stamp 同一套哈希）。產生：`python video/pipeline/source_rev.py handout/latex/src/ch03/chapter3.tex`，貼進標頭即可。`check_storyboard.py`／`derive_spoken.py` 的 preflight（Manim 時代＝已封存的 `schema.py`／`make.py`）會重算現檔哈希，不符即印 `[source_rev] WARN`（**warn-only、永不擋 render**——講義漂移是內容決策不是 build 錯誤），這就是 §8 的觸發器；LOCKED 卻沒 stamp 也 WARN。既有 §3.1／§3.2 稿的 stamp 指向凍結 legacy fragment 的 lock 時版本（2026-09-12 回補），故現在持續 WARN——§8 對齊到 `.tex` 後改 stamp 該 `.tex`。（動機：產線評估 2026-09-07 F2——兩份 LOCKED 稿的講義源在 lock 後被改三輪、且無任何機制會發現。）
 
 ### 交付形式：`.md` 為源、編譯 HTML 為審核稿（2026-06-14 使用者指示）
 
@@ -344,7 +344,7 @@ animation_cue: |
 
 定稿一節內容稿前，逐項過（**只列內容層；工程檢核屬第二階段**）：
 
-- [ ] 每個 `definition` / `theorem` / `proposition` 都有單元覆蓋；每個**不同模式**的 `example` 有代表單元，折疊掉的同型重複都就近註明（§2 代表式涵蓋）。**機器面：** `examples:` ／`folds:` 已宣告，且 `python video/pipeline/schema.py <deck>.yml` 的 `[example_coverage]` 區塊不印（0 EX1／0 EX2）。
+- [ ] 每個 `definition` / `theorem` / `proposition` 都有單元覆蓋；每個**不同模式**的 `example` 有代表單元，折疊掉的同型重複都就近註明（§2 代表式涵蓋）。**機器面：** `examples:` ／`folds:` 已宣告，且 `python video/pipeline/check_storyboard.py <片>.yml` 的 `[example_coverage]` 行是 `clean`（0 EX1／0 EX2；武裝前提＝該分鏡 `meta.chapter`＋`meta.section` 解得到講義節、`meta.id` 對得到這份內容稿）。
 - [ ] **順序自檢**（§1 分工；機器查不了，只能在這裡攔）：本節有沒有在推導出某結果**之前**就把它的結論式放上畫面？那是刻意的 advance organizer，還是洩題？（§3.1 場 13 學費：度數導數公式在 `sin′=cos` 推出前就印出來了。）以及——有沒有把「為什麼現在做這個」的鋪陳擋在它要服務的圖／式**前面**？（§3.1 場 06 學費：對稱論證講了 38 秒，學生還沒看到那三塊圖形。）
 - [ ] 沒有 `exercise` 內容洩入。
 - [ ] intro 與 outro 齊備（intro 有定位資訊 + tagline；recap 單元有 takeaway 清單；outro 無 takeaways）。
@@ -372,7 +372,7 @@ narration 草稿成形、**鎖稿並 derive 成 HTML／口語版之前**，跑�
 
 當講義源（2026-08-09 起＝`handout/latex/src/<ch>/<name>.tex`；既有 deck 的 stamp 仍指凍結 fragment）改動已寫過內容稿的一節：
 
-0. **觸發器＝`[source_rev]` WARN**（§6 標頭契約）：`derive_spoken.py --check`（與 Manim 時代已封存的 `schema.py`／`make.py`）任一 preflight 印出「handout source … changed since the content script was stamped」即進入本節；**不要**關掉 WARN 了事。做完 1–5 後用 `python video/pipeline/source_rev.py <源檔>` 重蓋 stamp（既有 legacy-stamp 的 deck 改蓋 `.tex`）。
+0. **觸發器＝`[source_rev]` WARN**（§6 標頭契約）：`check_storyboard.py`／`derive_spoken.py --check`（與 Manim 時代已封存的 `schema.py`／`make.py`）任一 preflight 印出「handout source … changed since the content script was stamped」即進入本節；**不要**關掉 WARN 了事。做完 1–5 後用 `python video/pipeline/source_rev.py <源檔>` 重蓋 stamp（既有 legacy-stamp 的 deck 改蓋 `.tex`）。
 1. **Diff 這一節**，認出哪些環境被加／刪／改寫（legacy-stamp 的 deck：`git diff <lock commit> HEAD -- legacy/html_handout/fragments/chNN/sec-N-M.html` 看 lock 後 HTML 的變動，再對照現行 `.tex`）。
 2. **外科式修改**受影響的單元，不要整份重寫。
 3. **重念受影響的 narration**：若記號改了，引用該記號的 narration 也要跟著改。

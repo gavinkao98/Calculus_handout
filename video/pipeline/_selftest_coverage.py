@@ -174,7 +174,8 @@ def test_scoped_templates():
 
 
 # test_schema_integration (schema.py wiring over storyboards/_fixtures/sc_coverage.yml) moved
-# 2026-09-28 with schema.py to legacy/manim_video/pipeline/_selftest_coverage_schema.py.
+# 2026-09-28 with schema.py to legacy/manim_video/pipeline/_selftest_coverage_schema.py; the
+# Remotion-era wiring over the same fixture is _selftest_check_storyboard.py.
 
 
 def test_non_dict_storyboard():

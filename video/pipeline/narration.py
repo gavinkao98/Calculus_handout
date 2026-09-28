@@ -24,8 +24,8 @@ from dataclasses import dataclass
 
 _SHOW = re.compile(r"\{\s*show\s+([A-Za-z0-9_.\[\]]+)\s*\}")
 # Anything that LOOKS like a marker: the opener plus what follows it up to the next brace.
-# This module is the ONE {show} grammar -- schema.py, sizecheck.py and derive_spoken's
-# parity check all ask it (code-review-2026-09-23 B-04) -- so a `{show`-looking run that
+# This module is the ONE {show} grammar -- check_storyboard.py, derive_spoken's parity
+# check (and the archived schema.py / sizecheck.py) all ask it (code-review-2026-09-23 B-04) -- so a `{show`-looking run that
 # `_SHOW` does not read (a bare `{show}`, an unclosed `{show x`, `{show a b}`) is exactly
 # what the player would leave in the beat TEXT, uncut and spoken aloud by TTS.
 _SHOW_LIKE = re.compile(r"\{\s*show\b[^{}]{0,40}\}?")

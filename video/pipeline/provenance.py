@@ -219,3 +219,29 @@ def provenance_issues(data: dict, loci: "Loci", enforce: bool) -> "list[tuple[st
                 issues.append((sev, f"{sid}.{path}: provenance ref {ref!r} does not "
                                     f"resolve (no such .md unit / handout anchor)"))
     return issues
+
+
+def scene_ref_issues(data: dict, loci: "Loci", enforce: bool) -> "list[tuple[str, str]]":
+    """Scene-level provenance for scenes that carry NO teaching-text field in the yml --
+    the Remotion shape (SPEC-remotion-storyboard-schema.md §4): on-screen text lives in
+    the composition, so the scene's `ref:` is its only provenance handle. A scene with a
+    text field is provenance_issues' job and is skipped here, so no scene is reported by
+    both. Same severity axis (warn-default, error under meta.otf_enforce); intro/outro
+    exempt; non-dict data -> []."""
+    sev = "error" if enforce else "warn"
+    issues: list[tuple[str, str]] = []
+    scenes = data.get("scenes", []) if isinstance(data, dict) else []
+    for scene in scenes or []:
+        if (not isinstance(scene, dict) or scene.get("kind") not in OTF_KINDS
+                or _present_text_fields(scene)):
+            continue
+        sid = scene.get("id", "?")
+        ref = scene.get("ref")
+        if not isinstance(ref, str) or not ref.strip():
+            issues.append((sev, f"{sid}: scene has no `ref:` (no on-screen text field in the "
+                                f"yml, so the scene-level ref is its only provenance handle "
+                                f"-- md:<unit> or doc:<anchor>)"))
+        elif not loci.resolves(ref):
+            issues.append((sev, f"{sid}: scene `ref:` {ref!r} does not resolve (no such .md "
+                                f"unit / handout anchor)"))
+    return issues

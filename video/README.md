@@ -46,8 +46,9 @@ video/
     loudnorm.py          兩段式 loudnorm（house −19 LUFS；自封存的 make.py 抽出）
     mimo_preview.py / listening_pack.py / loudness_ab.py / house_audio.py   試聽與聽感驗收
     rewatch_pack.py      看片評審 pack＋12 s 靜止硬閘（沿用，待接 Remotion）
+    check_storyboard.py  ★ Remotion 分鏡入口：結構驗證＋串下列內容層檢查器（契約＝SPEC-remotion-storyboard-schema.md；2026-09-28）
     provenance.py / pedagogy.py / step_coverage.py / example_coverage.py / source_rev.py /
-      review_pack.py / _screen_contract.py / narration_review.py   內容層確定性檢查器（待接 Remotion 分鏡）
+      review_pack.py / _screen_contract.py / narration_review.py   內容層確定性檢查器（經 check_storyboard.py 接 Remotion 分鏡）
     _bootstrap.py        sys.path 與輸出目錄 helper（精簡版）
     run_selftests.py / _selftest_*.py / _regression_scene_align.py   離線自測
     assets/              品牌 logo（Remotion 唯一固定元素）＋ house audio cue
@@ -61,7 +62,7 @@ video/
       REPORT-*.html / REVIEW-*.html   稽核／完工報告（self-contained，圖 base64 內嵌）
       _gen/              報告產生器＋資料（進版控；見下節「版控策略」）
   storyboards/
-    _fixtures/           內容層 selftest 的 fixture（otf_provenance／sc_coverage／scaffold／pedagogy_audit{,_draft}）
+    _fixtures/           內容層 selftest 的 fixture（otf_provenance／sc_coverage／scaffold／pedagogy_audit{,_draft}／remotion_minimal）
   experiments/           實驗線
     remotion_styles/     Remotion 風格探索紀錄（blueprint/、dark_glow/ 未選定方向；paper/ 已升格為 ../remotion/）
     remotion_pilot/      Remotion 前置評估與第三幕規劃稿
@@ -110,7 +111,8 @@ video/
 - **TTS＝MiMo `mimo-v2.5-tts`**（英文 voice Dean、中文 voice 冰糖）；Remotion 線用 `tts.py --unit scene`＋stable-ts forced alignment，失敗自動回退逐 beat。
   配音工作流試驗（Gemini 中文試片、三家 × 三段 pilot 報量）見 [`experiments/tts_workflow/README.md`](experiments/tts_workflow/README.md)；9 次 pilot 仍未執行。
 - **內容層不變：** `content_scripts/`（內容稿、口語版、rubric、稽核報告）全部留在原位；§3.2 Phase A（內容線）成果有效，Phase B（視覺線）作廢、待 Remotion 版 KICKOFF。
-- **待辦（另開輪次）：** §3.2 Phase B 的 Remotion 版 KICKOFF；內容層檢查器接 Remotion 分鏡 schema；`.claude/launch.json` 的 `remotion-review` 路徑修正（[KICKOFF-remotion-unification](KICKOFF-remotion-unification.md) §6）。
+- **分鏡 schema 與內容層閘（2026-09-28 接上）：** 欄位契約＝[`SPEC-remotion-storyboard-schema.md`](SPEC-remotion-storyboard-schema.md)；入口 `python video/pipeline/check_storyboard.py <片>.yml`（結構＋provenance／source_rev／pedagogy／coverage／example_coverage，每閘印武裝狀態；`tools/doctor.py --smoke` 對 `paper/*/*.yml` 全跑）。現行四支分鏡 0 error、provenance 全 WARN（場級 `ref:` 全缺），見 [`REVIEW_GATES.md`](REVIEW_GATES.md) 層 6。
+- **待辦（另開輪次）：** §3.2 Phase B 的 Remotion 版 KICKOFF；`.claude/launch.json` 的 `remotion-review` 路徑修正；SPEC §6 的待裁決項（場級 `ref:` WARN／ERROR、PD2 的 Remotion 場角色欄）（[KICKOFF-remotion-unification](KICKOFF-remotion-unification.md) §6）。
 
 ## 指令
 
@@ -132,7 +134,8 @@ cd video\remotion; npm ci; npm run q7      # → out/q7_mock.mp4；npx remotion 
 ```powershell
 .venv\Scripts\python video\pipeline\run_selftests.py          # 全部 pipeline/_selftest_*.py；任一紅即 exit 1
 .venv\Scripts\python video\pipeline\run_selftests.py -k tts   # 只跑名字含 tts 的
-python tools\doctor.py                                        # 環境健檢
+.venv\Scripts\python video\pipeline\check_storyboard.py video\experiments\remotion_styles\paper\q7\q7.yml   # 一支分鏡的結構＋內容層閘（--list 列 reveal id）
+python tools\doctor.py                                        # 環境健檢（--smoke 加跑 paper/*/*.yml 全部分鏡的閘）
 ```
 
 Remotion 端的型別檢查：在 `remotion/` 下 `npm run lint`（`tsc`）。

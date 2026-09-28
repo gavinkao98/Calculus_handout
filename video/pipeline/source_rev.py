@@ -6,7 +6,7 @@ moved on: the 2026-09-07 pipeline assessment (F2) found §3.1/§3.2 sources edit
 times after lock, narration still quoting sentences the handout no longer has, and no
 mechanism that would ever say so. This module is the same trick derived_check.py plays
 for *_mimo.yml, one layer up: the .md header carries a stamp of the handout file it was
-written against, and every preflight (schema.py / make.py / derive_spoken.py) re-hashes
+written against, and every preflight (check_storyboard.py / derive_spoken.py; the archived schema.py / make.py) re-hashes
 that file and WARNS on drift -- the trigger for CONTENT_METHODOLOGY.md §8 (diff ->
 surgical edit -> scoped NFA -> re-stamp). Warn-only by design: drift is a content
 decision, never a build error, so it must not gate a render.
