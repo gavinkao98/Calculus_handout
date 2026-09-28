@@ -160,3 +160,4 @@ merge 後在 main 上重驗：`run_selftests.py` 24／24 綠、`tools/doc_lint.p
    （結構驗證＋串 provenance／source_rev／pedagogy／step_coverage／example_coverage；`tools/doctor.py --smoke` 重掛為對 `remotion/*/*.yml` 全跑）；
    對現行四支分鏡的實跑結果記在 [`REVIEW_GATES.md`](REVIEW_GATES.md) 層 6 新列；待裁決項（場級 `ref:` 缺失 WARN／ERROR、PD2 的 Remotion 場角色欄）見 SPEC §6。
 4. `.claude/launch.json` 的 `remotion-review` 條目指向舊 session 的 scratchpad 路徑，需修。
+5. **2026-09-29 立檔、待開工**：Remotion 製作流程檢討＝[`KICKOFF-remotion-process-review.md`](KICKOFF-remotion-process-review.md)。使用者指出現行 Remotion 流程是 Manim gen-2 流程的平移（第 2、3 條的產物都是接線，沒有人重新設計流程）；§3.2 Phase B 開工檔（含 D1–D5）、SPEC §6 四項、`check_storyboard.py`／`doctor --smoke`、REVIEW_GATES 的「沿用，待接 Remotion」標記**全部凍結**，等四個問題（Q1–Q4）裁決後改寫或廢止。

@@ -13,6 +13,7 @@
   **`archive/2026-09-28-manim-gen2-final`**（指向 `60c505e`）。留在 `video/` 的是渲染器無關的共用層（TTS／對齊／音訊／loudnorm）與內容層。
   契約、逐檔清單與三個 task 的驗收＝[`KICKOFF-remotion-unification.md`](KICKOFF-remotion-unification.md)；新的精簡 [`DESIGN.md`](DESIGN.md) 只承接資料流、旁白契約、配音工作流與語意色對照。
   **收案數字（2026-09-28）：** 搬 196 檔（引擎 182＋文檔 14）、selftest 83→24 支全綠、`requirements.lock` 38→7 套、doc_lint clean；merge `c7e0d34`（引擎）／`d0b0514`（環境）／`e94d3ab`（文檔）。
+  **2026-09-29 開檢討輪（待開工）：** 使用者指出現行 Remotion 流程是 Manim 流程平移，立 [`KICKOFF-remotion-process-review.md`](KICKOFF-remotion-process-review.md)（四個問題 Q1–Q4）；§3.2 Phase B 開工檔（D1–D5）、SPEC §6、`check_storyboard.py`／`--smoke`、REVIEW_GATES「待接 Remotion」標記全部凍結至裁決。
   **下面各條與 Open items 裡 2026-09-28 以前、寫 Manim 引擎行為的內容一律是歷史紀錄。**
   **同日晚（獨立輪次）KICKOFF §6 第 3 條收案：** Remotion 分鏡 schema＝[`SPEC-remotion-storyboard-schema.md`](SPEC-remotion-storyboard-schema.md)，內容層確定性檢查器入口＝
   [`pipeline/check_storyboard.py`](pipeline/check_storyboard.py)（結構＋provenance／source_rev／pedagogy／coverage／example_coverage，每閘印武裝狀態；`doctor --smoke` 重掛）；

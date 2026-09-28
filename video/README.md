@@ -28,6 +28,7 @@ video/
   SPEC-motion-language.md   畫面語法五條規則（設計語言層；實作契約層隨 Manim 封存）
   SPEC-pedagogy-firstlearner-{framework,expansion}.md / PROPOSAL-scope-packaging-coverage.md   教學規格
   KICKOFF-remotion-unification.md   2026-09-28 Remotion 統一的契約與紀錄
+  KICKOFF-remotion-process-review.md   2026-09-29 Remotion 製作流程檢討（待開工；Phase B 與內容層閘接線在此輪裁決前凍結）
   KICKOFF-s32-chain-rule.md / KICKOFF-process-reform.md              節與流程的開工檔（歷史＋仍有效部分見各檔頂註）
   requirements.txt       pinned 依賴
   remotion/              ★ 現役製作處：Remotion 專案（紙本編輯排版；2026-09-28 自 experiments/remotion_styles/paper/ 升格）
