@@ -14,7 +14,7 @@ failed its own provenance gate and one selftest went red for weeks with nothing 
 every selftest -- `<this interpreter> -m pipeline.<name>` with cwd=video/ -- so a Phase
 close-out is one command. (The Manim-backed selftests that built Tex and took minutes moved
 to legacy/manim_video/pipeline/ on 2026-09-28; what is left finishes in seconds.)
-The fast deck-level gates (schema + lint + derive --check on the canonical decks) are
+The fast deck-level gate (check_storyboard.py over the Remotion decks) is
 `python tools/doctor.py --smoke`, not this.
 """
 from __future__ import annotations

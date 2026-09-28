@@ -224,7 +224,7 @@ def test_no_units_fires_ex1_per_example_so_the_caller_must_skip_deckless_decks()
     per handout example. That is correct for a deck whose .md simply forgot to declare,
     and WRONG for a deck that has no .md at all (ch01_inverse_functions, a gen-1 layout
     regression deck) -- there, "no declarations" means "nobody wrote a content script",
-    not "8 examples were dropped". Skipping is the CALLER's job (schema.py checks
+    not "8 examples were dropped". Skipping is the CALLER's job (check_storyboard.py checks
     deck_md.exists() first); do not move it in here and make a silent no-op of a real
     missing declaration."""
     keys = EC.tex_examples_by_section(TEX)["3.1"]

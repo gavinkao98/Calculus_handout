@@ -19,9 +19,11 @@ python tools\doctor.py
 與**確切補法**，最後給「能力摘要」告訴你現在哪些工作流跑得動。有 `[FAIL]` 時退出碼為 1。
 模組級 selftest 全套另跑 `.venv\Scripts\python video\pipeline\run_selftests.py`（不併進 doctor）。
 
-> **`--smoke` 已退役（2026-09-28）：** 它原本對 `video/storyboards/` 每個正典 deck 跑 `schema.py`＋`lint.py`＋`derive_spoken --check`；
-> 正典 storyboard 與 `schema.py`／`lint.py` 已隨 Manim gen-2 引擎封存到 `legacy/manim_video/`，`derive_spoken --check` 沒有正典 deck 可驗，
-> 故一併拿掉（旗標仍接受，只印一列說明）。見 [`video/KICKOFF-remotion-unification.md`](video/KICKOFF-remotion-unification.md)。
+> **`--smoke`＝Remotion 分鏡的 deck 級閘（2026-09-28 重掛）：** `python tools\doctor.py --smoke` 以 `.venv` python 對
+> `video/experiments/remotion_styles/paper/*/*.yml` 每支分鏡跑 [`video/pipeline/check_storyboard.py`](video/pipeline/check_storyboard.py)
+> （結構驗證＋provenance／source_rev／pedagogy／coverage／example_coverage；契約＝[`video/SPEC-remotion-storyboard-schema.md`](video/SPEC-remotion-storyboard-schema.md)），
+> 不 render、不計費；exit 1／2 的 deck 記 `[FAIL]`，WARN 只計數不擋。Manim 版 smoke（對正典 deck 跑 `schema.py`＋`lint.py`＋`derive_spoken --check`）
+> 同日隨引擎封存退役，見 [`video/KICKOFF-remotion-unification.md`](video/KICKOFF-remotion-unification.md)。
 
 ## 環境分層（四層核心 ＋ 審核工具）
 

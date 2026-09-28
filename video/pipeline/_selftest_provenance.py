@@ -164,6 +164,37 @@ def test_provenance_issues():
     assert len(pwarns) == 1 and "recipe.steps.0.text" in pwarns[0][1]
 
 
+def test_scene_ref_issues():
+    """Scene-level provenance for the Remotion shape (SPEC-remotion-storyboard-schema.md §4):
+    a content/divider scene with NO teaching-text field in the yml is judged by its `ref:`
+    alone; a scene that has a text field is provenance_issues' job and is never reported
+    here, so the two checks cannot double-report one scene."""
+    loci = P.Loci(md_unit_ids={"unit_a"}, handout_anchors={"sec:3.1"})
+    data = {"scenes": [
+        {"id": "ok_md", "kind": "content", "ref": "md:unit_a", "say": "x"},
+        {"id": "ok_doc", "kind": "content", "ref": "doc:sec:3.1", "say": "x"},
+        {"id": "miss", "kind": "content", "say": "x"},                          # no ref -> finding
+        {"id": "bad", "kind": "content", "ref": "md:nope", "say": "x"},          # unresolvable -> finding
+        {"id": "blank", "kind": "content", "ref": "  ", "say": "x"},             # blank counts as missing
+        {"id": "div", "kind": "divider", "duration": 3},                         # divider is OTF-scoped
+        {"id": "intro", "kind": "intro", "duration": 4},                         # exempt
+        {"id": "fielded", "kind": "content", "statement": "on-screen text"},     # per-field check owns it
+    ]}
+    warns = P.scene_ref_issues(data, loci, enforce=False)
+    assert all(s == "warn" for s, _ in warns)
+    ids = [m.split(":", 1)[0] for _, m in warns]
+    assert ids == ["miss", "bad", "blank", "div"], ids
+    assert "does not resolve" in dict((m.split(":", 1)[0], m) for _, m in warns)["bad"]
+    errs = P.scene_ref_issues(data, loci, enforce=True)
+    assert all(s == "error" for s, _ in errs) and len(errs) == len(warns)
+    # the fielded scene is reported by provenance_issues instead, exactly once
+    field_msgs = [m for _, m in P.provenance_issues(data, loci, enforce=False)]
+    assert field_msgs == ["fielded.statement: on-screen teaching text has no provenance ref "
+                          "(scene `ref:` or `refs.statement`)"], field_msgs
+    assert P.scene_ref_issues("not a dict", loci, enforce=False) == []
+    assert P.scene_ref_issues(None, loci, enforce=True) == []
+
+
 def test_tex_anchors():
     # only label-DEFINING positions: env num arg with ':', \figcaption key, \sechead number;
     # a literal env number and a \ref to a foreign label define nothing.
@@ -196,7 +227,7 @@ def test_handout_anchors_real_repo():
 
 def test_content_script_for():
     root = Path("/repo")
-    # the ONE strip rule shared by md: resolution, SC contracts (schema.py) and source_rev
+    # the ONE strip rule shared by md: resolution, SC contracts (check_storyboard.py) and source_rev
     assert P.content_script_for({"id": "ch03_trig_derivatives_mimo"}, root).name == "ch03_trig_derivatives.md"
     assert P.content_script_for({"id": "ch03_trig_derivatives"}, root).name == "ch03_trig_derivatives.md"
     assert P.content_script_for({"id": "mimo_first"}, root).name == "mimo_first.md"   # only the SUFFIX is stripped
@@ -216,7 +247,8 @@ def test_from_deck_strips_mimo_suffix():
 
 
 # test_schema_integration (schema.py wiring over storyboards/_fixtures/otf_provenance.yml) moved
-# 2026-09-28 with schema.py to legacy/manim_video/pipeline/_selftest_provenance_schema.py.
+# 2026-09-28 with schema.py to legacy/manim_video/pipeline/_selftest_provenance_schema.py; the
+# Remotion-era wiring over the same fixture is _selftest_check_storyboard.py.
 
 
 if __name__ == "__main__":
@@ -226,6 +258,7 @@ if __name__ == "__main__":
     test_scene_text_refs()
     test_provenance_issues()
     test_from_deck_strips_mimo_suffix()
+    test_scene_ref_issues()
     test_tex_anchors()
     test_handout_anchors_real_repo()
     test_content_script_for()

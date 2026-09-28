@@ -1,0 +1,66 @@
+# remotion_minimal.yml -- fixture for pipeline/check_storyboard.py (SPEC-remotion-storyboard-schema.md).
+# Remotion shape: meta + scenes[] with id / kind / say / duration only; on-screen text lives in
+# the composition, so a scene's `ref:` is its only provenance handle. Each scene plants exactly
+# one thing the entry must say (pinned by _selftest_check_storyboard.py):
+#   ok_ref          clean content scene (ref resolves via content_scripts/_fixture_otf.md unit_a)
+#   no_ref          content scene with no `ref:`           -> [provenance] WARN (scene-level)
+#   bad_ref         `ref:` that resolves to nothing        -> [provenance] WARN
+#   dup_show        same {show id} twice in one scene      -> [structure] ERROR
+#   bad_marker      `{show}` / `{show b c}` malformed      -> [structure] ERROR
+#   bad_pause       pauses.after names an unrevealed id    -> [structure] ERROR
+#   legacy_fields   Manim gen-2 fields (focus / carry)     -> [structure] WARN each (template: kept out so PD2 stays "not armed")
+#   no_duration     outro with no duration (+ a `say`)     -> [structure] ERROR (+ WARN: say ignored)
+#   div             divider with no scaffold.problem       -> [pedagogy] PD3 WARN (+ [provenance] WARN: no ref)
+# meta.id binds _fixture_otf.md (md: pool = {unit_a}); no meta.chapter -> doc: pool empty, hermetic.
+# meta.color_map is a Manim meta field -> [structure] WARN. No section -> example_coverage says so.
+meta:
+  id: _fixture_otf
+  title: Remotion fixture
+  voice: Dean
+  color_map: { x: concept }
+scenes:
+  - id: logo
+    kind: intro
+    duration: 4.0
+  - id: ok_ref
+    kind: content
+    ref: md:unit_a
+    say: |
+      Opening line, no reveal yet.
+      {show first} First reveal.
+      {show second} Second reveal, then a hold.
+    pauses:
+      - { after: second, seconds: 1.5 }
+  - id: no_ref
+    kind: content
+    say: "{show only} One beat, no provenance."
+  - id: bad_ref
+    kind: content
+    ref: md:does_not_exist
+    say: "{show only} One beat, ref points nowhere."
+  - id: dup_show
+    kind: content
+    ref: md:unit_a
+    say: "{show a} First time. {show a} Same id again."
+  - id: bad_marker
+    kind: content
+    ref: md:unit_a
+    say: "Text {show} more {show b c} end."
+  - id: bad_pause
+    kind: content
+    ref: md:unit_a
+    say: "{show p} text."
+    pauses:
+      - { after: nope, seconds: 1 }
+  - id: legacy_fields
+    kind: content
+    ref: md:unit_a
+    focus: []
+    carry: []
+    say: "{show z} text."
+  - id: no_duration
+    kind: outro
+    say: "an outro is silent; this is ignored"
+  - id: div
+    kind: divider
+    duration: 3

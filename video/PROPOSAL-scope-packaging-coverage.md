@@ -1,6 +1,7 @@
 # PROPOSAL — 影片內容取捨的三件事：分工、封裝、例題涵蓋（定稿）
 
 > 2026-09-12 立檔；同日四鏡（教學設計／產線工程／契約一致性／反對）獨立裁決，終審依親驗證據收斂成本定稿。
+> **2026-09-28 加註：** 下文的 `schema.py` 接線是 Manim gen-2 閘，已隨引擎封存；`example_coverage` 現由 [`pipeline/check_storyboard.py`](pipeline/check_storyboard.py) 對 Remotion 分鏡串跑（[`SPEC-remotion-storyboard-schema.md`](SPEC-remotion-storyboard-schema.md) §4）。
 > **狀態：已執行（2026-09-12）。** §6 步驟 1–7 全部完成、§7 驗收全過、回歸審核 0 blocking。
 > 執行紀錄與實測數字見 [`REBUILD_STATUS.md`](REBUILD_STATUS.md) 品質補強輪 ⑩；
 > 交付物 [`content_scripts/_audit/REVIEW-example-coverage-applied.html`](content_scripts/_audit/REVIEW-example-coverage-applied.html)。

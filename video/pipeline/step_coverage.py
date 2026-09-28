@@ -21,7 +21,7 @@ from pipeline.provenance import parse_ref
 # human PD1 gate caught it). `definition_math` is deliberately NOT here: it is a single
 # statement frame (definition / theorem statement / remark / forward-ref), no deck's
 # definition unit declares required_steps, and its prose is already covered by the
-# `statement` provenance field (REVIEW_GATES.md section 1, schema.py row).
+# `statement` provenance field (REVIEW_GATES.md section 1, check_storyboard.py row).
 _SCOPED_TEMPLATES = frozenset({"theorem_proof", "derivation", "worked_example",
                                "procedure_steps"})
 

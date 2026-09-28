@@ -14,6 +14,9 @@
   契約、逐檔清單與三個 task 的驗收＝[`KICKOFF-remotion-unification.md`](KICKOFF-remotion-unification.md)；新的精簡 [`DESIGN.md`](DESIGN.md) 只承接資料流、旁白契約、配音工作流與語意色對照。
   **收案數字（2026-09-28）：** 搬 196 檔（引擎 182＋文檔 14）、selftest 83→24 支全綠、`requirements.lock` 38→7 套、doc_lint clean；merge `c7e0d34`（引擎）／`d0b0514`（環境）／`e94d3ab`（文檔）。
   **下面各條與 Open items 裡 2026-09-28 以前、寫 Manim 引擎行為的內容一律是歷史紀錄。**
+  **同日晚（獨立輪次）KICKOFF §6 第 3 條收案：** Remotion 分鏡 schema＝[`SPEC-remotion-storyboard-schema.md`](SPEC-remotion-storyboard-schema.md)，內容層確定性檢查器入口＝
+  [`pipeline/check_storyboard.py`](pipeline/check_storyboard.py)（結構＋provenance／source_rev／pedagogy／coverage／example_coverage，每閘印武裝狀態；`doctor --smoke` 重掛）；
+  selftest 24→25 支全綠；現行四支分鏡 0 error、provenance 全 WARN（場級 `ref:` 全缺），數字在 [`REVIEW_GATES.md`](REVIEW_GATES.md) 層 6；待裁決見 SPEC §6。
 
 - **Q7 中文 Gemini Iapetus 全片試片（2026-09-26 完成）**：[批次與播放紀錄](experiments/tts_workflow/README.md)／[成片](experiments/remotion_styles/paper/out/q7zh_gemini_iapetus_scene_trial_20260926.mp4)。`gemini-3.8-flash-tts`／Iapetus 14／14 場、14 HTTP attempts、0 重試；raw 共 567.4 秒。receipt：2,090 text input＋18,166 audio output tokens，依既有 Standard 價估 USD 0.1645，未核帳。中文對齊 16 scenes（2 silent）、65 cue，5 estimated、18 低機率；試片未音鎖。成片 1080p30、17,766 frames、容器 592.256 秒、58,355,785 bytes、−19.0 LUFS／−5.2 dBTP；FFmpeg 全片影片解碼成功，70／285／540 秒抽幀視覺正常。raw＝`output/tts_workflow/q7zh_gemini_iapetus_scene_20260926`，manifest＝`experiments/remotion_styles/paper/public/audio/q7zh_gemini_iapetus_scene_trial`；MiMo 舊批次與成片保留。
 

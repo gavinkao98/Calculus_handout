@@ -1,5 +1,9 @@
 # SPEC — First-Learner Pedagogy ＋ On-Screen-Text Faithfulness Framework（video 產線）
 
+> **2026-09-28 加註：** 下文的確定性層宿主 `schema.py`／`lint.py` 是 Manim gen-2 閘，已隨引擎封存到 `legacy/manim_video/`；
+> 現役宿主＝[`pipeline/check_storyboard.py`](pipeline/check_storyboard.py)（Remotion 分鏡；欄位契約與各閘武裝前提見 [`SPEC-remotion-storyboard-schema.md`](SPEC-remotion-storyboard-schema.md)）。
+> 本檔其餘內容（PD／OF 家族、warn-default／opt-in 模型、`ref:`／`refs:` 文法）不變。
+
 > 狀態：設計定案 v3（待 writing-plans 轉施工計畫）。日期：2026-06-30。分支：`video/template-redesign-navy-spine`（commit/branch 待使用者裁決）。
 > 來源：使用者對 §3.1（trig derivatives）成片的教學回饋（針對「第一次學微積分的同學」）→ 升級為**可持續複用的框架/流程/模板/規則**，而非單節修補。
 > 修訂史：v1 經 Codex（gpt-5.5, xhigh, read-only）對抗式 review；v2 再經 4-agent 對抗式自審（對著真 codebase 查證）後**修正核心機制**——v1 的 §5 前提（scaffold 搬進 .md 即被 NFA/L1/L5 覆蓋）**被證偽**，見 §5、§13。v3 再經 Codex 獨立重攻 v2，採納「場級繼承」等 8 項精修（§13）。

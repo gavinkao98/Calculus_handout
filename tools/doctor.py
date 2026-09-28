@@ -9,9 +9,10 @@
     python tools/doctor.py --json     # 機器可讀（給 agent 解析）
 
 退出碼：所有「必要」項通過＝0；有任何 [FAIL]＝1（[WARN]／[INFO] 不影響）。
-`--smoke`（影片線正典 deck 的 schema／lint／derive --check 離線閘）已於 2026-09-28 退役：正典 storyboard
-與 schema.py／lint.py 隨 Manim gen-2 引擎封存到 legacy/manim_video/（見 video/KICKOFF-remotion-unification.md）；
-旗標仍接受，只印一列 [info] 說明。
+    python tools/doctor.py --smoke    # 加跑 Remotion 分鏡的 deck 級閘：video/pipeline/check_storyboard.py 對
+                                      # experiments/remotion_styles/paper/*/*.yml 全跑（結構＋內容層檢查器；不 render、不計費）
+Manim 版的 --smoke（正典 deck 的 schema／lint／derive --check）於 2026-09-28 隨引擎封存退役；同日重掛為上述
+Remotion 版（契約＝video/SPEC-remotion-storyboard-schema.md）。
 
 權威說明見 repo 根的 ENVIRONMENT.md；本檔是它的可執行版。
 """
@@ -472,17 +473,33 @@ def check_keys() -> None:
             record(INFO, "keys", f"{key} 未設", f"需要時才設（離線路徑不需要）：{use}")
 
 
-# ── ⑧ --smoke：2026-09-28 退役（旗標仍接受，只印一列說明）──────────────────
+# ── ⑧ --smoke：Remotion 分鏡的 deck 級閘（2026-09-28 重掛；不 render、不計費）──────
 
 def check_video_smoke() -> None:
-    """原本對每個正典 storyboard 跑 schema.py＋lint.py＋derive_spoken --check。三者的對象都沒了：
-    正典 storyboard 與 schema.py／lint.py 隨 Manim gen-2 引擎封存到 legacy/manim_video/；
-    derive_spoken.py 留在 video/pipeline/，但它的 --check 是對正典 storyboard 驗 parity，
-    沒有正典 deck 就無從驗，故一併拿掉。Remotion 版的 deck 閘待內容層檢查器接上新 storyboard
-    後重掛（video/KICKOFF-remotion-unification.md §6）。"""
-    record(INFO, "video-smoke", "--smoke 已退役（2026-09-28）",
-           "正典 deck 閘（schema／lint／derive --check）隨 Manim gen-2 封存，見 "
-           "video/KICKOFF-remotion-unification.md；模組 selftest 全套＝python video/pipeline/run_selftests.py")
+    """對每支現役 Remotion 分鏡（experiments/remotion_styles/paper/<片>/<片>.yml）跑
+    video/pipeline/check_storyboard.py：結構驗證＋provenance／source_rev／pedagogy／coverage／
+    example_coverage（契約＝video/SPEC-remotion-storyboard-schema.md）。exit 0＝PASS（附 WARN 數，
+    warn-only 不擋）、exit 1（error）／2（讀不到）＝FAIL。Manim 版 smoke（schema／lint／derive --check）
+    的對象已封存，不再回來。為何要有：doctor 只驗工具鏈，「工具鏈綠」與「分鏡在閘中止」曾同時成立
+    （產線評估 2026-09-07 F1／F4）。模組 selftest 全套另跑 python video/pipeline/run_selftests.py。"""
+    if not VENV_PY.exists():
+        record(INFO, "video-smoke", "略過：無 .venv", "先跑 tools/setup.ps1 建環境再 --smoke")
+        return
+    rdir = REPO.joinpath(*_REMOTION_DIR)
+    decks = sorted(p for p in rdir.glob("*/*.yml") if p.parent.name not in ("node_modules", "public", "out", "scripts"))
+    if not decks:
+        record(WARN, "video-smoke", "找不到 Remotion 分鏡", str(rdir / "*" / "*.yml"))
+        return
+    entry = REPO / "video" / "pipeline" / "check_storyboard.py"
+    for deck in decks:
+        rc, out = _run([str(VENV_PY), str(entry), str(deck)], timeout=120)
+        lines = [ln for ln in out.splitlines() if ln.strip()]
+        label = f"check_storyboard {deck.parent.name}/{deck.name}"
+        if rc == 0:
+            warns = sum(1 for ln in lines if ln.startswith("  WARN"))
+            record(PASS, "video-smoke", label, f"{warns} 個 WARN（warn-only，不擋）" if warns else "")
+        else:
+            record(FAIL, "video-smoke", label, " | ".join(lines[-3:]) or f"exit {rc}")
 
 
 # ── 報表 ──────────────────────────────────────────────────────────────
