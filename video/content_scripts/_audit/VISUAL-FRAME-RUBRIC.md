@@ -1,7 +1,7 @@
 # 影片視覺幀稽核 — 維度與收斂線（VISUAL-FRAME-RUBRIC）
 
 > 本檔是「影片視覺幀稽核」的契約與**單一真相來源**。視覺層走**講義 figure-audit 的鏡像**（見 [`../../../handout/_audit/FIGURE-AUDIT-RUBRIC.md`](../../../handout/_audit/FIGURE-AUDIT-RUBRIC.md)）：
-> - **gate 1 ＝ Claude 抽幀 subagent**（免費、每次 render 跑）——讀 [`../../pipeline/critic.py`](../../pipeline/critic.py) `--dry-run` 抽出的幀（一個 content scene 一張 fullest 幀），對照本檔判斷。
+> - **gate 1 ＝ Claude 抽幀 subagent**（免費、每次 render 跑）——讀 [`../../pipeline/critic.py`](../../../legacy/manim_video/pipeline/critic.py) `--dry-run` 抽出的幀（一個 content scene 一張 fullest 幀），對照本檔判斷。
 > - **gate 2 ＝ 外部 VLM 信心複核**（MiMo-V2.5 via `critic.py --confirm`，間歇、計費、需同意）——定稿前非每輪必跑，補 gate 1 的模型盲點。
 >
 > **被審物：** 已 render 的 scene 幀 PNG（additive reveal 的最末/最滿幀）。**依據：** `critic.py` 既有的 5 維 AES rubric（蒸餾自 DESIGN.md Visual QA）＋ figure-audit 維度 ＋ [`../../REVIEW_GATES.md`](../../REVIEW_GATES.md) 層 7「抽幀目視」清單，並補影片特有的 reveal／manim-Tex 失效模式。**性質：** 唯讀、propose-not-act、不改檔。
@@ -67,4 +67,4 @@
   - **A 維：** 每維 0–100 分 ＋ `defects`（`{dimension, severity low|med|high, where, issue, suggestion}`）。
   - 各乾淨維度一行；末行對「本節**視覺 blocking 是否歸零**」給明確結論。
 
-> **wiring 註（2026-06-16 已接線）：** gate 1（Claude subagent）直接讀本檔、即時涵蓋 V1–V9＋A1–A7。外部 gate 2（[`../../pipeline/critic.py`](../../pipeline/critic.py)／MiMo）**已接上本檔**：runtime verbatim-inject 整份 rubric body（取代原 hardcoded 5 維），JSON schema／`_write_md` 改輸出 `visual_blocking_count`＋`v_findings`（V1–V9、Blocking/Advisory、`VERDICT` 行）＋A1–A7 0–100 scores＋`defects`。§1.1 真 `--dry-run` 驗過。落地紀錄見 [`../../REVIEW_MODEL_DECISIONS.md`](../../REVIEW_MODEL_DECISIONS.md) §八。
+> **wiring 註（2026-06-16 已接線）：** gate 1（Claude subagent）直接讀本檔、即時涵蓋 V1–V9＋A1–A7。外部 gate 2（[`../../pipeline/critic.py`](../../../legacy/manim_video/pipeline/critic.py)／MiMo）**已接上本檔**：runtime verbatim-inject 整份 rubric body（取代原 hardcoded 5 維），JSON schema／`_write_md` 改輸出 `visual_blocking_count`＋`v_findings`（V1–V9、Blocking/Advisory、`VERDICT` 行）＋A1–A7 0–100 scores＋`defects`。§1.1 真 `--dry-run` 驗過。落地紀錄見 [`../../REVIEW_MODEL_DECISIONS.md`](../../REVIEW_MODEL_DECISIONS.md) §八。

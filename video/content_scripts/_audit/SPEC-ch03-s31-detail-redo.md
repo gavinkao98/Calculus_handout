@@ -15,7 +15,7 @@
 **關鍵定性：這不是改規則，是回去遵守本來就寫好的規則。**
 - [`CONTENT_METHODOLOGY.md`](../../CONTENT_METHODOLOGY.md) §1 核心理念 #1：**「Detail over compression。寧可多開一個教學單元……做 4 分鐘精華片不是目標。」**
 - 同檔 §3 環境對應表：**證明 >~4 步就拆「statement 單元＋proof 單元」**。
-- [`DESIGN.md`](../../DESIGN.md) 多頁拆分：**「修復方法是 split，不是 squeeze」**，並已建好 `part: {current,total}` 機制。
+- [`DESIGN.md`](../../../legacy/manim_video/DESIGN.md) 多頁拆分：**「修復方法是 split，不是 squeeze」**，並已建好 `part: {current,total}` 機制。
 
 第一版**違背了自己的方法論**；本次重做＝把 §3.1 補回合規。修法全靠現成機械，不動 pipeline。
 
@@ -98,7 +98,7 @@
 
 ## 5. Stage 2 流程（工程）
 
-1. 把新內容稿模板化進 [`ch03_trig_derivatives.yml`](../../storyboards/ch03_trig_derivatives.yml)：拆場、`part:`、新 `{show}` reveal 對齊新 narration。
+1. 把新內容稿模板化進 [`ch03_trig_derivatives.yml`](../../../legacy/manim_video/storyboards/ch03_trig_derivatives.yml)：拆場、`part:`、新 `{show}` reveal 對齊新 narration。
 2. 調整 3 個 hook（`sector_inequality`／`slope_equals_height`／`shm_stacked_graphs`）；若新增 `chord_le_arc` 則加第 4 個 hook 或併入 sector。
 3. 三閘：`schema.py`／`lint.py`／`sizecheck.py` **0 error**（sizecheck 的「拆 ~N 頁」warn 逐筆判，作為拆場依據）。
 4. 全片 mock render 1080p（`make.py --backend mock --quality high`）。
@@ -107,7 +107,7 @@
 
 ## 6. 護欄（D4，順手加）
 
-在 [`DESIGN.md`](../../DESIGN.md) §「Authoring checklist——反覆出現的錯誤」表加一行：
+在 [`DESIGN.md`](../../../legacy/manim_video/DESIGN.md) §「Authoring checklist——反覆出現的錯誤」表加一行：
 
 > **Don't：** 在低填充幀只放證明骨架／把 >4 步證明壓成 2–3 行。**Do：** proof >4 步拆 statement＋proof 場、超頁走 `part:`、一步一 beat。**原因：** detail over compression（CONTENT_METHODOLOGY §1）；ch03 §3.1 第一版壓縮漂移的學費（2026-06-29 密度稽核）。
 
@@ -123,6 +123,6 @@
 
 - 忠實來源：[`legacy/html_handout/fragments/ch03/sec-3-1.html`](../../../legacy/html_handout/fragments/ch03/sec-3-1.html)
 - 方法論：[`CONTENT_METHODOLOGY.md`](../../CONTENT_METHODOLOGY.md)（§1 detail-over-compression、§3 proof split、§8 維護）
-- 視覺/容量：[`DESIGN.md`](../../DESIGN.md)（容量契約、多頁 `part:`、template catalog）
+- 視覺/容量：[`DESIGN.md`](../../../legacy/manim_video/DESIGN.md)（容量契約、多頁 `part:`、template catalog）
 - 前版計畫：[`PLAN-ch03-s31-video.md`](PLAN-ch03-s31-video.md)（工程節奏沿用、密度假設被本檔取代）
 - 密度稽核：[`REVIEW-ch03-s31-density-audit.html`](REVIEW-ch03-s31-density-audit.html)

@@ -25,7 +25,7 @@
 | act/stage 切換提示 | `divider` | 一次性 stinger，不作為連續背景音。 |
 | caution 短提示 | `callout` with `type: caution` | 只在少數 notation trap / caution 場景使用，避免每個 callout 都響。 |
 
-所有內容教學模板仍依 [`../../../../DESIGN.md`](../../../../DESIGN.md) 的 Audio policy
+所有內容教學模板仍依 [`../../../../DESIGN.md`](../../../../../legacy/manim_video/DESIGN.md) 的 Audio policy
 維持 narration-first：`definition_math`、`theorem_proof`、`procedure_steps`、
 `derivation`、`value_table`、`sign_chart` 不放 BGM；`graph` 只在大型視覺轉換
 需要時才可搭配極淡 whoosh。

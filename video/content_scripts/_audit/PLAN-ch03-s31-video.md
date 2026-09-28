@@ -28,7 +28,7 @@
 - **已決定、不要再議：** 只做 §3.1 一節（跳過 ch02，使用者裁決）；走完整兩階段方法論；終點＝mock 成片、**TTS 延後**；deck id＝`ch03_trig_derivatives`；分支不另開。
 - **關鍵範本（照抄結構與風格）：**
   - 內容稿格式：`git show 9329a0b:video/content_scripts/ch01_inverse_functions.md`（header＋meta＋`### unit:`＋圍欄欄位；格式契約見 `CONTENT_METHODOLOGY.md` §6）。
-  - 工程 storyboard 格式／旁白風格／reveal marker：[`video/storyboards/ch01_inverse_functions.yml`](../../storyboards/ch01_inverse_functions.yml)（同分支唯一正典 storyboard，檔頭有 decomposition fold 註記範例）。
+  - 工程 storyboard 格式／旁白風格／reveal marker：[`video/storyboards/ch01_inverse_functions.yml`](../../../legacy/manim_video/storyboards/ch01_inverse_functions.yml)（同分支唯一正典 storyboard，檔頭有 decomposition fold 註記範例）。
   - `_narration.html` 審核稿樣板：第一次編時定版（MathJax/KaTeX CDN、逐單元列 narration、可展開 learning_goal/visual_need/animation_cue），之後沿用。
 - **§3.1 教學重量：** 幾何＋符號各半（**非** symbol-heavy，三張圖都吃重）→ 全視覺處理，不套 §5 symbol-heavy 條件化。
 

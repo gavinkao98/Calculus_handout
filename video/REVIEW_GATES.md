@@ -5,14 +5,19 @@
 > [RUNBOOK-mimo-narration-route.md](RUNBOOK-mimo-narration-route.md)、[REBUILD_STATUS.md](REBUILD_STATUS.md) 與
 > 根目錄 [`../CLAUDE.md`](../CLAUDE.md)／[`../README.md`](../README.md) 的審核機制收斂成一張表，方便一眼看全貌。
 > 整理日期：2026-06-15。內容若與 home doc 牴觸，以 home doc 為準，並回頭修本檔。
+>
+> **2026-09-28 Remotion 統一後的狀態標記**（契約＝[`KICKOFF-remotion-unification.md`](KICKOFF-remotion-unification.md)）：Manim gen-2 引擎已封存到
+> [`../legacy/manim_video/`](../legacy/manim_video/)。本檔各閘加標——**〔Manim gen-2 閘，已封存〕**＝閘的程式隨引擎進了 legacy，表列內容只存歷史；
+> **〔沿用，待接 Remotion〕**＝內容層閘，契約不變，但它讀的 storyboard／成片佈局是 Manim 時代的，接 Remotion 分鏡／成片另開輪次
+> （KICKOFF §6）。**層 5（manim hook code）整層退役。** Remotion 版的 render 前閘與 `[sync]` 對等閘尚未定義，由 §3.2 Phase B 的 Remotion 版 KICKOFF 定。
 
 ## 總綱
 
-產線分**七個產物層**，每層各有審核閘。能真正**擋住 render** 的只有 storyboard/timing 與兩軌 parity 的幾個**自動腳本閘**；
+產線分**七個產物層**，每層各有審核閘。能真正**擋住 render** 的只有 storyboard/timing 與兩軌 parity 的幾個**自動腳本閘**（其中 storyboard/timing 的 schema／lint／sizecheck／`[sync]` 已隨 Manim 封存）；
 內容／旁白／視覺層全為 **advisory**——模型（Codex / MiMo / Claude）或人提案，最後由人裁決，**稽核者一律唯讀、不自己改檔**。
 **2026-09-13 補**：層 7 另有一道確定性硬閘 `rewatch_pack --gate-still`（POST-render），它擋的不是 render，而是**該輪的完成**（見 §六）。
 
-流向：講義散文 →（Stage-1）內容稿 → 旁白稿 → 口語版 → manim hook code → storyboard/timing → render 成品。（「Mode」一詞專留講義 A/B/C；影片內容稿階段稱 **Stage-1**——見 [REVIEW_MODEL_DECISIONS.md](REVIEW_MODEL_DECISIONS.md) 詞彙紀律。）
+流向：講義散文 →（Stage-1）內容稿 → 旁白稿 → 口語版 → 分鏡／timing → render 成品（2026-09-28 起渲染＝Remotion；Manim 時代在口語版與 storyboard 之間另有「manim hook code」一層＝層 5，已退役）。（「Mode」一詞專留講義 A/B/C；影片內容稿階段稱 **Stage-1**——見 [REVIEW_MODEL_DECISIONS.md](REVIEW_MODEL_DECISIONS.md) 詞彙紀律。）
 
 **Phase 索引**（同一條線的四段粗分，方便對話指稱；不是新狀態機）：
 
@@ -20,12 +25,12 @@
 |---|---|---|
 | Content | 層 2–3 | six-lens、copyedit、旁白 sign-off（lock） |
 | Derivation | 層 4 | derive parity、NFA |
-| Storyboard | 層 5–6 | 工程鏡、schema/lint/sizecheck、pedagogy/OTF/SC、amplification |
-| Render | 層 7 | 視覺 gate1/gate2、人工驗收 |
+| Storyboard | 層 6（層 5 已退役） | pedagogy/OTF/SC、amplification（沿用，待接 Remotion）；工程鏡與 schema/lint/sizecheck 已封存 |
+| Render | 層 7 | 視覺 gate1、REWATCH、`--gate-still`（沿用，待接 Remotion）、人工驗收；VLM gate2（`critic.py`）已封存 |
 
 圖例：**■ 自動腳本・可擋 render**　**□ LLM 稽核・advisory**　**◆ 人工閘**　**◷ 未建（TODO）**
 
-> **gate 1 具名 subagent（2026-06-17；2026-06-30 補 pedagogy）：** 五道判斷閘的 gate1 已可用 `.claude/agents/` 具名 subagent 跑（唯讀 `Read/Grep/Glob`、薄提示引用各 SSOT rubric，比照講義 `handout-prose-audit`）：[`narration-faithfulness-audit`](../.claude/agents/narration-faithfulness-audit.md)（NFA）、[`narration-copyedit`](../.claude/agents/narration-copyedit.md)、[`visual-frame-audit`](../.claude/agents/visual-frame-audit.md)、[`hook-engineering-audit`](../.claude/agents/hook-engineering-audit.md)、[`pedagogy-firstlearner-audit`](../.claude/agents/pedagogy-firstlearner-audit.md)（讀 storyboard＋cited `.md`＋handout，PRE-render；與讀 render 後幀的 `visual-frame-audit` 同 gate1 tier、不同 stage）。**另有 [`video-amplification-audit`](../.claude/agents/video-amplification-audit.md)（敘述放大機會稽核、propose-not-act、永不 blocking；2026-07-01）。** 六鏡維持 multi-agent Workflow；gate2（Codex／外部 VLM）是外部模型、**不是** subagent（仍走 `codex exec`／`critic.py --confirm`，thin-prompt 模板 `PROMPT-narration-*.template.md` 留給 Codex gate2）。
+> **gate 1 具名 subagent（2026-06-17；2026-06-30 補 pedagogy）：** 五道判斷閘（2026-09-28 工程鏡退役後剩四道）的 gate1 已可用 `.claude/agents/` 具名 subagent 跑（唯讀 `Read/Grep/Glob`、薄提示引用各 SSOT rubric，比照講義 `handout-prose-audit`）：[`narration-faithfulness-audit`](../.claude/agents/narration-faithfulness-audit.md)（NFA）、[`narration-copyedit`](../.claude/agents/narration-copyedit.md)、[`visual-frame-audit`](../.claude/agents/visual-frame-audit.md)、`hook-engineering-audit`（2026-09-28 隨層 5 退役、定義檔已刪）、[`pedagogy-firstlearner-audit`](../.claude/agents/pedagogy-firstlearner-audit.md)（讀 storyboard＋cited `.md`＋handout，PRE-render；與讀 render 後幀的 `visual-frame-audit` 同 gate1 tier、不同 stage）。**另有 [`video-amplification-audit`](../.claude/agents/video-amplification-audit.md)（敘述放大機會稽核、propose-not-act、永不 blocking；2026-07-01）。** 六鏡維持 multi-agent Workflow；gate2（Codex／外部 VLM）是外部模型、**不是** subagent（仍走 `codex exec`；外部 VLM 的 `critic.py --confirm` 已隨 Manim 封存；thin-prompt 模板 `PROMPT-narration-*.template.md` 留給 Codex gate2）。
 
 ---
 
@@ -49,56 +54,59 @@
 
 | 閘 | 執行者 | 性質 | 把關內容 | 權威文檔 |
 |---|---|---|---|---|
-| `derive_spoken.py --check` | 確定性腳本（離線、免費） | ■（擋，exit 1） | 兩軌 parity：每個 canonical say 對齊（無漏／多 id）、`{show}` 標記逐一一致、無 `$`／LaTeX 漏進口語。每次改 `spoken.yml` 後重跑 | [README.md](README.md) §MiMo 路線、[DESIGN.md](DESIGN.md)；步驟見 [RUNBOOK-mimo-narration-route.md](RUNBOOK-mimo-narration-route.md) step 2 |
+| **〔沿用；只適用「正典＋口語」雙軌的節——正典 storyboard 已隨 Manim 封存，Remotion 分鏡直接寫口語時沒有這道〕** `derive_spoken.py --check` | 確定性腳本（離線、免費） | ■（擋，exit 1） | 兩軌 parity：每個 canonical say 對齊（無漏／多 id）、`{show}` 標記逐一一致、無 `$`／LaTeX 漏進口語。每次改 `spoken.yml` 後重跑 | [README.md](README.md) §MiMo 路線、[DESIGN.md](DESIGN.md)；步驟見 [RUNBOOK-mimo-narration-route.md](RUNBOOK-mimo-narration-route.md) step 2 |
 | NFA 旁白忠實稽核（lock 後；原 Mode B） | gate1 Claude subagent（免費、迭代到 blocking==0；reader 拆法見 rubric）→ gate2 Codex（計費、收斂後單次、需同意；ch01 記錄 gpt-5.5 reasoning xhigh） | □（每條標 [Blocking｜Advisory]；收斂＝**blocking==0**） | 七維 D1–D7：D1 HTML 逐字忠實、D2 口語逐字等同（只把數學符號念成字）、D3 數學唸法（`f^{-1}` 須念「f inverse」）、D7 數學正確（`CONTENT_APPROVED=no` 時必跑、獨立重算、開隔離盲 reader）。**不得改已核可 source**；裁決寫進修正 commit body（`git log --grep="NFA"`） | **SSOT [NARRATION-FAITHFULNESS-RUBRIC.md](content_scripts/_audit/NARRATION-FAITHFULNESS-RUBRIC.md)**；thin prompt [PROMPT-narration-faithfulness.template.md](content_scripts/_audit/PROMPT-narration-faithfulness.template.md)；commit 慣例 [`../CLAUDE.md`](../CLAUDE.md) |
 
-### 層 5｜manim hook code（生成動畫程式）
+### 層 5｜manim hook code（生成動畫程式）——**已退役（2026-09-28）**
+
+> Manim gen-2 的 `hook:` 機制隨引擎封存；工程鏡 rubric 在 [`HOOK-ENGINEERING-RUBRIC.md`](../legacy/manim_video/content_scripts/_audit/HOOK-ENGINEERING-RUBRIC.md)（legacy），
+> `hook-engineering-audit` agent 已刪。Remotion 場景 code 的稽核閘待定（見 [`CONTENT_METHODOLOGY.md`](CONTENT_METHODOLOGY.md) §5）。下表只存歷史。
 
 | 閘 | 執行者 | 性質 | 把關內容 | 權威文檔 |
 |---|---|---|---|---|
-| 工程鏡（生成 hook code 稽核） | gate1 Claude subagent（免費、讀 `review_pack.py` 組的 engineering packet）→ gate2 Codex（計費、收斂後單次、需同意） | □（收斂＝**engineering blocking==0**） | **單鏡頭**：只看生成 hook code 的數學保真（E1，blocking）與慣例（E2；theme primitive 不用 hex、實心／空心點語義、SAFE_MARGIN），**不看美學**（歸 VISUAL-FRAME）。與 VISUAL-FRAME **V8 邊界**配對：V8 查幀上可見數學、本鏡查生成它的 code。**2026-06-16**：DeepSeek 退場、改兩讀者；忠實／語域／拆解三鏡已歸 CONTENT-SIXLENS；math context 改吃內容稿動畫單元 narration／`source`（脫離已搬 `legacy/` 的 `.tex`） | **SSOT [HOOK-ENGINEERING-RUBRIC.md](content_scripts/_audit/HOOK-ENGINEERING-RUBRIC.md)**；assembler [pipeline/review_pack.py](pipeline/review_pack.py) |
+| **〔已退役〕** 工程鏡（生成 hook code 稽核） | gate1 Claude subagent（免費、讀 `review_pack.py` 組的 engineering packet）→ gate2 Codex（計費、收斂後單次、需同意） | □（收斂＝**engineering blocking==0**） | **單鏡頭**：只看生成 hook code 的數學保真（E1，blocking）與慣例（E2；theme primitive 不用 hex、實心／空心點語義、SAFE_MARGIN），**不看美學**（歸 VISUAL-FRAME）。與 VISUAL-FRAME **V8 邊界**配對：V8 查幀上可見數學、本鏡查生成它的 code。**2026-06-16**：DeepSeek 退場、改兩讀者；忠實／語域／拆解三鏡已歸 CONTENT-SIXLENS；math context 改吃內容稿動畫單元 narration／`source`（脫離已搬 `legacy/` 的 `.tex`） | **SSOT [HOOK-ENGINEERING-RUBRIC.md](../legacy/manim_video/content_scripts/_audit/HOOK-ENGINEERING-RUBRIC.md)**；assembler [pipeline/review_pack.py](pipeline/review_pack.py) |
 
 ### 層 6｜storyboard／timing
 
 | 閘 | 執行者 | 性質 | 把關內容 | 權威文檔 |
 |---|---|---|---|---|
-| `lint.py` | 腳本，make.py render 前跑（`--skip-lint` 可繞） | ■ error／warn | error（abort）：純文字欄出現 `$`／反斜線、`$` 不成對；warn：手動 `\\`、空心點用在已達值 | [DESIGN.md](DESIGN.md)、[README.md](README.md) |
-| `sizecheck.py` | 腳本，與 lint 並行（`--skip-sizecheck` 可繞） | ■ error／warn | error（abort）：同層 prose 字級不一、元素出框；warn：教學散文用 muted 色、超安全邊界、內容塊重疊。**盲點**：**這幾項**只查 `brand.prose`，不查直接構造的 `MathTex/Text`（2026-09-14 T3 起，新增的 L1 結論字級規則走全樹 `_type_nodes`、不受此限；下一列）。**並行安全（2026-09-14 r2 Task H）**：本閘建 Tex 的整段由 [`pipeline/texlock.py`](pipeline/texlock.py) 的 per-cwd 檔案鎖（`<media_dir>/Tex.lock`）互斥，同一 cwd 的第二支**等待**（每 10 s 印 `[texlock] waiting for pid N …`）而不再吐假的 `ERROR … could not build scene`；`make.py` 的 preflight 與 render、`critic.py --per scene`、`scratch_frames.py` 同掛，跨 worktree／跨 cwd 天然不互斥 | [DESIGN.md](DESIGN.md)；source [pipeline/texlock.py](pipeline/texlock.py)＋測試 [pipeline/_selftest_texlock.py](pipeline/_selftest_texlock.py) |
-| `sizecheck.py` fontfloor 最小字級 floor | 腳本，與 sizecheck 同跑（make.py-time、確定性） | ■ warn（warn-default；`meta.fontfloor_enforce` 開才 error／abort，預設關、landing 不擋） | 浮現「真實上螢幕字級 < `MIN_FONT_FLOOR`＝26px」的 `_brand_prose` 節點（render 前的工程對應物）；配 render 期 clamp（把縮過頭的節點托回 floor）＋ agent 在幀上肉眼施作的**手機寬尺標**（P6，~360–414px 視窗仍要讀得到）。與 VISUAL-FRAME V4／A6 配對：floor 浮現「小到讀不到」、V4 升 blocking／A6 扣分。**執行期＝`floorprobe`**（2026-09-14）：本列量的是 **build 佈局的 authored px**，`carry: to.scale`／hook 自建 `MathTex`／`\tfrac` scriptstyle 內縮／執行期 `.scale()` 它都看不到；`pipeline/floorprobe.py` 掛在 `scene.py` 每拍末與 `_tail` 前走 scene 的 mobject 樹補量，render 後由 `make.py` 印 `[floorprobe] …`，**永遠 warn-only**（幀已畫完，無可擋者）、無 `_enforce` 旗標 | [pipeline/visuals/theme.py](pipeline/visuals/theme.py)（`MIN_FONT_FLOOR`，SPEC §8）／[pipeline/sizecheck.py](pipeline/sizecheck.py)（floor check）／[pipeline/floorprobe.py](pipeline/floorprobe.py)＋[pipeline/_selftest_floorprobe.py](pipeline/_selftest_floorprobe.py)（執行期）／[pipeline/brand.py](pipeline/brand.py)；rubric [VISUAL-FRAME-RUBRIC.md](content_scripts/_audit/VISUAL-FRAME-RUBRIC.md) V4／A6 |
-| `sizecheck.py` 設計系統規則（LayoutRules L1–L3／MathRules M1–M3；**2026-09-14 T3 新增**） | 腳本，與 sizecheck 同跑（build-only、確定性、不 render） | ■ warn（**六條全部 warn-default**；`meta.layout_enforce` 開才把 L 系升 error／abort、`meta.mathtype_enforce` 開才升 M 系，兩者預設關、landing 不擋） | 把設計畫布九條規則裡**可確定性判定的六條**落成閘。**L1** 結論（`result`／`qed` 區塊）字級被鋪陳元素壓過 ≥ `L1_WEIGHT_RATIO`=1.15 倍（量的是**全樹** `_effective_font_px`，不是只看 `brand.prose`——結論多半是 `math_line` 的 `MathTex`；masthead 與 decoration 層不算鋪陳）／**L2** 下三分之一的 bbox 聯集覆蓋 < `L2_MIN_FILL`=15%／**L3** 主內容寬 < `L3_MAIN_W_FRAC`=58% 又沒開 `aside:`、也沒置中／**M1** 數學欄位含 `\text{}`／`\mbox{}` 或連續兩個以上裸英文字／**M2** 同一個 `reason` 同時有 `$…$` 與裸英文（語域混用）／**M3** 已知運算元名寫成裸字母（`sin` 而非 `\sin`）。**L 系讀 build 出的幾何、M 系讀 storyboard 原文。** 分流表見下方。**升硬閘的條件**＝某節自行開 `meta.<flag>_enforce: true` 跑完一輪零誤報，**下一輪才討論改預設**（T3 本輪明確不改預設） | [DESIGN.md](DESIGN.md) §設計系統規則落地；規則原文 [`_audit/design-template-system/LayoutRules.dc.html`](_audit/design-template-system/LayoutRules.dc.html)／[`MathRules.dc.html`](_audit/design-template-system/MathRules.dc.html)；source [pipeline/sizecheck.py](pipeline/sizecheck.py)；測試 [pipeline/_selftest_layout_rules.py](pipeline/_selftest_layout_rules.py)＋fixture [storyboards/_fixtures/layout_rules.yml](storyboards/_fixtures/layout_rules.yml) |
-| `schema.py` | 腳本，make.py render 前跑（`--skip-schema` 可繞） | ■ error／warn | **已建（2026-06-16）**：結構驗證（meta.id／section 必填、scene kind∈intro/content/divider/outro、id 唯一、content 需 template＋say、`{show}` 不閉合→error）＋列舉每場 `{show}` reveal 目標（`--list`）。**不**驗 target 是否存在於模板 payload（需 `reveal_targets()`／manim，屬 task #6）。**2026-06-30 增掛（2026-07-01 加 SC）**：OTF provenance／pedagogy ＋ **SC step-coverage** 結構 warn-checks 在此並跑（warn-default，`meta.otf_enforce`／`meta.pedagogy_enforce`／`meta.coverage_enforce` 開才 abort、預設關），即下方 `pedagogy-firstlearner-audit` 判斷閘的確定性底材。**2026-09-12 增掛 `source_rev`**（LOCKED 內容稿標頭的講義源 stamp vs 現檔；**永遠 warn-only**，WARN＝走 CONTENT_METHODOLOGY §8；`make.py`／`derive_spoken.py` 同掛）；`doc:` 錨池改為凍結 legacy standalone ∪ `.tex` label key（`doc:sec:`／`thm:`／`fig:`…）；`<deck>_mimo` 的 md／SC／source_rev 查找統一走 `provenance.content_script_for`。**2026-09-12 增掛 `example_coverage`（EX 層，例題折疊宣告閘）**：講義該節的 worked example（`\begin{envexample}{…}{ex:…}{}`，按 `\sechead` 區間歸節——**`ex:` 是章序不是節序**）比對內容稿單元的 `examples:`／`folds:` 宣告；EX1＝既沒教也沒折（`meta.example_coverage_enforce` 開才 error）、EX2＝宣告不成立（恆 warn）。**只接在此、不接 `make.py`**（同 SC：例題選材是撰稿期決定，不擋 render）；deck 無 `.md` 整個跳過。**閘只查宣告存不存在，不判折疊對不對**——語意歸下方 `pedagogy-firstlearner-audit` 的 `EX-adv` 與 REWATCH R5。**2026-09-14 增掛 `paced` 無 rail warn**（`_paced_no_rail_issues`）：`paced:` 列出的 derivation `anim: transform`／`cancel` 列若沒有 `reason`，它沒有 rail 可隨讀——morph 播完、整拍 hold；恆 warn，不擋 render。**這條只能由 schema 出聲**：`make.py` 的 `[stillness]` 對列在 `paced:` 的 reveal 一律免檢，看不到這種「宣告 paced、實際整拍靜止」的拍（§8 backlog ⑯）。**2026-09-14 r2 Task I 補閘覆蓋（兩個模板盲區）**：(a) provenance 的 `_present_text_fields` 加掃 **`procedure_steps` 的 `steps[].text`**（該模板把每個 step 的 text 以 `brand.prose` 上畫面，在此之前它一個文字欄都沒被掃——OF2 對該模板等於空跑，`ch03_chain_rule` 的 `decomposition_strategy` 整場無 `ref:` 也沒被報）；`math`／`worked[]` 是數學不掃，且**以 `template:` 為閘**（`steps[]` 與 derivation／worked_example 共用）。(b) `step_coverage._SCOPED_TEMPLATES` 加 **`procedure_steps`**（`coverage_enforce` 下「單元必須有 `screen_contract`」的模板集；SC1／SC2 本身與模板無關）；**`definition_math` 本輪不加**——單一陳述框不是步驟序列、全 23 deck 無一個 definition 單元宣告 `required_steps`，且 `ch03_trig_derivatives{,_mimo}` 已開 `coverage_enforce`，加了會立刻多 6 條 `[SC]` error（r3 再議）。(c) **`screen_contract` 解不開不再靜默**：`_screen_contract.parse_block` 對 YAML 語法錯回 `ParseError`（非 `None`），SC 印成獨立的 `[SC] <unit>: screen_contract failed to parse -- <err>`，**恆 error、不吃 `coverage_enforce`**（契約壞掉是撰稿 bug，不是可 opt-out 的覆蓋政策），且該單元不再同時被報成「沒寫契約」——原本一個非法轉義（§3.2 實踩雙引號 `tex:` 裡的 `\c`）會讓整份契約從閘視野消失、訊息把人導向「去寫一份」。deck 級 smoke＝`python tools/doctor.py --smoke`、模組級＝`python video/pipeline/run_selftests.py` | [DESIGN.md](DESIGN.md)、[README.md](README.md)；source [pipeline/schema.py](pipeline/schema.py)（provenance／pedagogy／coverage／example_coverage 落地 [pipeline/provenance.py](pipeline/provenance.py)／[pipeline/pedagogy.py](pipeline/pedagogy.py)／[pipeline/step_coverage.py](pipeline/step_coverage.py)／[pipeline/example_coverage.py](pipeline/example_coverage.py)） |
-| `pedagogy-firstlearner-audit`（初學者教學＋上畫面文字忠實） | gate1 Claude subagent（免費；讀 storyboard＋cited `.md`＋handout，**PRE-render**；同 `visual-frame-audit` 的免費 gate1 tier、但不同 stage——它讀 render 後幀，本閘讀 storyboard 源） | □（PD／OF／SC blocking 分開計數；warn-default、per-deck opt-in，landing 不擋） | PD1–PD4 教學品質（beat 粒度、`scaffold.motive` 動機、divider `scaffold.problem`、前提首用 `scaffold.flag`）＋ OF1–OF2 上畫面文字 vs 核准源忠實／可回溯 ＋ **SC1–SC2／SC-honesty／SC-adv 推導步驟覆蓋**（storyboard `covers:` vs `.md screen_contract`：漏步驟／缺 recap／覆蓋誠實；可合併不可掉）；確定性底材＝上列 `schema.py` 並跑的 provenance／pedagogy／**coverage** warn-checks（gate-1 自有 blocking＝PD1＋OF1＋**SC-honesty**，其餘結構存在性由確定性層算、本閘 surface＋給脈絡）。**確定性層看不見的仍要本閘自己看**：`procedure_steps` 的 `steps[].text` 與 `_SCOPED_TEMPLATES` 於 2026-09-14（r2 Task I）才入確定性層，`definition_math` 至今不在 SC 的 contract-必要模板集內 | **SSOT [PEDAGOGY-FIRSTLEARNER-RUBRIC.md](content_scripts/_audit/PEDAGOGY-FIRSTLEARNER-RUBRIC.md)**；agent [`../.claude/agents/pedagogy-firstlearner-audit.md`](../.claude/agents/pedagogy-firstlearner-audit.md) |
-| **REWATCH 看片多鏡評審**（成片品質；2026-09-12 首用、**2026-09-13 起＝里程碑審**） | POST-render：`pipeline/rewatch_pack.py` 把成片翻成 pack（逐場 contact sheet＋時間軸＋靜止統計）→ 五鏡獨立盲審（R1 初學者×2／R2 動畫導演／R3 教學設計／R4 節奏剪輯／R5 講師；跨 Gemini／Claude 家族：agy ×3＋subagent ×3）→ orchestrator refute-by-default 合成 | □（advisory；**永不 blocking**；餵重做水位裁決） | 唯一「看過影片本身」的審：時間、停留、畫面是否隨數學演化、跟不跟得上；不重審忠實／數學（歸 NFA／L5／OF）。首用＝§3.1 成片（`REVIEW-ch03_s31-rewatch-multilens.html`）。**2026-09-13 起 finding 可標畫面語法規則代號 `rule: ML1`–`ML5`（R2 MUST；[SPEC-motion-language.md](SPEC-motion-language.md)），digest `by_rule` 按規則計數**。**頻率＝里程碑審（2026-09-13 裁決）：一節收斂時跑一次完整六鏡；輪內不跑，改用上一輪 finding 的回歸清單（見 §六 6.2）** | **SSOT [REWATCH-REVIEW-RUBRIC.md](content_scripts/_audit/REWATCH-REVIEW-RUBRIC.md)**；template [PROMPT-rewatch.template.md](content_scripts/_audit/PROMPT-rewatch.template.md)；schema `rewatch-findings.schema.json`；agy 呼叫紀律見根 CLAUDE.md |
-| `video-amplification-audit`（敘述放大機會稽核；expansion 層 M2） | gate1 Claude subagent（免費；讀 storyboard＋cited `.md`＋handout `expansion:*`，**PRE-render**、propose-not-act） | □（AMP1 advisory；**永不 blocking**、只提候選、逐筆人裁） | 掃 handout `expansion:intuition`／`application` 判影片四態（screened／narration-only／visual-only／missing），只提 `missing` 的承重直覺（綁 `doc:` ＋標記短引文）；correctness caution 路由假設機制、example 歸 `example-supplement`。講義線 `mode-c-gapwalk` 的影片側對應，產 standalone HTML 裁決稿 | **SSOT [AMPLIFICATION-RUBRIC.md](content_scripts/_audit/AMPLIFICATION-RUBRIC.md)**；agent [`../.claude/agents/video-amplification-audit.md`](../.claude/agents/video-amplification-audit.md) |
-| make.py manifest-freshness（`--reuse-audio`） | 腳本 | ■（fail-fast） | 比對 manifest 與 `<deck>_mimo.yml`（deck id／scene／beat 數／`{show}`／text_hash／WAV 存在與時長），防複用過期音檔；非 reuse 跑時拒絕用 mock 覆蓋真 manifest | [DESIGN.md](DESIGN.md)、[README.md](README.md)；RUNBOOK step 4 |
-| sync guard（**2026-09-13 起 render 後＝硬閘**） | 腳本（`pipeline/timing.py` 常數） | ■ | **render 前**：短 beat／純 reveal beat 的啟發式**仍是 warn**（`[sync] short/reveal-only beat`，不擋）。**render 後（硬閘）**：ffprobe 實測每個 content 場的影片長度，與 expected 的偏差 > `SYNC_HARD_GATE_FRAMES`＝**2 影格**（fps 由 ffprobe **對成品實測**、不是猜的；㉑ 成片 30 fps＝0.067 s）→ **ERROR、compose 前 abort**（原為 warn）。旁白長過影片的既有 fatal 不變；手改 manifest 的 beat 總和檢查沿用 `SYNC_TOLERANCE_SECONDS`＝0.12 s。**依據**：㉑ 成片 21 場實測最大偏差剛好 1.0 影格、4 場貼線，1 影格零餘裕 | [DESIGN.md](DESIGN.md)、[README.md](README.md)、**本檔 §六**；RUNBOOK step 4 |
+| **〔Manim gen-2 閘，已封存〕** `lint.py` | 腳本，make.py render 前跑（`--skip-lint` 可繞） | ■ error／warn | error（abort）：純文字欄出現 `$`／反斜線、`$` 不成對；warn：手動 `\\`、空心點用在已達值 | [DESIGN.md](../legacy/manim_video/DESIGN.md)、[README.md](README.md) |
+| **〔Manim gen-2 閘，已封存〕** `sizecheck.py` | 腳本，與 lint 並行（`--skip-sizecheck` 可繞） | ■ error／warn | error（abort）：同層 prose 字級不一、元素出框；warn：教學散文用 muted 色、超安全邊界、內容塊重疊。**盲點**：**這幾項**只查 `brand.prose`，不查直接構造的 `MathTex/Text`（2026-09-14 T3 起，新增的 L1 結論字級規則走全樹 `_type_nodes`、不受此限；下一列）。**並行安全（2026-09-14 r2 Task H）**：本閘建 Tex 的整段由 [`pipeline/texlock.py`](../legacy/manim_video/pipeline/texlock.py) 的 per-cwd 檔案鎖（`<media_dir>/Tex.lock`）互斥，同一 cwd 的第二支**等待**（每 10 s 印 `[texlock] waiting for pid N …`）而不再吐假的 `ERROR … could not build scene`；`make.py` 的 preflight 與 render、`critic.py --per scene`、`scratch_frames.py` 同掛，跨 worktree／跨 cwd 天然不互斥 | [DESIGN.md](../legacy/manim_video/DESIGN.md)；source [pipeline/texlock.py](../legacy/manim_video/pipeline/texlock.py)＋測試 [pipeline/_selftest_texlock.py](../legacy/manim_video/pipeline/_selftest_texlock.py) |
+| **〔Manim gen-2 閘，已封存〕** `sizecheck.py` fontfloor 最小字級 floor | 腳本，與 sizecheck 同跑（make.py-time、確定性） | ■ warn（warn-default；`meta.fontfloor_enforce` 開才 error／abort，預設關、landing 不擋） | 浮現「真實上螢幕字級 < `MIN_FONT_FLOOR`＝26px」的 `_brand_prose` 節點（render 前的工程對應物）；配 render 期 clamp（把縮過頭的節點托回 floor）＋ agent 在幀上肉眼施作的**手機寬尺標**（P6，~360–414px 視窗仍要讀得到）。與 VISUAL-FRAME V4／A6 配對：floor 浮現「小到讀不到」、V4 升 blocking／A6 扣分。**執行期＝`floorprobe`**（2026-09-14）：本列量的是 **build 佈局的 authored px**，`carry: to.scale`／hook 自建 `MathTex`／`\tfrac` scriptstyle 內縮／執行期 `.scale()` 它都看不到；`pipeline/floorprobe.py` 掛在 `scene.py` 每拍末與 `_tail` 前走 scene 的 mobject 樹補量，render 後由 `make.py` 印 `[floorprobe] …`，**永遠 warn-only**（幀已畫完，無可擋者）、無 `_enforce` 旗標 | [pipeline/visuals/theme.py](../legacy/manim_video/pipeline/visuals/theme.py)（`MIN_FONT_FLOOR`，SPEC §8）／[pipeline/sizecheck.py](../legacy/manim_video/pipeline/sizecheck.py)（floor check）／[pipeline/floorprobe.py](../legacy/manim_video/pipeline/floorprobe.py)＋[pipeline/_selftest_floorprobe.py](../legacy/manim_video/pipeline/_selftest_floorprobe.py)（執行期）／[pipeline/brand.py](../legacy/manim_video/pipeline/brand.py)；rubric [VISUAL-FRAME-RUBRIC.md](content_scripts/_audit/VISUAL-FRAME-RUBRIC.md) V4／A6 |
+| **〔Manim gen-2 閘，已封存〕** `sizecheck.py` 設計系統規則（LayoutRules L1–L3／MathRules M1–M3；**2026-09-14 T3 新增**） | 腳本，與 sizecheck 同跑（build-only、確定性、不 render） | ■ warn（**六條全部 warn-default**；`meta.layout_enforce` 開才把 L 系升 error／abort、`meta.mathtype_enforce` 開才升 M 系，兩者預設關、landing 不擋） | 把設計畫布九條規則裡**可確定性判定的六條**落成閘。**L1** 結論（`result`／`qed` 區塊）字級被鋪陳元素壓過 ≥ `L1_WEIGHT_RATIO`=1.15 倍（量的是**全樹** `_effective_font_px`，不是只看 `brand.prose`——結論多半是 `math_line` 的 `MathTex`；masthead 與 decoration 層不算鋪陳）／**L2** 下三分之一的 bbox 聯集覆蓋 < `L2_MIN_FILL`=15%／**L3** 主內容寬 < `L3_MAIN_W_FRAC`=58% 又沒開 `aside:`、也沒置中／**M1** 數學欄位含 `\text{}`／`\mbox{}` 或連續兩個以上裸英文字／**M2** 同一個 `reason` 同時有 `$…$` 與裸英文（語域混用）／**M3** 已知運算元名寫成裸字母（`sin` 而非 `\sin`）。**L 系讀 build 出的幾何、M 系讀 storyboard 原文。** 分流表見下方。**升硬閘的條件**＝某節自行開 `meta.<flag>_enforce: true` 跑完一輪零誤報，**下一輪才討論改預設**（T3 本輪明確不改預設） | [DESIGN.md](../legacy/manim_video/DESIGN.md) §設計系統規則落地；規則原文 [`_audit/design-template-system/LayoutRules.dc.html`](../legacy/manim_video/_audit/design-template-system/LayoutRules.dc.html)／[`MathRules.dc.html`](../legacy/manim_video/_audit/design-template-system/MathRules.dc.html)；source [pipeline/sizecheck.py](../legacy/manim_video/pipeline/sizecheck.py)；測試 [pipeline/_selftest_layout_rules.py](../legacy/manim_video/pipeline/_selftest_layout_rules.py)＋fixture [storyboards/_fixtures/layout_rules.yml](../legacy/manim_video/storyboards/_fixtures/layout_rules.yml) |
+| **〔Manim gen-2 閘，已封存；它掛的 provenance／pedagogy／coverage／source_rev／example_coverage 檢查器留在 `pipeline/`＝沿用，待接 Remotion〕** `schema.py` | 腳本，make.py render 前跑（`--skip-schema` 可繞） | ■ error／warn | **已建（2026-06-16）**：結構驗證（meta.id／section 必填、scene kind∈intro/content/divider/outro、id 唯一、content 需 template＋say、`{show}` 不閉合→error）＋列舉每場 `{show}` reveal 目標（`--list`）。**不**驗 target 是否存在於模板 payload（需 `reveal_targets()`／manim，屬 task #6）。**2026-06-30 增掛（2026-07-01 加 SC）**：OTF provenance／pedagogy ＋ **SC step-coverage** 結構 warn-checks 在此並跑（warn-default，`meta.otf_enforce`／`meta.pedagogy_enforce`／`meta.coverage_enforce` 開才 abort、預設關），即下方 `pedagogy-firstlearner-audit` 判斷閘的確定性底材。**2026-09-12 增掛 `source_rev`**（LOCKED 內容稿標頭的講義源 stamp vs 現檔；**永遠 warn-only**，WARN＝走 CONTENT_METHODOLOGY §8；`make.py`／`derive_spoken.py` 同掛）；`doc:` 錨池改為凍結 legacy standalone ∪ `.tex` label key（`doc:sec:`／`thm:`／`fig:`…）；`<deck>_mimo` 的 md／SC／source_rev 查找統一走 `provenance.content_script_for`。**2026-09-12 增掛 `example_coverage`（EX 層，例題折疊宣告閘）**：講義該節的 worked example（`\begin{envexample}{…}{ex:…}{}`，按 `\sechead` 區間歸節——**`ex:` 是章序不是節序**）比對內容稿單元的 `examples:`／`folds:` 宣告；EX1＝既沒教也沒折（`meta.example_coverage_enforce` 開才 error）、EX2＝宣告不成立（恆 warn）。**只接在此、不接 `make.py`**（同 SC：例題選材是撰稿期決定，不擋 render）；deck 無 `.md` 整個跳過。**閘只查宣告存不存在，不判折疊對不對**——語意歸下方 `pedagogy-firstlearner-audit` 的 `EX-adv` 與 REWATCH R5。**2026-09-14 增掛 `paced` 無 rail warn**（`_paced_no_rail_issues`）：`paced:` 列出的 derivation `anim: transform`／`cancel` 列若沒有 `reason`，它沒有 rail 可隨讀——morph 播完、整拍 hold；恆 warn，不擋 render。**這條只能由 schema 出聲**：`make.py` 的 `[stillness]` 對列在 `paced:` 的 reveal 一律免檢，看不到這種「宣告 paced、實際整拍靜止」的拍（§8 backlog ⑯）。**2026-09-14 r2 Task I 補閘覆蓋（兩個模板盲區）**：(a) provenance 的 `_present_text_fields` 加掃 **`procedure_steps` 的 `steps[].text`**（該模板把每個 step 的 text 以 `brand.prose` 上畫面，在此之前它一個文字欄都沒被掃——OF2 對該模板等於空跑，`ch03_chain_rule` 的 `decomposition_strategy` 整場無 `ref:` 也沒被報）；`math`／`worked[]` 是數學不掃，且**以 `template:` 為閘**（`steps[]` 與 derivation／worked_example 共用）。(b) `step_coverage._SCOPED_TEMPLATES` 加 **`procedure_steps`**（`coverage_enforce` 下「單元必須有 `screen_contract`」的模板集；SC1／SC2 本身與模板無關）；**`definition_math` 本輪不加**——單一陳述框不是步驟序列、全 23 deck 無一個 definition 單元宣告 `required_steps`，且 `ch03_trig_derivatives{,_mimo}` 已開 `coverage_enforce`，加了會立刻多 6 條 `[SC]` error（r3 再議）。(c) **`screen_contract` 解不開不再靜默**：`_screen_contract.parse_block` 對 YAML 語法錯回 `ParseError`（非 `None`），SC 印成獨立的 `[SC] <unit>: screen_contract failed to parse -- <err>`，**恆 error、不吃 `coverage_enforce`**（契約壞掉是撰稿 bug，不是可 opt-out 的覆蓋政策），且該單元不再同時被報成「沒寫契約」——原本一個非法轉義（§3.2 實踩雙引號 `tex:` 裡的 `\c`）會讓整份契約從閘視野消失、訊息把人導向「去寫一份」。deck 級 smoke＝`python tools/doctor.py --smoke`、模組級＝`python video/pipeline/run_selftests.py` | [DESIGN.md](../legacy/manim_video/DESIGN.md)、[README.md](README.md)；source [pipeline/schema.py](../legacy/manim_video/pipeline/schema.py)（provenance／pedagogy／coverage／example_coverage 落地 [pipeline/provenance.py](pipeline/provenance.py)／[pipeline/pedagogy.py](pipeline/pedagogy.py)／[pipeline/step_coverage.py](pipeline/step_coverage.py)／[pipeline/example_coverage.py](pipeline/example_coverage.py)） |
+| **〔沿用，待接 Remotion〕** `pedagogy-firstlearner-audit`（初學者教學＋上畫面文字忠實） | gate1 Claude subagent（免費；讀 storyboard＋cited `.md`＋handout，**PRE-render**；同 `visual-frame-audit` 的免費 gate1 tier、但不同 stage——它讀 render 後幀，本閘讀 storyboard 源） | □（PD／OF／SC blocking 分開計數；warn-default、per-deck opt-in，landing 不擋） | PD1–PD4 教學品質（beat 粒度、`scaffold.motive` 動機、divider `scaffold.problem`、前提首用 `scaffold.flag`）＋ OF1–OF2 上畫面文字 vs 核准源忠實／可回溯 ＋ **SC1–SC2／SC-honesty／SC-adv 推導步驟覆蓋**（storyboard `covers:` vs `.md screen_contract`：漏步驟／缺 recap／覆蓋誠實；可合併不可掉）；確定性底材＝上列 `schema.py` 並跑的 provenance／pedagogy／**coverage** warn-checks（gate-1 自有 blocking＝PD1＋OF1＋**SC-honesty**，其餘結構存在性由確定性層算、本閘 surface＋給脈絡）。**確定性層看不見的仍要本閘自己看**：`procedure_steps` 的 `steps[].text` 與 `_SCOPED_TEMPLATES` 於 2026-09-14（r2 Task I）才入確定性層，`definition_math` 至今不在 SC 的 contract-必要模板集內 | **SSOT [PEDAGOGY-FIRSTLEARNER-RUBRIC.md](content_scripts/_audit/PEDAGOGY-FIRSTLEARNER-RUBRIC.md)**；agent [`../.claude/agents/pedagogy-firstlearner-audit.md`](../.claude/agents/pedagogy-firstlearner-audit.md) |
+| **〔沿用，待接 Remotion〕** **REWATCH 看片多鏡評審**（成片品質；2026-09-12 首用、**2026-09-13 起＝里程碑審**） | POST-render：`pipeline/rewatch_pack.py` 把成片翻成 pack（逐場 contact sheet＋時間軸＋靜止統計）→ 五鏡獨立盲審（R1 初學者×2／R2 動畫導演／R3 教學設計／R4 節奏剪輯／R5 講師；跨 Gemini／Claude 家族：agy ×3＋subagent ×3）→ orchestrator refute-by-default 合成 | □（advisory；**永不 blocking**；餵重做水位裁決） | 唯一「看過影片本身」的審：時間、停留、畫面是否隨數學演化、跟不跟得上；不重審忠實／數學（歸 NFA／L5／OF）。首用＝§3.1 成片（`REVIEW-ch03_s31-rewatch-multilens.html`）。**2026-09-13 起 finding 可標畫面語法規則代號 `rule: ML1`–`ML5`（R2 MUST；[SPEC-motion-language.md](SPEC-motion-language.md)），digest `by_rule` 按規則計數**。**頻率＝里程碑審（2026-09-13 裁決）：一節收斂時跑一次完整六鏡；輪內不跑，改用上一輪 finding 的回歸清單（見 §六 6.2）** | **SSOT [REWATCH-REVIEW-RUBRIC.md](content_scripts/_audit/REWATCH-REVIEW-RUBRIC.md)**；template [PROMPT-rewatch.template.md](content_scripts/_audit/PROMPT-rewatch.template.md)；schema `rewatch-findings.schema.json`；agy 呼叫紀律見根 CLAUDE.md |
+| **〔沿用，待接 Remotion〕** `video-amplification-audit`（敘述放大機會稽核；expansion 層 M2） | gate1 Claude subagent（免費；讀 storyboard＋cited `.md`＋handout `expansion:*`，**PRE-render**、propose-not-act） | □（AMP1 advisory；**永不 blocking**、只提候選、逐筆人裁） | 掃 handout `expansion:intuition`／`application` 判影片四態（screened／narration-only／visual-only／missing），只提 `missing` 的承重直覺（綁 `doc:` ＋標記短引文）；correctness caution 路由假設機制、example 歸 `example-supplement`。講義線 `mode-c-gapwalk` 的影片側對應，產 standalone HTML 裁決稿 | **SSOT [AMPLIFICATION-RUBRIC.md](content_scripts/_audit/AMPLIFICATION-RUBRIC.md)**；agent [`../.claude/agents/video-amplification-audit.md`](../.claude/agents/video-amplification-audit.md) |
+| **〔Manim gen-2 閘，已封存〕** make.py manifest-freshness（`--reuse-audio`） | 腳本 | ■（fail-fast） | 比對 manifest 與 `<deck>_mimo.yml`（deck id／scene／beat 數／`{show}`／text_hash／WAV 存在與時長），防複用過期音檔；非 reuse 跑時拒絕用 mock 覆蓋真 manifest | [DESIGN.md](../legacy/manim_video/DESIGN.md)、[README.md](README.md)；RUNBOOK step 4 |
+| **〔Manim gen-2 閘，已封存〕** sync guard（**2026-09-13 起 render 後＝硬閘**） | 腳本（`pipeline/timing.py` 常數） | ■ | **render 前**：短 beat／純 reveal beat 的啟發式**仍是 warn**（`[sync] short/reveal-only beat`，不擋）。**render 後（硬閘）**：ffprobe 實測每個 content 場的影片長度，與 expected 的偏差 > `SYNC_HARD_GATE_FRAMES`＝**2 影格**（fps 由 ffprobe **對成品實測**、不是猜的；㉑ 成片 30 fps＝0.067 s）→ **ERROR、compose 前 abort**（原為 warn）。旁白長過影片的既有 fatal 不變；手改 manifest 的 beat 總和檢查沿用 `SYNC_TOLERANCE_SECONDS`＝0.12 s。**依據**：㉑ 成片 21 場實測最大偏差剛好 1.0 影格、4 場貼線，1 影格零餘裕 | [DESIGN.md](../legacy/manim_video/DESIGN.md)、[README.md](README.md)、**本檔 §六**；RUNBOOK step 4 |
 
-**設計系統九規則的分流（2026-09-14 T3 定案）。** 規則原文＝設計畫布的
-[`LayoutRules.dc.html`](_audit/design-template-system/LayoutRules.dc.html)（L1–L4）與
-[`MathRules.dc.html`](_audit/design-template-system/MathRules.dc.html)（M1–M5）。**判「只能人審」的都寫出它歸哪個既有判斷閘**——沒有一條是「就這樣算了」：
+**〔Manim gen-2，已封存〕設計系統九規則的分流（2026-09-14 T3 定案）。** 規則原文＝設計畫布的
+[`LayoutRules.dc.html`](../legacy/manim_video/_audit/design-template-system/LayoutRules.dc.html)（L1–L4）與
+[`MathRules.dc.html`](../legacy/manim_video/_audit/design-template-system/MathRules.dc.html)（M1–M5）。**判「只能人審」的都寫出它歸哪個既有判斷閘**——沒有一條是「就這樣算了」：
 
 | # | 規則 | 分流 | 落腳處／理由 |
 |---|---|---|---|
-| L1 | 結論必須是畫面上最重的元素 | **可自動（T3 落地）** | `sizecheck._conclusion_weight_issues`。**字級那半可量**；「**且必須帶語意色**」那半**歸 VISUAL-FRAME `A7`**（用 accent 凸顯這個 beat 的重點）與 `V10`（語意色一致）——哪個 role 算「語意色」是撰稿判斷，不是幾何事實。實作要點：`_prose_nodes` 只收 `brand.prose` 標記的節點，而結論多半是 `math_line` 出來的 `MathTex`，所以 L1 走**新的全樹 `_type_nodes`**；**既有 muted／floor 檢查維持原路徑不動**（要不要一起改是另案，見 [`KICKOFF-shared-layer-v1.md`](KICKOFF-shared-layer-v1.md) §8） |
+| L1 | 結論必須是畫面上最重的元素 | **可自動（T3 落地）** | `sizecheck._conclusion_weight_issues`。**字級那半可量**；「**且必須帶語意色**」那半**歸 VISUAL-FRAME `A7`**（用 accent 凸顯這個 beat 的重點）與 `V10`（語意色一致）——哪個 role 算「語意色」是撰稿判斷，不是幾何事實。實作要點：`_prose_nodes` 只收 `brand.prose` 標記的節點，而結論多半是 `math_line` 出來的 `MathTex`，所以 L1 走**新的全樹 `_type_nodes`**；**既有 muted／floor 檢查維持原路徑不動**（要不要一起改是另案，見 [`KICKOFF-shared-layer-v1.md`](../legacy/manim_video/KICKOFF-shared-layer-v1.md) §8） |
 | L2 | 下三分之一不得長期空置 | **可自動（T3 落地）** | `sizecheck._bottom_band_issues`。用 bbox 聯集近似墨覆蓋：bbox **恆 ≥** 框內的墨，所以「連 bbox 都低於門檻」是比規則更強的宣稱——**只會少報，不會誤報** |
 | L3 | 右欄有條件展開 | **可自動（T3 落地）** | `sizecheck._main_width_issues`。規則給的兩個出口（開 `aside:`／主內容置中）都可量；圖與表天生置中，因此自動豁免 |
-| L4 | 三種佔比依章體質選 | **只能人審（本輪不做）** | 這是 authoring 選擇不是幾何事實，而且 storyboard **目前沒有 `layout:` 欄位**可供比對「宣告 vs 實際」。歸 VISUAL-FRAME `A1`（版面平衡）／`A7`（圖佔比）；欄位本身進 [`KICKOFF-shared-layer-v1.md`](KICKOFF-shared-layer-v1.md) §8 backlog |
+| L4 | 三種佔比依章體質選 | **只能人審（本輪不做）** | 這是 authoring 選擇不是幾何事實，而且 storyboard **目前沒有 `layout:` 欄位**可供比對「宣告 vs 實際」。歸 VISUAL-FRAME `A1`（版面平衡）／`A7`（圖佔比）；欄位本身進 [`KICKOFF-shared-layer-v1.md`](../legacy/manim_video/KICKOFF-shared-layer-v1.md) §8 backlog |
 | M1 | 數學行內不得混入散文 | **可自動（T3 落地）** | `sizecheck._math_register_issues`，讀 storyboard 原文（LaTeX 排完之後散文與數學都只是字形，量不回來） |
 | M2 | 註解 rail 只有兩種語域 | **可自動（T3 落地）** | `sizecheck._rail_register_issues`。**正典 deck 會大量命中——那是真違反、不是誤報**（`reason: "cancel $h$"`／`"write $h=2\cdot(h/2)$"` 就是規則卡畫的反例） |
 | M3 | 正斜體照數學慣例 | **半自動（T3 落地「可判定的那半」）** | `sizecheck._operator_upright_issues` 只查**已知運算元名寫成裸字母**（`sin` vs `\sin`）——那是 LaTeX 原文唯一可判定的部分。**完整的正／斜體判斷（每個變數該斜、每個常數該正）不可從原文判定**，歸 VISUAL-FRAME `V8`（幀上可見數學）與工程鏡 `E1` |
 | M4 | ∎ 是字形不是元件 | **只能人審** | 「讀起來像按鈕」是視覺做法問題（`brand.glyph("qed")` 的呈現），不是可量的幾何。歸 VISUAL-FRAME `A2`（吸引力）／`A4`（一致性）；改法進 §8 backlog |
-| M5 | 數學字級只有三階 | **已由 T2 覆蓋，不重寫** | [`pipeline/_selftest_type_scale.py`](pipeline/_selftest_type_scale.py)（AST 掃 `templates/` 的 `size=`）比 sizecheck 更早、更根本地擋住；再寫一條 sizecheck 規則是重複 |
+| M5 | 數學字級只有三階 | **已由 T2 覆蓋，不重寫** | [`pipeline/_selftest_type_scale.py`](../legacy/manim_video/pipeline/_selftest_type_scale.py)（AST 掃 `templates/` 的 `size=`）比 sizecheck 更早、更根本地擋住；再寫一條 sizecheck 規則是重複 |
 
 ### 層 7｜render 成品
 
 | 閘 | 執行者 | 性質 | 把關內容 | 權威文檔 |
 |---|---|---|---|---|
-| 視覺 gate1 ＝ Claude 抽幀 subagent | Claude 讀 `critic.py --dry-run` 抽出的**最滿幀（ink 最大；2026-09-14 起 `--per scene` 不再抽末幀，改抽整場 ink 量最大的一幀，`exit:` 清空畫面的場才不會抽到空幀）**（多模態、免費、每次 render） | □（收斂＝**視覺 blocking==0**） | 逐場 V1–V10 blocking＋A1–A7 magnitude：數學渲染完整、圖正確、表不溢出、reveal 同步、端點實心／空心、✓／✗ 正確、語意色一致（V10，2026-09-13；同一變數在圖與式子 token 不同色＝blocking）（蓋資訊的相撞／關鍵元素出框／reveal 不同步＝blocking） | SSOT [VISUAL-FRAME-RUBRIC.md](content_scripts/_audit/VISUAL-FRAME-RUBRIC.md)（比照 [`../handout/_audit/FIGURE-AUDIT-RUBRIC.md`](../handout/_audit/FIGURE-AUDIT-RUBRIC.md)）；機制 [pipeline/critic.py](pipeline/critic.py) `--dry-run` |
-| 視覺 gate2 ＝ 外部 VLM 信心複核 | ffmpeg 抽幀（免費）→ MiMo-V2.5（外部 API；**公測免費**、間歇、`--confirm`、仍需同意） | □（**不接進 make.py**；定稿前非每輪必跑） | **2026-06-16 已接 VISUAL-FRAME-RUBRIC**：runtime verbatim-inject 整份 rubric body，輸出 V1–V9 blocking findings＋`VERDICT` 行＋A1–A7（每維 0–100，**驅動重 render／排優先的 magnitude**）＋具體缺陷；專抓 sizecheck 漏掉的標籤壓線／碰撞。驅動「判→採→重 render→複驗」迴圈（停止條件＝視覺 blocking==0） | SSOT [VISUAL-FRAME-RUBRIC.md](content_scripts/_audit/VISUAL-FRAME-RUBRIC.md)；[README.md](README.md) §VLM 視覺批改、[DESIGN.md](DESIGN.md)；source [pipeline/critic.py](pipeline/critic.py) |
-| **`rewatch_pack.py` 12 s 最長靜止硬閘**（`--gate-still`；2026-09-13 裁決） | 腳本（POST-render、離線、確定性） | ■（擋，exit 1） | 只審 `content` 場，量 **0.05% 細門檻**（`FINE_CHANGE_FRAC`）的**最長靜止**：超過 `--gate-still <seconds>`（**預設 12.0、沒有關閉開關**）→ 印 `[still-gate] FAIL <scene>: … (beat N, <reveal>)`、**exit 1**；全過印 `[still-gate] PASS …`、exit 0。verdict 同時寫進 pack 的 **production view**（**不**給盲審鏡看，免污染盲審）。**不接進 `make.py`**——改由輪次協定規定「render 後必跑」（§六 6.4）。**A/B 同基線**：`--baseline <pack dir>` 比對來源 mp4 的 **fps 與畫面尺寸**（pack 現在會記錄兩者），不同、或舊 pack 沒紀錄 → **拒絕、exit 2、什麼都不寫**（不同 fps 會得出假結論） | 三門檻分工見 [DESIGN.md](DESIGN.md) §`[stillness]`；**驗收定義本檔 §六**；rubric [REWATCH-REVIEW-RUBRIC.md](content_scripts/_audit/REWATCH-REVIEW-RUBRIC.md) |
-| 人工 frame-grab 驗收 | 人工（MiMo route step 4） | ◆ | 在 reveal 時間點抽幀確認 reveal 準時、LaTeX 無亂碼，才 compose／交付 | [RUNBOOK-mimo-narration-route.md](RUNBOOK-mimo-narration-route.md) step 4 |
+| **〔沿用，待接 Remotion：抽幀來源改 `rewatch_pack` contact sheet 或 ffmpeg 抽幀；`critic.py --dry-run` 已封存〕** 視覺 gate1 ＝ Claude 抽幀 subagent | Claude 讀 `critic.py --dry-run` 抽出的**最滿幀（ink 最大；2026-09-14 起 `--per scene` 不再抽末幀，改抽整場 ink 量最大的一幀，`exit:` 清空畫面的場才不會抽到空幀）**（多模態、免費、每次 render） | □（收斂＝**視覺 blocking==0**） | 逐場 V1–V10 blocking＋A1–A7 magnitude：數學渲染完整、圖正確、表不溢出、reveal 同步、端點實心／空心、✓／✗ 正確、語意色一致（V10，2026-09-13；同一變數在圖與式子 token 不同色＝blocking）（蓋資訊的相撞／關鍵元素出框／reveal 不同步＝blocking） | SSOT [VISUAL-FRAME-RUBRIC.md](content_scripts/_audit/VISUAL-FRAME-RUBRIC.md)（比照 [`../handout/_audit/FIGURE-AUDIT-RUBRIC.md`](../handout/_audit/FIGURE-AUDIT-RUBRIC.md)）；機制 [pipeline/critic.py](../legacy/manim_video/pipeline/critic.py) `--dry-run` |
+| **〔Manim gen-2 閘（`critic.py`），已封存〕** 視覺 gate2 ＝ 外部 VLM 信心複核 | ffmpeg 抽幀（免費）→ MiMo-V2.5（外部 API；**公測免費**、間歇、`--confirm`、仍需同意） | □（**不接進 make.py**；定稿前非每輪必跑） | **2026-06-16 已接 VISUAL-FRAME-RUBRIC**：runtime verbatim-inject 整份 rubric body，輸出 V1–V9 blocking findings＋`VERDICT` 行＋A1–A7（每維 0–100，**驅動重 render／排優先的 magnitude**）＋具體缺陷；專抓 sizecheck 漏掉的標籤壓線／碰撞。驅動「判→採→重 render→複驗」迴圈（停止條件＝視覺 blocking==0） | SSOT [VISUAL-FRAME-RUBRIC.md](content_scripts/_audit/VISUAL-FRAME-RUBRIC.md)；[README.md](README.md) §VLM 視覺批改、[DESIGN.md](DESIGN.md)；source [pipeline/critic.py](../legacy/manim_video/pipeline/critic.py) |
+| **〔沿用，待接 Remotion〕** **`rewatch_pack.py` 12 s 最長靜止硬閘**（`--gate-still`；2026-09-13 裁決） | 腳本（POST-render、離線、確定性） | ■（擋，exit 1） | 只審 `content` 場，量 **0.05% 細門檻**（`FINE_CHANGE_FRAC`）的**最長靜止**：超過 `--gate-still <seconds>`（**預設 12.0、沒有關閉開關**）→ 印 `[still-gate] FAIL <scene>: … (beat N, <reveal>)`、**exit 1**；全過印 `[still-gate] PASS …`、exit 0。verdict 同時寫進 pack 的 **production view**（**不**給盲審鏡看，免污染盲審）。**不接進 `make.py`**——改由輪次協定規定「render 後必跑」（§六 6.4）。**A/B 同基線**：`--baseline <pack dir>` 比對來源 mp4 的 **fps 與畫面尺寸**（pack 現在會記錄兩者），不同、或舊 pack 沒紀錄 → **拒絕、exit 2、什麼都不寫**（不同 fps 會得出假結論） | 三門檻分工見 [DESIGN.md](../legacy/manim_video/DESIGN.md) §`[stillness]`；**驗收定義本檔 §六**；rubric [REWATCH-REVIEW-RUBRIC.md](content_scripts/_audit/REWATCH-REVIEW-RUBRIC.md) |
+| **〔沿用〕** 人工 frame-grab 驗收 | 人工（MiMo route step 4） | ◆ | 在 reveal 時間點抽幀確認 reveal 準時、LaTeX 無亂碼，才 compose／交付 | [RUNBOOK-mimo-narration-route.md](RUNBOOK-mimo-narration-route.md) step 4 |
 
-外加 **MiMo route step 0**：確認 `storyboards/<deck>.yml` 存在（含 say＋`{show}`），否則整條視覺路徑停住——進視覺步驟的 blocking 前置（[RUNBOOK-mimo-narration-route.md](RUNBOOK-mimo-narration-route.md) step 0）。
+外加 **MiMo route step 0**：確認該節分鏡存在（含 say＋`{show}`；Manim 時代＝`storyboards/<deck>.yml`，Remotion 現行＝`experiments/remotion_styles/paper/<片>/<片>.yml`），否則整條視覺路徑停住——進視覺步驟的 blocking 前置（[RUNBOOK-mimo-narration-route.md](RUNBOOK-mimo-narration-route.md) step 0）。
 
 ---
 
@@ -109,7 +117,7 @@
 3. **付費 API 先同意**——任何計費呼叫前要使用者明確同意；腳本以 `--dry-run`（估 token／USD、不送請求）＋ `--confirm`（讀 env key）落實。離線路徑（mock TTS、本地 render、ffmpeg）免。[`../CLAUDE.md`](../CLAUDE.md)。
 4. **NFA 裁決寫進 commit message**——subject ≤70、body 逐條「原本／為何不妥／改了什麼／證據」，供 `git log --grep="NFA"` 撈回（講義 Mode B 仍用 `git log --grep="Mode B"`）。[`../CLAUDE.md`](../CLAUDE.md)。
 5. **交付物用 standalone HTML**——等使用者過目的稽核產物一律出可雙擊渲染的 HTML。[`../CLAUDE.md`](../CLAUDE.md)。
-6. **每判斷閘一條收斂線**——所有 LLM 判斷閘（六-lens／copyedit／NFA／視覺／工程鏡）收斂判準＝**blocking findings==0**；advisory 逐筆人裁、不強制歸零。**不** governs Tier 0 確定性腳本（以 exit code 收斂）。散文類兩讀者（gate1 Claude 免費迭代→gate2 Codex 收斂後單次、需同意），**gate2 只套 copyedit／NFA**——six-lens 本身 multi-agent＋對抗複驗，不再疊 Codex。gate2 的**頻率**依下條矩陣分層。
+6. **每判斷閘一條收斂線**——所有 LLM 判斷閘（六-lens／copyedit／NFA／視覺；工程鏡已於 2026-09-28 隨層 5 退役）收斂判準＝**blocking findings==0**；advisory 逐筆人裁、不強制歸零。**不** governs Tier 0 確定性腳本（以 exit code 收斂）。散文類兩讀者（gate1 Claude 免費迭代→gate2 Codex 收斂後單次、需同意），**gate2 只套 copyedit／NFA**——six-lens 本身 multi-agent＋對抗複驗，不再疊 Codex。gate2 的**頻率**依下條矩陣分層。
 8. **gate 頻率矩陣（2026-07-07 修訂；理由＝規模從數節變 30+ 節，修訂紀錄見 [REVIEW_MODEL_DECISIONS.md](REVIEW_MODEL_DECISIONS.md) §九）：**
 
    | 閘 | gate-1（免費） | gate-2（計費） |
@@ -118,9 +126,9 @@
    | six-lens | 每節 | 無（維持既有拍板） |
    | copyedit | 每節 | **每章抽樣＋出版前抽查；高風險節全跑**（原：每節單次） |
    | NFA | 每節 | **每節**（§3.1 實證 gate-2 抓到 gate-1 漏的 D3 blocking） |
-   | 工程鏡（hook） | 每個有 hook 的節 | 高風險才跑 |
+   | ~~工程鏡（hook）~~（2026-09-28 隨層 5 退役） | — | — |
    | pedagogy-firstlearner | 每節（pre-render） | 無 |
-   | 視覺 frame audit | 每次 final render | VLM＝高風險／出版前抽樣 |
+   | 視覺 frame audit | 每次 final render | VLM（`critic.py`）已隨 Manim 封存 |
    | amplification | **每章一次**（原：每節） | 無 |
    | REWATCH 看片多鏡（2026-09-13 新增） | **里程碑：每節收斂時一次**（輪內不跑，改回歸清單；§六 6.2） | agy 外部鏡、**與 gate-1 同一次**跑、需逐次同意 |
 7. **撰稿兩階段（phase，非 mode）**——**DRAFT**（pre-lock：寫稿→`_narration.html`→copyedit，唯一能改稿窗口）／**LOCKED**（post-lock：derive→NFA→TTS，source 凍結、稽核唯讀）。綁在 `CONTENT_APPROVED` sign-off 這條不可逆邊界；post-lock 改稿須對動到的單元跑一次 scoped NFA 回歸。「Mode」一詞專留給講義 A/B/C。
@@ -145,9 +153,9 @@
 
 - ✅ **~~`review_pack.py` 的 `.tex` parser 已過時~~（2026-06-16 已解）**：已收斂為 engineering 鏡專用、脫離 `.tex`（math context 改吃內容稿）；忠實／語域／拆解三鏡歸 CONTENT-SIXLENS。工程鏡現可實跑（§1.1 dry-run 驗過 1 packet）。
 - ✅ **~~`critic.py` header stale／PLACEHOLDER 定價~~（2026-06-16 已解）**：header 重寫為「gate 2、已接 VISUAL-FRAME」；critic.py 定價改 MiMo 公測免費＝$0（dated，仍印 token＋受同意閘），review_pack.py 定價改標「unverified estimate」。
-- ✅ **~~`schema.py` 未建~~（2026-06-16 已建）**：結構驗證＋`{show}` 目標列舉，已接進 make.py render 前閘（`--skip-schema` 可繞）。target-vs-payload 交叉驗證仍待 `reveal_targets()`（task #6、需 manim）。
-- **直接構造的 `MathTex/Text` 標籤對 sizecheck 的 muted／floor／sibling 三項仍是盲點**（只靠 VISUAL-FRAME／人眼；2026-09-14 T3 的 L1 結論字級規則例外，它走全樹 `_type_nodes`）；hook code 的數學保真由 review_pack engineering 鏡（advisory）查。
-- **整節合併影片**（§1.2／§1.4／§1.5）因 Defender Tex-cache race 尚未驗（逐場已驗）。
+- **〔Manim gen-2，隨引擎封存〕** ✅ **~~`schema.py` 未建~~（2026-06-16 已建）**：結構驗證＋`{show}` 目標列舉，已接進 make.py render 前閘（`--skip-schema` 可繞）。target-vs-payload 交叉驗證仍待 `reveal_targets()`（task #6、需 manim）。
+- **〔Manim gen-2，隨引擎封存〕** **直接構造的 `MathTex/Text` 標籤對 sizecheck 的 muted／floor／sibling 三項仍是盲點**（只靠 VISUAL-FRAME／人眼；2026-09-14 T3 的 L1 結論字級規則例外，它走全樹 `_type_nodes`）；hook code 的數學保真由 review_pack engineering 鏡（advisory）查。
+- **〔Manim gen-2，隨引擎封存〕** **整節合併影片**（§1.2／§1.4／§1.5）因 Defender Tex-cache race 尚未驗（逐場已驗）。
 - **TTS 發音正確性無逐字自動 listen-back**（只靠 NFA 上游規約＋人工抽驗）；但**離線 listening pack**（`pipeline/listening_pack.py`，2026-07-11 T6）已補「逐 take 聽感驗收」——讀 manifest 產 standalone HTML（每場 `<audio>`＋WPM＋validation/qa＋fallback＋ebur128 LUFS/TP，依風險排序），正式交付前仍應完整聽一次全片。
 - **權威來源（NFA 已收回）**：video NFA 的維度／收斂線權威已從「借根 README §Mode B」收回到 [NARRATION-FAITHFULNESS-RUBRIC.md](content_scripts/_audit/NARRATION-FAITHFULNESS-RUBRIC.md)（SSOT）；commit 慣例權威仍在 `../CLAUDE.md`。講義 Mode B 的權威仍在**根 README**（不同產物，不混用）。
 
@@ -163,6 +171,8 @@
 > 檢討紀錄，兩者牴觸時以本節為準。落地時與 kickoff 原文的已知差異：`[sync]` 容差 **2 影格**（kickoff 寫 1 影格；
 > ㉑ 成片 21 場最大偏差剛好 1.0 影格、4 場貼線，1 影格零餘裕）。
 > **G0 內容鎖**寫在 §二 第 7 條（綁 DRAFT/LOCKED 邊界）；**G1 兩道硬閘**寫在 §一（層 6 sync guard／層 7 `--gate-still`）。
+> **2026-09-28：** 層 6 的 `[sync]` 隨 `make.py` 封存；`--gate-still` 沿用、待接 Remotion。§六 的輪次協定本身（批次化、輪內／里程碑審、停止條件、多 session）與渲染器無關，照舊有效；
+> 6.4 開工清單已拿掉 Manim 專屬項（`critic.py --out`、TeX 互斥、schema／lint／sizecheck 手動四閘）。
 
 ### 6.1 一輪的定義（G5：批次化）
 
@@ -243,7 +253,7 @@ gate-2 判它是 blocking，且給的修法（修根因、把指數搬進 LaTeX�
    **(a) 本輪是被量測指標驅動的**（為了把靜止壓下去而開）→ 指標**連續兩輪**無實質改善（fine 最長靜止**逐場** |Δ| < 0.5 s）才停。
    **(b) 本輪是被 must 驅動的**，且條件 2 已成立（must 全關、輪內無新 must）→ **指標剛剛改善不構成繼續跑的理由，本條視為滿足**。
    **為什麼要分**（§3.1 里程碑審實跑觸發，使用者裁決）：照原本的字面讀，「這一輪把指標改善了」會導致「尚未連續兩輪無改善」→ 再跑一輪 → 但 must 已全關、那一輪無事可做 → Δ 全 0 → 這時才算收斂。**協定會自己製造一輪空轉，而消滅空轉正是本節寫出來的理由。**
-4. `[sync]` ＝ 0、`run_selftests` 全綠、`sizecheck` 0 error
+4. `run_selftests` 全綠（原條文還有 `[sync]` ＝ 0、`sizecheck` 0 error——兩者是 Manim gen-2 閘，已封存；Remotion 版的對等閘由 §3.2 Phase B 的 Remotion 版 KICKOFF 定義）
 
 > 依這條，§3.1 **在第 ㉑ 輪就該停**（㉑ 的 21 場 fine 逐場 ±0.0，沒有動到任何驗收指標）。
 
@@ -255,7 +265,9 @@ gate-2 判它是 blocking，且給的修法（修根因、把指數搬進 LaTeX�
 
 ### 6.4 開工清單（G4：工具先於內容；**每節開工前逐項打勾再動內容**）
 
-- [ ] `python video/pipeline/run_selftests.py` 全綠（＋`python tools/doctor.py --smoke`）
+> 〔2026-09-28〕下列 `rewatch_pack` 相關項＝沿用，待接 Remotion（pack 目前還讀 Manim 時代的 storyboard／`output/` 佈局）。
+
+- [ ] `python video/pipeline/run_selftests.py` 全綠（＋`python tools/doctor.py`）
 - [ ] `rewatch_pack` 報得出死區的**位置**與**所在拍**（不只長度）——**已做**
 - [ ] A/B 兩包 pack **同 fps／同尺寸**：`rewatch_pack --baseline <pack dir>`（不同就 exit 2）
       **⚠ 基線包必須是 `2124a32` 之後產生的**——`--baseline` 要讀基線包 `pack.json` 裡的 fps／size，
@@ -264,38 +276,17 @@ gate-2 判它是 blocking，且給的修法（修根因、把指數搬進 LaTeX�
       解法：**留底成片**（例如 `<deck>__pre_<milestone>.mp4`）比留底 pack 重要——用現在的工具對
       舊成片重生一包合格基線即可。手上只有舊 pack 時，退而求其次是兩包 `INDEX.md` 逐場比
       `fine longest still`（2026-09-14 §3.1 就是這樣做的）。
-- [ ] `critic.py --out <dir>` **逐輪隔離留底**（同一目錄同時只能一人跑）——**已做**
 - [ ] TTS 依 [RUNBOOK-mimo-narration-route.md](RUNBOOK-mimo-narration-route.md)：`--reuse-existing`／`--no-billing`／`--skip-qa` 的適用範圍
       （reuse key 不含場號——**已做**）
-- [ ] **兩道硬閘在**：`[sync]`（§一 層 6）與 `[still-gate]`（§一 層 7），render 後必跑
+- [ ] **`[still-gate]`（§一 層 7）在**，render 後必跑（原列的 `[sync]` 隨 `make.py` 封存）
 - [ ] `rewatch_pack --scene <子集>` **一律另給 `--out`**（2026-09-14 起：不給 exit 2；`--out` 已存在
       且其 `pack.json` 非 subset 也 exit 2——子集一律不得覆寫全包的 `INDEX.md`／`pack.json`）
-- [ ] **會建 TeX 的工具，同一個工作目錄一次只跑一支**——不只 `sizecheck.py` 之間：`make.py` 內含自己的
-      sizecheck preflight，`critic.py`／`scratch_frames.py` 亦然。**互斥範圍是 cwd，不是全域**
-      （`config.media_dir = ./media` 相對 cwd，每個 worktree 各有自己的 `media/Tex`）⇒ **跨 worktree 不需排隊**，
-      寫成全域限制會在並行階段白白序列化所有子代理
-- [ ] **閘的輸出完整落檔再讀，禁止 `| tail -N`**（`sizecheck` 的摘要印在**最前面**，見下）
+- [ ] **閘的輸出完整落檔再讀，禁止 `| tail -N`**（實例：已封存的 `sizecheck` 把摘要印在**最前面**，見下）
 - [ ] 本節 kickoff §2「現況快照」已標明**量測當日的 main tip hash**（見下）
 
-> **在 worktree 裡跑第一項要注意（2026-09-13 實跑）：** `tools/doctor.py --smoke` 的 deck 閘走 `<repo>/.venv`，
-> 而 `<repo>` 是**當前工作樹**——worktree 沒有 `.venv`，那一段會直接 `[info] 略過`，**打勾等於沒跑**。
-> 在 worktree 裡改成對該 deck 手動跑四道離線閘（等價物）：
-> `python video/pipeline/schema.py <sb>`、`lint.py <sb>`、`sizecheck.py <sb>`、`derive_spoken.py --deck <deck> --check`。
-> `run_selftests.py` 不受影響（不吃 `.venv`）。
-
-> **TeX 互斥已由工具鎖接管（工具線 r2 Task H，2026-09-14；`pipeline/texlock.py`）：** 鎖檔＝`<media_dir>/Tex.lock`，
-> **刻意不放在 `Tex/` 裡**——manim 每次 Tex→SVG 後呼叫的 `delete_nonsvg_files()` 會把 `media/Tex` 裡非 `.svg`／`.tex`
-> 的檔**全部掃掉**，鎖放進去會被它守護的那個 build 自己清走（2026-09-14 實測：第二支約 1 s 後就拿到「空的」鎖、
-> 兩支照舊互撞）。同 cwd 的第二支現在會每 10 s 印一次
-> `[texlock] waiting for pid N (<reason>) ... Ns` **等待**，不再吐假的 `SIZE … could not build scene`（`.dvi` 讀不到）。
-> ⇒ **看到那行是正常等待、不是 hang**；等待上限 **30 分鐘**（足以等完一次全片 render），
-> 要縮短用環境變數 `TEXLOCK_TIMEOUT`（秒）——已落地（`texlock.py:136–149`，`DEFAULT_TIMEOUT = 1800.0`
-> 不變，`TEXLOCK_TIMEOUT` 設正數才覆寫）。
->
-> **這一條本身就是「快照會作廢」的實例（值得留著當教材）：** 回寫本節時 `TEXLOCK_TIMEOUT` 還不存在
-> （`grep` 零命中），於是先寫成「尚未落地」；同一天工具線併入 `294a9b1` 之後，那句註記**自己過期了**。
-> ⇒ **§六 描述別條線的工具行為時，要附「當日 main tip」與可自驗的 grep**，不要只寫結論。
-> 依據：**文件叮嚀擋不住看不見的那一支**——主對話親自撞出三個假 error，因為使用者看不到 `make.py` 裡面也有一支 preflight。
+> **〔2026-09-28 拿掉〕** 原本這裡有兩段 Manim 專屬說明（worktree 裡 `doctor --smoke` 的 deck 閘會略過、改手動跑 schema／lint／sizecheck；
+> TeX 建置互斥鎖 `texlock.py`），隨引擎封存；原文見 tag `archive/2026-09-28-manim-gen2-final` 的本檔。其中「**§六 描述別條線的工具行為時，
+> 要附『當日 main tip』與可自驗的 grep**，不要只寫結論」這條教訓與渲染器無關，照舊適用。
 
 > **`| tail -N` 為什麼寫成硬規則（2026-09-14 一天內兩次誤讀）：** `sizecheck.py` 先印
 > `[sizecheck] <deck>: N error(s), M warning(s)`，**再**逐條印 `SIZE `／`WARN ` 明細——`tail` 只留得到尾巴。
@@ -338,7 +329,7 @@ gate-2 判它是 blocking，且給的修法（修根因、把指數搬進 LaTeX�
 
 - **一個 session 擁有 `main` 與 render**，其他一律 **worktree 分支＋交 hash**
 - worktree 開分支後**先 `git merge main`**（分支點可能落後）
-- **輸出目錄各自隔離**：`critic.py --out`、`rewatch_pack --out`
+- **輸出目錄各自隔離**：`rewatch_pack --out`（原並列的 `critic.py --out` 隨 Manim 封存）
 - **根因調查一邊做就好**，另一邊只提供量測
 - 其餘照根 [`../CLAUDE.md`](../CLAUDE.md) §任務分派的**並行紀律**（開工先 `git status`、別人 dirty 的 hunk 不碰、
   render／tts 的時間窗互相通知、子代理各自 worktree）
@@ -383,7 +374,7 @@ R2 的兩處處方被否決（會在畫面留下假等式、會破壞跨場 `car
 **② 契約裡要明確授權「與實況不符就停下來回報，不要自行改判」，並在驗收時把「停手回報」視為正確行為、不是未完成。**
 §3.2 靠這一條避免做錯三次：
 
-- `worked_example` **不遷移**——[`DESIGN.md`](DESIGN.md)「既有 9 個 `derivation`＋`prompt:` 例題場（§3.1 四場、
+- `worked_example` **不遷移**——[`DESIGN.md`](../legacy/manim_video/DESIGN.md)「既有 9 個 `derivation`＋`prompt:` 例題場（§3.1 四場、
   §3.2 五場）＝不遷移」（2026-09-13 裁決：遷移要重 derive `_mimo`、reveal id 改名會讓 beat 級 TTS reuse 失配），
   而 §3.2 kickoff §4 A2 第 4 點寫的是「例題場改 `worked_example` 模板」——**兩份同日 kickoff 對同一件事給相反指示**。
   ⇒ 凍結一份共用層／模板時，**要回頭改受影響的節 kickoff**，或在 kickoff 之間寫明誰 supersede 誰。
@@ -404,7 +395,7 @@ R2 的兩處處方被否決（會在畫面留下假等式、會破壞跨場 `car
 與 `run_selftests`（約 9 分），而且**每個子代理各付一次**。
 
 **⑥ 子代理各自用 scratchpad 的子目錄，不要共用根目錄**（出處＝**工具線 r1**，記於
-[`KICKOFF-toolline-backlog-r2.md`](KICKOFF-toolline-backlog-r2.md) §1；非本節量測）——r1 六個 task 共用根目錄時
+[`KICKOFF-toolline-backlog-r2.md`](../legacy/manim_video/KICKOFF-toolline-backlog-r2.md) §1；非本節量測）——r1 六個 task 共用根目錄時
 **互撞過檔名**。產物一律放 `<scratchpad>/task<X>/`。
 
 **⑦ 背景長工作寫成單一 Python 驅動器，不要 `bash "<path>.sh"` 包一層**（出處同 ⑥，工具線 r1 實測）——

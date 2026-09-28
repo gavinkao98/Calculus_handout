@@ -8,7 +8,8 @@
 |------|------|------|
 | LaTeX 講義（唯一源＋出版線） | `handout/latex/` | **2026-08-09 拍板：講義線＋影片線統一走 LaTeX**——`src/<ch>/*.tex` 升格唯一內容源（ch03 pilot 已收），memoir 模板 → 出版級 A4 PDF。遷移計畫＝[`handout/latex/KICKOFF-latex-unification.md`](handout/latex/KICKOFF-latex-unification.md)（supersede 2026-07-17「先 HTML 後轉換」拍板） |
 | HTML 講義（已封存） | `legacy/html_handout/` | fragment／standalone／`build.py`／舊契約的歷史快照（2026-08-09 佈局重構移入；轉換產線工具在 `legacy/html2latex/`）。活資產已升層：rubric＋REVIEW 在 `handout/_audit/`、章 PLAN 在 `handout/_dev-archive/`、圖繪製與 `shot.mjs` 在 `handout/figkit/` |
-| Manim 影片 | `video/` | 旁白＋動畫＋TTS；`make.py` 建置（詳見 [`video/README.md`](video/README.md)） |
+| 影片（Remotion） | `video/` | 旁白＋動畫＋TTS；**2026-09-28 拍板：Remotion 為唯一渲染器**（現役製作處 `video/experiments/remotion_styles/`，契約＝[`video/KICKOFF-remotion-unification.md`](video/KICKOFF-remotion-unification.md)；詳見 [`video/README.md`](video/README.md)） |
+| Manim 影片（gen-2，已封存） | `legacy/manim_video/` | 2026-09-28 封存的 `make.py`＋模板引擎＋storyboard＋舊文檔，僅供參照；回退錨點＝tag `archive/2026-09-28-manim-gen2-final` |
 | 舊 LaTeX 講義 | `legacy/tex_handout/` | 已凍結，僅供參照（與 `handout/latex/` 無關） |
 
 > **講義「完成一章的完整閘序」**見權威總覽 [`handout/PIPELINE.md`](handout/PIPELINE.md)（手稿章 Ch1–4 的 gate 0–8 既成；Ch5 起無手稿 canon 章採 **5-milestone 閘序**＋gate-2 全跑（三閘每章必跑）；含各閘 subagent／rubric／Codex 調用紀律／「做完一章」定義與各章狀態 dashboard）。撰稿模式（Mode A/B/C、手稿與 canon 兩變體）見 [`CONTENT_AUTHORING_WORKFLOW.md`](CONTENT_AUTHORING_WORKFLOW.md)。
@@ -17,7 +18,7 @@
 
 ```bash
 python handout/latex/build.py all      # 建置全部講義單元（可接 ch01 只建一章；編譯＋字形閘→dist PDF）
-python video/make.py --quality high  # 1080p 渲染影片（預設品質）
+npx remotion render build <Comp> out/<name>.mp4 --codec=h264 --crf=20 --props=…  # 在 video/experiments/remotion_styles/paper/ 下；1080p（各片指令見其 SCRIPT.md）
 python tools/doctor.py            # 環境健康檢查
 tts.py --backend mock --unit beat # 離線 TTS mock（不計費，可逕行；--unit beat 只驗 beats 時鐘）
 ```
@@ -31,12 +32,12 @@ tts.py --backend mock --unit beat # 離線 TTS mock（不計費，可逕行；--
 
 ## 影片渲染解析度
 
-- **除非使用者特別要求，否則一律以 1080p 渲染**（`make.py --quality high`）。
+- **除非使用者特別要求，否則一律以 1080p 渲染**（Remotion composition 為 1920×1080、30 fps；指令見 [`video/experiments/remotion_styles/README.md`](video/experiments/remotion_styles/README.md)）。
 
 ## 付費 API 調用須先經同意
 
 - **每次調用任何計費／外部的生成式 API（如 MiMo TTS 批次合成、MiMo-V2.5 VLM 批改、Gemini 文字／影像生成等）之前，都必須先取得使用者明確同意，不可自行調用**（公測免費者仍屬外部 API，同樣先報量徵同意）。批次合成（例如整節旁白 TTS、整章重跑）一律先說明：這次要調用什麼模型、預估用量（場數／beat 數／音訊秒數）與成本，經同意後才執行。
-- 不計費、不連網的離線路徑不在此限，可逕行執行——例如 `tts.py --backend mock --unit beat`（寫靜音 WAV 驗 manifest／時序；預設 `--unit auto` 會走 scene 對齊，沒裝 stable-ts 時會在合成前中止，`--unit beat` 只驗 beats 時鐘）、本地 Manim render、ffmpeg mux/concat。
+- 不計費、不連網的離線路徑不在此限，可逕行執行——例如 `tts.py --backend mock --unit beat`（寫靜音 WAV 驗 manifest／時序；預設 `--unit auto` 會走 scene 對齊，沒裝 stable-ts 時會在合成前中止，`--unit beat` 只驗 beats 時鐘）、本地 Remotion render、ffmpeg mux/concat。
 - 取得一次同意即代表該次明確說明的工作範圍獲准；範圍變更（換模型、加場景、重跑）需重新徵得同意。
 - **〔2026-07-01 使用者授權〕Codex 唯讀調用（review／覆核／詢問意見／second-opinion）需逐次徵詢。** 範圍＝**`codex exec -s read-only`**（計畫／code／doc 對抗式 review、徵第二意見，唯讀不改檔；模型走 `~/.codex/config.toml` 預設 gpt-5.6-terra／max；`-i <圖檔>` 可附圖）。
 - **〔2026-09-12 使用者授權〕Antigravity CLI（`agy`）唯讀調用比照 Codex：逐次徵詢；走使用者的 Antigravity 訂閱額度（不另計費，但仍是外部生成式 API）。** 本體＝`%LOCALAPPDATA%\agy\bin\agy.exe`（安裝程式已把該目錄加進使用者 PATH，本機 2026-09-12 驗證 `which agy` 找得到；它會**自我更新**、binary 隨時換版，1.1.27→1.2.2 就在同一天發生）；換機找不到時才部署 shim [`tools/agy.cmd`](tools/agy.cmd)（比照 `tools/codex.cmd`，放 `%APPDATA%\npm`；`tools/setup.ps1` 會自動判斷）。**已驗證的 headless 用法**（2026-09-12，看片多鏡評審首用）：`agy --print "<prompt>" --model <id> --mode plan --dangerously-skip-permissions --output-format json --json-schema <schema.json> --print-timeout 45m`。要點：`--mode plan`＝**不動 repo，但不是全然唯讀**——它會在 `--add-dir` 資料夾內寫檔並執行腳本（2026-09-12 實測：內建 `search_web` 壞掉時它自己寫了三支 Python 爬蟲跑 YouTube 搜尋），所以 add-dir 一律指 repo 外的工作資料夾；`--dangerously-skip-permissions` 只是讓非互動模式不停下來問（唯讀下無風險，非互動必加）；**盲審隔離＝cwd 設在 repo 外的工作資料夾＋`--add-dir <資料夾>` 圈定它能讀的東西**；圖檔放進資料夾它自己用 file tool 讀（多模態，contact sheet 實測可讀）；`--output-format json` 回傳含 `structured_output`（依 `--json-schema`）與 `usage`；長工作一定給 `--print-timeout`（預設 5 分鐘會被切）。**搜尋類任務的結果要逐條核對**（2026-09-12 教訓）：`search_web` 失敗時它改用爬蟲，把「頁面第一個影片 ID」配「第一個標題」，17 條裡 5 條標題與連結不符、2 條工具判斷錯——凡它給的 URL／標題／出處一律自己打開驗證再用。首次呼叫吃到 503 會自動重試，回傳的 `status` 仍可能是 `ERROR` 但 `structured_output` 有值，讀結果時兩個欄位都看。模型清單 `agy models`（帳號現有：`gemini-3.8/3.7/3.6-flash-{high,medium,low}`、`gemini-3.1-pro-{high,low}`、`claude-sonnet-4-6`、`claude-opus-4-6-thinking`、`gpt-oss-120b-medium`）。與 Codex 分工：Codex＝GPT 家族 second opinion；agy＝Gemini／Claude 4.6 家族，多鏡評審要拉開模型家族時用（契約見 [`video/content_scripts/_audit/REWATCH-REVIEW-RUBRIC.md`](video/content_scripts/_audit/REWATCH-REVIEW-RUBRIC.md)）。

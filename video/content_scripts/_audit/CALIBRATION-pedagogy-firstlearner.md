@@ -4,7 +4,7 @@
 > - **deck A（approved）**：[`../../storyboards/_fixtures/pedagogy_audit.yml`](../../storyboards/_fixtures/pedagogy_audit.yml)，源 [`../_fixture_pedagogy.md`](../_fixture_pedagogy.md)（`CONTENT_APPROVED=yes`）。
 > - **deck B（draft）**：[`../../storyboards/_fixtures/pedagogy_audit_draft.yml`](../../storyboards/_fixtures/pedagogy_audit_draft.yml)，源 [`../_fixture_pedagogy_draft.md`](../_fixture_pedagogy_draft.md)（`CONTENT_APPROVED=no`）。
 >
-> 契約見 [`PEDAGOGY-FIRSTLEARNER-RUBRIC.md`](PEDAGOGY-FIRSTLEARNER-RUBRIC.md)。表分**兩軌**：① 確定性層（[`../../pipeline/schema.py`](../../pipeline/schema.py) 驅動 [`../../pipeline/pedagogy.py`](../../pipeline/pedagogy.py)／[`../../pipeline/provenance.py`](../../pipeline/provenance.py)，本檔已 pin 確認基線）；② agent 判斷層（gate-1 `pedagogy-firstlearner-audit`，由 Task 4 dispatch 後比對本表）。Task 4 的 calibration run 把實測結果填進文末「Calibration run result」。
+> 契約見 [`PEDAGOGY-FIRSTLEARNER-RUBRIC.md`](PEDAGOGY-FIRSTLEARNER-RUBRIC.md)。表分**兩軌**：① 確定性層（[`../../pipeline/schema.py`](../../../legacy/manim_video/pipeline/schema.py) 驅動 [`../../pipeline/pedagogy.py`](../../pipeline/pedagogy.py)／[`../../pipeline/provenance.py`](../../pipeline/provenance.py)，本檔已 pin 確認基線）；② agent 判斷層（gate-1 `pedagogy-firstlearner-audit`，由 Task 4 dispatch 後比對本表）。Task 4 的 calibration run 把實測結果填進文末「Calibration run result」。
 
 ---
 

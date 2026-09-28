@@ -1,5 +1,11 @@
 # KICKOFF — §3.2 `ch03_chain_rule`（首個全程照輪次協定走的節）
 
+> **2026-09-28 加註（影片線統一走 Remotion，[`KICKOFF-remotion-unification.md`](KICKOFF-remotion-unification.md)）：**
+> **Phase A（內容線）成果有效**——內容稿 LOCKED、口語版、NFA 報告都在 `content_scripts/` 原位；beat 切分成果隨正典 storyboard 封存在
+> `legacy/manim_video/storyboards/ch03_chain_rule{,_mimo}.yml`，Remotion 版要參考就去那裡讀。**Phase B（視覺線）作廢**——它建立在
+> Manim 共用層 v1、模板與 hook 上，這些已整包封存；§3.2 的 Remotion 版另開 KICKOFF。下文所有 `make.py`／模板／`sizecheck`／hook／
+> 共用層的步驟與連結（已改指 `legacy/manim_video/`）一律是歷史紀錄。
+
 > **立檔：2026-09-13**（使用者第二次裁決當日）。**這一節有兩個交付目標**：
 > ① 把 §3.2 做成片；② 順便把「一節怎麼做」變成可複製的 **SOP v1**（`KICKOFF-section-template.md`）
 > 與 [`REBUILD_STATUS.md`](REBUILD_STATUS.md)「每節成本量測」表的一列。
@@ -50,7 +56,7 @@
 | 6 | 並行之前**凍結共用層 v1** | 見 §1.2 |
 | 7 | **§3.1 收尾另開對話**：里程碑六鏡審（agy 三次呼叫徵同意）；4K final 等共用層 v1 落地後重 render | 不要在本節的 session 裡做 §3.1 的事 |
 
-### 1.2 共用層 v1 的四項（另一份開工檔 [`KICKOFF-shared-layer-v1.md`](KICKOFF-shared-layer-v1.md)）
+### 1.2 共用層 v1 的四項（另一份開工檔 [`KICKOFF-shared-layer-v1.md`](../legacy/manim_video/KICKOFF-shared-layer-v1.md)）
 
 1. 字體 **Instrument Sans**
 2. 字級**三階**＋**取消 `math_sm 40`**
@@ -208,7 +214,7 @@ python video/pipeline/run_selftests.py  → all 42 green
 
 ### 2.4 已驗證的 code 事實（沿用 §3.1，不重新發明）
 
-**完整版在 [`KICKOFF-s31-amplify.md`](KICKOFF-s31-amplify.md) §2，這裡只列本節會用到的四條：**
+**完整版在 [`KICKOFF-s31-amplify.md`](../legacy/manim_video/KICKOFF-s31-amplify.md) §2，這裡只列本節會用到的四條：**
 
 1. **六支 motion primitive 怎麼用**（原語 1 揭示時序／2 原地變形 `anim: transform`／3 游標掃描
    `kind: sweep`／4 聚焦 `focus:`／5 跨場延續 `color_role`＋`carry:`／6 圖跟旁白長
@@ -285,7 +291,7 @@ python video/pipeline/run_selftests.py  → all 42 green
 ### 3.7 共用層不在這裡改
 
 **字體、字級、`theme.py`／`brand.py`／`templates/` 的版面契約、`sizecheck` 的規則——
-全部是工具線 [`KICKOFF-shared-layer-v1.md`](KICKOFF-shared-layer-v1.md) 的檔，本節不碰。**
+全部是工具線 [`KICKOFF-shared-layer-v1.md`](../legacy/manim_video/KICKOFF-shared-layer-v1.md) 的檔，本節不碰。**
 發現需要改，**記進 §8 的工具線 backlog**，不要自己動手——兩條線同時改同一個檔＝⑯ 那種
 「兩個 session 搶 `derivation.py`」的場面。
 
@@ -655,14 +661,14 @@ python video/pipeline/rewatch_pack.py --deck ch03_chain_rule --out <milestone pa
 
 | 不做 | 理由 |
 |---|---|
-| **不改共用層** | 字體／字級／`theme.py`／`brand.py`／`templates/`／`sizecheck` 規則是工具線 [`KICKOFF-shared-layer-v1.md`](KICKOFF-shared-layer-v1.md) 的檔；兩條線同時改同一個檔＝⑯ 那種搶檔面。**發現需要就記進下方 backlog。** |
-| **不做畫面語法缺口 T2–T4** | [`KICKOFF-motion-language-gaps.md`](KICKOFF-motion-language-gaps.md) 的 T2（inset＋框選＋閃爍）／T3（token 級變形＋兩段式消去）／T4（跨場攜帶）已在 ⑮ 落地，**沒落地的部分屬工具線**，本節只「用」不「改」。 |
+| **不改共用層** | 字體／字級／`theme.py`／`brand.py`／`templates/`／`sizecheck` 規則是工具線 [`KICKOFF-shared-layer-v1.md`](../legacy/manim_video/KICKOFF-shared-layer-v1.md) 的檔；兩條線同時改同一個檔＝⑯ 那種搶檔面。**發現需要就記進下方 backlog。** |
+| **不做畫面語法缺口 T2–T4** | [`KICKOFF-motion-language-gaps.md`](../legacy/manim_video/KICKOFF-motion-language-gaps.md) 的 T2（inset＋框選＋閃爍）／T3（token 級變形＋兩段式消去）／T4（跨場攜帶）已在 ⑮ 落地，**沒落地的部分屬工具線**，本節只「用」不「改」。 |
 | **不並行開 §3.3** | 裁決 4：先用 §3.2 把流程走成熟、產出 SOP v1，**之後**才並行。§3.3 的 `envexample` 有 8 個（`ex:3.9`–`ex:3.16`，`chapter3.tex:426–579`），體質與 §3.2 不同，不要在流程還沒定型時開。 |
 | **不做新舊 A/B** | 裁決 3 取消。 |
 | **不碰 §3.1** | 收尾（里程碑六鏡＋4K final）**另開對話**（裁決 7）。 |
 | **不自行重試 §3.1 的 3 場 FA 降級** | 使用者裁決「先不用」修，重試會燒 billed API。 |
 
-**工具線 backlog（本節發現、寫給 [`KICKOFF-shared-layer-v1.md`](KICKOFF-shared-layer-v1.md) 或另案）：**
+**工具線 backlog（本節發現、寫給 [`KICKOFF-shared-layer-v1.md`](../legacy/manim_video/KICKOFF-shared-layer-v1.md) 或另案）：**
 
 - ⚠️ `animations/ch03_chain_rule_hooks.py:57` 的 `_fade` 仍回傳寫死秒數（§2.4 第 4 點）——
   **B1 順手遷**，但 `pipeline/` 裡的同款殘餘（`pacing.walk`／`play_block` 標稱值、每拍 wait 整幀進位）

@@ -3,25 +3,30 @@
 > 這是「最新方法」的可貼提示詞。把下方 fenced 區塊整段貼給負責**某一節**的 session，
 > 填入該節的 `DECK` / `SECTION`。權威細節：`video/README.md` §「MiMo 旁白／影片路線」、
 > `video/DESIGN.md` §「MiMo 口語軌」、`video/REBUILD_STATUS.md` 2026-06-14 節。
+>
+> **2026-09-28 起渲染改走 Remotion**（[`KICKOFF-remotion-unification.md`](KICKOFF-remotion-unification.md)）：`make.py` 與五支正典 storyboard
+> 已封存到 `legacy/manim_video/`。本 runbook 的口語化、NFA、TTS 計費紀律照舊有效；原步驟 4 的 `make.py --reuse-audio` render
+> 改成 Remotion render（每支片的指令在它的 `SCRIPT.md`，入口＝[`experiments/remotion_styles/README.md`](experiments/remotion_styles/README.md)）。
 
-**前提（重要）：** 此路線需要該節的**正典 storyboard** `video/storyboards/<deck>.yml`（含 `say` ＋ `{show}`）。
-`storyboards/` 現況＝`_demo_*.yml`（模板示範／回歸樣本）＋已落地的正典 deck（如 `ch03_trig_derivatives.yml`——
-首個走完本路線全程的節）＋版面回歸 deck（`ch01_inverse_functions.yml`）。任一章節在**該節 storyboard 落地前
+**前提（重要）：** 此路線需要該節的**分鏡**（含 `say` ＋ `{show}`）。Remotion 現行位置＝
+`video/experiments/remotion_styles/paper/<片>/<片>.yml`（tts.py 格式，`say` 直接寫口語）。Manim 時代的正典 storyboard
+（`video/storyboards/<deck>.yml`，如 §3.1 的 `ch03_trig_derivatives.yml`——首個走完本路線全程的節）已封存到
+`legacy/manim_video/storyboards/`，`video/storyboards/` 只剩內容層 fixture。任一章節在**該節分鏡落地前
 先別跑本路線的影片步驟**；可先用下方「念法慣例」＋ NFA（旁白忠實稽核，原 Mode B）把口語版納入認可包，
-storyboard 落地後再走完整流程。
+分鏡落地後再走完整流程。
 
 ---
 
 ```
 你負責 NTU 微積分影片產線（repo Calculus_handout，video/ 子樹）某一節的「MiMo 旁白雙版／影片」產出。
 全程用繁體中文溝通；動手前先讀 video/README.md §「MiMo 旁白／影片路線」、video/DESIGN.md §「MiMo 口語軌」、
-該節 content_scripts/<deck>.md 與 storyboards/<deck>.yml。
+該節 content_scripts/<deck>.md 與該節分鏡（Remotion：experiments/remotion_styles/paper/<片>/<片>.yml）。
 
 DECK: <填，如 ch01_precise_limit>      SECTION: <填，如 §1.6>
 
 步驟 0（前提檢查，先做）：
-- 確認 storyboards/<deck>.yml 存在（含 say + {show}）。不存在就停手回報——本路線在 storyboard 落地後才跑
-  （旁白須先認可 → 出 storyboard）。
+- 確認該節分鏡存在（含 say + {show}）。不存在就停手回報——本路線在分鏡落地後才跑
+  （旁白須先認可 → 出分鏡）。
 
 步驟 1 — 寫口語單一源 content_scripts/<deck>.spoken.yml：
 - 每個 content scene 一筆 `scene_id: | <口語旁白>`；把該 scene 已認可 narration 的英文散文「逐字保留」，
@@ -35,7 +40,9 @@ DECK: <填，如 ch01_precise_limit>      SECTION: <填，如 §1.6>
   · 反三角 arcsin → "arcsine of …"；π/2 → "pi over two"；分數念 "one half / nine-fifths" 等
 - 只改數學念法，不動英文散文用詞。
 
-步驟 2 — 生成＋parity 檢查（不呼叫任何 API）：
+步驟 2 — 生成＋parity 檢查（不呼叫任何 API；只適用「正典 LaTeX 分鏡＋.spoken.yml」雙軌的節。
+  derive_spoken.py 讀 video/storyboards/<deck>.yml——Manim 時代的正典已封存；Remotion 分鏡直接寫口語時沒有這一步，
+  NFA 直接審分鏡的 say）：
   python video/pipeline/derive_spoken.py --deck <deck> --check   # 必須印 "parity OK"
   python video/pipeline/derive_spoken.py --deck <deck>           # 生成 _mimo.yml + _narration_spoken.md
   （這兩個生成檔標 DO NOT EDIT；要改旁白改 .spoken.yml 後重生。）
@@ -52,17 +59,21 @@ DECK: <填，如 ch01_precise_limit>      SECTION: <填，如 §1.6>
 - 收斂：依 Keep/Rewrite/Cut 改 <deck>.spoken.yml → 重跑 derive --check → 回歸審核 →
   寫乾淨的 REPORT-<deck>-narration-faithfulness.md。NFA 裁決寫進該次修正 commit 的 message body（CLAUDE.md，`git log --grep="NFA"`）。
 
-步驟 4 —（須先徵得使用者同意：MiMo 雖免費仍屬外部 API）合成＋render：
+步驟 4 —（須先徵得使用者同意：MiMo 雖免費仍屬外部 API）合成＋Remotion render：
 - 確認 .env 有 MIMO_API_KEY。預設走 `mimo-v2.5-tts` 的 builtin voice `Dean`（經 `audio.voice` 選定、
   不送 style/persona prompt；voice-design/Calm Professor 已於 2026-07-05 退役）。先 smoke
   （mimo_preview.py --smoke）確認回應形狀。**報價依據：先跑 `--dry-run` 取「預期／最壞 call 數」**
   （`tts.py … --backend mimo --dry-run` 印逐場 planned/worst 表＋est 分鐘；worst 已把 fallback ladder 每非空 beat
   計入；reuse 可再往下降，報價時註明）。**`--backend` 為必填**（無預設，防裸跑誤燒/誤蓋）。報用量、徵同意後：
-  python video/pipeline/tts.py  --storyboard video/storyboards/<deck>_mimo.yml --backend mimo
-  python video/make.py          --storyboard video/storyboards/<deck>_mimo.yml --reuse-audio --quality high
-  → output/chNN/sX.Y/<deck>_mimo.mp4（1080p 預覽；正式交付才 --quality 4k）
-  （成片旁另出 `<stem>.timeline.json`／`.vtt`／`.chapters.txt` sidecar；真音檔路徑另 two-pass loudnorm 到 house
-  -19 LUFS；離線聽感驗收＝`python video/pipeline/listening_pack.py --manifest <…/manifest.json>`。）
+  python video/pipeline/tts.py --storyboard <分鏡.yml> --scene all --backend mimo --unit scene \
+      --output-dir video/experiments/remotion_styles/paper/public/audio/<批次>
+  接著在 paper/ 下（指令照該片 SCRIPT.md）：
+  npx remotion bundle
+  npx remotion render build <Composition> out/<片>_raw.mp4 --codec=h264 --crf=20 --props='{"manifest":"audio/<批次>/manifest.json"}'
+  python scripts/loudnorm.py out/<片>_raw.mp4 out/<片>_final.mp4   # two-pass loudnorm 到 house -19 LUFS
+  → out/<片>_final.mp4（1920×1080、30 fps）
+  （章節點＝`python scripts/chapters.py`；離線聽感驗收＝`python video/pipeline/listening_pack.py --manifest <…/manifest.json>`。
+  Manim 時代的 `make.py --reuse-audio` render 與 timeline／vtt／chapters sidecar 已封存。）
 - **合成單位 `--unit`（scene-level TTS＋forced alignment，2026-07-05；batch-2 全 template＋rung 3 於 2026-07-06；設計見 DESIGN.md「Manifest schema 2」）：**
   `tts.py` 預設 `--unit auto`——**全部 content template（10 個，單一源＝`pipeline/template_names.py:CONTENT_TEMPLATES`）**：
   `callout`／`definition_math`／`derivation`／`graph`／`procedure_steps`／`recap_cards`／`sign_chart`／`theorem_proof`／
@@ -70,8 +81,9 @@ DECK: <填，如 ch01_precise_limit>      SECTION: <填，如 §1.6>
   2026-09-13 新增 worked_example，9→10；parity
   selftest 守 registry 一致）走 scene-level（一場一次合成、`stable-ts` 回推 beat 時序、
   per-scene validation，過不了自動回退 beat）。要全走舊路用 `--unit beat`；單一場強制 scene 用 `--unit scene`。
+  **Remotion 分鏡沒有 `template` 欄位，`--unit auto` 一律退回 beat——要 scene-level 必須明寫 `--unit scene`。**
   **紀律：scene-level 真合成只在 narration lock＋NFA 之後**（「改一個字→整場重合成」的 blast radius 由 lock 吃掉）；
-  lock 前一律 `make.py --backend mock`（beats、零計費、離線）迭代。**注意（2026-09-14 §3.2 實測）：`tts.py --backend mock --storyboard <deck>_mimo.yml` 會把靜音 WAV 與 mock manifest 寫進 `audio_mimo/`——與真 MiMo 音檔同一目錄；真合成前先清掉或帶 `--force-backend-switch`。****§7 fallback ladder＝arbiter(免費)→resynth(1 call)
+  lock 前一律用 `tts.py --backend mock --unit beat` 的 mock manifest 迭代（零計費、離線；Remotion 換 manifest 即重新對時）。**注意（2026-09-14 §3.2 實測）：`tts.py --backend mock --storyboard <deck>_mimo.yml` 會把靜音 WAV 與 mock manifest 寫進 `audio_mimo/`——與真 MiMo 音檔同一目錄；真合成前先清掉或帶 `--force-backend-switch`。****§7 fallback ladder＝arbiter(免費)→resynth(1 call)
   →chunk(sentence-chunk，N 個 billed sub-synth)→beats(budget-exempt 終點——不佔 rungs 2–3 budget，但 MiMo 下每非空
   beat 仍一次 call、非免費)**；scene-level 合成報價時要把 fallback 預算一併列入：
   預設 `--fallback-budget 2` 只夠 resynth，**要啟用 chunk 救援得把 budget 調到覆蓋 fan-out（1＋該場句數），句數即 billed
@@ -151,15 +163,10 @@ DECK: <填，如 ch01_precise_limit>      SECTION: <填，如 §1.6>
   `--reuse-existing --no-billing --scene shm_stacked_graphs,derivative_of_cosine`（不帶 `--unit beat`）
   在第一次呼叫前就被 `--no-billing` 攔下；補上 `--unit beat` 後 `backend_calls: 0`。
   scene_aligned 的場則用預設 `--unit auto` 即可。
-- `make.py --reuse-audio` 會先驗 manifest freshness（deck id、scene、beat count、`{show}`、
-  `text_hash`、WAV 存在/時長；`scene_aligned` 另驗 scene WAV＋words/aligned 檔＋`validation.status`），再 render；
-  若報 stale/incomplete，不要硬跳過，先重跑該 storyboard 的 `tts.py` 或確認是不是選錯 `<deck>_mimo.yml`。
-- 若出現 `[sync] short/reveal-only beat warning`，通常是連續 `{show a} {show b}` 或短空 beat；
-  優先把其中一個 reveal 合併到有旁白的 beat，或接受它作為 deliberate visual pause。
-- render 後 `[sync] render/audio lengths clean` **必須**出現——2026-09-13 起是硬閘：影片短於旁白、或
-  |video − expected| 超過 `SYNC_HARD_GATE_FRAMES`＝2 影格（fps 由 ffprobe 對成品實測），`make.py` 自己就
-  ERROR、compose 前 abort，不會有 warn 可以帶過（閘定義見 [`REVIEW_GATES.md`](REVIEW_GATES.md) §一 層 6）。
-- render 後跑 `python video/pipeline/rewatch_pack.py --deck <deck>`（要留底就加 `--out <dir>`；要跟
+- **〔2026-09-28 移除〕** 原本的 `make.py --reuse-audio` manifest freshness 檢查與 `[sync]` 兩道（render 前 short／reveal-only
+  beat warning、render 後硬閘）隨 `make.py` 封存；Remotion 端的對等檢查尚未建（見 `video/DESIGN.md`「資料流」的 TODO）。
+  在那之前，render 前自己確認 `--props` 指到這次 `tts.py` 寫出的 manifest，別拿舊批次或 mock 的 manifest 出正式片。
+- （沿用，待接 Remotion：`rewatch_pack` 目前讀 Manim 時代的 storyboard／`output/` 佈局）render 後跑 `python video/pipeline/rewatch_pack.py --deck <deck>`（要留底就加 `--out <dir>`；要跟
   上一輪比就加 `--baseline <上一輪 pack dir>`）：`[still-gate] PASS` 才算該輪完成，exit 1＝有 content 場
   0.05% 細門檻最長靜止超過 12 s（FAIL 行帶所在拍）、exit 2＝基線 fps／尺寸不同、拒絕 A/B。verdict 在
   pack 的 `PRODUCTION.md`。**注意 `--scene` 子集打進既有 pack 目錄會整個覆寫 `INDEX.md`／`pack.json`，

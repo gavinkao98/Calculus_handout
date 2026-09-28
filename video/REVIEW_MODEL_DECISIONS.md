@@ -169,10 +169,10 @@ minimal-unify 主體已落地（地圖 [REVIEW_GATES.md](REVIEW_GATES.md) 已同
 
 ### 後續收尾（2026-06-16 大重設一併完成）
 
-9. **engineering 鏡退場 DeepSeek、改 gate1 Claude／gate2 Codex**：與其餘判斷閘一致。`review_pack.py` 重寫為**離線 packet 組裝器**（無 API/key），新增 SSOT [`HOOK-ENGINEERING-RUBRIC.md`](content_scripts/_audit/HOOK-ENGINEERING-RUBRIC.md)（E1 數學保真 blocking＋E2 慣例、收斂＝engineering blocking==0）；gate1 Claude subagent 讀 packet、gate2 Codex 收斂後單次。**至此每道判斷閘都是 gate1 Claude →（散文/工程）gate2 Codex／（視覺）gate2 VLM 的一致形狀。**
+9. **engineering 鏡退場 DeepSeek、改 gate1 Claude／gate2 Codex**：與其餘判斷閘一致。`review_pack.py` 重寫為**離線 packet 組裝器**（無 API/key），新增 SSOT [`HOOK-ENGINEERING-RUBRIC.md`](../legacy/manim_video/content_scripts/_audit/HOOK-ENGINEERING-RUBRIC.md)（E1 數學保真 blocking＋E2 慣例、收斂＝engineering blocking==0）；gate1 Claude subagent 讀 packet、gate2 Codex 收斂後單次。**至此每道判斷閘都是 gate1 Claude →（散文/工程）gate2 Codex／（視覺）gate2 VLM 的一致形狀。**
 10. **`schema.py` 已建**（render 前第三閘，接進 make.py：schema→lint→sizecheck）——原列產線 backlog，本輪完成。
 
-> **仍屬產線 backlog（非本重構）：** VISUAL-FRAME detection 面驗證（併入第一個真正重跑的節）、`{show}` target-vs-payload 交叉驗證（task #6、需 manim）。續追 [REBUILD_STATUS.md](REBUILD_STATUS.md)。
+> **仍屬產線 backlog（非本重構）：** VISUAL-FRAME detection 面驗證（併入第一個真正重跑的節）、`{show}` target-vs-payload 交叉驗證（task #6、需 manim）。續追 [REBUILD_STATUS.md](REBUILD_STATUS.md)。（2026-09-28 註：後者已於 2026-07-11 由產線硬化 T5 落地於 sizecheck，並隨 Manim 引擎封存；工程鏡與層 5 同日退役。）
 
 ---
 

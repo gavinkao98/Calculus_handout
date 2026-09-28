@@ -63,7 +63,7 @@ python authoring/seed_converge/run.py --drafter openai:gpt-5.1 --auditor gemini:
 ## 視覺層：figure_critic.py（多模態圖檢查）
 
 文字審（run.py 的 DeepSeek）看不到 render 後的視覺缺陷。`figure_critic.py` 是
-[`critic.py`](../../video/pipeline/critic.py) 的講義版：pymupdf 把含圖的 PDF 頁轉
+[`critic.py`](../../legacy/manim_video/pipeline/critic.py) 的講義版：pymupdf 把含圖的 PDF 頁轉
 PNG → 多模態模型（Gemini，`image_url`）→ 依 CONTENT_SPEC §10 圖規則出 defects（label
 碰撞／出界／只靠顏色編碼／灰階存活）→ 人 triage。閘門同 run.py。
 
