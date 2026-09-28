@@ -5,6 +5,7 @@
 > `legacy/manim_video/storyboards/ch03_chain_rule{,_mimo}.yml`，Remotion 版要參考就去那裡讀。**Phase B（視覺線）作廢**——它建立在
 > Manim 共用層 v1、模板與 hook 上，這些已整包封存；§3.2 的 Remotion 版另開 KICKOFF。下文所有 `make.py`／`schema.py`／模板／`sizecheck`／hook／
 > 共用層的步驟與連結（已改指 `legacy/manim_video/`）一律是歷史紀錄。
+> **Remotion 版 Phase B 的開工檔＝[`KICKOFF-s32-remotion-phaseB.md`](KICKOFF-s32-remotion-phaseB.md)**（2026-09-28 立檔；取代本檔 §5／§6，§4 Phase A 照抄沿用；含 Phase A 音檔本機遺失的事實與重對映／重配音的裁決表）。
 
 > **立檔：2026-09-13**（使用者第二次裁決當日）。**這一節有兩個交付目標**：
 > ① 把 §3.2 做成片；② 順便把「一節怎麼做」變成可複製的 **SOP v1**（`KICKOFF-section-template.md`）
