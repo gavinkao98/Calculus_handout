@@ -1,20 +1,22 @@
-# Local fallback deps for the video/ pipeline.
+# -*- coding: utf-8 -*-
+# video/ 產線的 Python 直接依賴（人讀版；pinned，版本與 ../requirements.lock 一致）。
+# （首行 coding 宣告不能拿掉：pip 在 Windows 繁中語系預設用 cp950 解讀 requirements 檔，
+#   沒有它，本檔的中文註解會讓 `pip install -r` 直接 UnicodeDecodeError。）
 #
-# The pipeline normally loads heavy deps from the vendored .deps_voiceover / .deps
-# dirs at repo root (see pipeline/_bootstrap.py). Those are gitignored, so a fresh
-# clone on a new machine does NOT have them. When they are absent, create a venv
-# and install this file instead:
+# 2026-09-28 起影片渲染改走 Remotion（Node 專案，npm 依賴見 experiments/remotion_styles/paper/
+# 的 package-lock.json），manim 已隨 Manim gen-2 引擎退場（封存在 legacy/manim_video/，見
+# KICKOFF-remotion-unification.md）。這裡剩下的是 pipeline/ 的 TTS／對齊／音訊／稽核包等 Python 端。
+#
+# 要精確重現整個 repo 的 Python 環境（含傳遞依賴）請改裝 ../requirements.lock——見 ../ENVIRONMENT.md
+# 與 tools/setup.ps1（以下在 repo 根執行）：
 #
 #   python -m venv .venv
-#   .venv\Scripts\python -m pip install -r video\requirements.txt
+#   .venv\Scripts\python -m pip install -r requirements.lock
 #
-# See README.md "## 環境" for the ffmpeg shim + run command.
-
-# Direct deps of the video/ pipeline (pinned). For an EXACT, reproducible install
-# of the whole repo's Python env (incl. transitive deps) install ../requirements.lock
-# instead — see ../ENVIRONMENT.md / tools/setup.ps1. Versions below match that lock.
-manim==0.20.1         # vendored as .deps_voiceover; render engine
-pyyaml==6.0.3         # vendored as .deps; storyboard/fragment parsing
-imageio-ffmpeg==0.6.0 # bundled ffmpeg binary (only used when no system ffmpeg on PATH)
-fonttools==4.63.0     # one-shot logo-outline SVG generator (pipeline/assets/_outline_text.py)
-# (MiMo TTS uses stdlib urllib -- no extra dep needed; the Gemini route + google-genai were retired 2026-06-16)
+# forced alignment（stable-ts／whisper-timestamped）走全域 python、不在這裡，見 ../ENVIRONMENT.md ⑤c。
+pyyaml==6.0.3         # storyboard／旁白稿／manifest 解析
+numpy==2.4.6          # rewatch_pack 的畫面變動統計（原由 manim 間接帶入，manim 退場後改為明列）
+pillow==12.2.0        # rewatch_pack contact sheet 與稽核報告內嵌圖（同上，改為明列）
+imageio-ffmpeg==0.6.0 # 內附 ffmpeg 二進位（系統 PATH 沒有 ffmpeg 時才用得到）
+fonttools==4.63.0     # 一次性的 logo 外框 SVG 產生器（pipeline/assets/_outline_text.py）
+# （MiMo TTS 用 stdlib urllib，不需額外套件；Gemini 路線與 google-genai 已於 2026-06-16 退場）

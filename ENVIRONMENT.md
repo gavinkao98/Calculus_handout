@@ -13,26 +13,25 @@ powershell -ExecutionPolicy Bypass -File tools\setup.ps1
 
 # 2) 任何時候想知道「這台缺什麼、怎麼補」
 python tools\doctor.py
-
-# 3) 影片線：環境綠之外再驗「產線綠」——正典 deck 的離線 render 前閘（schema／lint／derive --check；不 render、不計費）
-python tools\doctor.py --smoke
 ```
 
 `doctor.py` 是**純 stdlib、任何 python 都能跑**（venv 還沒建也能跑），會逐項印 `[ OK ]／[WARN]／[FAIL]`
 與**確切補法**，最後給「能力摘要」告訴你現在哪些工作流跑得動。有 `[FAIL]` 時退出碼為 1。
-`--smoke` 另對 `video/storyboards/` 每個正典 deck 跑 `schema.py`（含 provenance／source_rev／pedagogy／coverage）＋`lint.py`＋（有 `.spoken.yml` 者）`derive_spoken --check`，
-deck 閘失敗也算 `[FAIL]`——工具鏈綠不等於產線綠（2026-08-10 佈局重構後正典 deck 過不了自己的 provenance 閘、doctor 卻全綠，見
-`video/_audit/REVIEW-pipeline-assessment-2026-09-07.html`）。模組級 selftest 全套＝`.venv\Scripts\python video\pipeline\run_selftests.py`（manim 類要幾分鐘，故不併進 doctor）。
+模組級 selftest 全套另跑 `.venv\Scripts\python video\pipeline\run_selftests.py`（不併進 doctor）。
+
+> **`--smoke` 已退役（2026-09-28）：** 它原本對 `video/storyboards/` 每個正典 deck 跑 `schema.py`＋`lint.py`＋`derive_spoken --check`；
+> 正典 storyboard 與 `schema.py`／`lint.py` 已隨 Manim gen-2 引擎封存到 `legacy/manim_video/`，`derive_spoken --check` 沒有正典 deck 可驗，
+> 故一併拿掉（旗標仍接受，只印一列說明）。見 [`video/KICKOFF-remotion-unification.md`](video/KICKOFF-remotion-unification.md)。
 
 ## 環境分層（四層核心 ＋ 審核工具）
 
 | 層 | 內容 | 怎麼統一 |
 |---|---|---|
-| **① Python 套件** | 共用 `.venv`（manim 0.20.1、PyYAML、ManimPango、Pillow、imageio-ffmpeg、fonttools、pymupdf…） | `setup.ps1` 從 [`requirements.lock`](requirements.lock) 精確重現 |
+| **① Python 套件** | 共用 `.venv`（PyYAML、Pillow、numpy、imageio-ffmpeg、fonttools、pymupdf、Brotli；2026-09-28 起不含 manim 一族） | `setup.ps1` 從 [`requirements.lock`](requirements.lock) 精確重現 |
 | **② 系統 binary** | `ffmpeg`、`ffprobe` | 每台 `winget install --id Gyan.FFmpeg -e`（**含 ffprobe**） |
-| **③ LaTeX** | MiKTeX：`latex`、`dvisvgm` + `plex-mono`/`lmodern`/`microtype`（Route A：video 文字＋數學皆走 LaTeX；MiKTeX 首編自動補裝）＋ **repo vendored 的 `InstrumentSans`**（無 CTAN 套件，不會自動補裝，見 ①b） | 每台裝 MiKTeX（manim 的 Tex/MathTex 沒有它就編不出來；無 code 繞法）；**再跑一次 `tools\setup.ps1`** 把 vendored 字型註冊進 MiKTeX |
-| **①b 影片字型** | **全走 LaTeX**：文字 **Instrument Sans**（2026-09-13 由 IBM Plex Sans 換過來）、eyebrow IBM Plex Mono、數學 Latin Modern（後兩者的套件見 ③）。**不再用 Pango 系統字型**（Times/Courier 已棄） | 無需安裝系統字型。**Instrument Sans 是 repo vendored**（`video/pipeline/fonts/instrument-sans/`），換機／搬 repo 後要跑 `tools\setup.ps1` 做 MiKTeX 使用者層級註冊；`plex-mono`／`lmodern`／`microtype` 由 ③ 的 MiKTeX 供應。四層檢查都在 `doctor.py`，見下方 ①b |
-| **④ Node + 瀏覽器** | Node ≥21、Google Chrome（給 `handout/figkit/shot.mjs` 截圖、`video/experiments/reference_frames/yt_frames.mjs` 抓 YouTube 幀） | 每台裝 Node LTS + Chrome |
+| **③ LaTeX** | MiKTeX（**講義出版線 [`handout/latex/`](handout/latex/) 專用**：`lualatex`／`latexmk`／`newcomputermodern`／`pdftotext`，見 ③b）。**影片線自 2026-09-28 起不需要 TeX**（Remotion 的數學走 MathJax） | 每台裝 MiKTeX；首次編譯自動補裝缺的套件 |
+| **①b 影片字型** | **已退役（2026-09-28）**：Manim 時代的 LaTeX 字型（vendored Instrument Sans＋Plex Mono＋Latin Modern）隨 Manim gen-2 引擎封存，見 [`legacy/manim_video/`](legacy/manim_video/)。Remotion 線的字型由 npm 套件供應（`@fontsource/*`、MathJax 字型），隨 ④ 的 `npm ci` 裝好 | 無需任何安裝步驟；`tools\setup.ps1` 不再做 MiKTeX 註冊。沿革見下方 ①b |
+| **④ Node + 瀏覽器** | **Node ≥21＝Remotion 影片線的正式依賴**（2026-09-28 起影片唯一渲染器；專案在 `video/experiments/remotion_styles/paper/`，npm 依賴由其 `package-lock.json` 釘死）；另給 `handout/figkit/shot.mjs` 截圖、`video/experiments/reference_frames/yt_frames.mjs` 抓 YouTube 幀。Google Chrome 給 `shot.mjs` | 每台裝 Node LTS + Chrome；再到 `video/experiments/remotion_styles/paper/` 跑一次 `npm ci` |
 | **⑤ codex（審核工具，選用）** | Mode B 講義審核／video gate2 用的 `codex` CLI | 部署版控的 [`tools/codex.cmd`](tools/codex.cmd) shim（解 PATH＋stale-launcher 兩坑）；見下方 ⑤ |
 | **⑤c agy（Antigravity CLI，多模型唯讀評審，選用）** | 看片多鏡評審等要拉開模型家族（Gemini／Claude 4.6）的唯讀評審；走 Antigravity 訂閱 | 本體隨 Antigravity IDE 裝在 `%LOCALAPPDATA%\agy\bin\`（安裝程式通常已加進使用者 PATH）；找不到時部署版控 shim [`tools/agy.cmd`](tools/agy.cmd)；見下方 ⑤c |
 | **⑤b Vale（去 AI 味 lint，選用）** | 散文 AI-tell flag 引擎（markup-aware，自動排除 `$...$`／LaTeX／code）；handout prose 與 video narration 去 AI 味用（[`PLAN-deai-flavor.md`](authoring/_archive/deai/PLAN-deai-flavor.md)） | 每台 `winget install errata-ai.Vale`；**flag-only／advisory**，缺它不擋核心產線（同 codex，WARN 不 FAIL）。見下方 ⑤b |
@@ -41,7 +40,7 @@ deck 閘失敗也算 `[FAIL]`——工具鏈綠不等於產線綠（2026-08-10 �
 
 ## 一次性安裝（每台機器各做一次）
 
-本機驗證過的版本：Python 3.12.10、Node v24、MiKTeX、ffmpeg 8.1.1、Vale 3.15.1（選用）、whisper-timestamped 1.15.9 / openai-whisper 20250625 / stable-ts 2.19.1 / torchaudio 2.11.0（scene-level forced alignment 正式路線用，見 `video/pipeline/scene_align.py`）。
+本機驗證過的版本：Python 3.12.10、Node v24、Remotion 4.0.529（npm，`paper/package-lock.json` 釘版）、MiKTeX（講義線）、ffmpeg 8.1.1、Vale 3.15.1（選用）、whisper-timestamped 1.15.9 / openai-whisper 20250625 / stable-ts 2.19.1 / torchaudio 2.11.0（scene-level forced alignment 正式路線用，見 `video/pipeline/scene_align.py`）。
 
 ```powershell
 # Python（lock 以 3.12 凍結，請用 3.12 以免 wheel 不相容）
@@ -50,8 +49,10 @@ winget install Python.Python.3.12
 # ffmpeg 全套（含 ffprobe）— 裝完開「新的」shell 讓 PATH 生效
 winget install --id Gyan.FFmpeg -e
 
-# Node LTS（shot.mjs 用 global WebSocket/fetch，需 ≥21）
+# Node LTS（Remotion 影片線＋shot.mjs 用 global WebSocket/fetch，需 ≥21）
 winget install OpenJS.NodeJS.LTS
+# Remotion 專案的 npm 依賴（依 package-lock.json 精確重現；node_modules 不進版控）
+Push-Location video\experiments\remotion_styles\paper; npm ci; Pop-Location
 
 # Google Chrome（shot.mjs 用 CDP 截圖）
 winget install Google.Chrome
@@ -62,10 +63,9 @@ winget install --id errata-ai.Vale -e
 # forced alignment（選用，video 實驗線用；全局裝，方便任何 thread 直接呼叫）
 python -m pip install --upgrade whisper-timestamped stable-ts
 
-# LaTeX：裝 MiKTeX（https://miktex.org）。latex/dvisvgm 會進 PATH；
-# video 文字＋數學皆走 LaTeX，需 plex-mono/lmodern/microtype 套件
-# （MiKTeX 首次編譯自動補裝；只能 pdflatex）。文字字體 Instrument Sans 是 repo
-# vendored、不會自動補裝——裝完 MiKTeX 要跑 tools\setup.ps1 註冊（見 ①b）。
+# LaTeX：裝 MiKTeX（https://miktex.org），講義出版線（handout/latex/）用；
+# lualatex／latexmk 會進 PATH，newcomputermodern 等套件首次編譯自動補裝（見 ③b）。
+# 影片線 2026-09-28 起不需要 TeX。
 ```
 
 裝完跑 `tools\setup.ps1` 補 Python 端，再 `python tools\doctor.py` 應全綠。
@@ -79,6 +79,11 @@ python -m pip install --upgrade whisper-timestamped stable-ts
 - **精確重現：** [`requirements.lock`](requirements.lock)（`pip freeze` 全圖、精確 `==`）是安裝權威。
   各區的人讀版直接依賴清單：[`video/requirements.txt`](video/requirements.txt)、
   [`authoring/seed_converge/requirements.txt`](authoring/seed_converge/requirements.txt)。
+- **2026-09-28 拆掉 manim 一族：** 影片線改走 Remotion（[`video/KICKOFF-remotion-unification.md`](video/KICKOFF-remotion-unification.md)），
+  `manim`／`ManimPango` 與只被它們（傳遞）依賴的 29 個套件移出 lock（逐項 `Required-by` 鏈見該次 commit body），
+  lock 剩 7 個套件，已在乾淨 venv 以 `pip install -r requirements.lock` 驗過可裝、`pip check` 無缺。
+  **舊機 `.venv` 裡已裝的 manim 一族不必清**（lock 是契約，多裝無害）；要重建 Manim 環境，改裝 tag
+  `archive/2026-09-28-manim-gen2-final` 的 lock（`git show archive/2026-09-28-manim-gen2-final:requirements.lock`）。
 - **曾漏裝、現已納入：** `fonttools`（logo 外框一次性工具）、`pymupdf`/`fitz`（authoring 圖稽核）
   以前沒宣告也沒裝，換機重跑會 ImportError；現都進 lock。
   2026-07-17 起這兩個**還背著 LaTeX 出版線的字形閘**（[`handout/latex/check_glyphs.py`](handout/latex/check_glyphs.py)，
@@ -92,43 +97,31 @@ python -m pip install --upgrade whisper-timestamped stable-ts
   fontTools 要解 woff2 就需要 Brotli。缺它 → 字形閘對圖裡的字型 FAIL 並指名（不會靜默略過）。
 
 ### ② ffmpeg / ffprobe — 裝真正的全套（策略 A）
-- `make.py` 的 compose 與 `critic.py` 抽幀用**裸名** `ffmpeg`／`ffprobe` 呼叫，必須在 PATH 上。
+- Remotion 成片的後處理（`paper/scripts/loudnorm.py` 響度正規化、`chapters.py` 嵌章節）、
+  `video/pipeline/rewatch_pack.py` 抽幀與讀時長、音訊量測都用**裸名** `ffmpeg`／`ffprobe` 呼叫，必須在 PATH 上。
+  （2026-09-28 前另有 `make.py` compose 與 `critic.py` 抽幀，已隨 Manim gen-2 引擎封存。）
 - **`ffprobe` 是過去的硬卡點：** `imageio-ffmpeg` 與舊的 `.venv\ffmpeg_shim` 都**只給 ffmpeg、不給 ffprobe**；
   缺它時 `make.py` render 後的時長健檢（`_probe_duration`）會 `FileNotFoundError` 直接崩、**compose 不跑＝沒有合併成片**。
 - **統一作法：** 每台 `winget install --id Gyan.FFmpeg -e` 裝 Gyan 全套（ffmpeg＋ffprobe＋ffplay），兩者一起進 PATH。
   **裝了系統 ffmpeg 後，舊的 `.venv\ffmpeg_shim` 變多餘，可不再依賴。**
 
-### ③ LaTeX — MiKTeX，沒有 code 繞法
-- manim 的每個 `Tex`／`MathTex` 都要走真 TeX：`latex → .dvi → dvisvgm → svg`。
-- `pipeline/_bootstrap.apply_tex_template()` 設的全域 TeX template 用 **`InstrumentSans`**（文字，vendored，見 ①b）
-  **+ `plex-mono`**（eyebrow/label mono）**+ `lmodern`**（數學）**+ `microtype`**（kerning）＋`familydefault=\sfdefault`，
-  外加 `\DeclareMathOperator` 三個反三角 operator（Route A，2026-06-24：所有螢幕文字＋數學都走 LaTeX 以拿到 kerning；
-  文字家族 2026-09-13 由 `plex-sans` 換成 Instrument Sans）。`plex-mono`／`lm`／`microtype` 是 MiKTeX 套件，首次編譯會自動
-  補裝；**`InstrumentSans` 不是**——它沒有 CTAN 套件，靠 repo vendored（①b）。**硬約束：只能 pdflatex**——
-  lualatex/xelatex 會破壞 manim 的 `\special{dvisvgm:raw}` 數學子部件定址，故排除需 fontspec 的 `newcomputermodern`。
-  （`newtx` 已不再是 video 需求，但仍是 `legacy/tex_handout/` 的需求。）
-- handout 的 HTML 講義**不需要** LaTeX（數學走 MathJax/KaTeX CDN）；`video/` render 需要 pdflatex 路徑，
-  出版排版線（`handout/latex/`）另需 lualatex 路徑（見 ③b）——同一套 MiKTeX、兩條互不干擾。
-- **踩坑（2026-06-25）：文字 render 成空白／場景一開頭 `IndexError` 崩。** 症狀：含文字的場景 render 崩在
-  `IndexError: too many indices for array`（標題 Tex 沒有任何點），或 latex／dvisvgm 印
-  `'miktex-makemf.exe…mf' is not recognized`、`no font file found for '…'`。**不是缺套件**——`kpsewhich`
-  查得到 `.sty`——而是字型查找鏈斷了。**兩個入口，症狀一樣：**
-  ① 這台 MiKTeX 的**字型檔名庫（FNDB）stale**：latex 找不到已裝的 `.tfm`，fallback 去壞掉的 `makemf`。修法：
-  ```powershell
-  initexmf --update-fndb     # 刷新檔名資料庫，latex 才找得到已裝的 .tfm
-  miktex fontmaps configure  # 重建字型 map（dvisvgm 描 Type1 外框要它）
-  ```
-  ② **vendored Instrument Sans 的 map 沒併進 `ps2pk.map`**（換機／搬 repo 後沒跑 `tools/setup.ps1`）：latex 編得過、
-  dvisvgm 描不出外框。修法＝跑 `tools/setup.ps1`（見 ①b）。
-  兩者修完**還要刪 manim 的 Tex 快取** `media/Tex/`——壞掉時期那批空白 svg 會被 manim 依 hash 沿用，不清就還是空。
-  `doctor.py` 的「文字 Tex 實編非空」檢查（`check_tex_compiles`）會實 build 一個 Tex 抓這個坑（kpsewhich 查
-  `.sty` 在 ≠ 編得出字），`check_vendored_text_font` 則分別點名 ①b 的三個前提。另：MiKTeX 一直印
-  「you have not checked for updates as a MiKTeX user」是同源警告，開一次 MiKTeX Console → Check for updates 可消。
+### ③ LaTeX — MiKTeX（講義出版線專用；影片線 2026-09-28 起不需要）
+- **現役用途只剩講義出版線** [`handout/latex/`](handout/latex/)：`lualatex`＋`latexmk`＋`newcomputermodern`＋`pdftotext`，
+  細節見 ③b。`doctor.py` 的 `LaTeX` 區只驗 MiKTeX 本體在（`latex` 在 PATH），講義線工具鏈由 `handout-tex` 區細驗。
+- handout 的 HTML 講義（已封存於 `legacy/html_handout/`）**不需要** LaTeX（數學走 MathJax/KaTeX CDN）。
+  `legacy/tex_handout/`（凍結）需要 `newtx`，不在 doctor 檢查範圍。
+- **沿革（2026-09-28 退役，見 [`video/KICKOFF-remotion-unification.md`](video/KICKOFF-remotion-unification.md)）：**
+  Manim gen-2 影片線的每個 `Tex`／`MathTex` 都走真 TeX（`latex → .dvi → dvisvgm → svg`；Route A 讓螢幕文字＋數學全走
+  pdflatex，且只能 pdflatex），所以 MiKTeX 曾是影片線的硬需求：`doctor.py` 另驗 `dvisvgm`／`dvipng`、
+  `plex-mono`／`lmodern`／`microtype` 套件與「文字 Tex 實編非空」，本節也載有「文字 render 成空白」
+  （MiKTeX FNDB stale、vendored 字型 map 沒併進 `ps2pk.map`）的踩坑修法。影片線改走 Remotion（數學由 MathJax 出 SVG）
+  後這些全部退役；引擎本體在 [`legacy/manim_video/`](legacy/manim_video/)，本節當時的完整原文用
+  `git show archive/2026-09-28-manim-gen2-final:ENVIRONMENT.md` 取回。
 
 ### ③b handout LaTeX 出版排版線 — lualatex + memoir + NCM + vendored Inter
 - **這條線是講義的出版排版（`handout/latex/`，[`handout/latex/KICKOFF-latex-pilot.md`](handout/latex/KICKOFF-latex-pilot.md)）**：
   fragment 經 `convert.py` 確定性轉換 → `template/calcbook.sty`（memoir）→ `latexmk -lualatex` 出 A4 PDF。
-  與 video 的「只能 pdflatex」硬約束**不衝突**——兩條線各走各的引擎，同一套 MiKTeX。
+  （Manim 時代影片線走 pdflatex、本線走 lualatex，同一套 MiKTeX 互不干擾；2026-09-28 起 MiKTeX 只剩本線在用。）
 - 需求全在 MiKTeX 內：`lualatex`／`latexmk` 內建；`newcomputermodern`（本文＋數學字體）首次編譯自動補裝；
   `pdftotext`（完整性閘 `check_prose.py`）MiKTeX 也自帶（poppler 系工具）。
 - **`pdftotext` 要抓到 poppler 版，不是「在 PATH 就好」（2026-07-27）**：Git for Windows 的
@@ -145,45 +138,29 @@ python -m pip install --upgrade whisper-timestamped stable-ts
 - `doctor.py` 的 `check_handout_latex`（區名 `handout-tex`）驗上述全部：lualatex／latexmk／pdftotext 在 PATH、
   `kpsewhich NewCM10-Regular.otf` 可尋、vendored Inter 六檔在。
 
-### ①b 影片字型 — 全走 LaTeX（vendored Instrument Sans 文字 + Plex Mono + Latin Modern 數學）
-- Route A（2026-06-24）後，影片**所有螢幕文字＋數學都走 LaTeX/pdflatex**：文字 **Instrument Sans**（標題/內文；2026-09-13
-  由 IBM Plex Sans 換過來）+ **IBM Plex Mono**（eyebrow/標籤），數學 **Latin Modern**。字體在 ③ 的 preamble 設定，
-  **不再經 Pango、不用任何系統字型**（舊的 Times New Roman／Courier New 已棄）。根因：manim `Text`（Pango）不套 kerning，LaTeX 會。
-- **Instrument Sans 沒有 CTAN 的 pdflatex 套件**（2023 年的 Google Font／OFL，只有 OTF/TTF；`kpsewhich instrument-sans.sty` 查無），
-  所以走 **vendoring**：字體檔與 pdflatex 字型支援都在 `video/pipeline/fonts/instrument-sans/`，隨 repo 走。
-  - `otf/`＝三個靜態字重 OTF（Regular／SemiBold／Bold）＋ `OFL.txt`。來源＝GitHub `Instrument/instrument-sans`
-    commit `7fa22308a3d0c94ee2b3cd537a1196b65db34a3e`（`fonts/otf/`），sha256：
-    Regular `33c8c755…a372fa`／SemiBold `2846d624…30d085fe`／Bold `6746ca64…f58c4a25`／`OFL.txt` `9e27a72e…134ef966`。
-    **Medium（500）沒收**：`autoinst` 的 NFSS 權重表沒有對應碼（`-nfssweight=mb=medium` 不被接受），
-    裝不進來；現役 code 也只用到 upright regular（`\mdseries`）與 bold（`\textbf`）。
-  - `texmf/`＝`autoinst`（MiKTeX 自帶的 lcdf-typetools）生成的 pdflatex 支援：`.sty`／`.fd`／`.tfm`／`.vf`／`.pfb`／`.enc`／`.map`
-    ＋一份 `miktex/config/updmap.cfg`。**重生指令**（在 `video/pipeline/fonts/instrument-sans/` 下跑）：
-    ```bash
-    /c/Strawberry/perl/bin/perl "$LOCALAPPDATA/Programs/MiKTeX/scripts/fontools/autoinst" \
-      -target=texmf -vendor=instrument -typeface=instrumentsans -sanserif -encoding=OT1,T1 \
-      -nosmallcaps -noswash -notitling -nosuperiors -noinferiors -noornaments -nofractions \
-      -nooldstyle -notabular otf/InstrumentSans-{Regular,SemiBold,Bold}.otf
-    ```
-    ⚠ `autoinst` 是 perl 腳本，Git Bash 內附的 msys perl **缺 `Pod::Usage` 跑不起來**，一定要用 Strawberry Perl
-    （`C:\Strawberry\perl\bin\perl`）呼叫 `%LOCALAPPDATA%\Programs\MiKTeX\scripts\fontools\autoinst`。
-    生成物只涵蓋 upright（無 italic／small caps）——現役 code grep 過只用 `\textbf`／`\texttt`／預設 upright。
-- **換機／搬 repo 後要跑 `tools/setup.ps1`**（冪等）：它做兩步 MiKTeX **使用者層級**設定——
-  ```powershell
-  initexmf --register-root=<repo>\video\pipeline\fonts\instrument-sans\texmf
-  miktex fontmaps configure      # 把 vendored updmap.cfg 的 Map 行併進 ps2pk.map／psfonts.map
-  ```
-  **為什麼非做不可（2026-09-13 實測）：** 純環境變數路線（`TEXINPUTS`／`TFMFONTS`／`VFFONTS`／`T1FONTS`／`ENCFONTS`／
-  `TEXFONTMAPS`）能讓 `latex` 編過，但 **`dvisvgm` 只讀它預設找到的第一個 map 檔**（本機＝`ps2pk.map`），且
-  manim 呼叫它時不帶 `--font-map`（`--no-fonts --verbosity=0`，錯誤還被靜音）——把 vendored map 命名成 `ps2pk.map`
-  搶第一順位則換成 `lmodern`／`plex-mono` 描不出來。所以 map 一定要併進本機生成的 `ps2pk.map`。
-  註冊的是**任一份** vendored `texmf`（各 worktree 的內容相同），所以主 checkout 註冊一次，全部 worktree 都能 render。
-- `doctor.py` 驗四層：`check_fonts` 以 kpsewhich 驗 `plex-mono.sty`／`lmodern.sty`／`microtype.sty`；
-  `check_vendored_text_font` 驗 ① vendored 關鍵檔在 ② `kpsewhich InstrumentSans.sty` 指到 repo 內（root 已註冊）
-  ③ `ps2pk.map` 真的含 `InstrumentSans` 行；`check_tex_compiles` 再實 build 一個 Tex 確認非空。
-- **影片只 vendored 這一套字型。** Direction D 的 vendored 設計字型早於 2026-06-20 清理移除；`fonttools` 仍是依賴（logo 外框工具
-  `pipeline/assets/_outline_text.py` 用）。
+### ①b 影片字型 — 已隨 Manim gen-2 封存（2026-09-28）
+- **現況：** Remotion 線的字型全由 npm 套件供應（`@fontsource/eb-garamond`、`@fontsource/noto-serif-tc`、
+  MathJax 的 `@mathjax/mathjax-pagella-font`），`npm ci`（見 ④）裝好即可，**不需要任何系統字型或 MiKTeX 註冊**。
+  `tools/setup.ps1` 已拿掉「把 vendored Instrument Sans 註冊給 MiKTeX」那一步，`doctor.py` 也不再驗字型。
+- **沿革：** Manim gen-2 影片線（Route A，2026-06-24 起）的螢幕文字＋數學全走 LaTeX：文字 **Instrument Sans**
+  （2026-09-13 由 IBM Plex Sans 換過來；沒有 CTAN 套件，OTF＋`autoinst` 生成物 vendored 在 repo）、eyebrow **IBM Plex Mono**、
+  數學 **Latin Modern**。因為 `dvisvgm` 只讀它預設找到的第一個 map 檔，vendored 字型要靠 `setup.ps1` 做兩步 MiKTeX
+  使用者層級註冊（`initexmf --register-root=…` ＋ `miktex fontmaps configure`）。這套字型已隨 `video/pipeline/fonts/`
+  搬到 [`legacy/manim_video/`](legacy/manim_video/)；來源 commit、sha256、`autoinst` 重生指令與註冊步驟的完整原文用
+  `git show archive/2026-09-28-manim-gen2-final:ENVIRONMENT.md` 取回。裁決與搬移清單見
+  [`video/KICKOFF-remotion-unification.md`](video/KICKOFF-remotion-unification.md)。
+- **舊機遺留（選用清理）：** 跑過舊版 `setup.ps1` 的機器，MiKTeX 仍登記著指向
+  `<repo>\video\pipeline\fonts\instrument-sans\texmf` 的使用者 root（檔案搬走後該路徑不存在）。講義線用不到它；想清掉就跑
+  `initexmf --unregister-root=<repo>\video\pipeline\fonts\instrument-sans\texmf` 再 `miktex fontmaps configure`。
+- `fonttools` 仍是依賴（logo 外框工具 `video/pipeline/assets/_outline_text.py` 與講義字形閘用，見 ①）。
 
-### ④ Node + Chrome — 給 handout 圖 render 與 `video/experiments/reference_frames/` 抓 YouTube 幀用
+### ④ Node + Chrome — Remotion 影片線（正式依賴）、handout 圖 render 與 `video/experiments/reference_frames/` 抓 YouTube 幀
+- **Remotion＝影片線唯一渲染器（2026-09-28 拍板，[`video/KICKOFF-remotion-unification.md`](video/KICKOFF-remotion-unification.md)）：**
+  Node ≥21 因此從「handout 工具」升為**影片線的正式依賴**。專案目前在
+  [`video/experiments/remotion_styles/paper/`](video/experiments/remotion_styles/paper/)（升格正式目錄另開一輪），
+  npm 依賴（`remotion`／`@remotion/cli` 4.0.529、React、MathJax、`@fontsource/*` 字型）由它的 `package-lock.json` 釘死；
+  `node_modules/` 不進版控，**每台機器在該夾跑一次 `npm ci`**（精確照 lock 重現、需網路）。
+  `doctor.py` 的 `Node` 區驗 Node ≥21，並在 `node_modules/` 不存在時 WARN 提示 `npm ci`。
 - [`legacy/html_handout/build.py`](legacy/html_handout/build.py) 組裝 HTML 是**純 Python stdlib**，任何 python 都能跑、無額外需求。
 - [`handout/figkit/shot.mjs`](handout/figkit/shot.mjs)（render `.sheet` 成 PNG 餵 figure 稽核）需要
   **Node ≥21**（global WebSocket/fetch）＋ **Google Chrome**。Chrome 路徑現在會先讀 `CHROME` 環境變數、
@@ -262,7 +239,7 @@ copy tools\agy.cmd "%APPDATA%\npm\agy.cmd"
 
 ### ⑤c forced alignment — 本機 word timestamps（選用）
 
-`video/experiments/forced_alignment_dean/` 測「整段 Dean 音訊 → 對位 → storyboard beat durations → render/mux」的路線。這不是核心成片產線必需，所以缺了只在 `doctor.py` 顯示 WARN，不會讓一般 `make.py`／MiMo beat 流程 FAIL。兩個工具、兩種角色（2026-07-05 三場景實測拍板，詳見 [`RESULTS-2026-07-05.md`](video/experiments/forced_alignment_dean/RESULTS-2026-07-05.md)）：
+`video/experiments/forced_alignment_dean/` 測「整段 Dean 音訊 → 對位 → storyboard beat durations → render/mux」的路線。這不是核心成片產線必需，所以缺了只在 `doctor.py` 顯示 WARN，不會讓一般 MiMo beat 流程 FAIL。兩個工具、兩種角色（2026-07-05 三場景實測拍板，詳見 [`RESULTS-2026-07-05.md`](video/experiments/forced_alignment_dean/RESULTS-2026-07-05.md)）：
 
 - **`stable-ts`＝計時來源：** transcript-constrained forced alignment（`stable_whisper.align()`），被 plan transcript 約束、結構上不可能漏字，每字附 timestamp＋機率。wrapper：[`run_stable_ts_align.py`](video/experiments/forced_alignment_dean/run_stable_ts_align.py)。
 - **`whisper_timestamped`＝QA 探針：** 自由 ASR＋DTW timestamps。ASR decoder 對重複的數學公式片語會跳字（實測 derivation 場景漏 12 字、後續 beat 全部錯位），**不可當計時來源**；改當獨立 QA——拿 ASR 文字 diff transcript，抓「TTS 沒唸／唸錯」這類 FA 結構上看不到的錯。wrapper：[`run_whisper_timestamped.py`](video/experiments/forced_alignment_dean/run_whisper_timestamped.py)。
@@ -276,8 +253,8 @@ copy tools\agy.cmd "%APPDATA%\npm\agy.cmd"
 
 ### 祕鑰
 - 全部走環境變數，**永不進版控、不寫檔、不記 log**。`.env` 已 gitignored。
-- 離線路徑不需要 key：`make.py --backend mock`、`tts.py --backend mock --unit beat`、`critic.py --dry-run`、
-  `doctor.py`。批次計費前依 [`CLAUDE.md`](CLAUDE.md) 報用量徵同意。
+- 離線路徑不需要 key：`tts.py --backend mock --unit beat`、本地 Remotion render、`doctor.py`。
+  批次計費前依 [`CLAUDE.md`](CLAUDE.md) 報用量徵同意。
 
 ## 在用 / 不在用
 
