@@ -1,5 +1,13 @@
 # Q7 配音工作流試驗
 
+## Gemini 中文數學 LaTeX／口語稿 A/B 試音（2026-09-27）
+
+[試聽對照頁](../../_audit/REVIEW-gemini-math-latex-tts-2026-09-27.html)將高中數學、微積分、線性代數共 12 個常見算式分成三段；每段各用原樣 LaTeX 與事先寫好的中文口語稿合成一次。[精確試稿](latex_math_ab_20260927.json)固定 `gemini-3.8-flash-tts`／Iapetus、無 style、無自動重試。使用者在看到 6 次請求、約 2–5 分鐘、US$0.04–0.10 的報量後同意；實際 6／6 次成功、0 重試。受控工具為 [`tts_gemini_math_probe.py`](../../pipeline/tts_gemini_math_probe.py)，每次請求保存 plan、payload、原始回應、WAV、receipt 與 ledger；未完成請求不自動補送。
+
+原始批次在 `video/output/tts_workflow/math_latex_ab_20260927/`（本機輸出，不進版控）；六段音檔共 **126.68 秒**，receipt 合計 **494 文字輸入 token＋4,056 音訊輸出 token**。按 2026-09-27 查核的 [Gemini 3.8 Flash TTS Standard 價格](https://ai.google.dev/gemini-api/docs/pricing#gemini-3.8-flash-tts)估 **US$0.036751**，未核帳。`listen/` 為原始 WAV 的逐位元相同副本；試聽頁的六個播放鈕連到該目錄，沒有音量或速度處理。
+
+本機 Whisper small 的無提示辨識在 LaTeX 微積分版出現 `Lim`、`d dx`，線性代數版出現 `Determine A` 等字樣；口語版辨識較接近稿子。但辨識器也把兩版的 `+6` 都辨成 `-6`，不能把 ASR 當成實際發音或正確率的裁決。逐式人耳核對尚未完成，試音結果不代表正式音鎖，也不變更現行配音路線。
+
 ## Gemini Iapetus 中文全片批次
 
 此批從既有 MiMo 14 場 `plan.json` 複製**同一份完整 scene 文字與 cue**，另凍結 `gemini-3.8-flash-tts`／Iapetus 的 14 個請求；每場一次，無 style、無自動重試。它是獨立試片批次，`audio_locked=false`、`nfa_status=not_verified`，不覆寫 MiMo take、原片或 Q7ZH 預設 manifest。使用者已授權這次最多 14 次合成；實際執行前仍須核對本次 plan 的 14 場文字與 hash 符合該授權。

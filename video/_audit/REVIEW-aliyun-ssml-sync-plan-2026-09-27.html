@@ -1,0 +1,66 @@
+<!doctype html>
+<html lang="zh-Hant">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>阿里雲 SSML × Remotion 對齊小測試</title>
+  <style>
+    :root{font-family:system-ui,"Microsoft JhengHei",sans-serif;color:#18312c;background:#f6f8f5}
+    body{max-width:900px;margin:0 auto;padding:32px 22px 72px;line-height:1.7}
+    h1{font-size:1.9rem;line-height:1.3}h2{margin-top:2rem;font-size:1.25rem}
+    .card{background:#fff;border:1px solid #d7e2dc;border-radius:12px;padding:20px 24px;margin:18px 0}
+    .lead{font-size:1.08rem}.pill{display:inline-block;border-radius:20px;background:#dcece3;padding:2px 10px;font-size:.87rem}
+    pre{white-space:pre-wrap;overflow-wrap:anywhere;background:#eff4f0;border-radius:8px;padding:16px;font-size:.94rem;line-height:1.7}
+    table{border-collapse:collapse;width:100%;background:#fff}th,td{border:1px solid #d7e2dc;padding:10px 12px;text-align:left;vertical-align:top}th{background:#e8f0e9}
+    a{color:#156254}small{color:#536b62}
+  </style>
+  <script>window.MathJax={tex:{inlineMath:[['\\(','\\)']]}};</script>
+  <script defer src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
+</head>
+<body>
+  <span class="pill">測試紀錄 · 北京模型服務尚未可用</span>
+  <h1>阿里雲 SSML 能否簡化 Remotion 配音對齊？</h1>
+  <p class="lead">檢驗 CosyVoice 在讀取 LaTeX 的同一段旁白中，能否依 SSML 插入停頓，並回傳足以驅動畫面揭示點的實際字詞時間戳。</p>
+
+  <section class="card">
+    <h2>固定條件與報量</h2>
+    <p>新加坡地域（<code>ap-southeast-1</code>）；模型 <code>cosyvoice-v3-plus</code>；官方音色 <code>longanyang</code>；中文；每段單次請求；輸出 WAV；啟用串流輸出與 <code>word_timestamp_enabled=true</code>。第二段另啟用 <code>enable_ssml=true</code>。使用新加坡 DashScope 網域 <code>dashscope-intl.aliyuncs.com</code>；不設定風格、不換音色、不自動重試。</p>
+    <p>最多 <strong>2 次生成</strong>，第一段 71 字元、第二段含標籤 149 字元，合計最多 220 字元。按官方新加坡地域人民幣 1.9082 元／萬字，保守地連 SSML 標籤全數計入，估計最多 <strong>人民幣 0.0419804 元，報量以 0.05 元計</strong>；新加坡地域沒有此模型的免費額度。沒有取得明確批次同意前，不發出生成請求。</p>
+  </section>
+
+  <h2>兩次請求的精確文稿</h2>
+  <p>可見的數學內容相同：先看 \(x^2-5x+6=0\)，再化為 \((x-2)(x-3)=0\)，最後指出 \(x=2\) 或 \(x=3\)。</p>
+  <div class="card">
+    <h3>A · LaTeX，沒有 SSML</h3>
+    <pre>先看這個式子：$x^2-5x+6=0$。接著把左邊改寫成：$(x-2)(x-3)=0$。因此，解是 $x=2$ 或 $x=3$。現在回頭檢查。</pre>
+    <h3>B · 同文稿，加入三處 400 毫秒停頓</h3>
+    <pre>&lt;speak&gt;先看這個式子：$x^2-5x+6=0$。&lt;break time="400ms"/&gt;接著把左邊改寫成：$(x-2)(x-3)=0$。&lt;break time="400ms"/&gt;因此，解是 $x=2$ 或 $x=3$。&lt;break time="400ms"/&gt;現在回頭檢查。&lt;/speak&gt;</pre>
+  </div>
+
+  <h2>對齊驗收</h2>
+  <table>
+    <thead><tr><th>要驗什麼</th><th>判斷方法</th></tr></thead>
+    <tbody>
+      <tr><td>兩種能力能否同時使用</td><td>B 必須成功讀出 LaTeX、解析 SSML、回傳 WAV 與字詞時間戳；任一項缺少就記為不通過。</td></tr>
+      <tr><td>三個畫面揭示點</td><td>「接著」「因此」「現在」分別對應第二式、答案、回頭檢查；由回傳字詞起點轉成 30 fps 影格。不得把 SSML 寫的 400 ms 當成實際影格時間。</td></tr>
+      <tr><td>公式邊界</td><td>另檢查第一式起點與「或」的位置是否能從時間戳穩定辨認。這兩個點是診斷項，不因公式展開後的字詞不同而假稱已自動對齊。</td></tr>
+      <tr><td>人工核點</td><td>對成品音訊逐點試聽並看波形；三個必要揭示點與實際語音起點的偏差均需 ≤0.10 秒（30 fps 下約 3 格）。</td></tr>
+      <tr><td>Remotion 相容</td><td>產生一段 1080p、30 fps 的簡短公式畫面，使用現有 manifest 秒數與 <code>buildShow</code> 思路驅動畫面；不需本機 Whisper 才算簡化成功。</td></tr>
+      <tr><td>停頓價值</td><td>量測每處前一句結尾到下一句開頭的實際空檔，對照 A/B 並聽是否自然；三處不強求剛好 400 ms。</td></tr>
+    </tbody>
+  </table>
+  <p>兩份原始音檔、完整串流回應、請求設定及時間戳要在本機保存。只改時間映射時重算 Remotion，不重配音；若任何時間戳缺漏或偏差超標，保留音檔並以本機對齊或人工校點作備援。</p>
+
+  <h2>決策</h2>
+  <p>若必要點全部通過，可把阿里雲原生時間戳作為新配音的主要 cue 來源，把 Whisper 降為例外備援。若 SSML 停頓改善觀看節奏但時間戳不穩，SSML 只能控制聲音，不能簡化對齊。這個小測試不更改現有正式 MiMo／Remotion 產線；擴大到完整場景或其他模型須另行報量。</p>
+  <section class="card">
+    <h2>執行結果與後續方案</h2>
+    <p>2026-09-27，新加坡 DashScope HTTP 串流端點對 A 版回傳 HTTP 400、<code>InvalidParameter</code>、<code>current user api does not support stream call</code>；沒有音訊或時間戳。已保存原始回應與請求紀錄，沒有重送 A，也沒有發出 B。HTTP 文件另註明該頁能力僅適用北京地域；這次實測證明不能以新加坡 HTTP 串流完成本案，但不能推論新加坡 WebSocket 也失敗。</p>
+    <p>官方 WebSocket 文件另列新加坡端點，且 <code>run-task</code> 支援 <code>enable_ssml</code> 與 <code>word_timestamp_enabled</code>。後續若獲新授權，使用同一模型、音色、兩段文稿與最多 220 字元，改走新加坡 WebSocket 各一次，最多新增 2 次生成，保守估價仍為人民幣 0.05 元；原 HTTP 失敗請求不計入新批次，也不重送。WebSocket 版本的完成條件仍是兩份 WAV、時間戳、三個 cue 人工核點與 Remotion 預覽。</p>
+    <p>使用者隨後改用北京地域 API key，授權相同兩段測試。北京 <code>cosyvoice-v3-plus</code> 牌價為人民幣 2 元／萬字，220 字元保守估價 0.044 元；帳號實際剩餘免費額度尚未核實。2026-09-27 北京 HTTP 串流端點對 A 版回傳 HTTP 403、<code>Model.AccessDenied</code>、<code>Model access denied.</code>；沒有音訊或時間戳。原始錯誤回應保存在 <code>video/output/tts_workflow/aliyun_ssml_sync_beijing_20260927/plain/response_error.txt</code>。本批未重送 A，也未發出 B。</p>
+    <p>阿里雲官方將 <code>Model.AccessDenied</code> 解釋為所用 API key 的工作空間沒有模型呼叫權限。請先在北京地域確認這支 key 屬於預設業務空間，或確認所屬子業務空間已獲 <code>cosyvoice-v3-plus</code> 呼叫授權；另核對 key 的自訂模型權限是否包含該模型。完成設定後，需重新報量並取得同意，才另開新批次測試。</p>
+    <p>使用者把 key 改到預設業務空間後，核准同模型、同音色、同兩段文稿的新批次。北京 HTTP 對 A 版回傳 HTTP 403、<code>AccessDenied.Unpurchased</code>、<code>Access to model denied. Please make sure you are eligible for using the model.</code>；沒有音訊或時間戳。原始錯誤回應保存在 <code>video/output/tts_workflow/aliyun_ssml_sync_beijing_authorized_20260927/plain/response_error.txt</code>。本批只送出 A 一次，沒有重送或送 B。阿里雲官方對此碼的說明是百鍊服務可能尚未開通，虛擬經銷商帳號也可能無法購買部分模型。使用者可自行在北京地域檢查服務開通與服務條款，並查看 <code>cosyvoice-v3-plus</code> 的免費額度；本次沒有操作使用者的控制台。</p>
+  </section>
+  <small>官方依據：<a href="https://help.aliyun.com/en/model-studio/cosyvoice-tts-http-api">CosyVoice HTTP API 與字詞時間戳</a>、<a href="https://help.aliyun.com/en/model-studio/cosyvoice-websocket-api">新加坡 WebSocket 端點</a>、<a href="https://help.aliyun.com/en/model-studio/cosyvoice-client-events">WebSocket SSML 與時間戳參數</a>、<a href="https://help.aliyun.com/en/model-studio/cosyvoice-voice-list">音色支援表</a>、<a href="https://help.aliyun.com/zh/model-studio/ssml-latex-user-guide">SSML 與 LaTeX</a>、<a href="https://help.aliyun.com/en/model-studio/singapore-regional-access-information">新加坡地域與網域</a>、<a href="https://help.aliyun.com/zh/model-studio/model-pricing">模型價格</a>、<a href="https://help.aliyun.com/en/model-studio/error-code">Model.AccessDenied 說明</a>。查核日期：2026-09-27。</small>
+</body>
+</html>

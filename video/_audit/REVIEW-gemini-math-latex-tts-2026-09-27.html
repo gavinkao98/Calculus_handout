@@ -1,0 +1,56 @@
+<!doctype html>
+<html lang="zh-Hant">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Gemini 中文數學配音：LaTeX 與口語稿 A/B 試驗</title>
+<script>MathJax={tex:{inlineMath:[['\\(','\\)']]}};</script>
+<script defer src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
+<style>
+  :root{color-scheme:light;--ink:#183147;--muted:#536776;--line:#d8e0e6;--bg:#f3f6f8;--card:#fff;--blue:#17628f}
+  *{box-sizing:border-box}body{margin:0;background:var(--bg);color:var(--ink);font:16px/1.72 "Noto Sans TC","Microsoft JhengHei",sans-serif}
+  main{max-width:1060px;margin:auto;padding:38px 24px 80px}h1{font-size:2rem;line-height:1.3;margin:0 0 8px}h2{font-size:1.42rem;margin:0 0 12px}
+  p{margin:8px 0 14px}.lead{font-size:1.07rem;color:var(--muted)}.meta,.case{background:var(--card);border:1px solid var(--line);border-radius:12px;padding:22px;margin:22px 0}
+  .badge{display:inline-block;background:#e5f2f9;color:var(--blue);font-weight:700;border-radius:99px;padding:3px 12px;font-size:.88rem}
+  .mathline{padding:10px 14px;background:#f5f8fa;border-left:3px solid var(--blue);margin:12px 0}.pair{display:grid;grid-template-columns:1fr 1fr;gap:14px;margin-top:18px}
+  .variant{border:1px solid var(--line);border-radius:9px;padding:14px;min-width:0}.variant h3{margin:0 0 8px;font-size:1rem}
+  pre{white-space:pre-wrap;overflow-wrap:anywhere;margin:0;font:14px/1.65 Consolas,"Microsoft JhengHei",monospace}audio{display:block;width:100%;margin:8px 0 12px}
+  small,.note{color:var(--muted)}a{color:var(--blue)}@media(max-width:720px){.pair{grid-template-columns:1fr}main{padding:24px 14px 50px}}
+</style>
+</head>
+<body><main>
+<h1>Gemini 中文數學配音：LaTeX 與口語稿 A/B 試驗</h1>
+<p class="lead">三個科目、十二個常見算式；每個科目用相同聲線各合成兩版，比較數學正確性與聽感。</p>
+<section class="meta">
+  <p><strong>狀態：</strong>六段試音已完成，6／6 次請求成功、零重試；原始 take 與完整回傳紀錄保留。尚未做逐式人耳聽審，本頁的初步判讀只供定位。</p>
+  <p><strong>固定設定：</strong><code>gemini-3.8-flash-tts</code>、Iapetus、無 style；每版一段完整文字，共 6 次請求，無自動重試。左側保留原樣 LaTeX（含 <code>$</code>），右側是預先寫好的中文口語稿。兩版的數學意思相同。</p>
+  <p><strong>實際用量與費用估算：</strong>六段合計 126.68 秒；receipt 記錄 494 個文字輸入 token、4,056 個音訊輸出 token。按<a href="https://ai.google.dev/gemini-api/docs/pricing#gemini-3.8-flash-tts">官方 Standard 單價</a>估計 US$0.036751，尚未核對帳單。六段音檔均為原始 WAV 的逐位元相同副本，未修改音量或速度。</p>
+  <p><strong>初步觀察：</strong>離線 Whisper small 的無提示辨識，在 LaTeX 微積分版出現「Lim」「d dx」等字樣，矩陣版出現「Determine A」與不清楚的三角函數讀法；口語版的辨識結果較接近稿子。辨識器也把兩版的 <code>+6</code> 都辨成 <code>-6</code>，因此這些紀錄不能當作確定的實際發音或正確率。請以播放音檔、人耳逐式核對為準。</p>
+  <p class="note">評分時逐式記錄：是否唸出 LaTeX 指令／符號、運算順序與括號範圍是否正確、變數與希臘字母發音、自然度，以及漏字或改字。兩版不預設哪一版較好。</p>
+</section>
+
+<section class="case"><span class="badge">01 高中數學</span><h2>方程式、分數、根號、三角函數、對數</h2>
+  <div class="mathline">\(x^2-5x+6=0\)　\(x=\frac{5\pm\sqrt{25-24}}{2}\)　\(\sin^2\theta+\cos^2\theta=1\)　\(\log_2 8=3\)</div>
+  <div class="pair">
+    <div class="variant"><h3>A｜送入原樣 LaTeX（22.12 秒）</h3><audio controls preload="none" src="../output/tts_workflow/math_latex_ab_20260927/listen/high_school_latex.wav"></audio><pre>先看一元二次方程：$x^2-5x+6=0$。用公式解，得到 $x=\frac{5\pm\sqrt{25-24}}{2}$。再看三角恆等式：$\sin^2\theta+\cos^2\theta=1$。最後，$\log_2 8=3$。</pre></div>
+    <div class="variant"><h3>B｜送入中文口語稿（22.16 秒）</h3><audio controls preload="none" src="../output/tts_workflow/math_latex_ab_20260927/listen/high_school_spoken.wav"></audio><pre>先看一元二次方程：x 的平方減五 x 加六等於零。用公式解，得到 x 等於五加減根號下二十五減二十四，所得的結果再除以二。再看三角恆等式：theta 角的正弦平方加餘弦平方等於一。最後，以二為底、八的對數等於三。</pre></div>
+  </div>
+</section>
+
+<section class="case"><span class="badge">02 微積分</span><h2>極限、導數、定積分、偏導數</h2>
+  <div class="mathline">\(\lim_{x\to0}\frac{\sin x}{x}=1\)　\(\frac{d}{dx}x^3=3x^2\)　\(\int_0^1 2x\,dx=1\)　\(\frac{\partial f}{\partial x}=2xy\)</div>
+  <div class="pair">
+    <div class="variant"><h3>A｜送入原樣 LaTeX（23.36 秒）</h3><audio controls preload="none" src="../output/tts_workflow/math_latex_ab_20260927/listen/calculus_latex.wav"></audio><pre>當 $x\to0$ 時，$\lim_{x\to0}\frac{\sin x}{x}=1$。對 $x^3$ 微分，得到 $\frac{d}{dx}x^3=3x^2$。定積分 $\int_0^1 2x\,dx=1$。若 $f(x,y)=x^2y$，則 $\frac{\partial f}{\partial x}=2xy$。</pre></div>
+    <div class="variant"><h3>B｜送入中文口語稿（21.84 秒）</h3><audio controls preload="none" src="../output/tts_workflow/math_latex_ab_20260927/listen/calculus_spoken.wav"></audio><pre>當 x 趨近於零時，x 的正弦除以 x 的極限等於一。對 x 的三次方微分，導數等於三乘 x 的平方。從零到一，二 x 對 x 的定積分等於一。若函數 f 的值是 x 的平方乘 y，則 f 對 x 的偏導數等於二 x y。</pre></div>
+  </div>
+</section>
+
+<section class="case"><span class="badge">03 線性代數</span><h2>矩陣、行列式、特徵值、內積</h2>
+  <div class="mathline">\(A=\begin{pmatrix}1&amp;2\\3&amp;4\end{pmatrix}\)　\(\det A=-2\)　\(A\mathbf v=\lambda\mathbf v\)　\(\mathbf u\cdot\mathbf v=\|\mathbf u\|\|\mathbf v\|\cos\theta\)</div>
+  <div class="pair">
+    <div class="variant"><h3>A｜送入原樣 LaTeX（16.64 秒）</h3><audio controls preload="none" src="../output/tts_workflow/math_latex_ab_20260927/listen/linear_algebra_latex.wav"></audio><pre>令 $A=\begin{pmatrix}1&amp;2\\3&amp;4\end{pmatrix}$，則 $\det A=-2$。若 $A\mathbf v=\lambda\mathbf v$，$\lambda$ 就是特徵值。最後，$\mathbf u\cdot\mathbf v=\|\mathbf u\|\|\mathbf v\|\cos\theta$。</pre></div>
+    <div class="variant"><h3>B｜送入中文口語稿（20.56 秒）</h3><audio controls preload="none" src="../output/tts_workflow/math_latex_ab_20260927/listen/linear_algebra_spoken.wav"></audio><pre>令 A 是一個二乘二矩陣，第一橫排是一、二，第二橫排是三、四。它的行列式等於負二。若 A 乘向量 v 等於 lambda 乘向量 v，lambda 就是特徵值。最後，向量 u 和向量 v 的內積，等於 u 的長度乘 v 的長度，再乘 theta 角的餘弦。</pre></div>
+  </div>
+</section>
+<p><small>精確待送文字以同目錄上層 <a href="../experiments/tts_workflow/latex_math_ab_20260927.json">JSON 試稿</a>為準；本頁供閱讀與審核。LaTeX 公式使用 MathJax 呈現，需連網載入。</small></p>
+</main></body></html>
