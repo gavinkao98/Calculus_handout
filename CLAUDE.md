@@ -8,7 +8,7 @@
 |------|------|------|
 | LaTeX 講義（唯一源＋出版線） | `handout/latex/` | **2026-08-09 拍板：講義線＋影片線統一走 LaTeX**——`src/<ch>/*.tex` 升格唯一內容源（ch03 pilot 已收），memoir 模板 → 出版級 A4 PDF。遷移計畫＝[`handout/latex/KICKOFF-latex-unification.md`](handout/latex/KICKOFF-latex-unification.md)（supersede 2026-07-17「先 HTML 後轉換」拍板） |
 | HTML 講義（已封存） | `legacy/html_handout/` | fragment／standalone／`build.py`／舊契約的歷史快照（2026-08-09 佈局重構移入；轉換產線工具在 `legacy/html2latex/`）。活資產已升層：rubric＋REVIEW 在 `handout/_audit/`、章 PLAN 在 `handout/_dev-archive/`、圖繪製與 `shot.mjs` 在 `handout/figkit/` |
-| 影片（Remotion） | `video/` | 旁白＋動畫＋TTS；**2026-09-28 拍板：Remotion 為唯一渲染器**（現役製作處 `video/experiments/remotion_styles/`，契約＝[`video/KICKOFF-remotion-unification.md`](video/KICKOFF-remotion-unification.md)；詳見 [`video/README.md`](video/README.md)） |
+| 影片（Remotion） | `video/` | 旁白＋動畫＋TTS；**2026-09-28 拍板：Remotion 為唯一渲染器**（現役製作處 `video/remotion/`，2026-09-28 自 `experiments/remotion_styles/paper/` 升格；契約＝[`video/KICKOFF-remotion-unification.md`](video/KICKOFF-remotion-unification.md)；詳見 [`video/README.md`](video/README.md)） |
 | Manim 影片（gen-2，已封存） | `legacy/manim_video/` | 2026-09-28 封存的 `make.py`＋模板引擎＋storyboard＋舊文檔，僅供參照；回退錨點＝tag `archive/2026-09-28-manim-gen2-final` |
 | 舊 LaTeX 講義 | `legacy/tex_handout/` | 已凍結，僅供參照（與 `handout/latex/` 無關） |
 
@@ -18,7 +18,7 @@
 
 ```bash
 python handout/latex/build.py all      # 建置全部講義單元（可接 ch01 只建一章；編譯＋字形閘→dist PDF）
-npx remotion render build <Comp> out/<name>.mp4 --codec=h264 --crf=20 --props=…  # 在 video/experiments/remotion_styles/paper/ 下；1080p（各片指令見其 SCRIPT.md）
+npx remotion render build <Comp> out/<name>.mp4 --codec=h264 --crf=20 --props=…  # 在 video/remotion/ 下；1080p（各片指令見其 SCRIPT.md）
 python tools/doctor.py            # 環境健康檢查
 tts.py --backend mock --unit beat # 離線 TTS mock（不計費，可逕行；--unit beat 只驗 beats 時鐘）
 ```

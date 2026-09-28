@@ -91,20 +91,20 @@
 離線 mock（不計費、可逕行；在 repo 根目錄）：
 
 ```bash
-python video/pipeline/tts.py --storyboard video/experiments/remotion_styles/paper/act3/act3.yml \
+python video/pipeline/tts.py --storyboard video/remotion/act3/act3.yml \
   --scene all --backend mock --unit beat \
-  --output-dir video/experiments/remotion_styles/paper/public/audio/act3_mock
+  --output-dir video/remotion/public/audio/act3_mock
 ```
 
 真 MiMo 配音（**付費外部 API，須先經使用者同意**；5 個有旁白的場、35 個 beat、mock 估約 186 s 音訊）：
 
 ```bash
-python video/pipeline/tts.py --storyboard video/experiments/remotion_styles/paper/act3/act3.yml \
+python video/pipeline/tts.py --storyboard video/remotion/act3/act3.yml \
   --scene all --backend mimo --unit beat \
-  --output-dir video/experiments/remotion_styles/paper/public/audio/act3_mimo
+  --output-dir video/remotion/public/audio/act3_mimo
 ```
 
-然後在 `paper/` 下：
+然後在 `video/remotion/` 下：
 
 ```bash
 npx remotion bundle

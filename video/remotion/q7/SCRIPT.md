@@ -115,9 +115,9 @@
 ## 重現
 ```bash
 # mock 時序（離線、不計費）
-python video/pipeline/tts.py --storyboard video/experiments/remotion_styles/paper/q7/q7.yml \
-  --scene all --backend mock --unit beat --output-dir video/experiments/remotion_styles/paper/public/audio/q7_mock
-# 在 paper/ 下
+python video/pipeline/tts.py --storyboard video/remotion/q7/q7.yml \
+  --scene all --backend mock --unit beat --output-dir video/remotion/public/audio/q7_mock
+# 在 video/remotion/ 下
 npm ci
 npm run q7          # out/q7_mock.mp4
 npm run q7:stills   # out/q7_stills/
@@ -144,9 +144,9 @@ npm run q7:stills   # out/q7_stills/
 - **配音：** MiMo `mimo-v2.5-tts`、voice 冰糖、`--unit beat`（中文沒有逐字對齊；英文版靠 `atWord` 卡字的三處，在中文分鏡是獨立的拍：angles 的 `tan`／`vert`、halfway 的 `list`）。首輪 54 次＋延伸段 19 次，累計 73 次、0 次重試；之後依審核改了延伸段六拍旁白，冰糖重配 6 次（manifest receipt：6 次呼叫、0 次重試）。2026-09-26 含延伸段的成品：1080p、loudnorm −19 LUFS（TP −2.8 dBTP），全片 9 分 09 秒（16483 幀），`out/q7zh_final.mp4`（音訊在 `public/audio/q7zh_beat/`，不進版控）。
 ```bash
 # 真配音（MiMo 計費，需先徵得使用者同意）
-python video/pipeline/tts.py --storyboard video/experiments/remotion_styles/paper/q7/q7.zh.yml \
-  --scene all --backend mimo --unit beat --output-dir video/experiments/remotion_styles/paper/public/audio/q7zh_beat
-# 在 paper/ 下
+python video/pipeline/tts.py --storyboard video/remotion/q7/q7.zh.yml \
+  --scene all --backend mimo --unit beat --output-dir video/remotion/public/audio/q7zh_beat
+# 在 video/remotion/ 下
 npx remotion bundle
 npx remotion render build Q7ZH out/q7zh_raw.mp4 --codec=h264 --crf=20 --props='{"manifest":"audio/q7zh_beat/manifest.json"}'
 python scripts/loudnorm.py out/q7zh_raw.mp4 out/q7zh_final.mp4

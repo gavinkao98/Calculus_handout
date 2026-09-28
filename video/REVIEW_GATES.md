@@ -106,7 +106,7 @@
 | **〔沿用，待接 Remotion〕** **`rewatch_pack.py` 12 s 最長靜止硬閘**（`--gate-still`；2026-09-13 裁決） | 腳本（POST-render、離線、確定性） | ■（擋，exit 1） | 只審 `content` 場，量 **0.05% 細門檻**（`FINE_CHANGE_FRAC`）的**最長靜止**：超過 `--gate-still <seconds>`（**預設 12.0、沒有關閉開關**）→ 印 `[still-gate] FAIL <scene>: … (beat N, <reveal>)`、**exit 1**；全過印 `[still-gate] PASS …`、exit 0。verdict 同時寫進 pack 的 **production view**（**不**給盲審鏡看，免污染盲審）。**不接進 `make.py`**——改由輪次協定規定「render 後必跑」（§六 6.4）。**A/B 同基線**：`--baseline <pack dir>` 比對來源 mp4 的 **fps 與畫面尺寸**（pack 現在會記錄兩者），不同、或舊 pack 沒紀錄 → **拒絕、exit 2、什麼都不寫**（不同 fps 會得出假結論） | 三門檻分工見 [DESIGN.md](../legacy/manim_video/DESIGN.md) §`[stillness]`；**驗收定義本檔 §六**；rubric [REWATCH-REVIEW-RUBRIC.md](content_scripts/_audit/REWATCH-REVIEW-RUBRIC.md) |
 | **〔沿用〕** 人工 frame-grab 驗收 | 人工（MiMo route step 4） | ◆ | 在 reveal 時間點抽幀確認 reveal 準時、LaTeX 無亂碼，才 compose／交付 | [RUNBOOK-mimo-narration-route.md](RUNBOOK-mimo-narration-route.md) step 4 |
 
-外加 **MiMo route step 0**：確認該節分鏡存在（含 say＋`{show}`；Manim 時代＝`storyboards/<deck>.yml`，Remotion 現行＝`experiments/remotion_styles/paper/<片>/<片>.yml`），否則整條視覺路徑停住——進視覺步驟的 blocking 前置（[RUNBOOK-mimo-narration-route.md](RUNBOOK-mimo-narration-route.md) step 0）。
+外加 **MiMo route step 0**：確認該節分鏡存在（含 say＋`{show}`；Manim 時代＝`storyboards/<deck>.yml`，Remotion 現行＝`remotion/<片>/<片>.yml`），否則整條視覺路徑停住——進視覺步驟的 blocking 前置（[RUNBOOK-mimo-narration-route.md](RUNBOOK-mimo-narration-route.md) step 0）。
 
 ---
 

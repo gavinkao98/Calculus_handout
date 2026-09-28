@@ -9,7 +9,7 @@
 > 改成 Remotion render（每支片的指令在它的 `SCRIPT.md`，入口＝[`experiments/remotion_styles/README.md`](experiments/remotion_styles/README.md)）。
 
 **前提（重要）：** 此路線需要該節的**分鏡**（含 `say` ＋ `{show}`）。Remotion 現行位置＝
-`video/experiments/remotion_styles/paper/<片>/<片>.yml`（tts.py 格式，`say` 直接寫口語）。Manim 時代的正典 storyboard
+`video/remotion/<片>/<片>.yml`（tts.py 格式，`say` 直接寫口語）。Manim 時代的正典 storyboard
 （`video/storyboards/<deck>.yml`，如 §3.1 的 `ch03_trig_derivatives.yml`——首個走完本路線全程的節）已封存到
 `legacy/manim_video/storyboards/`，`video/storyboards/` 只剩內容層 fixture。任一章節在**該節分鏡落地前
 先別跑本路線的影片步驟**；可先用下方「念法慣例」＋ NFA（旁白忠實稽核，原 Mode B）把口語版納入認可包，
@@ -20,7 +20,7 @@
 ```
 你負責 NTU 微積分影片產線（repo Calculus_handout，video/ 子樹）某一節的「MiMo 旁白雙版／影片」產出。
 全程用繁體中文溝通；動手前先讀 video/README.md §「MiMo 旁白／影片路線」、video/DESIGN.md §「MiMo 口語軌」、
-該節 content_scripts/<deck>.md 與該節分鏡（Remotion：experiments/remotion_styles/paper/<片>/<片>.yml）。
+該節 content_scripts/<deck>.md 與該節分鏡（Remotion：video/remotion/<片>/<片>.yml）。
 
 DECK: <填，如 ch01_precise_limit>      SECTION: <填，如 §1.6>
 
@@ -66,8 +66,8 @@ DECK: <填，如 ch01_precise_limit>      SECTION: <填，如 §1.6>
   （`tts.py … --backend mimo --dry-run` 印逐場 planned/worst 表＋est 分鐘；worst 已把 fallback ladder 每非空 beat
   計入；reuse 可再往下降，報價時註明）。**`--backend` 為必填**（無預設，防裸跑誤燒/誤蓋）。報用量、徵同意後：
   python video/pipeline/tts.py --storyboard <分鏡.yml> --scene all --backend mimo --unit scene \
-      --output-dir video/experiments/remotion_styles/paper/public/audio/<批次>
-  接著在 paper/ 下（指令照該片 SCRIPT.md）：
+      --output-dir video/remotion/public/audio/<批次>
+  接著在 video/remotion/ 下（指令照該片 SCRIPT.md）：
   npx remotion bundle
   npx remotion render build <Composition> out/<片>_raw.mp4 --codec=h264 --crf=20 --props='{"manifest":"audio/<批次>/manifest.json"}'
   python scripts/loudnorm.py out/<片>_raw.mp4 out/<片>_final.mp4   # two-pass loudnorm 到 house -19 LUFS

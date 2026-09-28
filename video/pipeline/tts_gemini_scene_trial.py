@@ -50,7 +50,7 @@ def build_plan(mimo_plan: dict) -> dict:
 
 def save_plan(source_plan: Path, output_dir: Path) -> dict:
     original = json.loads(source_plan.read_text(encoding="utf-8"))
-    storyboard_path = safe.REPO_ROOT / "video/experiments/remotion_styles/paper/q7/q7.zh.yml"
+    storyboard_path = safe.REPO_ROOT / "video/remotion/q7/q7.zh.yml"
     current_storyboard = safe.yaml.safe_load(storyboard_path.read_text(encoding="utf-8-sig"))
     if original.get("source_snapshot_hash") != safe.digest(current_storyboard):
         raise ValueError("來源 MiMo plan 與目前 q7.zh.yml 不一致")

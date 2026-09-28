@@ -2,7 +2,7 @@
 
 > **2026-09-13 立檔。依據**＝四支參考影片的逐幀拆解 [`content_scripts/_audit/REVIEW-reference-videos-A1A2B1C1.html`](content_scripts/_audit/REVIEW-reference-videos-A1A2B1C1.html)（32 張對照卡，每卡左＝參考影片三幀動作條、右＝我方 §3.1 同概念的幀）與六鏡看片 [`REVIEW-ch03_s31-rewatch-multilens.html`](content_scripts/_audit/REVIEW-ch03_s31-rewatch-multilens.html)。**裁決**＝使用者 2026-09-13「五條規則都進規格」。研究過程與替代方案見附錄 A，參考影片清單見附錄 B，工具見附錄 C。
 >
-> **2026-09-28 加註（影片線統一走 Remotion，[`KICKOFF-remotion-unification.md`](KICKOFF-remotion-unification.md)）：** 五條規則是設計語言，與渲染器無關，Remotion 線照舊適用（Remotion 的動態語彙見 [`experiments/remotion_styles/paper/STYLE.md`](experiments/remotion_styles/paper/STYLE.md)）。下文「已有機制」「驗收接線」描述的是 **Manim gen-2 的實作**（`storyboard` 欄位、`make.py`、`schema`／`sizecheck`、`critic.py`），已隨引擎封存；Remotion 版的實作契約層待定。
+> **2026-09-28 加註（影片線統一走 Remotion，[`KICKOFF-remotion-unification.md`](KICKOFF-remotion-unification.md)）：** 五條規則是設計語言，與渲染器無關，Remotion 線照舊適用（Remotion 的動態語彙見 [`remotion/STYLE.md`](remotion/STYLE.md)）。下文「已有機制」「驗收接線」描述的是 **Manim gen-2 的實作**（`storyboard` 欄位、`make.py`、`schema`／`sizecheck`、`critic.py`），已隨引擎封存；Remotion 版的實作契約層待定。
 >
 > **定位。** 本檔是 motion primitive 的**設計語言層**：規定畫面「該怎麼動」與「為什麼」。Manim gen-2 的**實作契約層**＝[`legacy/manim_video/DESIGN.md`](../legacy/manim_video/DESIGN.md)「motion primitive」各節（storyboard 欄位、Block、anim、零行為改變；2026-09-28 隨引擎封存）。驗收歸 [`REVIEW_GATES.md`](REVIEW_GATES.md) 與 [`REWATCH-REVIEW-RUBRIC.md`](content_scripts/_audit/REWATCH-REVIEW-RUBRIC.md)。衝突時**本檔定原則、DESIGN.md 定欄位**：欄位做不到原則就回來改欄位，不反過來降原則。
 >

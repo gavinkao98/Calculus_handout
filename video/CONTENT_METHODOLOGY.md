@@ -6,7 +6,7 @@
 >
 > **血統與定位：** 萃取自 [`legacy/MANIM_STORYBOARD.md`](../legacy/MANIM_STORYBOARD.md)（gen-1, v1.6）的教學精神，**剝離**其 gen-1 工程約束（spoken-math 改寫大表、reveal 策略、9-template catalog、lint／schema），**適配** gen-2（正典 narration 內嵌 LaTeX 只寫一次；真旁白走 MiMo＝逐節輕量口語派生，非大規則表；intro／outro first-class）。它是 gen-1 方法論在 gen-2 的繼任者。
 >
-> **相關文件：** 視覺系統（2026-09-28 起 Remotion）見 [`experiments/remotion_styles/paper/STYLE.md`](experiments/remotion_styles/paper/STYLE.md)，資料流與旁白契約見 [`DESIGN.md`](DESIGN.md)（Manim gen-2 的視覺系統已封存：[`legacy/manim_video/DESIGN.md`](../legacy/manim_video/DESIGN.md)、[`pipeline/visuals/theme.py`](../legacy/manim_video/pipeline/visuals/theme.py)）；講義環境詞彙（2026-08-09 LaTeX 統一後）定義在 [`../handout/latex/template/calcbook.sty`](../handout/latex/template/calcbook.sty) 語意層（歷史 HTML 契約＝[`../legacy/html_handout/CONTRACT-html-writing.md`](../legacy/html_handout/CONTRACT-html-writing.md)，環境同構：`env-theorem`→`envtheorem`）；本產線總覽見 [`README.md`](README.md)。
+> **相關文件：** 視覺系統（2026-09-28 起 Remotion）見 [`remotion/STYLE.md`](remotion/STYLE.md)，資料流與旁白契約見 [`DESIGN.md`](DESIGN.md)（Manim gen-2 的視覺系統已封存：[`legacy/manim_video/DESIGN.md`](../legacy/manim_video/DESIGN.md)、[`pipeline/visuals/theme.py`](../legacy/manim_video/pipeline/visuals/theme.py)）；講義環境詞彙（2026-08-09 LaTeX 統一後）定義在 [`../handout/latex/template/calcbook.sty`](../handout/latex/template/calcbook.sty) 語意層（歷史 HTML 契約＝[`../legacy/html_handout/CONTRACT-html-writing.md`](../legacy/html_handout/CONTRACT-html-writing.md)，環境同構：`env-theorem`→`envtheorem`）；本產線總覽見 [`README.md`](README.md)。
 >
 > **交付物：** 每節一份**內容稿**（格式見 §6）——`.md` 為 source of truth，且**一律附上編譯後的 standalone HTML 審核稿**供使用者閱讀（見 §6「交付形式」，2026-06-14 使用者指示）。
 
@@ -56,7 +56,7 @@
 
 ## 2. 影片的單位與範圍（Scope）
 
-- **一節 = 一支影片。**（gen-2：一節一片；小節之間不另做過場片。**節內導航靠成片的章節點**（YouTube 章節格式；Manim 時代由 `make.py` compose 每次寫 `<stem>.chapters.txt`，Remotion 線由 `paper/scripts/chapters.py` 產生並可嵌入 mp4）；2026-09-12 裁決**不做**分幕獨立檔，理由與重開條件見 [`PROPOSAL-scope-packaging-coverage.md`](PROPOSAL-scope-packaging-coverage.md) §3。）
+- **一節 = 一支影片。**（gen-2：一節一片；小節之間不另做過場片。**節內導航靠成片的章節點**（YouTube 章節格式；Manim 時代由 `make.py` compose 每次寫 `<stem>.chapters.txt`，Remotion 線由 `remotion/scripts/chapters.py` 產生並可嵌入 mp4）；2026-09-12 裁決**不做**分幕獨立檔，理由與重開條件見 [`PROPOSAL-scope-packaging-coverage.md`](PROPOSAL-scope-packaging-coverage.md) §3。）
 - **每支必有 intro 與 outro**（gen-2 first-class，純動畫、**無 narration**）：
   - **intro** — Section Gate 開場（章節地圖 → 聚焦本節 → 標題字卡）。內容稿只需提供本節在章內的定位：章、章名、節、節標題，以及一句引導問題 `tagline`。
   - **outro** — 收尾的品牌字卡（暗轉亮橋接 → 最終 logo 字卡，**無 takeaways**）。Key Takeaways 是獨立的 recap 單元（→ `recap_cards` 場景，有旁白），不在 outro。
@@ -187,7 +187,7 @@
 
 ### 動畫的分工（重要）
 
-內容稿**只提動畫建議（自然語言）**，**MUST NOT 寫動畫程式碼**——內容層與工程層的分離不變。但**客製動畫的場景 code 由 Claude 依 `animation_cue` 的自然語言生成**（不再由使用者手畫）：2026-09-28 起是 Remotion 的場景元件（現行在 `experiments/remotion_styles/paper/src/<片>/`；設計與製作派 `motion-designer` 子代理）。（歷史：Manim gen-2 時代生成的是 manim code，接入工程稿的 `# HOOK` 接入點，對應 gen-1 的 `hook` escape hatch——已隨引擎封存。）生成的動畫 code 視同 narration：**SHOULD 經使用者過目認可**再定版。
+內容稿**只提動畫建議（自然語言）**，**MUST NOT 寫動畫程式碼**——內容層與工程層的分離不變。但**客製動畫的場景 code 由 Claude 依 `animation_cue` 的自然語言生成**（不再由使用者手畫）：2026-09-28 起是 Remotion 的場景元件（現行在 `remotion/src/<片>/`；設計與製作派 `motion-designer` 子代理）。（歷史：Manim gen-2 時代生成的是 manim code，接入工程稿的 `# HOOK` 接入點，對應 gen-1 的 `hook` escape hatch——已隨引擎封存。）生成的動畫 code 視同 narration：**SHOULD 經使用者過目認可**再定版。
 
 於是 `animation_cue` 是使用者／內容稿作者交給 Claude 的**動畫規格**，也是 Claude 生成 code 的依據；它的寫法 **SHOULD** 聚焦**教學意圖**而非實作細節（實作細節由 Claude 在生成時決定）：
 
@@ -196,7 +196,7 @@
 
 ### hook 內的文字一律走 `brand.*`（2026-09-13 鋪滿輪；[`SPEC-motion-language.md`](SPEC-motion-language.md) 規則 5）——〔Manim gen-2，已封存〕
 
-> 本小節綁 Manim 的 `brand` 層與 hook 機制，2026-09-28 隨引擎封存、只存歷史；背後的原則（語意色與字級由共用層統一給，場景 code 不各自硬寫）在 Remotion 線怎麼落實，待模板定案時寫進 [`experiments/remotion_styles/paper/STYLE.md`](experiments/remotion_styles/paper/STYLE.md)。
+> 本小節綁 Manim 的 `brand` 層與 hook 機制，2026-09-28 隨引擎封存、只存歷史；背後的原則（語意色與字級由共用層統一給，場景 code 不各自硬寫）在 Remotion 線怎麼落實，待模板定案時寫進 [`remotion/STYLE.md`](remotion/STYLE.md)。
 
 生成的 hook code **MUST NOT** 直接建 `MathTex`／`Tex`／`Text` 來放教學文字（標籤、式子、註記），一律經
 `brand.math_line`／`brand.prose`／`brand.eyebrow`。原因是產線的語意色（`meta.color_map` 的變數色、`{{…}}`
@@ -218,7 +218,7 @@ Claude 依 `animation_cue` 生成的客製動畫 code 偶爾 render 失敗。**�
 緊迴路用 Remotion 的即時預覽或單場 render（離線、不計費；mock manifest 即可對時）：
 
 ```powershell
-cd video\experiments\remotion_styles\paper
+cd video\remotion
 npx remotion studio                                          # 即時預覽、改 code 秒回
 npx remotion render build <片>-<場id> out\<場id>.mp4         # 只渲一場（單場 composition 見 src/Root.tsx，如 Q7-hook）
 ```

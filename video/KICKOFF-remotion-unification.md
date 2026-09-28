@@ -153,7 +153,7 @@ merge 後在 main 上重驗：`run_selftests.py` 24／24 綠、`tools/doc_lint.p
 
 ## 6. 另開的後續（不在本輪）
 
-1. `experiments/remotion_styles/paper/` 升格為正式目錄（例如 `video/remotion/`）＋路徑全面更新。
+1. **已完成（2026-09-28）**：`experiments/remotion_styles/paper/` 升格為正式目錄 `video/remotion/`（目錄名由使用者確認；純 `git mv`＝commit `cffc8bf`，路徑引用全面更新、`remotion/scripts/loudnorm.py` 的 sys.path、`tools/doctor.py`／`ENVIRONMENT.md`／根 `CLAUDE.md`／根 `README.md`／`.claude/agents/motion-designer.md` 同步＝其後一個 commit）。`blueprint/`、`dark_glow/` 與風格探索紀錄留在 `experiments/remotion_styles/`；本機 gitignored 的 `out/`、`public/audio/`、`node_modules/` 以檔案系統一併搬到新目錄。本檔 §1.4／§4／§5 的 `experiments/remotion_styles/paper/` 為當日歷史敘述，不改。
 2. §3.2 Phase B 的 Remotion 版 KICKOFF（Remotion 版的閘序：哪些內容層閘直接沿用、視覺閘怎麼接 Remotion 幀）。
 3. 內容層確定性檢查器（provenance／pedagogy／coverage）接 Remotion storyboard yml 的 schema。
 4. `.claude/launch.json` 的 `remotion-review` 條目指向舊 session 的 scratchpad 路徑，需修。
