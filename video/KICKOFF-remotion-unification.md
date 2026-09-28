@@ -154,6 +154,6 @@ merge 後在 main 上重驗：`run_selftests.py` 24／24 綠、`tools/doc_lint.p
 ## 6. 另開的後續（不在本輪）
 
 1. `experiments/remotion_styles/paper/` 升格為正式目錄（例如 `video/remotion/`）＋路徑全面更新。
-2. §3.2 Phase B 的 Remotion 版 KICKOFF（Remotion 版的閘序：哪些內容層閘直接沿用、視覺閘怎麼接 Remotion 幀）。
+2. ✅ **已完成（2026-09-28）**：§3.2 Phase B 的 Remotion 版 KICKOFF＝[`KICKOFF-s32-remotion-phaseB.md`](KICKOFF-s32-remotion-phaseB.md)（Phase A 產物→`s32.yml` 的派生規則、沿用／退役閘表與三個新確定性檢查、motion-designer 派工形狀、成本欄位；另記 Phase A 音檔本機遺失的事實，重對映／重配音待使用者裁決）。
 3. 內容層確定性檢查器（provenance／pedagogy／coverage）接 Remotion storyboard yml 的 schema。
 4. `.claude/launch.json` 的 `remotion-review` 條目指向舊 session 的 scratchpad 路徑，需修。
