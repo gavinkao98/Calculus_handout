@@ -1,6 +1,7 @@
 # KICKOFF — Remotion 製作流程檢討（2026-09-29 立檔，待開工）
 
 > **裁決稿已產出（2026-09-29）：[`_audit/REVIEW-remotion-process-review-2026-09-29.html`](_audit/REVIEW-remotion-process-review-2026-09-29.html)，待使用者裁決。** 四題各附證據表、可選方案與勾選格，§5 文檔處置清單、§5.1／5.2 建議流程總圖在內。三個契約前提被證據推翻（Q7 稽核在付費 TTS **之前**、12 s 靜止非 Manim 特有、s31 非單一子代理），見其 §0。裁決後另開執行輪（§5 第 4 條）。
+> **同日稍後使用者裁決：四題改由 A/B 對比回答**——A 繼承線（平移版原樣）與 B 重設線（從講義起、只沿用視覺素材、流程自訂）同做 §3.2，收線後交叉審再裁四題。契約＝[`KICKOFF-remotion-process-ab.md`](KICKOFF-remotion-process-ab.md)；§7 凍結清單延續到對比收線。
 
 > **起因（使用者，2026-09-29）：** 「Remotion 我打算重新檢討一下整個製作流程……這些製作流程我記得是沿用 manim 的嗎？
 > remotion 的路線應該可以考慮重新檢討一下。」主對話核對後確認：**現行寫給 Remotion 的流程，基本上是 Manim gen-2

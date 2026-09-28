@@ -7,6 +7,8 @@
 > **驗收定義的權威仍在 [`REVIEW_GATES.md`](REVIEW_GATES.md) §六。** 本檔是這一節視覺線的執行計畫；牴觸以 §六為準，並回頭修本檔。
 > **這一輪只寫計畫**：不做片、不呼叫任何付費／外部 API。§1 的裁決表等使用者拍板後，Phase B 才開工。
 >
+> **2026-09-29 加註：** 本檔成為流程 A/B 對比的 **A 繼承線**契約（[`KICKOFF-remotion-process-ab.md`](KICKOFF-remotion-process-ab.md) §1.1）：目錄／composition／deck 改 `s32a`／`S32A`、D1 直接走 S 重配、D2–D5 用本檔預設不改良、量測與借用帳照該檔 §2–§3。其餘原文照舊。
+>
 > **路徑口徑：** 本檔路徑已依 2026-09-28 升格後的正式目錄 `video/remotion/` 書寫（升格線 `cffc8bf` 已併入 main `df6a03d`；schema 線亦已併入 `fe2de55`，見 §2.5）。
 
 ---
