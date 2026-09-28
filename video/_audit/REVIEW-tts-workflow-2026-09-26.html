@@ -70,7 +70,7 @@
 <tr><td><strong>數學：halfway</strong></td><td>「要回到中心，就要瞄準一個偶數偶數點，把它叫做二 p、二 q。」<br>「關鍵全在這個中點。」</td><td>p／q 念法、條件重音、中點到奇偶判斷的接續。</td></tr>
 <tr><td><strong>完整總結：recap</strong></td><td>「整理一下：a 小題有無窮多個角度，b 小題一個都沒有。」</td><td>完整講完兩個想法的節奏與收尾。</td></tr>
 </tbody></table></div>
-<p class="small">引文來自 <a href="../experiments/remotion_styles/paper/q7/q7.zh.yml">q7.zh.yml</a>，只節錄展示，未改原稿。正式樣本以確認後的完整自然語段為準，去掉 show 標記；各段總字數與預估秒數待量稿。</p>
+<p class="small">引文來自 <a href="../remotion/q7/q7.zh.yml">q7.zh.yml</a>，只節錄展示，未改原稿。正式樣本以確認後的完整自然語段為準，去掉 show 標記；各段總字數與預估秒數待量稿。</p>
 <div class="two">
 <article class="card"><span class="label">候選規模，尚未執行</span><h3>3 家 × 3 段 × 1 take</h3><p>最多 9 次初始合成。voice 試音、重試與之後長段測試另列批次。現有 MiMo beat 音檔只當現況 baseline；公平比較同語段時，MiMo 的新呼叫包含在這 9 次內。</p><p style="margin-top:12px"><strong>費用：待報價。本輪沒有 API 同意。</strong></p></article>
 <article class="card"><span class="label">比較方法，門檻待審</span><h3>等響度、盲聽、不加背景音樂</h3><p>錯讀為硬門檻；記錄自然度、語氣接續、人工修改工時、必要 cue 誤差。暫提必要 cue 經人工確認誤差 ≤ 0.10 秒；這是驗收目標，不是模型保證。勝出後另報更長語段的穩定性試驗。</p></article>
@@ -82,7 +82,7 @@
 <div class="eyebrow">05 ／ 可落地的細節</div><h2>把容易返工的地方，先定清楚</h2>
 <p class="intro">以下都是候選契約，尚未成為現行程式行為。既有正式規則仍以 <a href="../../CLAUDE.md">CLAUDE.md</a>、<a href="../REVIEW_GATES.md">REVIEW_GATES.md</a> 與 <a href="../RUNBOOK-mimo-narration-route.md">MiMo runbook</a> 為準。</p>
 <details><summary>三種單位：合成語段、文字定位、既有 scene／beat</summary><div class="detail-body">
-<ul><li><strong>自然語段＝合成單位。</strong>短 scene 可一次念完；長 scene 在自然意思結束處分段。中英文可各自分段，不強制相同 beat 數。</li><li><strong>語言專屬文字 span＋穩定 cue ID＝定位單位。</strong>cue 指向定稿文字的明確範圍，同詞多次出現也不混淆。顯示公式和 spoken text 分開對應；時間資料不能反過來改數學內容。</li><li><strong>scene／beat＝相容匯出單位。</strong>adapter 把選定音檔與 cue 時間匯出給現有 <a href="../experiments/remotion_styles/paper/src/s31/timing.ts">buildShow</a>、<a href="../experiments/remotion_styles/paper/src/lib/words.ts">words.ts</a>。不把每個 show marker 變成 TTS 切點，也不先建立完整動畫事件語言。</li></ul>
+<ul><li><strong>自然語段＝合成單位。</strong>短 scene 可一次念完；長 scene 在自然意思結束處分段。中英文可各自分段，不強制相同 beat 數。</li><li><strong>語言專屬文字 span＋穩定 cue ID＝定位單位。</strong>cue 指向定稿文字的明確範圍，同詞多次出現也不混淆。顯示公式和 spoken text 分開對應；時間資料不能反過來改數學內容。</li><li><strong>scene／beat＝相容匯出單位。</strong>adapter 把選定音檔與 cue 時間匯出給現有 <a href="../remotion/src/s31/timing.ts">buildShow</a>、<a href="../remotion/src/lib/words.ts">words.ts</a>。不把每個 show marker 變成 TTS 切點，也不先建立完整動畫事件語言。</li></ul>
 <p>Q7 的「關鍵全在這個中點」可以在一段連續旁白中標記 <code>halfway.mid</code>；具體秒數屬於選定 take。這裡只示意 ID，沒有捏造對齊結果。</p>
 </div></details>
 <details><summary>重用與版本：同一個請求，可以有不同 take</summary><div class="detail-body">
@@ -115,7 +115,7 @@
 <tr><td><a href="../pipeline/derive_spoken.py">derive_spoken.py</a>／<a href="../pipeline/narration.py">narration.py</a></td><td>口語稿、語段／文字解析、混合語言時長估算；擴充共用念法與 lint。</td></tr>
 <tr><td><a href="../pipeline/tts.py">tts.py</a>／<a href="../pipeline/mimo_preview.py">mimo_preview.py</a></td><td>同一批 plan 與帳本管理；合成保存 take，預覽試音也納入計畫。</td></tr>
 <tr><td><a href="../pipeline/scene_align.py">scene_align.py</a>／<a href="../pipeline/listening_pack.py">listening_pack.py</a></td><td>時間定位與念法疑點分流；試聽、選 take、人工裁決。</td></tr>
-<tr><td><a href="../pipeline/pauses.py">pauses.py</a>／<a href="../pipeline/pacing.py">pacing.py</a>／<a href="../experiments/remotion_styles/paper/scripts/loudnorm.py">loudnorm.py</a></td><td>記錄停頓、剪裁與音量配方，再驗最後交付音檔；沿用現有 −19 LUFS 作起始比較基準。</td></tr>
+<tr><td><a href="../pipeline/pauses.py">pauses.py</a>／<a href="../pipeline/pacing.py">pacing.py</a>／<a href="../remotion/scripts/loudnorm.py">loudnorm.py</a></td><td>記錄停頓、剪裁與音量配方，再驗最後交付音檔；沿用現有 −19 LUFS 作起始比較基準。</td></tr>
 </tbody></table></div>
 <p class="small">新增套件／模型先確認安裝方案並徵求同意；批准安裝後同步 <a href="../../ENVIRONMENT.md">ENVIRONMENT.md</a>、<a href="../../tools/doctor.py">tools/doctor.py</a> 與版本鎖。本輪零依賴變更。</p>
 </section>
@@ -123,7 +123,7 @@
 <section class="decision"><h2>這次審閱，只需要決定三件事</h2><ol><li>是否採用「稿鎖 → 該批同意 → 試聽／對齊 → 音鎖」這條主線。</li><li>鎖音前完整聽一次，是否成為每支影片的固定步驟。</li><li>是否以 Q7 的三類語段、三家候選作第一輪試驗規模。</li></ol><p class="small">認可設計不等於批准外部呼叫。下一步若做實驗，會先交付具體文字、voice、用量與費用供同意。</p></section>
 <section class="contract"><details><summary>來源與現況依據（查核日：2026-09-26）</summary><div class="detail-body">
 <p>以下文件能力不等於 Q7 實測結果，也不保證特定模型與參數組合皆可用；執行前須確認所選模型的相容性與當日定價。</p>
-<ul class="source-list"><li><a href="https://platform.minimax.io/docs/api-reference/speech-t2a-http">MiniMax T2A 文件</a>：發音修正、停頓及詞級時間資料的候選來源。</li><li><a href="https://elevenlabs.io/docs/api-reference/text-to-speech/convert-with-timestamps">ElevenLabs TTS with timestamps</a>：字元級時間資料；需另驗中文 cue。</li><li><a href="https://www.remotion.dev/docs/elevenlabs">Remotion ElevenLabs 工具</a>：STT → Caption 格式轉換，本身不是 TTS。</li><li><a href="https://ai.google.dev/gemini-api/docs/speech-generation">Gemini speech generation</a>：可控制風格的 TTS，不能據此推論 LaTeX 念法可靠。</li><li><a href="https://docs.fish.audio/developer-guide/models-pricing/models-overview">Fish Audio 模型文件</a>：S2.1 Pro 候補評估來源。</li><li><a href="../content_scripts/_audit/NARRATION-FAITHFULNESS-RUBRIC.md">NFA 契約</a>、<a href="../../.claude/agents/narration-faithfulness-audit.md">NFA 代理</a>、<a href="../experiments/forced_alignment_dean/RESULTS-2026-07-05.md">既有對齊實驗</a>、<a href="../experiments/remotion_styles/paper/q7/GLOSSARY.zh.md">Q7 中文念法</a>、<a href="../experiments/remotion_styles/paper/q7/SCRIPT.md">Q7 製作紀錄</a>。</li></ul>
+<ul class="source-list"><li><a href="https://platform.minimax.io/docs/api-reference/speech-t2a-http">MiniMax T2A 文件</a>：發音修正、停頓及詞級時間資料的候選來源。</li><li><a href="https://elevenlabs.io/docs/api-reference/text-to-speech/convert-with-timestamps">ElevenLabs TTS with timestamps</a>：字元級時間資料；需另驗中文 cue。</li><li><a href="https://www.remotion.dev/docs/elevenlabs">Remotion ElevenLabs 工具</a>：STT → Caption 格式轉換，本身不是 TTS。</li><li><a href="https://ai.google.dev/gemini-api/docs/speech-generation">Gemini speech generation</a>：可控制風格的 TTS，不能據此推論 LaTeX 念法可靠。</li><li><a href="https://docs.fish.audio/developer-guide/models-pricing/models-overview">Fish Audio 模型文件</a>：S2.1 Pro 候補評估來源。</li><li><a href="../content_scripts/_audit/NARRATION-FAITHFULNESS-RUBRIC.md">NFA 契約</a>、<a href="../../.claude/agents/narration-faithfulness-audit.md">NFA 代理</a>、<a href="../experiments/forced_alignment_dean/RESULTS-2026-07-05.md">既有對齊實驗</a>、<a href="../remotion/q7/GLOSSARY.zh.md">Q7 中文念法</a>、<a href="../remotion/q7/SCRIPT.md">Q7 製作紀錄</a>。</li></ul>
 </div></details></section>
 <footer class="footer">版控設計紀錄：<a href="../DESIGN.md#tts-workflow-proposal-2026-09-26">DESIGN.md 提案小節</a> ／ <a href="../REBUILD_STATUS.md">進度錨</a>。本頁可離線閱讀；外部來源連結需網路。沒有遠端字型、CDN、外部腳本或遙測。</footer>
 </main>

@@ -21,9 +21,9 @@ class FullGeminiTrialTests(unittest.TestCase):
         self.addCleanup(temporary.cleanup)
         self.root = Path(temporary.name)
         self.source = self.root / "mimo-plan.json"
-        storyboard = mimo.yaml.safe_load((mimo.REPO_ROOT / "video/experiments/remotion_styles/paper/q7/q7.zh.yml")
+        storyboard = mimo.yaml.safe_load((mimo.REPO_ROOT / "video/remotion/q7/q7.zh.yml")
                                            .read_text(encoding="utf-8"))
-        self.mimo_plan = mimo.build_plan(storyboard, "video/experiments/remotion_styles/paper/q7/q7.zh.yml")
+        self.mimo_plan = mimo.build_plan(storyboard, "video/remotion/q7/q7.zh.yml")
         self.source.write_bytes(mimo.json_bytes(self.mimo_plan))
         self.trial = self.root / "gemini"
         self.plan = gemini.save_plan(self.source, self.trial)

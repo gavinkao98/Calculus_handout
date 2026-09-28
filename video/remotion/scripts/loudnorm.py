@@ -9,7 +9,7 @@ loudness the Manim line did.
 import sys
 from pathlib import Path
 
-sys.path.insert(0, str(Path(__file__).resolve().parents[4]))  # video/
+sys.path.insert(0, str(Path(__file__).resolve().parents[2]))  # video/  (remotion/scripts/loudnorm.py -> video/)
 from pipeline import loudnorm  # noqa: E402
 
 src, out = Path(sys.argv[1]), Path(sys.argv[2])

@@ -153,8 +153,8 @@ def check_latex() -> None:
 
 # ── ④ Node ≥21（Remotion 影片線正式依賴＋handout 圖 shot.mjs）＋ Chrome（shot.mjs）──
 
-# Remotion 專案（2026-09-28 起影片線唯一渲染器；升格正式目錄前仍在實驗夾）
-_REMOTION_DIR = ("video", "experiments", "remotion_styles", "paper")
+# Remotion 專案（2026-09-28 起影片線唯一渲染器；同日自 experiments/remotion_styles/paper/ 升格為 video/remotion/）
+_REMOTION_DIR = ("video", "remotion")
 
 
 def check_node_and_chrome() -> None:
@@ -174,7 +174,7 @@ def check_node_and_chrome() -> None:
                    "Remotion 影片線與 shot.mjs（global WebSocket/fetch）都需 Node ≥21。"
                    "升級：winget install OpenJS.NodeJS.LTS")
 
-    # Remotion 的 npm 依賴（node_modules 不進版控；版本由 paper/package-lock.json 釘死，npm ci 精確重現）
+    # Remotion 的 npm 依賴（node_modules 不進版控；版本由 video/remotion/package-lock.json 釘死，npm ci 精確重現）
     rdir = REPO.joinpath(*_REMOTION_DIR)
     if (rdir / "node_modules").is_dir():
         record(PASS, "Node", "Remotion node_modules 已裝", str(rdir / "node_modules"))
@@ -390,7 +390,7 @@ def check_chinese_alignment_model() -> None:
 
 def check_assets() -> None:
     # The vendored brand asset is the outlined NTU lockup SVG -- the source of the copy the
-    # Remotion project serves from paper/public/brand/ for every intro/outro.
+    # Remotion project serves from video/remotion/public/brand/ for every intro/outro.
     lockup = REPO / "video" / "pipeline" / "assets" / "lockup-color-outlined.svg"
     if lockup.exists():
         record(PASS, "assets", "logo lockup SVG", str(lockup))
@@ -527,7 +527,7 @@ def print_report(as_json: bool) -> int:
         and not _missing("ffmpeg", "ffmpeg") and not _missing("ffmpeg", "ffprobe")
     handout_fig_ok = node_ok and not _missing("handout", "Chrome")
     print("\n能力摘要\n" + "─" * 64)
-    print(f"  {'✅' if video_ok else '❌'} 影片 Remotion render＋後處理（Node≥21＋paper/node_modules＋venv＋ffmpeg＋ffprobe）")
+    print(f"  {'✅' if video_ok else '❌'} 影片 Remotion render＋後處理（Node≥21＋video/remotion/node_modules＋venv＋ffmpeg＋ffprobe）")
     print(f"  {'✅' if handout_fig_ok else '❌'} handout 圖 render／figure 稽核（Node≥21＋Chrome）")
     print("  ✅ handout build.py（純 stdlib，任何 python 皆可）")
     handout_tex_ok = not any(s == FAIL and a == "handout-tex" for s, a, *_ in _results)

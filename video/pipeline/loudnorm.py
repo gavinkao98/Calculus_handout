@@ -3,7 +3,7 @@
 Extracted verbatim from the Manim-era make.py (now legacy/manim_video/make.py) on
 2026-09-28, when the video line moved to Remotion (video/KICKOFF-remotion-unification.md):
 the house loudness contract and its ffmpeg filter are renderer-independent, and the
-Remotion line's finishing step (experiments/remotion_styles/paper/scripts/loudnorm.py)
+Remotion line's finishing step (video/remotion/scripts/loudnorm.py)
 calls `_loudnorm_final` from here. No manim, no API -- ffmpeg only.
 """
 from __future__ import annotations

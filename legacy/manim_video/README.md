@@ -112,7 +112,7 @@ value_table、worked_example、wrap_mixed、zero_height_prose。
   `stillness.py`、`rewatch_pack.py`、`house_audio.py`、`listening_pack.py`、`loudness_ab.py`、
   `mimo_preview.py`、`_regression_scene_align.py`、`run_selftests.py`、`_bootstrap.py`（精簡版：
   只剩 `bootstrap()` 的 `sys.path` 邏輯與 `section_output_dir`）。這些與渲染器無關，Remotion
-  線（`video/experiments/remotion_styles/paper/`）的配音與成片步驟直接呼叫它們。
+  線（`video/remotion/`）的配音與成片步驟直接呼叫它們。
 - **新增 `pipeline/loudnorm.py`**：自 `make.py` 原樣抽出 `HOUSE_LUFS`／`LOUDNORM_TP`／
   `LOUDNORM_TOL_I`、`_loudnorm_final` 與它直接呼叫的 `_ffmpeg`；Remotion 的
   `paper/scripts/loudnorm.py` 改從這裡 import，成片響度契約（−19 LUFS、TP −1.5 dBTP）不變。

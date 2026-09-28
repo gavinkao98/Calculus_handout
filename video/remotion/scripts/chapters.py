@@ -17,7 +17,7 @@ import subprocess
 import sys
 from pathlib import Path
 
-HERE = Path(__file__).resolve().parents[1]  # paper/
+HERE = Path(__file__).resolve().parents[1]  # video/remotion/
 TIMING = HERE / "src" / "s31" / "timing.ts"
 
 # short 繁中 labels per scene id (display only; order/timing come from the manifest)

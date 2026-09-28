@@ -1,5 +1,5 @@
 """Offline self-test for pipeline/loudnorm.py (the house T10 two-pass loudnorm the Remotion
-line's paper/scripts/loudnorm.py finishes a film with): synthetic clips made with ffmpeg
+line's video/remotion/scripts/loudnorm.py finishes a film with): synthetic clips made with ffmpeg
 lavfi -- no API, no render.
 Run: python video/pipeline/_selftest_loudnorm.py
 

@@ -1,6 +1,6 @@
 // Pick the Noto Serif TC unicode-range subsets that Q7's Chinese strings need,
 // and write src/q7/cjkFaces.ts (static imports → only those woff2 files are bundled).
-//   node scripts/cjk-subsets.mjs        (run in paper/; rerun after editing src/q7/i18n/zh.ts, ext.zh.ts or card.ts)
+//   node scripts/cjk-subsets.mjs        (run in video/remotion/; rerun after editing src/q7/i18n/zh.ts, ext.zh.ts or card.ts)
 //
 // Chinese is set in the stack 'EB Garamond', 'Noto Serif TC': a character the
 // bundled Garamond cut (its latin subset) draws never reaches Noto. Every other

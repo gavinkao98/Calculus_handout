@@ -13,7 +13,7 @@ effort: medium
 ## 開工
 
 - 你在 git worktree 裡：先 `git merge main`，再 `git status`。讀根目錄 `CLAUDE.md`。
-- 設計前事實來源：[`video/experiments/remotion_styles/README.md`](../../video/experiments/remotion_styles/README.md)（使用者的設計前提；與呼叫端 prompt 衝突時以 prompt 為準）。
+- 設計前事實來源：[`video/experiments/remotion_styles/README.md`](../../video/experiments/remotion_styles/README.md)（使用者的設計前提；與呼叫端 prompt 衝突時以 prompt 為準）。現役製作處＝`video/remotion/`（2026-09-28 自 `experiments/remotion_styles/paper/` 升格），畫面契約＝[`video/remotion/STYLE.md`](../../video/remotion/STYLE.md)。
 - 設計前用 Skill 工具載入：`frontend-design`（非通用的視覺設計）、`remotion:remotion-best-practices`（Remotion 慣例，依它的路由再讀子 skill；2026-09-27 改走 user-scope plugin 後 skill 名稱加了 `remotion:` 命名空間，見 ENVIRONMENT.md ④）、`dataviz`（座標軸／曲線／配色與色彩驗證）。
 - 唯一固定元素是品牌 logo（`video/pipeline/assets/brand/*.svg`、`video/pipeline/assets/lockup-color-outlined.svg`）：不重畫、不改色，只挑適合背景的版本。
 

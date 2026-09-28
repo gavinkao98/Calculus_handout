@@ -6,8 +6,8 @@
 > [`../legacy/manim_video/DESIGN.md`](../legacy/manim_video/DESIGN.md)；本檔是**精簡新版**，只承接與渲染器無關的四塊：
 > **資料流**、**旁白 `say`／`{show}` beat 文法與 TTS manifest 的時序契約**、**配音工作流設計**、**語意色軸的講義對照**。
 >
-> **不在本檔：** 畫面契約（token、字型、版面、動態語彙）在 [`experiments/remotion_styles/paper/STYLE.md`](experiments/remotion_styles/paper/STYLE.md)；
-> 各片的分鏡與重現指令在 `experiments/remotion_styles/paper/<片>/SCRIPT.md`（例：[`q7/SCRIPT.md`](experiments/remotion_styles/paper/q7/SCRIPT.md)）；
+> **不在本檔：** 畫面契約（token、字型、版面、動態語彙）在 [`remotion/STYLE.md`](remotion/STYLE.md)；
+> 各片的分鏡與重現指令在 `remotion/<片>/SCRIPT.md`（例：[`q7/SCRIPT.md`](remotion/q7/SCRIPT.md)）；
 > 現役製作處的導覽在 [`experiments/remotion_styles/README.md`](experiments/remotion_styles/README.md)。Manim 時代的模板 payload、`accent`／`scene_role`、
 > Lectern 版面、容量契約、motion primitive 等**一律不承接**，要查去 legacy 那份。
 >
@@ -27,7 +27,7 @@ video/content_scripts/<deck>.md       Stage-1 內容稿（方法論＝CONTENT_ME
    │  （作者依內容稿寫分鏡；旁白直接寫口語，見下方「旁白 `say` 文法」）
    ▼
 Remotion 分鏡 <id>.yml                 tts.py 格式：meta＋scenes[]；content 場的 `say` 以 {show <id>} 切 beat
-   │                                   （現行位置：experiments/remotion_styles/paper/<片>/<片>.yml）
+   │                                   （現行位置：remotion/<片>/<片>.yml）
    ▼
 pipeline/tts.py                       每 scene（--unit scene＋forced alignment）或每 beat 合成；       (DONE)
    │                                   mock＝靜音、不計費；mimo 等真 backend＝外部 API，逐次徵同意
@@ -51,7 +51,7 @@ out/<片>_final.mp4                    （選用）scripts/chapters.py 產章節
 
 **尚未建（TODO，另開輪次；見 KICKOFF-remotion-unification §6）：** Remotion 分鏡 yml 的 schema 與 render 前閘（Manim 時代的
 `schema.py`／`lint.py`／`sizecheck.py` 已封存）；內容層確定性檢查器（`provenance`／`pedagogy`／`step_coverage`／`example_coverage`）接 Remotion 分鏡；
-render 前的 manifest freshness 檢查（Manim 時代由 `make.py --reuse-audio` 做，Remotion 端目前沒有）；`paper/` 升格為正式目錄。
+render 前的 manifest freshness 檢查（Manim 時代由 `make.py --reuse-audio` 做，Remotion 端目前沒有）。（`paper/` 升格為正式目錄 `remotion/` 已於 2026-09-28 完成。）
 
 ### Alignment：音訊長度就是畫面長度
 
@@ -74,7 +74,7 @@ MiMo（`mimo-v2.5-tts`）**不讀 inline LaTeX**，旁白必須「把數學攤�
 內嵌 LaTeX，口語版的唯一源是 `content_scripts/<deck>.spoken.yml`，由 `pipeline/derive_spoken.py` 生成 `storyboards/<deck>_mimo.yml`
 與閱讀視圖 `content_scripts/<deck>_narration_spoken.md`，`--check` 守 parity（scene／`{show}` 結構一致、口語無 `$`）。
 **2026-09-28 起：** `derive_spoken.py` 留在 `pipeline/`，但它讀的正典 storyboard 已隨 Manim 封存到 `legacy/manim_video/storyboards/`；
-Remotion 線現行做法是**分鏡 yml 直接寫口語**（見 `paper/q7/q7.yml` 檔頭：「Spoken English only (no LaTeX: MiMo reads the text literally)」）。
+Remotion 線現行做法是**分鏡 yml 直接寫口語**（見 `remotion/q7/q7.yml` 檔頭：「Spoken English only (no LaTeX: MiMo reads the text literally)」）。
 Remotion 線要不要恢復「正典＋口語」雙軌，隨分鏡 schema 一起定。
 
 **MiMo 非決定性：** 同文字重合成＝不同 take、長度約 ±10%，影片長度不可重現；**要定版就別重合成**。
@@ -193,7 +193,7 @@ scenes:
 
 manifest 裡的音檔路徑是跑 `tts.py` 那台機器的絕對路徑，Remotion 只取路徑的最後兩段、接在 manifest 所在資料夾之下（`src/s31/timing.ts` 的 `relAudio`，
 例：`scenes/NN_id.wav`），所以 manifest 與音檔要一起搬、維持原本的子資料夾結構。
-音訊在 `paper/public/audio/`，**不進版控**；換機要重跑 TTS（真 backend 先徵同意）。
+音訊在 `remotion/public/audio/`，**不進版控**；換機要重跑 TTS（真 backend 先徵同意）。
 
 ### `pauses:`——揭示之後讓畫面靜靜停一下
 
@@ -269,6 +269,6 @@ pauses:                      # content 場專用，opt-in
 | strategy | `aStrategy` | procedure／strategy | `#6453a7` 紫 | `#a493e6` |
 | aside | `aAside` | remark／note；未標記內容的中性色 | `#5d646f` 灰 | `#96a0ae` |
 
-**Remotion 線是否沿用本軸，由設計輪決定。** 現役 `paper/` 風格用的是自己的 token（`src/theme.ts`：墨黑＋品牌深紅 `accent`＋藍鉛筆 cobalt，見
-[`experiments/remotion_styles/paper/STYLE.md`](experiments/remotion_styles/paper/STYLE.md)），尚未對位到上表。要定為模板時，再決定是整套採用、只取部分族群，
+**Remotion 線是否沿用本軸，由設計輪決定。** 現役 `remotion/`（紙本編輯排版）風格用的是自己的 token（`src/theme.ts`：墨黑＋品牌深紅 `accent`＋藍鉛筆 cobalt，見
+[`remotion/STYLE.md`](remotion/STYLE.md)），尚未對位到上表。要定為模板時，再決定是整套採用、只取部分族群，
 或維持紙本風格自己的語意色；決定後回寫本節。

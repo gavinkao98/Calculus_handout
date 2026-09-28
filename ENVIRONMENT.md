@@ -31,7 +31,7 @@ python tools\doctor.py
 | **② 系統 binary** | `ffmpeg`、`ffprobe` | 每台 `winget install --id Gyan.FFmpeg -e`（**含 ffprobe**） |
 | **③ LaTeX** | MiKTeX（**講義出版線 [`handout/latex/`](handout/latex/) 專用**：`lualatex`／`latexmk`／`newcomputermodern`／`pdftotext`，見 ③b）。**影片線自 2026-09-28 起不需要 TeX**（Remotion 的數學走 MathJax） | 每台裝 MiKTeX；首次編譯自動補裝缺的套件 |
 | **①b 影片字型** | **已退役（2026-09-28）**：Manim 時代的 LaTeX 字型（vendored Instrument Sans＋Plex Mono＋Latin Modern）隨 Manim gen-2 引擎封存，見 [`legacy/manim_video/`](legacy/manim_video/)。Remotion 線的字型由 npm 套件供應（`@fontsource/*`、MathJax 字型），隨 ④ 的 `npm ci` 裝好 | 無需任何安裝步驟；`tools\setup.ps1` 不再做 MiKTeX 註冊。沿革見下方 ①b |
-| **④ Node + 瀏覽器** | **Node ≥21＝Remotion 影片線的正式依賴**（2026-09-28 起影片唯一渲染器；專案在 `video/experiments/remotion_styles/paper/`，npm 依賴由其 `package-lock.json` 釘死）；另給 `handout/figkit/shot.mjs` 截圖、`video/experiments/reference_frames/yt_frames.mjs` 抓 YouTube 幀。Google Chrome 給 `shot.mjs` | 每台裝 Node LTS + Chrome；再到 `video/experiments/remotion_styles/paper/` 跑一次 `npm ci` |
+| **④ Node + 瀏覽器** | **Node ≥21＝Remotion 影片線的正式依賴**（2026-09-28 起影片唯一渲染器；專案在 `video/remotion/`，npm 依賴由其 `package-lock.json` 釘死）；另給 `handout/figkit/shot.mjs` 截圖、`video/experiments/reference_frames/yt_frames.mjs` 抓 YouTube 幀。Google Chrome 給 `shot.mjs` | 每台裝 Node LTS + Chrome；再到 `video/remotion/` 跑一次 `npm ci` |
 | **⑤ codex（審核工具，選用）** | Mode B 講義審核／video gate2 用的 `codex` CLI | 部署版控的 [`tools/codex.cmd`](tools/codex.cmd) shim（解 PATH＋stale-launcher 兩坑）；見下方 ⑤ |
 | **⑤c agy（Antigravity CLI，多模型唯讀評審，選用）** | 看片多鏡評審等要拉開模型家族（Gemini／Claude 4.6）的唯讀評審；走 Antigravity 訂閱 | 本體隨 Antigravity IDE 裝在 `%LOCALAPPDATA%\agy\bin\`（安裝程式通常已加進使用者 PATH）；找不到時部署版控 shim [`tools/agy.cmd`](tools/agy.cmd)；見下方 ⑤c |
 | **⑤b Vale（去 AI 味 lint，選用）** | 散文 AI-tell flag 引擎（markup-aware，自動排除 `$...$`／LaTeX／code）；handout prose 與 video narration 去 AI 味用（[`PLAN-deai-flavor.md`](authoring/_archive/deai/PLAN-deai-flavor.md)） | 每台 `winget install errata-ai.Vale`；**flag-only／advisory**，缺它不擋核心產線（同 codex，WARN 不 FAIL）。見下方 ⑤b |
@@ -40,7 +40,7 @@ python tools\doctor.py
 
 ## 一次性安裝（每台機器各做一次）
 
-本機驗證過的版本：Python 3.12.10、Node v24、Remotion 4.0.529（npm，`paper/package-lock.json` 釘版）、MiKTeX（講義線）、ffmpeg 8.1.1、Vale 3.15.1（選用）、whisper-timestamped 1.15.9 / openai-whisper 20250625 / stable-ts 2.19.1 / torchaudio 2.11.0（scene-level forced alignment 正式路線用，見 `video/pipeline/scene_align.py`）。
+本機驗證過的版本：Python 3.12.10、Node v24、Remotion 4.0.529（npm，`video/remotion/package-lock.json` 釘版）、MiKTeX（講義線）、ffmpeg 8.1.1、Vale 3.15.1（選用）、whisper-timestamped 1.15.9 / openai-whisper 20250625 / stable-ts 2.19.1 / torchaudio 2.11.0（scene-level forced alignment 正式路線用，見 `video/pipeline/scene_align.py`）。
 
 ```powershell
 # Python（lock 以 3.12 凍結，請用 3.12 以免 wheel 不相容）
@@ -52,7 +52,7 @@ winget install --id Gyan.FFmpeg -e
 # Node LTS（Remotion 影片線＋shot.mjs 用 global WebSocket/fetch，需 ≥21）
 winget install OpenJS.NodeJS.LTS
 # Remotion 專案的 npm 依賴（依 package-lock.json 精確重現；node_modules 不進版控）
-Push-Location video\experiments\remotion_styles\paper; npm ci; Pop-Location
+Push-Location video\remotion; npm ci; Pop-Location
 
 # Google Chrome（shot.mjs 用 CDP 截圖）
 winget install Google.Chrome
@@ -97,7 +97,7 @@ python -m pip install --upgrade whisper-timestamped stable-ts
   fontTools 要解 woff2 就需要 Brotli。缺它 → 字形閘對圖裡的字型 FAIL 並指名（不會靜默略過）。
 
 ### ② ffmpeg / ffprobe — 裝真正的全套（策略 A）
-- Remotion 成片的後處理（`paper/scripts/loudnorm.py` 響度正規化、`chapters.py` 嵌章節）、
+- Remotion 成片的後處理（`video/remotion/scripts/loudnorm.py` 響度正規化、`chapters.py` 嵌章節）、
   `video/pipeline/rewatch_pack.py` 抽幀與讀時長、音訊量測都用**裸名** `ffmpeg`／`ffprobe` 呼叫，必須在 PATH 上。
   （2026-09-28 前另有 `make.py` compose 與 `critic.py` 抽幀，已隨 Manim gen-2 引擎封存。）
 - **`ffprobe` 是過去的硬卡點：** `imageio-ffmpeg` 與舊的 `.venv\ffmpeg_shim` 都**只給 ffmpeg、不給 ffprobe**；
@@ -157,7 +157,7 @@ python -m pip install --upgrade whisper-timestamped stable-ts
 ### ④ Node + Chrome — Remotion 影片線（正式依賴）、handout 圖 render 與 `video/experiments/reference_frames/` 抓 YouTube 幀
 - **Remotion＝影片線唯一渲染器（2026-09-28 拍板，[`video/KICKOFF-remotion-unification.md`](video/KICKOFF-remotion-unification.md)）：**
   Node ≥21 因此從「handout 工具」升為**影片線的正式依賴**。專案目前在
-  [`video/experiments/remotion_styles/paper/`](video/experiments/remotion_styles/paper/)（升格正式目錄另開一輪），
+  [`video/remotion/`](video/remotion/)（2026-09-28 自 `experiments/remotion_styles/paper/` 升格），
   npm 依賴（`remotion`／`@remotion/cli` 4.0.529、React、MathJax、`@fontsource/*` 字型）由它的 `package-lock.json` 釘死；
   `node_modules/` 不進版控，**每台機器在該夾跑一次 `npm ci`**（精確照 lock 重現、需網路）。
   `doctor.py` 的 `Node` 區驗 Node ≥21，並在 `node_modules/` 不存在時 WARN 提示 `npm ci`。
