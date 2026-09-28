@@ -173,16 +173,8 @@ def test_scoped_templates():
                    coverage.coverage_issues(sb, {}, enforce=False))
 
 
-def test_schema_integration():
-    import subprocess
-    py = sys.executable
-    repo_root = Path(__file__).resolve().parent.parent.parent   # cwd-independent (run_selftests.py runs from video/)
-    out = subprocess.run(
-        [py, "video/pipeline/schema.py", "video/storyboards/_fixtures/sc_coverage.yml"],
-        capture_output=True, text=True, encoding="utf-8", errors="replace", cwd=repo_root)
-    assert out.returncode == 0, out.stdout + out.stderr   # warn-default never aborts
-    assert "[coverage]" in out.stdout
-    assert "reduced" in out.stdout                          # SC2 surfaced as warn
+# test_schema_integration (schema.py wiring over storyboards/_fixtures/sc_coverage.yml) moved
+# 2026-09-28 with schema.py to legacy/manim_video/pipeline/_selftest_coverage_schema.py.
 
 
 def test_non_dict_storyboard():
@@ -204,6 +196,5 @@ if __name__ == "__main__":
     test_sc2_and_missing_contract()
     test_unparseable_contract()
     test_scoped_templates()
-    test_schema_integration()
     test_non_dict_storyboard()
     print("OK coverage self-test")

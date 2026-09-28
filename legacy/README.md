@@ -1,9 +1,12 @@
 # legacy/ — 已封存的產線（凍結，僅供參考）
 
-本資料夾封存了**前兩代媒體產線**（gen-0／gen-1，被 `../video/` gen-2 取代；封存
-2026-05-31）、**舊 LaTeX 講義樹**（`tex_handout/`，2026-06-13 凍結）、以及 **HTML 講義
+本資料夾封存了**三代媒體產線**——gen-0／gen-1（被 `../video/` gen-2 取代；封存
+2026-05-31）與 **gen-2 的 Manim 渲染引擎**（`manim_video/`，2026-09-28 影片線統一走
+Remotion 後封存）——以及**舊 LaTeX 講義樹**（`tex_handout/`，2026-06-13 凍結）、**HTML 講義
 時代的兩件套**（2026-08-09 LaTeX 統一後移入）：
 
+- [`manim_video/`](manim_video/README.md) — gen-2 Manim 講義影片產線（`make.py`＋渲染側
+  `pipeline/`＋模板＋storyboard＋hook 動畫；回退 tag `archive/2026-09-28-manim-gen2-final`）。
 - [`html_handout/`](html_handout/README.md) — HTML 撰稿線快照（fragments／standalone／
   `build.py`／舊契約；**存量 provenance 的 grep 地**）。
 - [`html2latex/`](html2latex/README.md) — HTML→LaTeX 轉換產線工具（12 單元首轉完畢後退役）。
@@ -38,6 +41,17 @@ Beamer 投影片 → PDF → TTS 合成 → ffmpeg 合成 MP4。
 
 - `artifacts/manim/manim_voiceover_experiment/`（含 `MANIM_VOICEOVER_MIGRATION_PLAN.md` 與各 spike）
 - `scripts/manim_templates/{voiceover_service,voiceover_scene,reveal_strategy,narration_compiler,narration_markers,latex_speech,anchors}.py`
+
+### gen-2 — Manim 講義影片產線（2026-09-28 封存）
+
+講義內容稿 → storyboard YAML → `make.py`（parse → synth → render → compose）→ Manim 逐場
+渲染＋MiMo 旁白 → ffmpeg 成片。2026-09-28 使用者拍板影片線統一走 Remotion，渲染引擎整包
+以 `git mv` 移入 [`manim_video/`](manim_video/README.md)（相對路徑不變）；與渲染器無關的
+共用層（TTS／對齊／音訊）與內容層留在 [`../video/`](../video/README.md)。
+
+- 說明、逐項「從 → 到」對照表、留在 `video/` 的部分與原因：[`manim_video/README.md`](manim_video/README.md)
+- 契約：[`../video/KICKOFF-remotion-unification.md`](../video/KICKOFF-remotion-unification.md)
+- 回退錨點：annotated tag `archive/2026-09-28-manim-gen2-final`（要跑請 checkout 此 tag）
 
 ## 結構
 

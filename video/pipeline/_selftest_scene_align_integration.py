@@ -1,6 +1,9 @@
 """Offline end-to-end: tts.synthesize_scene scene path (stubbed aligner + synth) ->
-schema-2 entry -> make.py reuse-validation + render-sync + ladder demotion. No API,
-no whisper model, no ffmpeg. Run: python video/pipeline/_selftest_scene_align_integration.py"""
+schema-2 entry + ladder demotion. No API, no whisper model, no ffmpeg.
+Run: python video/pipeline/_selftest_scene_align_integration.py
+
+The make.py consumers of that entry (reuse-validation + render-sync) moved 2026-09-28 with
+make.py to legacy/manim_video/pipeline/_selftest_scene_align_integration_make.py."""
 import argparse
 import sys
 import tempfile
@@ -10,7 +13,6 @@ sys.path.insert(0, str(Path(__file__).resolve().parent.parent))
 from pipeline import scene_align as SA           # noqa: E402
 from pipeline import tts                          # noqa: E402
 from pipeline.audio import write_pcm_wav, silence_pcm, wav_duration  # noqa: E402
-import make                                       # noqa: E402
 
 SCENE = {"id": "slope_equals_height", "kind": "content", "template": "graph",
          "say": "First point. {show g.0} Second point here now. {show g.1} Third and final point."}
@@ -67,8 +69,8 @@ def _fake_align_long_fails(wav_path, plan, **kw):
     return {"words": words, "summary": summary, "segments": [], "multi": {}}
 
 
-def test_tts_scene_path_and_make_consumers():
-    saved = (SA.align_scene, tts._synth_scene_wav, make._probe_duration_fps)
+def test_tts_scene_path():
+    saved = (SA.align_scene, tts._synth_scene_wav)
     SA.align_scene, tts._synth_scene_wav = _fake_align, _fake_synth(12.0)
     try:
         with tempfile.TemporaryDirectory() as d:
@@ -81,15 +83,8 @@ def test_tts_scene_path_and_make_consumers():
             assert not Path(entry["audio_file"] + ".tmp").exists()           # temp gone
             assert Path(entry["alignment"]["words_file"]).exists()
             assert Path(entry["alignment"]["aligned_file"]).exists()
-            manifest = {"schema": 2, "deck_id": META["id"], "backend": "mimo", "model": "mimo-v2.5-tts",
-                        "voice": "Dean", "style": "STY", "scenes": [entry]}
-            make._check_manifest_schema(manifest)
-            make._validate_reuse_manifest(META, [SCENE], manifest)           # raises if stale
-            make._probe_duration_fps = lambda p: (1.0 + entry["audio_seconds"] + 1.0, 30.0)
-            assert make._audit_render_sync([SCENE], manifest,
-                                           {SCENE["id"]: Path(entry["audio_file"])}, lead=1.0) is True
     finally:
-        SA.align_scene, tts._synth_scene_wav, make._probe_duration_fps = saved
+        SA.align_scene, tts._synth_scene_wav = saved
 
 
 def test_gate_fail_demotes_to_beats():
@@ -213,7 +208,7 @@ def test_chunk_generic_error_demotes_to_beats_not_crash():
 
 
 if __name__ == "__main__":
-    test_tts_scene_path_and_make_consumers()
+    test_tts_scene_path()
     test_gate_fail_demotes_to_beats()
     test_alignment_error_demotes_to_beats_not_crash()
     test_build_fallback_rungs_has_chunk()
