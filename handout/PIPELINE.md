@@ -119,7 +119,7 @@ HTML standalone 在兩線時代定位＝撰稿預覽＋圖閘 render 載體（D2
 ## 工程注意：subagent 持久化
 
 `.claude/` 被根 `.gitignore` 整個擋掉。要讓 gate subagent 進版控（換機/未來重用），須 **`git add -f .claude/agents/<name>.md`**。目前 `.claude/agents/` 下 **12 個 subagent 皆應 force-add 追蹤**：
-handout 線 6 個（`example-supplement`、`handout-prose-audit`、`handout-figure-opportunity-audit`、`handout-figure-audit`、`mode-c-gapwalk`、`learner-sim`）＋ video 線 6 個（`hook-engineering-audit`、`narration-copyedit`、`narration-faithfulness-audit`、`visual-frame-audit`、`pedagogy-firstlearner-audit`、`video-amplification-audit`）。**新增 subagent 後務必 force-add**，否則換機即失。
+handout 線 6 個（`example-supplement`、`handout-prose-audit`、`handout-figure-opportunity-audit`、`handout-figure-audit`、`mode-c-gapwalk`、`learner-sim`）＋ video 線 6 個（`narration-copyedit`、`narration-faithfulness-audit`、`visual-frame-audit`、`pedagogy-firstlearner-audit`、`video-amplification-audit`、`motion-designer`；原 `hook-engineering-audit` 已於 2026-09-28 隨 Manim gen-2 刪除，見 [`../video/KICKOFF-remotion-unification.md`](../video/KICKOFF-remotion-unification.md)）。**新增 subagent 後務必 force-add**，否則換機即失。
 
 ## 各章狀態 dashboard（唯一章狀態表；2026-07-07）
 

@@ -7,11 +7,11 @@
 
     python tools/doctor.py            # 全部檢查
     python tools/doctor.py --json     # 機器可讀（給 agent 解析）
-    python tools/doctor.py --smoke    # 加跑影片線正典 deck 的離線 render 前閘（schema／lint／derive --check；不 render、不計費）
 
 退出碼：所有「必要」項通過＝0；有任何 [FAIL]＝1（[WARN]／[INFO] 不影響）。
-`--smoke` 的 deck 閘失敗也算 [FAIL]——工具鏈綠不代表產線綠（2026-08-10 佈局重構後正典 deck 過不了
-自己的 provenance 閘，doctor 卻仍報影片線 ✅；見 video/_audit/REVIEW-pipeline-assessment-2026-09-07.html F1／F4）。
+`--smoke`（影片線正典 deck 的 schema／lint／derive --check 離線閘）已於 2026-09-28 退役：正典 storyboard
+與 schema.py／lint.py 隨 Manim gen-2 引擎封存到 legacy/manim_video/（見 video/KICKOFF-remotion-unification.md）；
+旗標仍接受，只印一列 [info] 說明。
 
 權威說明見 repo 根的 ENVIRONMENT.md；本檔是它的可執行版。
 """
@@ -69,8 +69,6 @@ def _run(cmd: list[str], timeout: int = 30) -> tuple[int, str]:
 # 套件 → (import 名, 嚴重度, 用途)。critical 缺＝FAIL，optional 缺＝WARN。
 _VENV_MODS = [
     ("PyYAML", "yaml", "critical", "讀 storyboard／fragment 設定（整條產線靠它）"),
-    ("manim", "manim", "critical", "影片場景 render"),
-    ("ManimPango", "manimpango", "critical", "manim 文字排版／註冊內附字型"),
     ("pillow", "PIL", "critical", "幀處理／稽核報告 base64 內嵌圖"),
     ("imageio-ffmpeg", "imageio_ffmpeg", "optional", "內附 ffmpeg 二進位（裝了系統 ffmpeg 後非必要）"),
     ("fonttools", "fontTools", "optional", "LaTeX 字形閘讀原始字型輪廓（handout/latex/check_glyphs.py）；產 logo 外框 SVG"),
@@ -121,7 +119,7 @@ def check_python_and_venv() -> None:
             record(WARN, "Python", f"{pkg} 缺（選用）", f"{use}；需要時：.venv\\Scripts\\python -m pip install {pkg}")
 
 
-# ── ② 系統 binary：ffmpeg / ffprobe（影片 compose + 視覺稽核）────────────
+# ── ② 系統 binary：ffmpeg / ffprobe（成片後處理 + 抽幀稽核）──────────────
 
 def check_ffmpeg() -> None:
     remedy = "winget install --id Gyan.FFmpeg -e  （裝完開新 shell 讓 PATH 生效）"
@@ -132,45 +130,57 @@ def check_ffmpeg() -> None:
             ver = out.splitlines()[0] if out else ""
             record(PASS, "ffmpeg", f"{name} 在 PATH", ver or path)
         else:
-            why = "compose 合併成片＋critic 抽幀都要它" if name == "ffmpeg" else \
-                  "make.py render 後時長健檢用裸名呼叫，缺它會 compose 直接崩、無合併片"
+            why = "Remotion 成片的 loudnorm／章節嵌入、rewatch_pack 抽幀、音訊量測都用裸名呼叫它" \
+                if name == "ffmpeg" else "rewatch_pack 讀逐場時長／幀率用裸名呼叫它"
             record(FAIL, "ffmpeg", f"{name} 不在 PATH", f"{why}。補：{remedy}")
 
 
-# ── ③ LaTeX（manim 的 Tex/MathTex 一定要真 TeX 才能編譯）───────────────
+# ── ③ LaTeX（MiKTeX 本體；講義線 handout/latex/ 專用，影片線自 2026-09-28 起不需 TeX）──
 
 def check_latex() -> None:
-    remedy = "裝 MiKTeX（https://miktex.org），latex/dvisvgm 會進 PATH；首次用會自動補 newtx 套件"
-    for name, sev in (("latex", "critical"), ("dvisvgm", "critical"), ("dvipng", "optional")):
-        path = shutil.which(name)
-        if path:
-            record(PASS, "LaTeX", f"{name} 在 PATH", path)
-        elif sev == "critical":
-            record(FAIL, "LaTeX", f"{name} 不在 PATH", f"影片任何含數學的場景都編不出來。補：{remedy}")
-        else:
-            record(WARN, "LaTeX", f"{name} 不在 PATH（選用）", remedy)
-
-    # Route A：video 文字＋數學皆走 LaTeX——_bootstrap.apply_tex_template 的 preamble \usepackage
-    # plex-sans／plex-mono／lmodern／microtype。這些套件的存在由 check_fonts 以 kpsewhich 驗
-    # （latex/dvisvgm 在 PATH 是先決條件）。newtx 已不再是 video 需求，但仍是 legacy/tex_handout 的需求。
+    """MiKTeX 在不在（以 `latex` 在 PATH 為探針）。講義出版線（handout/latex/）的 lualatex／latexmk／
+    NCM／pdftotext 由 check_handout_latex 細驗。影片線改走 Remotion（數學由 MathJax 出 SVG）後不再需要
+    TeX；原本為 Manim Tex→SVG 驗的 dvisvgm／dvipng 與影片字型套件檢查已隨 gen-2 引擎退役
+    （見 video/KICKOFF-remotion-unification.md）。"""
+    remedy = "裝 MiKTeX（https://miktex.org），latex／lualatex／latexmk 會進 PATH；首次編譯會自動補缺的套件"
+    path = shutil.which("latex")
+    if path:
+        record(PASS, "LaTeX", "latex 在 PATH（MiKTeX 已裝）", path)
+    else:
+        record(FAIL, "LaTeX", "latex 不在 PATH（MiKTeX 未裝）",
+               f"講義出版線（handout/latex/）排不出 PDF。補：{remedy}")
 
 
-# ── ④ handout HTML 圖 render：Node ≥21 + Chrome（shot.mjs）──────────────
+# ── ④ Node ≥21（Remotion 影片線正式依賴＋handout 圖 shot.mjs）＋ Chrome（shot.mjs）──
+
+# Remotion 專案（2026-09-28 起影片線唯一渲染器；升格正式目錄前仍在實驗夾）
+_REMOTION_DIR = ("video", "experiments", "remotion_styles", "paper")
+
 
 def check_node_and_chrome() -> None:
     node = shutil.which("node")
     if not node:
-        record(FAIL, "handout", "node 不在 PATH",
-               "shot.mjs（render 講義圖供 figure 稽核）要 Node ≥21。裝：winget install OpenJS.NodeJS.LTS")
+        record(FAIL, "Node", "node 不在 PATH",
+               "Remotion 影片線（render／studio）與 shot.mjs（render 講義圖供 figure 稽核）都要 Node ≥21。"
+               "裝：winget install OpenJS.NodeJS.LTS")
     else:
         rc, out = _run(["node", "--version"])
         m = re.search(r"v(\d+)", out or "")
         major = int(m.group(1)) if m else 0
         if major >= 21:
-            record(PASS, "handout", f"node {out.strip()}", node)
+            record(PASS, "Node", f"node {out.strip()}", f"{node}（Remotion 影片線正式依賴＋shot.mjs）")
         else:
-            record(FAIL, "handout", f"node {out.strip()} < 21",
-                   "shot.mjs 用 global WebSocket/fetch，需 Node ≥21。升級：winget install OpenJS.NodeJS.LTS")
+            record(FAIL, "Node", f"node {out.strip()} < 21",
+                   "Remotion 影片線與 shot.mjs（global WebSocket/fetch）都需 Node ≥21。"
+                   "升級：winget install OpenJS.NodeJS.LTS")
+
+    # Remotion 的 npm 依賴（node_modules 不進版控；版本由 paper/package-lock.json 釘死，npm ci 精確重現）
+    rdir = REPO.joinpath(*_REMOTION_DIR)
+    if (rdir / "node_modules").is_dir():
+        record(PASS, "Node", "Remotion node_modules 已裝", str(rdir / "node_modules"))
+    else:
+        record(WARN, "Node", "Remotion node_modules 不存在（影片 render 前要裝）",
+               f"在 {rdir} 跑 `npm ci`（依 package-lock.json 精確重現，需網路）")
 
     # Chrome：shot.mjs 先讀 CHROME env，再退回常見安裝位置
     candidates = []
@@ -379,10 +389,8 @@ def check_chinese_alignment_model() -> None:
 
 
 def check_assets() -> None:
-    # The render-critical vendored asset is the outlined NTU lockup SVG -- brand
-    # .logo_lockup_outlined() loads it for every intro/outro. (No design fonts are vendored:
-    # Route A renders all text + math through LaTeX packages -- see check_fonts -- so there
-    # is nothing under assets/fonts/ to expect.)
+    # The vendored brand asset is the outlined NTU lockup SVG -- the source of the copy the
+    # Remotion project serves from paper/public/brand/ for every intro/outro.
     lockup = REPO / "video" / "pipeline" / "assets" / "lockup-color-outlined.svg"
     if lockup.exists():
         record(PASS, "assets", "logo lockup SVG", str(lockup))
@@ -391,151 +399,10 @@ def check_assets() -> None:
                f"預期在 {lockup}（intro/outro render 要它；應隨 git 而來，git status 檢查是否誤刪）")
 
 
-# ── ⑥b 影片字型：LaTeX 套件（Route A 後文字＋數學皆走 LaTeX，不再用 Pango 系統字型）──
-
-def check_fonts() -> None:
-    """Route A（2026-06-24）後，影片**所有螢幕文字＋數學都走 LaTeX/pdflatex**——文字 Instrument
-    Sans（2026-09-13 換字，repo 內 vendored＋autoinst 生成，見 check_vendored_text_font）、
-    eyebrow/label 用 IBM Plex Mono、數學 Latin Modern，字體在 _bootstrap.apply_tex_template 的
-    preamble 設定，不再經 Pango（舊的 Times New Roman／Courier New 系統字型已棄）。所以這裡驗的是
-    這些 MiKTeX 套件存在（kpsewhich），缺了含文字／數學的場景會編譯失敗或 fallback。"""
-    if not shutil.which("kpsewhich"):
-        record(WARN, "fonts", "kpsewhich 不在 PATH，略過 LaTeX 字型套件檢查",
-               "裝 MiKTeX 後 kpsewhich 會進 PATH（見 LaTeX 區）")
-        return
-    styles = (
-        ("plex-mono.sty", FAIL, "eyebrow/label（IBM Plex Mono）"),
-        ("lmodern.sty", FAIL, "影片數學（Latin Modern）"),
-        ("microtype.sty", WARN, "kerning/protrusion（preamble 也載它）"),
-    )
-    for sty, sev, why in styles:
-        rc, out = _run(["kpsewhich", sty])
-        if rc == 0 and out.strip():
-            record(PASS, "fonts", f"{sty} 可見", f"{why}")
-        else:
-            record(sev, "fonts", f"{sty} 找不到",
-                   f"{why}。MiKTeX 首次編譯通常自動補裝；或手動 `mpm --install` 對應 bundle"
-                   "（plex / lm / microtype）")
-
-
-# ── ⑥b2 影片文字字型 Instrument Sans：repo vendored ＋ MiKTeX 使用者層級註冊 ──
-
-# vendored tree（video/pipeline/fonts/instrument-sans/）內必須在的關鍵檔。CTAN 沒有
-# Instrument Sans 的 pdflatex 套件，所以字型支援是 autoinst 生成物、隨 repo 走。
-_IS_DIR = ("video", "pipeline", "fonts", "instrument-sans")
-_IS_FILES = (
-    "OFL.txt",
-    "otf/InstrumentSans-Regular.otf",
-    "otf/InstrumentSans-Bold.otf",
-    "texmf/tex/latex/instrumentsans/InstrumentSans.sty",
-    "texmf/tex/latex/instrumentsans/T1InstrumentSans-LF.fd",
-    "texmf/fonts/tfm/instrument/instrumentsans/InstrumentSans-Regular-lf-t1.tfm",
-    "texmf/fonts/type1/instrument/instrumentsans/InstrumentSans-Regular.pfb",
-    "texmf/fonts/map/dvips/instrumentsans/InstrumentSans.map",
-    "texmf/miktex/config/updmap.cfg",
-)
-
-
-def check_vendored_text_font() -> None:
-    """影片文字字型＝Instrument Sans（2026-09-13 換字），**沒有 CTAN 套件**：OTF＋autoinst 生成的
-    tfm/vf/pfb/enc/map/sty 全部 vendored 在 repo 裡。但光有檔案不夠——`latex` 與 `dvisvgm` 都得
-    找得到它們，而 **dvisvgm 只讀它預設找到的第一個 map 檔（本機＝ps2pk.map），沒有任何環境變數
-    能加 map**（實測 2026-09-13：TEXINPUTS/TFMFONTS/… 能讓 latex 編過，dvisvgm 仍 `no font file
-    found` → 文字 render 成空白）。所以要兩步 MiKTeX **使用者層級**設定，由 tools/setup.ps1 做：
-
-        initexmf --register-root=<repo>\\video\\pipeline\\fonts\\instrument-sans\\texmf
-        miktex fontmaps configure      # 把 vendored updmap.cfg 的 Map 行併進 ps2pk/psfonts.map
-
-    這裡驗三件事：① vendored 檔案在 ② `kpsewhich InstrumentSans.sty` 指到 repo 內（＝root 已註冊）
-    ③ 產生的 ps2pk.map 真的含 InstrumentSans 行（＝fontmaps configure 跑過）。"""
-    vdir = REPO.joinpath(*_IS_DIR)
-    missing = [rel for rel in _IS_FILES if not (vdir / rel).exists()]
-    if missing:
-        record(FAIL, "fonts", "vendored Instrument Sans 檔案不全",
-               f"{vdir} 缺 {', '.join(missing[:4])}"
-               f"{' …' if len(missing) > 4 else ''}；應隨 git 而來，先 git status 檢查是否誤刪")
-        return
-    record(PASS, "fonts", "vendored Instrument Sans 檔案齊", f"{vdir}（OTF＋autoinst 生成物）")
-
-    if not shutil.which("kpsewhich"):
-        record(WARN, "fonts", "kpsewhich 不在 PATH，略過 Instrument Sans 註冊檢查",
-               "裝 MiKTeX 後 kpsewhich 會進 PATH（見 LaTeX 區）")
-        return
-    setup_fix = ("跑 `powershell -ExecutionPolicy Bypass -File tools/setup.ps1`（會做 "
-                 "initexmf --register-root ＋ miktex fontmaps configure），再刪 `media/Tex` 快取。"
-                 "詳見 ENVIRONMENT.md ①b。")
-    rc, out = _run(["kpsewhich", "InstrumentSans.sty"])
-    sty = (out or "").strip().splitlines()[0] if rc == 0 and out.strip() else ""
-    if sty:
-        record(PASS, "fonts", "InstrumentSans.sty 可見（TEXMF root 已註冊）", sty)
-    else:
-        record(FAIL, "fonts", "InstrumentSans.sty 找不到（TEXMF root 未註冊）",
-               f"影片所有文字都編不出來。{setup_fix}")
-
-    rc, out = _run(["kpsewhich", "--format=map", "ps2pk.map"])
-    mp = (out or "").strip().splitlines()[0] if rc == 0 and out.strip() else ""
-    hit = False
-    if mp:
-        try:
-            hit = "InstrumentSans" in Path(mp).read_text(encoding="utf-8", errors="replace")
-        except OSError:
-            hit = False
-    if hit:
-        record(PASS, "fonts", "ps2pk.map 含 InstrumentSans（dvisvgm 描得出外框）", mp)
-    else:
-        record(FAIL, "fonts", "ps2pk.map 沒有 InstrumentSans（文字會 render 成空白）",
-               f"{mp or 'ps2pk.map 找不到'}。{setup_fix}")
-
-
-# ── ⑥d Plex 文字真的編得出來：實 build 一個 Tex、確認非空（補 kpsewhich 盲點）──
-
-def check_tex_compiles() -> None:
-    """kpsewhich 只證 `.sty` 檔在；**不證** latex→dvisvgm 真能把文字字體編成 glyph。
-    踩坑（2026-06-25）：MiKTeX 字型檔名庫（FNDB）stale → latex 找不到 .tfm、fallback 去壞掉的
-    `makemf` → 文字 render 成空白 → 場景一開頭 `IndexError` 崩，但 doctor 全綠（只查 .sty）。
-    2026-09-13 換 Instrument Sans 後同一個坑又多一個入口：map 沒併進 ps2pk.map（見
-    check_vendored_text_font）也是「latex 編過、dvisvgm 描不出外框」。這裡實 build 一個
-    Instrument Sans Bold＋Plex Mono 的 Tex（每次用全新 media_dir，壞掉時期的空白快取才不會遮住
-    真壞），斷言 family 有 glyph 點。修法見 ENVIRONMENT.md「文字 render 成空白」。"""
-    if not VENV_PY.exists() or not shutil.which("latex") or not shutil.which("kpsewhich"):
-        record(INFO, "fonts", "文字 Tex 實編檢查略過", "缺 .venv／latex／kpsewhich（見上方對應區）")
-        return
-    probe = (
-        "import sys, os, json, tempfile\n"
-        "sys.path.insert(0, %r)\n"
-        "os.chdir(%r)\n"
-        "from pipeline import _bootstrap\n"
-        "_bootstrap.bootstrap()\n"
-        "import manim\n"
-        "manim.config.media_dir = tempfile.mkdtemp(prefix='doctor_tex_')\n"  # fresh -> 不吃舊空白快取
-        "_bootstrap.apply_tex_template()\n"
-        "from manim import Tex\n"
-        "import numpy as np\n"
-        "try:\n"
-        "    t = Tex(r'\\textbf{Hg} \\texttt{Hg}')\n"            # Instrument Sans Bold + Plex Mono
-        "    n = sum(int(np.asarray(m.points).shape[0]) for m in t.family_members_with_points())\n"
-        "    print('DOCTOR_TEX ' + json.dumps({'ok': n > 0, 'points': n}))\n"
-        "except Exception as e:\n"
-        "    print('DOCTOR_TEX ' + json.dumps({'ok': False, 'error': type(e).__name__ + ': ' + str(e)[:200]}))\n"
-    ) % (str(REPO / "video"), str(REPO))
-    _rc, out = _run([str(VENV_PY), "-c", probe], timeout=120)  # 一次 live latex 編譯，給足時間
-    data: dict = {}
-    for line in (out or "").splitlines():
-        if line.startswith("DOCTOR_TEX "):
-            try:
-                data = json.loads(line[len("DOCTOR_TEX "):])
-            except Exception:
-                data = {}
-    fix = ("字型查找壞（latex fallback 去 makemf，或 map 沒併進 ps2pk.map）。修：跑 tools/setup.ps1"
-           "（register-root ＋ fontmaps configure），必要時 `initexmf --update-fndb`，"
-           "再刪 `media/Tex` 快取（manim 會沿用舊空白）。詳見 ENVIRONMENT.md「文字 render 成空白」。")
-    if data.get("ok"):
-        record(PASS, "fonts", "文字 Tex 實編非空",
-               f"latex→dvisvgm 出 {data.get('points')} 個 glyph 點（文字真的 render 得出來）")
-    elif data.get("error"):
-        record(FAIL, "fonts", "文字 Tex 編譯失敗（render 會崩）", f"{data['error']}。{fix}")
-    else:
-        record(FAIL, "fonts", "文字 Tex 實編出空白（render 會崩）", fix)
+# ── ⑥b／⑥b2／⑥d 影片字型與 Tex 實編檢查：2026-09-28 隨 Manim gen-2 引擎退役 ──────────
+# 原本驗 Route A 的 LaTeX 字型套件（plex-mono／lmodern／microtype）、vendored Instrument Sans 的
+# MiKTeX 註冊（ps2pk.map），並實 build 一個 Tex。影片線改走 Remotion 後這些都不再需要；字型檔隨
+# video/pipeline/fonts/ 進 legacy/manim_video/。回退見 video/KICKOFF-remotion-unification.md 的 tag。
 
 
 # ── ⑥c handout LaTeX 排版線（pilot v2：lualatex＋latexmk＋NCM＋vendored Inter）──
@@ -605,40 +472,17 @@ def check_keys() -> None:
             record(INFO, "keys", f"{key} 未設", f"需要時才設（離線路徑不需要）：{use}")
 
 
-# ── ⑧ --smoke：影片線正典 deck 的離線 render 前閘（不 render、不計費）──────────
+# ── ⑧ --smoke：2026-09-28 退役（旗標仍接受，只印一列說明）──────────────────
 
 def check_video_smoke() -> None:
-    """對每個正典 storyboard（video/storyboards/*.yml；底線開頭的 demo／fixture 除外）跑
-    schema.py（含 provenance／source_rev／pedagogy／coverage）＋lint.py，有 .spoken.yml 的 deck
-    再跑 derive_spoken --check（parity）。全部離線、純檢查、幾秒完成。為何要有：doctor 原本只驗
-    工具鏈，所以「✅ 影片完整 render→compose」與「正典 deck 在 provenance 閘中止」曾同時成立
-    （產線評估 2026-09-07 F1／F4）。selftest 全套另跑 `python video/pipeline/run_selftests.py`
-    （manim 類要幾分鐘，故不併進 doctor）。"""
-    if not VENV_PY.exists():
-        record(INFO, "video-smoke", "略過：無 .venv", "先跑 tools/setup.ps1 建環境再 --smoke")
-        return
-    pipeline = REPO / "video" / "pipeline"
-    decks = sorted(p for p in (REPO / "video" / "storyboards").glob("*.yml") if not p.name.startswith("_"))
-    if not decks:
-        record(WARN, "video-smoke", "找不到正典 storyboard", str(REPO / "video" / "storyboards"))
-        return
-
-    def _record_gate(label: str, rc: int, out: str) -> None:
-        lines = [ln for ln in out.splitlines() if ln.strip()]
-        if rc == 0:
-            warns = sum(1 for ln in lines if "WARN" in ln)
-            record(PASS, "video-smoke", label, f"{warns} 個 WARN（warn-only，不擋）" if warns else "")
-        else:
-            record(FAIL, "video-smoke", label, " | ".join(lines[-3:]) or f"exit {rc}")
-
-    for deck in decks:
-        for gate in ("schema", "lint"):
-            rc, out = _run([str(VENV_PY), str(pipeline / f"{gate}.py"), str(deck)], timeout=120)
-            _record_gate(f"{gate} {deck.name}", rc, out)
-        if (REPO / "video" / "content_scripts" / f"{deck.stem}.spoken.yml").exists():
-            rc, out = _run([str(VENV_PY), str(pipeline / "derive_spoken.py"), "--deck", deck.stem, "--check"],
-                           timeout=120)
-            _record_gate(f"derive --check {deck.stem}", rc, out)
+    """原本對每個正典 storyboard 跑 schema.py＋lint.py＋derive_spoken --check。三者的對象都沒了：
+    正典 storyboard 與 schema.py／lint.py 隨 Manim gen-2 引擎封存到 legacy/manim_video/；
+    derive_spoken.py 留在 video/pipeline/，但它的 --check 是對正典 storyboard 驗 parity，
+    沒有正典 deck 就無從驗，故一併拿掉。Remotion 版的 deck 閘待內容層檢查器接上新 storyboard
+    後重掛（video/KICKOFF-remotion-unification.md §6）。"""
+    record(INFO, "video-smoke", "--smoke 已退役（2026-09-28）",
+           "正典 deck 閘（schema／lint／derive --check）隨 Manim gen-2 封存，見 "
+           "video/KICKOFF-remotion-unification.md；模組 selftest 全套＝python video/pipeline/run_selftests.py")
 
 
 # ── 報表 ──────────────────────────────────────────────────────────────
@@ -677,27 +521,20 @@ def print_report(as_json: bool) -> int:
         print(line)
 
     # 能力摘要：直接告訴你「現在哪些工作流跑得動」
-    video_ok = not any(_missing("Python", x) for x in ("PyYAML", "manim", "ManimPango", "pillow")) \
-        and not _missing("LaTeX", "latex") and not _missing("LaTeX", "dvisvgm") \
-        and not _missing("ffmpeg", "ffmpeg") and not _missing("ffmpeg", "ffprobe") \
-        and not _missing("fonts", "InstrumentSans.sty") and not _missing("fonts", "plex-mono.sty") \
-        and not _missing("fonts", "lmodern.sty") and not _missing("fonts", "文字 Tex") \
-        and not _missing("fonts", "vendored Instrument Sans") and not _missing("fonts", "ps2pk.map")
-    handout_fig_ok = not _missing("handout", "node") and not _missing("handout", "< 21") \
-        and not _missing("handout", "Chrome")
+    node_ok = not _missing("Node", "node")
+    video_ok = node_ok and _has("Node", "Remotion node_modules", PASS) \
+        and not any(_missing("Python", x) for x in ("PyYAML", "pillow")) \
+        and not _missing("ffmpeg", "ffmpeg") and not _missing("ffmpeg", "ffprobe")
+    handout_fig_ok = node_ok and not _missing("handout", "Chrome")
     print("\n能力摘要\n" + "─" * 64)
-    print(f"  {'✅' if video_ok else '❌'} 影片完整 render→compose 成片（venv＋LaTeX＋ffmpeg＋ffprobe）")
+    print(f"  {'✅' if video_ok else '❌'} 影片 Remotion render＋後處理（Node≥21＋paper/node_modules＋venv＋ffmpeg＋ffprobe）")
     print(f"  {'✅' if handout_fig_ok else '❌'} handout 圖 render／figure 稽核（Node≥21＋Chrome）")
     print("  ✅ handout build.py（純 stdlib，任何 python 皆可）")
     handout_tex_ok = not any(s == FAIL and a == "handout-tex" for s, a, *_ in _results)
     print(f"  {'✅' if handout_tex_ok else '❌'} handout LaTeX 排版線（lualatex＋latexmk＋NCM＋vendored Inter＋pdftotext）")
     codex_ok = any(s == PASS and a == "codex" for s, a, *_ in _results)
     print(f"  {'✅' if codex_ok else '⚠️ '} codex 審核（Mode B 講義／video gate2；缺＝不擋產線）")
-    if any(a == "video-smoke" for _, a, *_ in _results):
-        smoke_ok = not any(s == FAIL and a == "video-smoke" for s, a, *_ in _results)
-        print(f"  {'✅' if smoke_ok else '❌'} 影片線正典 deck 離線閘 --smoke（schema＋provenance＋lint＋derive --check；不 render）")
-    else:
-        print("  ·  影片線正典 deck 離線閘未跑（加 --smoke；selftest 全套＝python video/pipeline/run_selftests.py）")
+    print("  ·  模組 selftest 全套另跑：python video/pipeline/run_selftests.py（不併進 doctor）")
 
     print("\n" + "─" * 64)
     verdict = "全部必要項通過 ✅" if fails == 0 else f"{fails} 項必要缺漏 ❌（見上方 [FAIL]）"
@@ -721,9 +558,6 @@ def main() -> int:
     check_forced_alignment()
     check_chinese_alignment_model()
     check_assets()
-    check_fonts()
-    check_vendored_text_font()
-    check_tex_compiles()
     check_handout_latex()
     check_keys()
     if smoke:
