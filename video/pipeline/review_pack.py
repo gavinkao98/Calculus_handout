@@ -38,7 +38,7 @@ import yaml  # noqa: E402
 
 # The engineering audit SSOT. Injected VERBATIM into the packet so the dimensions
 # live in exactly one place (HOOK-ENGINEERING-RUBRIC.md) -- the same file gate 2 reads.
-RUBRIC_PATH = (Path(__file__).resolve().parent.parent
+RUBRIC_PATH = (Path(__file__).resolve().parents[2] / "legacy" / "manim_video"   # rubric archived 2026-09-28
                / "content_scripts" / "_audit" / "HOOK-ENGINEERING-RUBRIC.md")
 
 # Four-level finding triage (CLAUDE.md), carried in the packet so the reviewer
@@ -258,7 +258,7 @@ def main() -> int:
     print(f"[review] {meta['id']}: engineering packet ({len(packet['cues'])} animated "
           f"unit(s)) -> {packet_path}", flush=True)
     print("[review] gate 1: hand this packet to a Claude subagent (free) -- it judges "
-          "against content_scripts/_audit/HOOK-ENGINEERING-RUBRIC.md (injected above).",
+          "against legacy/manim_video/content_scripts/_audit/HOOK-ENGINEERING-RUBRIC.md (injected above).",
           flush=True)
     print("[review] gate 2: Codex single run after convergence (CLAUDE.md consent).",
           flush=True)

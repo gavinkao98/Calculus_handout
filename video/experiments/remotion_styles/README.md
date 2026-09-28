@@ -25,7 +25,7 @@
 - **2026-09-25（續）：** 配音流程升級，三項都已驗證。
   - **整場合成：** `tts.py --unit scene`。`--unit auto` 只認舊產線的模板名稱，Remotion 稿一律會退回逐 beat，所以要明確指定 `scene`。
   - **逐字對時：** `paper/src/lib/words.ts`，動畫呼叫 `atWord()` 對到旁白的某個字。
-  - **響度正規化：** `paper/scripts/loudnorm.py`，沿用 `make.py` 的兩段式 loudnorm，目標 −19 LUFS。
+  - **響度正規化：** `paper/scripts/loudnorm.py`，沿用兩段式 loudnorm（`video/pipeline/loudnorm.py`，2026-09-28 自封存的 `make.py` 抽出），目標 −19 LUFS。
 - **無指引生成實驗：** 主對話從講義提煉 [`OUTLINE-s31.md`](OUTLINE-s31.md)（只列要教的內容），子代理在不讀舊稿、舊片的隔離條件下，自己寫出整節 §3.1（`paper/s31/`、`paper/src/s31/`）。
   - **講法：** 「先猜（單位圓速度箭頭）→ 證明時記下欠款（OWED）→ 逐條還清（PAID IN FULL）」。
   - **配音：** MiMo `--unit scene` 共 29 次呼叫；14 場中 12 場整場對齊成功，areas、warnings 退回逐 beat。

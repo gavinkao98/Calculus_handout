@@ -124,12 +124,32 @@ git diff archive/2026-09-28-manim-gen2-final -- video/        # 看封存後動�
 
 不准動：`video/**`（除 `video/requirements.txt`）、`legacy/**`、`CLAUDE.md`、`README.md`。若發現 `CLAUDE.md` 需要配套改動，寫進回報，不要動手。
 
-## 5. 主對話收尾（merge 後）
+## 5. 收案紀錄（2026-09-28，主對話 merge＋審核）
 
-- 三個分支依 Task 1 → Task 3 → Task 2 順序 merge（Task 2 的連結目標要等 Task 1 落地才驗得到）。
-- merge 後重跑：`run_selftests.py` 全綠、`doctor.py`、連結檢查（含 Task 2 暫列的 legacy 連結）。
-- 本機刪除：`video/media/`、`video/.git`、兩個 stale worktree 與分支。
-- `REBUILD_STATUS.md` 補上實際數字（搬了幾檔、剩幾支 selftest）。
+三個 task 各一個 opus 子代理、各自 worktree、各一個 commit，依 Task 1 → Task 3 → Task 2 併入 main：
+
+| Task | 子代理 commit | merge commit | 實際結果 |
+|---|---|---|---|
+| 1 引擎搬移 | `01c757c` | `c7e0d34` | `git mv` 182 檔；新增 `pipeline/loudnorm.py`（自 `make.py` 逐字抽出 5 個定義）、`_selftest_loudnorm.py`；`_bootstrap.py` 精簡；`legacy/manim_video/README.md`＋`legacy/README.md` gen-2 節。selftest **83 → 24 支全綠（約 10 秒）**；共用層 import 不載入 manim；`paper/scripts/loudnorm.py` 對合成測試片實跑 I=−19.0 LUFS |
+| 3 環境層 | `e0095e0` | `d0b0514` | `requirements.lock` **38 → 7 套**（31 項 `Required-by` 鏈全根在 manim，表在該 commit body；乾淨 venv 實裝＋`pip check` 通過）；doctor 去 manim／字型／Tex smoke，加 Remotion `node_modules` WARN；setup.ps1 去 Instrument Sans 註冊；ENVIRONMENT.md ①／①b／③／④ 改寫；刪 `hook-engineering-audit` agent、改 `visual-frame-audit` 抽幀來源 |
+| 2 文檔 | `6af9f53` | `e94d3ab` | `git mv` 14 份文檔；新 `video/DESIGN.md`（約 29 KB，四塊承接）；改寫 README／REBUILD_STATUS／REVIEW_GATES／RUNBOOK／KICKOFF 頂註／SPEC-motion-language／CONTENT_METHODOLOGY／根 README／CLAUDE.md／CONTENT_SPEC，另修 `content_scripts/_audit/` 等 14 處連結 |
+
+merge 後在 main 上重驗：`run_selftests.py` 24／24 綠、`tools/doc_lint.py` clean、`git grep "import manim" -- 'video/*.py'` 只剩 `_archive/scratch/`（既有歷史夾）與 `experiments/forced_alignment_dean/render_aligned_scene.py`（見例外 ②）。
+主對話收尾 commit：`review_pack.py` 的 rubric 預設路徑改指 legacy、`experiments/remotion_styles/README.md` 的「沿用 `make.py` 的 loudnorm」改指 `pipeline/loudnorm.py`、REBUILD_STATUS 補收案數字。
+
+**主對話裁決的例外（偏離 §3／§4 字面，均接受）：**
+
+1. **四支 selftest 只拆函式、不整檔搬**（`_selftest_{coverage,pedagogy,provenance}.py` 的 `test_schema_integration`、`_selftest_scene_align_integration.py` 的 make 依賴測試→ legacy 各成獨立檔）。理由：整檔搬會讓 §2 要留下的內容層檢查器在 `video/` 沒有任何測試，§3.2 保留的 fixture 也沒人用。
+2. **`experiments/forced_alignment_dean/render_aligned_scene.py` 仍 import manim。** 依 §2「已結案實驗夾原地不動」，此檔自此無法執行；它是 scene-level FA 路線的歷史起源，留作紀錄。Task 1 驗收 4 的「零命中」以此為唯一例外。
+3. **doctor 多刪了 plex-mono／lmodern／microtype 與 dvisvgm／dvipng 檢查。** 前四者只服務 Manim Tex；`microtype` 講義線也用，但 MiKTeX 首編自動補裝，且原檢查只是 WARN，接受。
+4. **`video/requirements.txt` 首行加 `# -*- coding: utf-8 -*-`**（修既有 bug：繁中 Windows 上 pip 用 cp950 讀含中文註解的檔會 UnicodeDecodeError）；另補列 numpy、pillow（`rewatch_pack.py` 直接 import，原由 manim 間接帶入）。
+5. Task 3 順手改了 `handout/PIPELINE.md` 的 subagent 清單（去 hook-engineering-audit、補漏列的 motion-designer）與 doctor／ENVIRONMENT 裡提到 `make.py`／`critic.py` 的過期文字；Task 2 順手修了 `authoring/seed_converge/README.md`、`pipeline/assets/audio/house/README.md` 的連結。皆為零行為改變的文字修正。
+
+**既有、非本輪造成的問題（留紀錄）：** `doctor.py` 在本機 Git Bash 下報 `pdftotext 不是 poppler 版`——Git for Windows 的 xpdf 版排在 MiKTeX 前面，用 tag 上的舊 doctor 跑結果相同，修法早在 ENVIRONMENT.md ③b（2026-07-27）。
+
+**本機清理（不進 git）：** 刪 `video/media/`（Tex 快取 55 MB）、空目錄 `video/.git`、兩個已併入 main 的 locked 舊 worktree（`agent-a2e1af99bff46677c`、`agent-a4355a6273de952b0`）及其分支、一個未登記的 9-14 殘留夾（`agent-ac4d8696b5d83aebb`，只剩 pipeline 複本與 Tex 快取）。`video/output/`（含付費 TTS 原音）**未動**；`.deps_voiceover/` 本機不存在。
+
+**tag `archive/2026-09-28-manim-gen2-final` 仍只在本機**，要帶到其他電腦：`git push origin archive/2026-09-28-manim-gen2-final`。
 
 ## 6. 另開的後續（不在本輪）
 
