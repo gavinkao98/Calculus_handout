@@ -1,0 +1,536 @@
+<!doctype html>
+<html lang="zh-Hant">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Remotion 製作流程檢討｜裁決稿 2026-09-29</title>
+<style>
+:root{color-scheme:light;--ink:#1f1b16;--muted:#5a5249;--paper:#f4efe4;--white:#fffdf8;--line:#d9d0bd;--red:#ba0c2f;--blue:#1f5e9e;--ochre:#a07c10;--green:#2f6b3a;--sand:#efe6d2;--radius:10px}
+*{box-sizing:border-box}
+body{margin:0;background:var(--paper);color:var(--ink);font:15px/1.7 system-ui,-apple-system,"Segoe UI","Microsoft JhengHei","Noto Sans TC",sans-serif}
+main{max-width:1180px;margin:0 auto;padding:28px 24px 80px}
+h1{font-size:28px;line-height:1.3;margin:0 0 6px}
+h2{font-size:22px;margin:44px 0 10px;padding-top:10px;border-top:2px solid var(--ink)}
+h3{font-size:17px;margin:26px 0 8px}
+h4{font-size:15px;margin:18px 0 6px;color:var(--muted)}
+p{margin:8px 0}
+.eyebrow{font-size:12px;letter-spacing:.18em;text-transform:uppercase;color:var(--red);font-weight:600}
+.meta{color:var(--muted);font-size:13px}
+code{font-family:Consolas,"SFMono-Regular",Menlo,monospace;font-size:.92em;background:var(--sand);padding:1px 4px;border-radius:4px}
+pre{background:var(--white);border:1px solid var(--line);border-radius:var(--radius);padding:12px 14px;overflow:auto;font-size:13px;line-height:1.5}
+table{border-collapse:collapse;width:100%;margin:10px 0 14px;background:var(--white);font-size:13.5px}
+th,td{border:1px solid var(--line);padding:7px 9px;vertical-align:top;text-align:left}
+th{background:var(--sand);font-weight:600}
+td.c{text-align:center;white-space:nowrap}
+.tag{display:inline-block;padding:0 7px;border-radius:999px;font-size:12px;font-weight:600;line-height:1.6;white-space:nowrap}
+.t-drop{background:#f7dada;color:var(--red)}
+.t-keep{background:#dcebd9;color:var(--green)}
+.t-morph{background:#fbeccb;color:#7a5a00}
+.t-done{background:#e2e6ee;color:#3a4a66}
+.t-yes{background:#dcebd9;color:var(--green)}
+.t-no{background:#f7dada;color:var(--red)}
+.t-part{background:#fbeccb;color:#7a5a00}
+.t-lucky{background:#ece2f7;color:#5a3a8a}
+.box{background:var(--white);border:1px solid var(--line);border-left:5px solid var(--blue);border-radius:var(--radius);padding:12px 16px;margin:14px 0}
+.box.warn{border-left-color:var(--red)}
+.box.ok{border-left-color:var(--green)}
+.box.pick{border-left-color:var(--ochre);background:#fff9ea}
+.opts{display:grid;grid-template-columns:repeat(auto-fit,minmax(300px,1fr));gap:12px;margin:12px 0}
+.opt{background:var(--white);border:1px solid var(--line);border-radius:var(--radius);padding:12px 14px}
+.opt h4{margin:0 0 6px;color:var(--ink)}
+.opt .cost{color:var(--muted);font-size:13px}
+.opt.rec{border-color:var(--ochre);box-shadow:0 0 0 2px #f2e2b8 inset}
+label.pick{display:flex;gap:8px;align-items:flex-start;margin:6px 0;cursor:pointer}
+label.pick input{margin-top:5px}
+.small{font-size:12.5px;color:var(--muted)}
+.flow{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:8px;margin:12px 0}
+.flow .step{background:var(--white);border:1px solid var(--line);border-radius:8px;padding:8px 10px;font-size:13px;position:relative}
+.flow .step b{display:block;font-size:13.5px}
+.flow .step .who{color:var(--muted);font-size:12px}
+.flow .step.gate{border-left:4px solid var(--red)}
+.flow .step.human{border-left:4px solid var(--ochre)}
+.flow .step.tool{border-left:4px solid var(--blue)}
+.flow .step.paid{background:#fff3f3}
+.legend span{margin-right:14px;font-size:12.5px}
+.ev{color:var(--muted);font-size:12.5px}
+nav a{margin-right:12px;font-size:13.5px;color:var(--blue)}
+.two{display:grid;grid-template-columns:1fr 1fr;gap:14px}
+@media(max-width:820px){.two{grid-template-columns:1fr}main{padding:18px 14px 60px}h1{font-size:23px}}
+@media print{body{background:#fff}main{max-width:none}nav{display:none}}
+</style>
+</head>
+<body>
+<main>
+<div class="eyebrow">video 產線 · Remotion 製作流程檢討 · 裁決稿</div>
+<h1>Remotion 的正式流程該長什麼樣：四個問題的證據、取捨與待勾選項</h1>
+<p class="meta">2026-09-29 ｜ 契約＝<code>video/KICKOFF-remotion-process-review.md</code> §4–§5 ｜ 本稿只攤開取捨，<b>裁決是使用者的</b>；每題與每件文檔各留勾選格。本輪不做片、不改分鏡、不動 <code>.py</code>／<code>.yml</code>／<code>.tsx</code>、零外部 API 呼叫。</p>
+<nav><a href="#sum">摘要</a><a href="#q1">Q1 Manim 特有的病</a><a href="#q2">Q2 該留但可更輕</a><a href="#q3">Q3 原生流程靠什麼</a><a href="#q4">Q4 {show} 與 atWord</a><a href="#flow">建議流程總圖</a><a href="#docs">文檔處置清單</a><a href="#accept">驗收與未做到</a><a href="#ev">證據索引</a></nav>
+
+<div class="box">
+<b>怎麼讀這份稿。</b> 每題先給一張證據表（每列指到 <code>路徑:行號</code> 或 commit，簡稱見<a href="#ev">證據索引</a>），再列「可選方案與代價」，最後是勾選格。勾選格只是紙上打勾，不會存檔；請在對話裡回覆選項代號（例：「Q1 選 B、Q4 選 乙」）或直接改這份 HTML 後交回。標示 <span class="tag t-keep">建議</span> 的是本稿的預設，理由寫在旁邊；依根 <code>CLAUDE.md</code> Karpathy §1，所有解讀都攤開、不默默選。
+</div>
+
+<h2 id="sum">0 · 摘要：四題各一句、待使用者選的分歧、三個被證據推翻的契約前提</h2>
+
+<table>
+<tr><th style="width:8%">題</th><th style="width:46%">一句結論（證據在各節）</th><th>待使用者裁的分歧</th></tr>
+<tr><td class="c">Q1</td><td>Manim 特有的病只有一小群（<code>[sync]</code>、sizecheck／fontfloor／LayoutRules／capacity、texlock、lint 欄位規則、hook E2）——它們可以廢止；<b>12 s 長靜止不是 Manim 的病</b>（⑧ 判病灶在旁白編排；Q7ZH 試片也有兩場超過），G0–G7 的原則層與渲染器無關。</td><td>12 s 硬閘：保留為硬閘（要先把 <code>rewatch_pack</code> 接上 Remotion）／降為 advisory／改由 R4 鏡判。G5 批次化：保留「一次 merge」但放棄「一輪一 render」。</td></tr>
+<tr><td class="c">Q2</td><td>六類病都與渲染器無關，但七份 rubric 的「讀哪個欄位、從哪裡取幀」綁死 Manim；Remotion 現行四支分鏡<b>沒有任何內容層閘真正武裝</b>（`ref:`／`covers:`／內容稿全缺）。Phase A 七輪抓到的 4 條 blocking：3 條漏步驟、1 條書寫 parity（單軌上不會發生），數學錯 0。</td><td>內容忠實的擋在哪裡：render 前的分鏡級 NFA（審 <code>say</code>，D7 開）／看片後一次外部稽核（Q7 模式）／兩者都要。覆蓋度用 <code>covers:</code>＋SCRIPT 拍表，還是用 OUTLINE 的 C 編號人工對照。</td></tr>
+<tr><td class="c">Q3</td><td>原生版有文檔或程式保證的只有：mock 對時、render 期硬閘（標籤守門／字形閘／場序守門，但都是<b>片專屬</b>不是共用層）、loudnorm、局部重渲。內容稽核、回歸、旁白人閘、覆蓋對照都只在某一支片上「碰巧」發生過；s31 從未經任何內容閘，且含講義沒有的內容。</td><td>把原生版寫成流程時，內容契約用什麼：內容稿（LOCKED，Phase A 產物）／OUTLINE 式大綱／兩級制（課程節用內容稿、解題片用大綱）。</td></tr>
+<tr><td class="c">Q4</td><td><code>{show}</code> 在 Remotion 仍是唯一場內時間契約（yml→manifest <code>beats[]</code>→TSX <code>at(id)</code>），且在 scene 模式參與對齊閘 3–5、在 beat 模式是合成單位；<code>atWord()</code> 只在英文 scene_aligned 過閘的場有值，13 個呼叫點全部以拍為錨、全部退回 <code>at()</code>，<b>不能取代 beat</b>。<code>spoken.yml</code> 雙軌在 Remotion 沒有輸入端。</td><td>分鏡格式：甲「yml 為源＋SCRIPT.md 為人讀投影」／乙「SCRIPT.md 為源、yml 生成」；雙軌廢止與否；<code>animation_cue</code>／<code>screen_contract</code> 對 Remotion 的角色。</td></tr>
+</table>
+
+<div class="box warn">
+<b>三個契約前提被證據推翻（寫進裁決稿，免得裁決建立在錯的敘述上）：</b>
+<ol>
+<li><b>「Q7 事後找 Codex 做一次 NFA 式稽核」</b>（KICKOFF §1 表）——git 順序是 mock render（<code>07ce925</code> 00:56）→ Codex 稽核修正（<code>a1caa63</code> 01:25）→ 記錄 MiMo 成品（<code>3fce30d</code> 01:51）。稽核在<b>付費配音之前</b>、對 mock 做；只有中文延伸段的 agy 審核在 TTS 之後（<code>c70ae2a</code>），代價是重配 6 次。<code>a1caa63</code> 實改 6 處（含 writeup），非「5 條措辭」；六處全屬嚴謹度（三處照字面是錯的數學陳述），主證明與答案無誤。</li>
+<li><b>「12 秒靜止是 Manim 模板靜態場的病」</b>（KICKOFF §2 表）——RS:60 品質補強輪 ⑧ 的相關性分析判「病灶不在模板層」；PR:110-114 五場超線是 Task D 拉長旁白造成；Remotion Q7ZH 試片 exam 14.2 s／foldback 12.8 s（RS:26）。病因與渲染器無關。</li>
+<li><b>「一個 motion-designer 子代理一天做完 s31」</b>——<code>0e00951</code>（atWord 對時）的 trailer 是 Claude Sonnet 5，s31 至少兩個代理、四個後續 commit（21:17→23:50）；標籤守門是使用者看片後才補的（<code>b0c00a3</code>）。Q7 兩語版全部落在 09-26 00:56–08:07 約 7 小時，非「兩天」。</li>
+</ol>
+<p class="small">另兩件沒想到的事：(a) <code>rewatch_pack.py</code> 目前<b>五處</b>讀不到 Remotion 成品（RP:487／505／494／64／545），unification §3.2 把它列為「Remotion 在用」不實；(b) Remotion 的「結構性保證」多半只在 s31 或 q7：場序守門只有 Q7（ROOT:31）、標籤守門要每場自己呼叫且 act3 零呼叫、字形閘只有 q7、28 px 字級只是 token 約定（<code>s31/kit.tsx:382</code> 就有一處 26）。</p>
+</div>
+
+<h2 id="q1">Q1 · Manim 時代的閘序裡，哪些在防 Manim 特有的病，Remotion 已經不需要</h2>
+<p>答案形式依契約 §4 Q1：每閘一列——病因｜Manim 特有？｜Remotion 有無結構性保證｜候選處置。「處置」欄的四種標籤：<span class="tag t-drop">廢止</span> 病隨引擎消失或已無輸入端；<span class="tag t-keep">保留</span> 病與渲染器無關且形式可直接沿用；<span class="tag t-morph">改形</span> 病仍在但要換輸入或換量法；<span class="tag t-done">已取代</span> 2026-09-28 已有 Remotion 對等物。</p>
+
+<h3>1.1 逐閘表</h3>
+<table>
+<tr><th style="width:15%">閘</th><th style="width:26%">它防的病（證據）</th><th style="width:9%">Manim 特有？</th><th style="width:30%">Remotion 是否已有結構性保證（證據）</th><th>候選處置</th></tr>
+<tr><td><b><code>[sync]</code> 硬閘</b>（render 後影片長 vs 旁白長，容差 2 影格）</td><td>manim 每個 <code>play</code> 進位一整格、reveal 回報標稱秒數，場尾 hold 算錯（TM:84-87；RG:85）；hooks 回傳標稱秒數（PR:92）；依賴 <code>disable_caching</code>（TM:92-96）</td><td><span class="tag t-yes">是</span></td><td><b>有</b>：場長＝LEAD＋⌈旁白秒×fps⌉＋TAIL、<code>calculateMetadata</code> 從 manifest 算 <code>durationInFrames</code>（S31T:50-53；ROOT:17-22）。殘餘風險只剩「render 指到錯的 manifest」（PB:218）</td><td><span class="tag t-drop">廢止</span> 原形；殘餘風險改由「render 時把 manifest 路徑＋sha256 記進 <code>RENDER.md</code>」這種紀錄式對策（PB:217 ③），不必寫新閘</td></tr>
+<tr><td><b>12 s 最長靜止硬閘</b>（<code>rewatch_pack --gate-still</code>）</td><td>content 場 0.05% 門檻最長靜止 &gt;12 s（RG:109；RP:348-361）。門檻來自 ⑧：<code>longest_still_seconds</code> 對 verdict 相關 −0.82（RS:60）</td><td><span class="tag t-no">否</span></td><td><b>無自動閘</b>。只有規則「禁止長靜止：每拍都有東西在動」（ST:68）；<code>rewatch_pack</code> 五處讀不到 Remotion（RP:487／505／494／64／545-553）；Q7ZH 試片量到兩場超線（RS:26），但量測工具不在版控（TW:118）</td><td><span class="tag t-morph">改形</span> 見 1.2 分歧 ①：接上 Remotion 後保留硬閘／降 advisory／交 R4 鏡</td></tr>
+<tr><td><b><code>[stillness]</code> 6 s authoring advisory</b></td><td>render 前抓未宣告的長靜止（LD:969-985；ML4 SPEC-ML:85）</td><td><span class="tag t-part">部分</span> 規則通用，但輸入全是 Manim 宣告層（<code>paced:</code>／sweep／<code>STOCK_ANIM_SECONDS</code>，TM:20-45）</td><td><b>無</b>：Remotion 沒有 <code>paced:</code>／<code>pauses:</code> 宣告層（PB:219）；<code>stillness.py</code> 在 live tree 但沒有呼叫者</td><td><span class="tag t-drop">廢止</span> 現行實作；若要 authoring 期提醒，得先有新的宣告來源（例如 SCRIPT.md 拍表的「畫面」欄為空）</td></tr>
+<tr><td><b>sizecheck／fontfloor／floorprobe／LayoutRules L1–L3／capacity</b></td><td>固定模板吃進多變內容而爆版、auto-fit 把字縮到 floor 以下、下三分之一空置（RG:76-78、93-95；LD:656-662、725-749）</td><td><span class="tag t-yes">是</span>（模板＋<code>brand.prose</code>＋<code>scale_to_fit_width</code>）</td><td>沒有模板容量這回事，版面由作者排（ST:74）；字級只有 token 約定 ≥28（ST:46-50；<code>theme.ts:42-60</code>），鏡頭倍率 s&lt;1 不自動查（ST:48），src 有 157 個數字字面 <code>size={N}</code>、KIT:382 有一處 26</td><td><span class="tag t-drop">廢止</span> 原形。「有效字級＝token×鏡頭倍率 ≥28」若要機械化是新工作（PB:214 已列 backlog、§8「不做」）</td></tr>
+<tr><td><b>MathRules M1–M3</b></td><td>storyboard 原文 LaTeX 的語域混用、<code>\sin</code> 寫成裸字母（RG:97-99）</td><td><span class="tag t-part">部分</span> 慣例通用，但 Remotion 沒有「storyboard 數學欄」，數學在 TSX／i18n 字串</td><td>只有「公式排版」規則（ST:92-97），不自動；q7 的「TeX 裡不能有中文」會 throw（CJK:46-49）</td><td><span class="tag t-drop">廢止</span> 原形；慣例併入 STYLE.md 公式排版節（已在）</td></tr>
+<tr><td><b>texlock</b></td><td>同一目錄 Tex 建置互撞吐假 error（RG:76、161）</td><td><span class="tag t-yes">是</span></td><td>MathJax 在行程內、記憶體快取（<code>math/tex.ts:32-37</code>）</td><td><span class="tag t-drop">廢止</span></td></tr>
+<tr><td><b>lint.py</b></td><td>純文字欄出現 <code>$</code>／反斜線、空心點用錯（RG:75）</td><td><span class="tag t-part">部分</span>（「<code>say</code> 裡不該有 <code>$</code>」通用）</td><td>口語版本來就無 LaTeX（PB:213）；q7 字串解析遇未閉合 <code>$</code> 會 throw（<code>q7/kit.tsx:43-63</code>，只限 q7）</td><td><span class="tag t-drop">廢止</span> 原形；「<code>say</code> 無 <code>$</code>」一條併入 <code>check_storyboard</code>（SPEC §3 已含 malformed 檢查，加 <code>$</code> 一條即可）</td></tr>
+<tr><td><b>schema.py 結構驗證</b></td><td>meta 必填、kind 合法、id 唯一、<code>{show}</code> 不閉合（RG:79）</td><td><span class="tag t-part">部分</span>（結構通用；<code>template</code>／payload 屬 Manim）</td><td><b>已取代</b>：<code>check_storyboard.py</code>（RG:80；SPEC §1-§3）</td><td><span class="tag t-done">已取代</span>；去留隨 Q2（它掛的內容層閘）與 Q4（分鏡格式）</td></tr>
+<tr><td><b>manifest freshness</b>（<code>make.py --reuse-audio</code>）</td><td>分鏡改了、音檔沒重配（RG:84）</td><td><span class="tag t-no">否</span></td><td><b>部分</b>：composition 只讀 manifest 不讀 yml（S31T:74-79）；場序只有 Q7 比對（ROOT:31），S31 遇不認得的場畫空白不報錯（<code>S31.tsx:55,67</code>）；拍 id 不在 manifest 會 throw（KIT:25）；沒有 text_hash 比對</td><td><span class="tag t-morph">改形</span>：<code>tts.py … --reuse-existing --dry-run</code> 的 <code>plan</code>＝0 就是「分鏡文字＝manifest」的證明（PB:217 ②，不需 API key）；加上場序守門推廣到所有 composition（先例 <code>q7Meta</code>）</td></tr>
+<tr><td><b>hook-engineering（層 5）</b></td><td>E1 code 畫錯數學；E2 <code>T.color</code>／SAFE_MARGIN 慣例（RG:62-69）</td><td>E1 <span class="tag t-no">否</span>／E2 <span class="tag t-yes">是</span></td><td><b>無</b>：Remotion 每場都是 TSX；場景 code 稽核閘「待定」（CM:210）；motion-designer 自審只看美術（MD:24）</td><td>E2 <span class="tag t-drop">廢止</span>；E1 <span class="tag t-morph">改形</span> 併入 Q2 的「幀上數學正確」（VISUAL V8）＋看片後外部稽核，不另立工程鏡</td></tr>
+<tr><td><b>critic.py VLM gate-2</b></td><td>外部 VLM 視覺複核（RG:108）</td><td><span class="tag t-part">部分</span>（工具綁 Manim 抽幀；概念通用）</td><td>無；PB:216 擬由里程碑審的 agy 鏡替代</td><td><span class="tag t-drop">廢止</span>；多模態外部鏡併入 REWATCH（Q2）</td></tr>
+<tr><td><b>VISUAL-FRAME V1–V10</b></td><td>逐條：V1 出框、V2 相撞、V3 視窗、V4 數學渲染完整／字級、V5 端點語義、V6 幀↔拍一致、V7 reveal 同步、V8 幀上數學正確、V9 讀值尺度、V10 語意色一致（VF:20-33）</td><td>V4 <span class="tag t-part">部分</span>（條文寫「manim Tex 特有失效」、floor 26 px <code>_brand_prose</code>，VF:23-24）；V7／V10 <span class="tag t-part">部分</span>（機制條文屬 Manim）；其餘 <span class="tag t-no">否</span></td><td>V2：<code>checkLabels</code> render 期 throw（KIT:398-494；ST:88-90）但每場自己呼叫（s31 8/15、q7 10/17、<b>act3 0/6</b>）且只查標籤對圖形；V7：拍起點來自 manifest、<code>atWord</code> 找不到字 throw（S31T:54-58；KIT:48-52）；V10：語意色 token（ST:11-12）但無「圖與式同色」檢查；V4：MathJax 無 viewBox 才 throw（<code>math/tex.ts:34-53</code>）</td><td><span class="tag t-morph">改形</span>：拿掉 Tex／<code>_brand_prose</code>／26 px／<code>focus:</code>／<code>anim: transform</code> 等 Manim 條文，V2 縮成「guard 蓋不到的碰撞」，floor 改 28 px（ST:48），豁免清單的「深色極簡背景」（VF:49）換成紙本風格；判準本身保留</td></tr>
+<tr><td><b>VISUAL-FRAME A1–A7</b></td><td>版面、吸引力、邏輯流、一致性、深度、字體、層級／圖佔比（VF:39-45）</td><td>A4／A7 <span class="tag t-part">部分</span>（<code>accent:</code> 欄、模板把圖擠小 LD:653-655）；其餘 <span class="tag t-no">否</span></td><td>只有 STYLE 規則（鏡頭紀律 ST:70-79、字級 ST:46-50）</td><td><span class="tag t-keep">保留</span>；A7 的「圖佔比」改寫為 Remotion 語境</td></tr>
+<tr><td><b>REWATCH 六鏡</b></td><td>看片層：時間、停留、跟不跟得上（RG:82；RW:31-81）</td><td><span class="tag t-no">否</span></td><td>輸入 pack 綁 Manim；rubric 寫死 27 場、1 s lead／tail、§3.1 讀者設定（RW:13、18、35、126）；R4 仍引 <code>make.py</code> 的 6 s（RW:76）</td><td><span class="tag t-morph">改形</span> 輸入：pack 改吃 Remotion 成品＋manifest；鏡數與頻率見 Q2</td></tr>
+<tr><td><b><code>rewatch_pack</code> 死區定位</b></td><td>只報長度、死區定位到錯的拍（PR:40、89）</td><td><span class="tag t-no">否</span></td><td><b>無，且讀不到 Remotion</b>（見上）</td><td><span class="tag t-morph">改形</span>（PB:226 三旗標方案已擬：<code>--storyboard</code>／<code>--manifest</code>／<code>--av-dir</code>／LEAD／TAIL）</td></tr>
+<tr><td><b>G0 內容鎖</b></td><td>會改拍長的內容排在動作設計之後（Task D，PR:110-114）</td><td><span class="tag t-no">否</span></td><td><b>部分</b>：場長自動重新對時（S31T:1-6），但拍內動畫是固定幀長 <code>p(id, len=24)</code>（KIT:35-36），旁白拉長只會多出靜止；TTS 重配仍計費（Q7ZH 審核修正多 6 次，XR:40）</td><td><span class="tag t-keep">保留</span>；成本理由改寫：從「render 40 分鐘」改為「重配計費＋拍內動畫不會自動填滿拉長的拍」</td></tr>
+<tr><td><b>G1 硬閘原則</b></td><td>warn-only 等於沒有閘（PR:121-124）</td><td><span class="tag t-no">否</span></td><td>—</td><td><span class="tag t-keep">保留</span> 原則；它管的兩道閘各依上表處置</td></tr>
+<tr><td><b>G2 里程碑審</b></td><td>生成式 advisory 每輪重新長出來（PR:66-75；RG:200-221）</td><td><span class="tag t-no">否</span></td><td>無</td><td><span class="tag t-keep">保留</span>（Q2 決定鏡數）</td></tr>
+<tr><td><b>G3 停止條件</b></td><td>沒定義何時算完成、㉑ 空轉（PR:116-119；RG:248-267）</td><td><span class="tag t-no">否</span>（條件 3 依賴 <code>rewatch_pack</code> fine 指標、條件 4 依賴 <code>check_storyboard</code>）</td><td>無</td><td><span class="tag t-keep">保留</span>；條件 4 的 Remotion 對等物＝PB:288 那組（tsc clean、無 label-guard throw、dry-run plan 0）</td></tr>
+<tr><td><b>G4 工具先於內容</b></td><td>工具缺陷燒掉輪次（PR:87-93）</td><td><span class="tag t-part">部分</span>：9 項中 4 項綁 Manim 佈局（RG:271、275-279、285-287）；TTS 兩項與「禁 <code>| tail</code>」「main tip hash」通用</td><td>無</td><td><span class="tag t-morph">改形</span> 6.4 清單為 Remotion 版</td></tr>
+<tr><td><b>G5 批次化</b>（一輪＝一 merge 一 render 一審）</td><td>8 次全片 render、每輪 2–3 小時（RG:184）</td><td><span class="tag t-part">部分</span>：render 成本這半屬 Manim；審查與 TTS 成本通用</td><td>Remotion 整片約 10 分、局部重渲約 1 分多（Q7S:164）；但時長一變就不能局部重渲</td><td><span class="tag t-morph">改形</span> 見 1.2 分歧 ②</td></tr>
+<tr><td><b>G6 契約進測試</b></td><td>契約靠肉眼在成片發現（PR:126-129）</td><td><span class="tag t-no">否</span>（原則）</td><td>Remotion 沒有測試框架（<code>package.json</code> 只有 <code>"lint": "tsc"</code>）；<code>checkLabels</code> 無單元測試</td><td><span class="tag t-keep">保留</span>；落腳點要定（render 期 throw 算不算「測試」）</td></tr>
+<tr><td><b>G7 多 session</b></td><td>並行互相覆蓋（PR:101-102）</td><td><span class="tag t-no">否</span></td><td>音檔在 <code>public/audio</code> 不進版控（XR:26）；§3.2 音檔在清 worktree 時遺失（PB:84）</td><td><span class="tag t-keep">保留</span>；隔離對象改為「付費音檔備份」（PB:85 教訓）</td></tr>
+<tr><td><b>pipeline-hardening T1–T11</b></td><td>T1 派生檔 freshness、T2 tts 計費硬化、T3 allowlist、T4 QA 入 manifest、T5 <code>{show}</code> target 交叉核對、T6 listening pack、T7 vtt／chapters、T8 單次編碼、T9 轉場、T10 響度、T11 文檔（PH:179-863）</td><td>T3／T5／T8／T9 <span class="tag t-yes">是</span>；T7 <span class="tag t-part">部分</span>；其餘 <span class="tag t-no">否</span>（TTS／音訊層）</td><td>T5 反方向有保證（code 要的拍不存在就 throw，KIT:25），正方向（yml 有拍、TSX 沒用）沒有；T7 只有 s31 專用 <code>chapters.py</code>（寫死 s31 路徑）、無 vtt</td><td>T3／T8／T9 <span class="tag t-drop">廢止</span>；T5 <span class="tag t-morph">改形</span>（yml↔TSX 拍 id 雙向對照，Q4）；其餘 <span class="tag t-keep">保留</span>（都在共用 <code>tts.py</code>）</td></tr>
+</table>
+
+<div class="box">
+<b>成本結構對照（每個數字附出處；KICKOFF §2 表的「一次 render 要 40 分鐘」在證據檔裡找不到出處）。</b>
+<table>
+<tr><th>項目</th><th>Manim gen-2</th><th>Remotion</th></tr>
+<tr><td>全片 render</td><td>15–25 分（<code>legacy/manim_video/pipeline/texlock.py:68</code>）；「遠超過 15 分鐘」（LD:1710）；8 次／8 輪（PR:30）</td><td>act3 192 s 片約 2 分 40 秒（ST:127）；Q7ZH 9 分片約 10 分（Q7S:164）</td></tr>
+<tr><td>局部重做</td><td>三場定點 render 可做（RG:346；PH:872）</td><td>局部重渲 2450 幀約 1 分多，<b>限場長不變</b>（Q7S:158-164）</td></tr>
+<tr><td>一輪牆鐘</td><td>派工→R2 結果 2–3 小時（PR:33）</td><td>無紀錄（s31 四個 commit 21:17→23:50；Q7 兩語版 7 小時內）</td></tr>
+<tr><td>TTS 浪費</td><td>核准 22、實際 15、其中 9 次浪費在工具缺陷（PR:34）——全在 TTS 層，Remotion 用同一支 <code>tts.py</code></td><td>s31 29 次 0 重試、Q7 31 次 0 重試、Q7ZH 79 次 0 重試（XR:33、38、40）</td></tr>
+<tr><td>離線自測</td><td>sizecheck cold TeX 約 6 分、selftest 約 9 分（RG:398-399）</td><td>selftest 24 支約 10 s（PB:106）；<code>tsc</code></td></tr>
+</table>
+</div>
+
+<h3>1.2 取捨攤開（每個分歧至少兩案）</h3>
+
+<h4>分歧 ①　12 s 最長靜止硬閘怎麼處置</h4>
+<div class="opts">
+<div class="opt rec"><h4>A · 保留硬閘，先把 <code>rewatch_pack</code> 接上 Remotion <span class="tag t-keep">建議</span></h4><p>PB:226 的三旗標＋LEAD／TAIL 注入方案。病因與渲染器無關（RS:60），⑧ 的 −0.82 相關性是本產線唯一量化過的品質指標。</p><p class="cost">代價：一個工具 task（紅測試先行）；量測效度存疑——紙紋隨鏡頭移動可能被記為「在動」（ST:3、126 vs ST:68），接上後要用 s31 做一次校準。</p></div>
+<div class="opt"><h4>B · 降為 advisory，交 REWATCH R4 鏡判</h4><p>R4 的 <code>T-still</code> 判讀線同為 12 s（SPEC-ML:94）；Remotion 每拍「都有東西在動」是 STYLE 規則（ST:68）。</p><p class="cost">代價：回到「warn-only 等於沒有閘」（PR:121-124）；R4 是生成式，每次重新生成。</p></div>
+<div class="opt"><h4>C · 暫不接，等第一支正式課程節做完再看有沒有超線</h4><p>Q7ZH 已有兩場超線的實證（RS:26），這案等於明知有病不量。</p><p class="cost">代價最低，但違反 G1／G4「工具先於內容」。</p></div>
+</div>
+
+<h4>分歧 ②　G5「一輪一 render」在 Remotion 上的形狀</h4>
+<div class="opts">
+<div class="opt rec"><h4>甲 · 保留「一次 merge、一次審」，放棄「一次 render」 <span class="tag t-keep">建議</span></h4><p>批次化防的是「審查每輪重新生成」（PR:66-75）與「TTS 計費」，這兩個成本在 Remotion 沒變；render 成本變小，單場 composition 可逐場 render（PB:96），所以「一輪」的邊界改按 6.8 ③「擋不擋路」切，不按 render 切。</p><p class="cost">代價：要重寫 §六 6.1 的定義句；停止條件 3 的「連續兩輪」改以「審」為單位。</p></div>
+<div class="opt"><h4>乙 · 原樣沿用 G5</h4><p>零文檔改動。</p><p class="cost">代價：把 Manim 的 render 成本當前提，會為了湊一次 render 而等待，失去 Remotion 局部重渲的紅利；局部重渲只在場長不變時可用，旁白一改仍是整片（Q7S:164）。</p></div>
+</div>
+
+<h4>分歧 ③　VISUAL-FRAME rubric 怎麼改</h4>
+<div class="opts">
+<div class="opt rec"><h4>A · 原檔外科式改寫（去 Manim 條文、floor 28、背景豁免換紙本） <span class="tag t-keep">建議</span></h4><p class="cost">代價：一個 haiku／sonnet 級文檔 task；V1–V10 編號不變，既有報告可比。</p></div>
+<div class="opt"><h4>B · 新立 Remotion 版 rubric，舊檔進 legacy</h4><p class="cost">代價：與 REWATCH／pedagogy 的交叉引用（V10↔ML5、V8↔E1）要全部改指；歷史報告的 V 編號斷鏈。</p></div>
+</div>
+
+<div class="box pick">
+<b>Q1 勾選</b>
+<label class="pick"><input type="checkbox"> 同意 1.1 表中標 <span class="tag t-drop">廢止</span> 的全部項目（<code>[sync]</code> 原形、sizecheck 一族、MathRules、texlock、lint 原形、hook E2、critic VLM、<code>[stillness]</code> 現行實作、T3／T8／T9）</label>
+<label class="pick"><input type="checkbox"> 分歧 ①：<input type="checkbox"> A 保留硬閘先接工具　<input type="checkbox"> B 降 advisory　<input type="checkbox"> C 暫不接</label>
+<label class="pick"><input type="checkbox"> 分歧 ②：<input type="checkbox"> 甲 一 merge 一審、不綁 render　<input type="checkbox"> 乙 原樣沿用</label>
+<label class="pick"><input type="checkbox"> 分歧 ③：<input type="checkbox"> A 外科改寫　<input type="checkbox"> B 新立檔</label>
+<label class="pick"><input type="checkbox"> 其他／保留意見：＿＿＿＿＿＿＿＿＿＿</label>
+</div>
+
+<h2 id="q2">Q2 · 哪些在防與渲染器無關的病，該保留但可以換更輕的形式</h2>
+<p>答案形式依契約 §4 Q2：每個病一列——Remotion 上的形式｜什麼時候跑｜誰跑｜blocking 或 advisory。先給兩組實績（Phase A 七輪、Q7 稽核），因為「更輕的形式」要看實際抓到什麼才定得下來。</p>
+
+<h3>2.1 實績：Manim 平移版的七輪稽核抓到什麼（§3.2 Phase A）</h3>
+<table>
+<tr><th style="width:4%">#</th><th style="width:16%">閘</th><th style="width:9%">findings</th><th style="width:7%">blocking</th><th style="width:42%">blocking 的實際內容</th><th>類型／成本</th></tr>
+<tr><td class="c">1</td><td>pedagogy 第 1 輪</td><td>3 PD＋5 adv</td><td class="c">3</td><td>PD1-1 <code>proof_delicate_bound</code> 三角不等式中間式沒上畫面；PD1-2 <code>decomposition_strategy</code> Strategy 3.1 第 5 步缺席；PD1-3 <code>example_chain_times_quotient</code> 缺前因子整理式（<code>f8ed626</code> ⑥）</td><td>上畫面漏步驟；四輪合計 534,811 in-house token（RS:133）</td></tr>
+<tr><td class="c">2–3</td><td>pedagogy 第 2、3 輪</td><td>1 PD＋5／1 adv</td><td class="c">1／1</td><td>PD1-2 修不動——「四條出路實測全被<b>模板容量</b>堵死」（<code>f8ed626</code>）</td><td>缺步驟本身通用；<b>修不動是 Manim 特有</b></td></tr>
+<tr><td class="c">4</td><td>pedagogy 第 4 輪</td><td>0＋2 adv</td><td class="c">0</td><td>用 <code>part:</code> 分頁修掉，content 場 22→23，TTS 多 1 次呼叫（<code>23dd48e</code>）</td><td>—</td></tr>
+<tr><td class="c">5</td><td>NFA gate-1（Claude）</td><td>0 B／3 A</td><td class="c">0</td><td>N1-01 narration 與 say 措辭不同（維持）、N1-02 D4 主詞動詞相距 23 字、N1-03 D3 "squared" 範圍沒關（REPORT:36-64）</td><td>措辭、念法；159,059 token（RS:131）</td></tr>
+<tr><td class="c">6</td><td>gate-1 回歸</td><td>0 B／1 A</td><td class="c">0</td><td>R2-01 gate-2 的 prompt 判準與 <code>.md</code> 檔頭相反——主對話派工契約寫錯（REPORT:84-91）</td><td>派工契約；兩次回歸合計 200,921</td></tr>
+<tr><td class="c">7</td><td>NFA gate-2（agy Gemini 3.1 Pro）</td><td>1 B／0 A；13 條高風險念法全 PASS；D7 <code>clean_verified</code></td><td class="c">1</td><td>N2-01 D2：say 原句 “three over $(x+2)$ squared” 的 <code>squared</code> 在 <code>$…$</code> 外，口語端改寫並搬位（REPORT:143-155）。修法把指數搬進 LaTeX，「口語文字一字不改」（:157-162），朗讀出來完全一樣（signoff HTML:416）。gate-1 沒抓到，且此問題正是 gate-1 自己 N1-03 的修法造成；主對話看過判灰區放過（:166-168）。gate-2 另從 <code>disagreements_with_premise</code> 欄反對前提，促成新增旁白簽核人閘（RG:238-241）</td><td><b>書寫／口語 parity</b>，聽感零變化；外部 167,500 token、1 次呼叫（RS:137-138）</td></tr>
+<tr><td class="c">8</td><td>N2-01 修後回歸</td><td>0／0；全 deck 同型 0 處</td><td class="c">0</td><td>—</td><td>—</td></tr>
+</table>
+<div class="box">
+<b>讀法。</b> 不重複的 blocking 共 4 條：3 條「推導步驟沒上畫面」（PD1）、1 條「書寫版與口語版 parity」（D2）。<b>數學錯 0、念法錯 0。</b> D2 那條只在「正典 LaTeX 稿＋口語稿」雙軌上才可能發生（Remotion 分鏡檔頭寫明 “Spoken English only”，<code>s31.yml:2</code>／<code>q7.yml:2</code>），單軌上沒有這個病。PD1 的三條病是通用的，但兩輪修不動是 Manim 模板容量造成，Remotion 沒有這個成本。REBUILD_STATUS:125 寫「7 輪」，八個組成加總是 8。
+</div>
+
+<h3>2.2 實績：Remotion 原生版唯一的內容稽核抓到什麼（Q7，<code>a1caa63</code>，Codex gpt-6-sol／xhigh）</h3>
+<table>
+<tr><th style="width:8%">條</th><th style="width:56%">原句與問題</th><th>等級</th></tr>
+<tr><td class="c">F1</td><td>“the only lattice points on the segment are the start, the end, and the midpoint”——跳過「為何 (p,q) 是射線上第一個格點」</td><td>嚴謹度（論證少一步）</td></tr>
+<tr><td class="c">F2</td><td>“hit an even, even point”——沒排除原點本身就是偶偶點</td><td>嚴謹度（照字面量詞錯）</td></tr>
+<tr><td class="c">F3</td><td>“crosses p vertical walls … bounces p plus q times”——無絕對值、未限定能回中心的擊球</td><td>嚴謹度（p、q 為負時照字面算錯）</td></tr>
+<tr><td class="c">F4</td><td>“tan theta is q over p”——p=0 不成立</td><td>嚴謹度（邊界）</td></tr>
+<tr><td class="c">F5</td><td>“never hits a lattice point”（原點就是格點）；“fills in the whole table”（誇大稠密性）</td><td>嚴謹度＋措辭（照字面是錯的）</td></tr>
+<tr><td class="c">+1</td><td>writeup 場 “the ray … with slope tan θ”——鉛直射擊不成立</td><td>嚴謹度（邊界）</td></tr>
+</table>
+<p class="small">答案錯 0、主證明錯 0；六處全在 <code>q7.yml</code> 的 <code>say</code>＋SCRIPT.md＋六個 TSX（stat 見 <code>git show --stat a1caa63</code>）。稽核在 mock render 之後、付費 TTS 之前（見摘要）。中文延伸段的 agy 審核則在 TTS 之後（<code>c70ae2a</code>），六拍重配（XR:40）。另：REWATCH:166 已因引文捏造把 Gemini 從看片鏡名單拿掉，而 <code>c70ae2a</code> 只記「採納」、沒記逐條核實——這是原生版沒有回歸紀律的實例。</p>
+
+<h3>2.3 逐病表：Remotion 上的最輕可行形式</h3>
+<table>
+<tr><th style="width:14%">病</th><th style="width:22%">Manim 平移版的形式（現行文檔）</th><th style="width:30%">Remotion 上的最輕可行形式（本稿提案，證據）</th><th style="width:11%">什麼時候跑</th><th style="width:11%">誰跑</th><th>blocking？</th></tr>
+<tr><td><b>旁白不忠實</b>（NFA D1–D7）</td><td>正典稿→<code>spoken.yml</code>→<code>derive --check</code>→gate-1 讀 <code>_narration_spoken.md</code>→gate-2 每節（RG:60、131）；rubric 與 agent 定義「源＝<code>.md</code> narration」但實務對 <code>say:</code> 判（REPORT:28-30）</td><td>單軌：<b>直接審分鏡 <code>say</code> 對內容契約</b>。D1／D2 parity 維度失去對象（無雙軌）；D3 念法、D4 順耳、D7 數學正確保留——原生版旁白是子代理重寫的，不是核准源，<b>D7 必開</b>（RG:60 的 <code>CONTENT_APPROVED=no</code> 條款）。現行分鏡已含念法表明禁的說法：“x plus h over two”（<code>s31.yml:49,105</code>、<code>act3.yml:39-58</code> vs NFA-RUBRIC:48），證明沒有這道閘會漏</td><td>分鏡寫完、<b>付費 TTS 之前</b>（Q7 實際順序；改字＝重配）</td><td>gate-1 subagent；gate-2 外部一次（頻率見分歧 ②）</td><td>D3／D7 blocking；D4 advisory</td></tr>
+<tr><td><b>教學漏步</b>（PD1／SC1–SC2／SC-honesty）</td><td>storyboard <code>covers:</code> 對 <code>.md</code> <code>screen_contract.required_steps</code>（確定性 SC1／SC2）＋gate-1 讀 storyboard（PD1 以 <code>{show}</code> 為單位，PED-RUBRIC:38）</td><td>確定性層照舊（<code>check_storyboard [coverage]</code>，SPEC §4）——但要有兩個前提：內容稿存在、分鏡有 <code>ref: md:</code>＋<code>covers:</code>（現行三支<b>都沒有</b>，PB:105；SPEC:69 provenance not armed）。判斷層改讀 <b>SCRIPT.md 拍表</b>（每拍列上畫面 TeX＋covers id，PB:199 已這樣設計）。PD2「必須有契約」因無 <code>template</code> 不武裝（SPEC §6.2）</td><td>SCRIPT.md 定稿時（render 前）；B3 實作後抽 3 場對 TSX（PB:199）</td><td>確定性腳本＋gate-1 subagent</td><td>SC-honesty／PD1 blocking；SC1／SC2 warn-default、<code>coverage_enforce</code> 升 error</td></tr>
+<tr><td><b>出處斷鏈</b>（provenance OF2／<code>source_rev</code>）</td><td>逐欄 <code>ref:</code>＋場級 <code>ref:</code>（<code>scene_ref_issues</code>）；<code>source_rev</code> stamp 恆 warn（RG:80）</td><td>場級 <code>ref:</code> 是 Remotion 場唯一的 provenance 把手（SPEC:42）；OF1 逐字忠實只能對 SCRIPT.md 拍表判（PB:199）。解題片（Q7）本無講義出處，SPEC §6.1 的 <code>meta.provenance: none</code> 宣告式 opt-out 是最輕的做法（否則每跑一次 13 條 WARN）</td><td>render 前（<code>check_storyboard</code>）</td><td>確定性腳本</td><td>warn；<code>otf_enforce</code> 升 error（分歧 ③）</td></tr>
+<tr><td><b>例題被默默丟掉</b>（EX1／EX2）</td><td><code>example_coverage</code> 讀講義 <code>\sechead</code> 區間 vs <code>.md</code> 的 <code>examples:</code>／<code>folds:</code>（RG:79）</td><td><b>與渲染器完全無關、不讀分鏡</b>（SPEC:73）——照舊，零改動。唯一前提是 <code>meta.chapter</code>／<code>section</code>＋內容稿存在。s31 沒有內容稿所以整個跳過——s31 是否折疊了講義例題（C10–C12 有列，但無機器對照）從未被查</td><td>撰稿期一次</td><td>確定性腳本</td><td>EX1 warn／enforce error；EX2 恆 warn</td></tr>
+<tr><td><b>去 AI 味／散文品質</b>（copyedit C1–C5、six-lens L1–L6）</td><td>內容稿層（層 2–3），lock 前；six-lens multi-agent、copyedit gate-1＋gate-2 抽樣（RG:45、52、129-130）</td><td>兩者都審 <b>內容稿</b>，與渲染器無關——但原生版<b>沒有內容稿</b>（s31 從 OUTLINE 生成，q7 的教學計畫不在版控）。若採 Q3「內容契約＝內容稿」路線，這兩閘原樣沿用；若採 OUTLINE 路線，six-lens 的 L1 忠實／L5 數學正確要改審<b>分鏡 say</b>（s31 有講義沒有的內容——單位圓速度箭頭「猜」、co-function 負號規律，SCRIPT:19-21、125；講義 §3.1 區段 grep 不到——正是 L1 要判的）</td><td>lock 前（內容稿）或分鏡定稿時（OUTLINE 路線）</td><td>subagent；copyedit gate-2 抽樣</td><td>six-lens L1／L5／L6 blocking；copyedit 恆 advisory</td></tr>
+<tr><td><b>放大機會</b>（AMP1）</td><td>每章一次，讀講義 <code>expansion:*</code>＋storyboard（RG:83、135）</td><td>不變；判「已上片」的依據從 storyboard 的 <code>statement</code>／<code>annotations</code>（AMP-RUBRIC:27、33）改為 SCRIPT.md 拍表</td><td>每章一次</td><td>subagent</td><td>永不 blocking</td></tr>
+<tr><td><b>成片看不下去</b>（REWATCH R1–R5、視覺 V1–V10）</td><td>里程碑六鏡（agy ×3＋subagent ×3）＋每次 render 視覺 gate-1（RG:82、107、134-136）</td><td>輸入改為 Remotion 成品（<code>rewatch_pack</code> 接上，或 <code>frames.mjs</code> 抽幀）；rubric 去 Manim 條文（Q1 分歧 ③）。鏡數見分歧 ④</td><td>視覺：每次正式 render；REWATCH：一節收斂時一次</td><td>subagent；外部鏡逐次徵同意</td><td>視覺 V blocking；REWATCH 永不 blocking（must／should）</td></tr>
+</table>
+
+<h3>2.4 取捨攤開</h3>
+
+<h4>分歧 ①　內容忠實的擋放在哪裡</h4>
+<div class="opts">
+<div class="opt rec"><h4>A · render 前、TTS 前的分鏡級 NFA（gate-1）＋看片後一次外部第二讀者 <span class="tag t-keep">建議</span></h4><p>Q7 的實際順序（mock → Codex → 修 → TTS）證明前置擋可行且便宜：改字發生在計費之前。Phase A 的實證是「異家族第二讀者不接受第一讀者與指揮者共同的灰區」（RG:243-246）。</p><p class="cost">代價：每節一次外部呼叫（Phase A 那次 167.5k token）；D7 開＝盲算 reader 多一個。</p></div>
+<div class="opt"><h4>B · 只做看片後一次外部稽核（Q7 中文版模式）</h4><p>最輕。</p><p class="cost">代價：Q7ZH 實證＝審核在 TTS 後、六拍重配（XR:40）；念法錯（“x plus h over two”）會被合成進付費音檔。</p></div>
+<div class="opt"><h4>C · 完整沿用 Phase A 七層（六鏡→copyedit→sign-off→derive→NFA 雙閘→簽核）</h4><p>對 §3.2 這種已走完 Phase A 的節零成本（產物都在）。</p><p class="cost">代價：新節每節 ≈ 9×10⁵ in-house token＋外部一次（RS:131-138）；其中 D2 parity 維度在單軌上是空轉。</p></div>
+</div>
+
+<h4>分歧 ②　NFA gate-2 的頻率</h4>
+<div class="opts">
+<div class="opt rec"><h4>甲 · 每節一次（沿 RG:131 矩陣） <span class="tag t-keep">建議</span></h4><p class="cost">依據＝§3.1 D3、§3.2 D2 兩次都是 gate-2 才抓到。代價一節一次外部呼叫。</p></div>
+<div class="opt"><h4>乙 · 每章抽樣＋高風險節全跑（同 copyedit 的做法，RG:130）</h4><p class="cost">省外部呼叫；代價是漏的那一節會把錯念法合成進付費音檔。</p></div>
+</div>
+
+<h4>分歧 ③　場級 <code>ref:</code> 缺失（SPEC §6.1）</h4>
+<div class="opts">
+<div class="opt rec"><h4>A · 課程節 ERROR（<code>otf_enforce</code> 預設開）、解題片以 <code>meta.provenance: none</code> 明示 opt-out <span class="tag t-keep">建議</span></h4><p class="cost">代價：SPEC 加一個宣告欄；現行 s31 要補 14 個 <code>ref:</code>（或宣告 none，因為它不是從內容稿做的）。</p></div>
+<div class="opt"><h4>B · 維持 warn-default（現況）</h4><p class="cost">代價：與 6.2「vacuous pass」教訓相悖——provenance 現在對四支分鏡全是 not armed 的綠燈。</p></div>
+</div>
+
+<h4>分歧 ④　REWATCH 鏡數</h4>
+<div class="opts">
+<div class="opt"><h4>A · 六鏡照舊（R1×2／R2–R5；agy ×3）</h4><p class="cost">代價：一次里程碑審 ≈ 3 次外部呼叫＋3 個 subagent；rubric 要先去 Manim 條文。</p></div>
+<div class="opt rec"><h4>B · 精簡為三鏡（R1 初學者、R2 動畫導演、R4 節奏），R3／R5 併入 pedagogy／NFA 的前置擋 <span class="tag t-keep">建議</span></h4><p>R3 教學設計與 R5 講師鏡審的是「漏步驟、跟不上」——在 Remotion 上這些已由 SCRIPT.md 拍表的前置擋抓；REWATCH 只留「看片才看得到」的三鏡（RG:82「唯一看過影片本身的審」）。</p><p class="cost">代價：rubric 與 <code>rewatch_merge</code>／schema 的鏡別表要改；跨家族第二讀者變少。</p></div>
+<div class="opt"><h4>C · 只跑使用者看片人閘＋一個 R2 導演鏡</h4><p class="cost">最省；代價是失去初學者視角（R1 是唯一站在觀眾那邊的鏡）。</p></div>
+</div>
+
+<div class="box pick">
+<b>Q2 勾選</b>
+<label class="pick"><input type="checkbox"> 同意 2.3 表的形式（例題閘零改動；provenance／coverage 確定性層照舊但前提要武裝；NFA 改審分鏡 <code>say</code>、D7 必開；REWATCH／視覺輸入改形）</label>
+<label class="pick"><input type="checkbox"> 分歧 ①：<input type="checkbox"> A 前置 gate-1＋事後外部一次　<input type="checkbox"> B 只事後外部　<input type="checkbox"> C 沿用 Phase A 七層</label>
+<label class="pick"><input type="checkbox"> 分歧 ②：<input type="checkbox"> 甲 每節　<input type="checkbox"> 乙 抽樣</label>
+<label class="pick"><input type="checkbox"> 分歧 ③：<input type="checkbox"> A ERROR＋opt-out 宣告　<input type="checkbox"> B 維持 warn</label>
+<label class="pick"><input type="checkbox"> 分歧 ④：<input type="checkbox"> A 六鏡　<input type="checkbox"> B 三鏡　<input type="checkbox"> C 人閘＋R2</label>
+<label class="pick"><input type="checkbox"> 其他／保留意見：＿＿＿＿＿＿＿＿＿＿</label>
+</div>
+
+<h2 id="q3">Q3 · Remotion 的 §3.1 與 Q7「一次做完」的做法，品質靠什麼撐住，正式化時缺什麼</h2>
+<p>答案形式依契約 §4 Q3：原生流程的「步驟表」（第一次把它寫成流程），每步標 <span class="tag t-keep">已有</span>（有文檔或程式保證）／<span class="tag t-no">缺</span>／<span class="tag t-lucky">碰巧</span>（只在那支片成立、沒有東西保證下一支片也會發生）。實際時間線由 git 重建：s31＝<code>a250581</code>（OUTLINE，09-25 20:16）→<code>15f89dd</code>（整節 mock，21:17）→<code>0e00951</code>（atWord，21:56，Sonnet 5）→<code>b0c00a3</code>（標籤守門，23:50）；Q7 英文＝<code>07ce925</code>（mock，09-26 00:56）→<code>a1caa63</code>（Codex 修正，01:25）→<code>3fce30d</code>（記 MiMo 成品，01:51）；Q7 中文＝<code>9ac3eb1</code>（05:43）→<code>3e3fc10</code>（延伸段，07:06）→<code>c70ae2a</code>（agy 修正，07:29）→<code>7086c7d</code>（08:07）。</p>
+
+<h3>3.1 原生流程步驟表</h3>
+<table>
+<tr><th style="width:3%">#</th><th style="width:17%">步驟</th><th style="width:26%">證據</th><th style="width:9%">s31</th><th style="width:9%">q7</th><th>判定與理由</th></tr>
+<tr><td class="c">1</td><td>視覺方向人閘（三方向風格幀→使用者選 paper）</td><td>XR:19-26</td><td>前置</td><td>沿用</td><td><span class="tag t-keep">已有</span> 做一次即可，不是每節步驟</td></tr>
+<tr><td class="c">2</td><td>內容提煉（OUTLINE／教學計畫）</td><td><code>OUTLINE-s31.md:4</code>「只列要教的內容與數學事實，不規定講法、順序、畫面或篇幅」；q7 SCRIPT:4「使用者核准的教學計畫」</td><td>有</td><td>有，計畫<b>不在版控</b></td><td><span class="tag t-lucky">碰巧</span> OUTLINE 不是契約：無 <code>[source:]</code>／講義 label（只在 :3 指整節），例題有列（C10–C12）但無 required steps；q7 的計畫連檔都沒有</td></tr>
+<tr><td class="c">3</td><td>隔離生成（不讀舊稿、舊片）</td><td>XR:31</td><td>有</td><td>未記載</td><td><span class="tag t-lucky">碰巧</span> 條件只在派工 prompt 裡，prompt 不在版控</td></tr>
+<tr><td class="c">4</td><td>一個子代理一次寫出旁白＋畫面＋TSX</td><td><code>15f89dd</code>、<code>07ce925</code>；兩份 SCRIPT:2</td><td>有</td><td>有</td><td><span class="tag t-no">缺</span> motion-designer 定義檔（MD:4-6）的職掌沒有「寫旁白或內容」；這一步實際發生了，但沒有任何文檔說它該發生</td></tr>
+<tr><td class="c">5</td><td>自審迴圈</td><td>MD:24「render 後自己讀 PNG…至少迭代兩輪再交件」</td><td>無紀錄</td><td>無紀錄</td><td>視覺半邊 <span class="tag t-keep">已有</span>、內容半邊 <span class="tag t-no">缺</span>：條款只講層級／間距／對比／辨識度；commit 只記 tsc、標籤守門、逐像素 diff（<code>771073b</code>），沒記自審輪數</td></tr>
+<tr><td class="c">6</td><td>mock 對時（150 wpm）先看版型</td><td><code>s31.yml:4-5</code>；Q7S:115-124</td><td>有</td><td>有</td><td><span class="tag t-keep">已有</span>；mock 高估約 15%（PB:184）、對中文不準（<code>9ac3eb1</code>）</td></tr>
+<tr><td class="c">7</td><td>render 期結構硬閘（標籤守門／字形閘／場序守門）</td><td>KIT:25、398-494；ST:88-90、27；ROOT:31</td><td>標籤閘是看片後才補（<code>b0c00a3</code>）</td><td>一開始就沿用</td><td><span class="tag t-keep">已有</span> 但<b>片專屬</b>：寫在 <code>src/s31/kit.tsx</code>（ST:89），每場自己呼叫（act3 0/6）；場序守門只有 Q7；字級下限無檢查器</td></tr>
+<tr><td class="c">8</td><td>外部內容稽核</td><td>XR:37；<code>a1caa63</code>、<code>c70ae2a</code></td><td>無（XR:15）</td><td>英文在付費 TTS 前；中文延伸段在 TTS 後</td><td><span class="tag t-lucky">碰巧</span> 沒有文檔說何時跑、審什麼；s31 完全沒審</td></tr>
+<tr><td class="c">9</td><td>稽核後回歸</td><td>XR:37 只寫「回歸通過」</td><td>無</td><td>英文一句話；中文無</td><td><span class="tag t-lucky">碰巧</span> 違反根 CLAUDE.md「修完必須回歸審核」的既有紀律</td></tr>
+<tr><td class="c">10</td><td>合成前旁白人閘</td><td><code>REVIEW-q7-zh-narration.html:34-45</code>；<code>ddd1333</code></td><td>無</td><td>只有中文版</td><td><span class="tag t-lucky">碰巧</span>（RG:195-198 說真正的旁白人閘有兩個、都要排進輪次）</td></tr>
+<tr><td class="c">11</td><td>付費 TTS（先徵同意、<code>--unit scene</code>）</td><td>XR:28、33、38、40</td><td>29 次</td><td>英 31／中 79＋試音 10</td><td><span class="tag t-keep">已有</span>（規則）；報量紀錄沒留在 README，成本帳只有呼叫次數</td></tr>
+<tr><td class="c">12</td><td><code>atWord</code> 逐字對時</td><td>ST:111-122</td><td>TTS 後才補</td><td>英文一開始就用；中文改獨立拍（ST:44）</td><td><span class="tag t-keep">已有</span></td></tr>
+<tr><td class="c">13</td><td>loudnorm −19 LUFS</td><td>XR:30、35、39</td><td>有</td><td>有</td><td><span class="tag t-keep">已有</span></td></tr>
+<tr><td class="c">14</td><td>使用者看片人閘→產出模板規則</td><td>ST:70-72、81-83；<code>7c2ddb9</code>（鏡頭移動 54→6 次）；<code>7086c7d</code></td><td>有</td><td>有</td><td>做法 <span class="tag t-keep">已有</span>，但沒寫成流程上的一步；兩條模板規則都是看片後才裁決（PB:56 D4 的理由）</td></tr>
+<tr><td class="c">15</td><td>局部重渲</td><td>Q7S:158-164</td><td>無</td><td>只有中文版</td><td><span class="tag t-keep">已有</span> 文檔；限場長不變</td></tr>
+<tr><td class="c">16</td><td>章節點</td><td><code>7c2ddb9</code> 的 <code>chapters.py</code></td><td>有</td><td>無紀錄</td><td><span class="tag t-lucky">碰巧</span>（<code>chapters.py:21</code> 寫死 s31 路徑，不計 q7 的 HOLD）</td></tr>
+<tr><td class="c">17</td><td>12 s 停格量測</td><td>RS:26；TW:118</td><td>沒量</td><td>只量了中文 scene 試片（非交付片）</td><td><span class="tag t-no">缺</span> <code>rewatch_pack</code> 未接（RG:109、271）；量測工具不在版控</td></tr>
+<tr><td class="c">18</td><td>視覺幀稽核／REWATCH</td><td>XR:15</td><td>無</td><td>無</td><td><span class="tag t-no">缺</span></td></tr>
+<tr><td class="c">19</td><td>跨語系「不可退化」對照表</td><td><code>GLOSSARY.zh.md:91-99</code></td><td>—</td><td>有</td><td><span class="tag t-lucky">碰巧</span></td></tr>
+<tr><td class="c">20</td><td>精確數學自驗（延伸段幾何）</td><td><code>EXTENSION.zh.md:100-109</code></td><td>無</td><td>只有延伸段，腳本不在版控（:5）</td><td><span class="tag t-lucky">碰巧</span></td></tr>
+</table>
+
+<h3>3.2 品質是靠什麼撐住的（讀法）</h3>
+<div class="box">
+<p><b>可複製的部分</b>（6、7、11、12、13、15）全部在<b>工程層</b>：mock 對時讓版型先於配音、render 期 throw 讓標籤碰撞與缺拍出不了片、loudnorm 與局部重渲讓修改便宜。這些是 Remotion 真正買到的紅利，且與內容無關。</p>
+<p><b>碰巧的部分</b>（2、3、8、9、10、16、19、20）全部在<b>內容層與紀律層</b>：Q7 的數學對，是因為主對話派了 Codex 且子代理照改；s31 的數學對，<b>沒有任何人查過</b>（含兩處講義沒有的內容）。使用者「看片滿意」是唯一人閘，它抓得到鏡頭太多、標籤蓋線（ST:72、83），抓不到念法錯（“x plus h over two” 至今在 <code>s31.yml:49</code>）與覆蓋缺口。</p>
+<p><b>結論：</b>原生版的品質＝工程層硬閘＋主對話的臨場判斷。前者可以直接寫進流程；後者正是 Q2 要補的內容層前置擋。兩者合起來，比 Manim 七層輕得多，但不是零。</p>
+</div>
+
+<h3>3.3 正式化缺口（做成課程節、可並行多節時缺什麼）</h3>
+<table>
+<tr><th style="width:16%">缺口</th><th style="width:44%">現況證據</th><th>缺什麼</th></tr>
+<tr><td><b>內容忠實的前置擋</b></td><td>四支分鏡 <code>ref:</code>／<code>covers:</code>／<code>source:</code> 全 0；provenance 全 WARN（RS:20）；NFA／copyedit agent 讀 <code>.md</code>，Remotion 的片沒有 <code>.md</code>；motion-designer 自審只看視覺（MD:24）</td><td>何時跑、審什麼對象（分鏡 <code>say</code> 對什麼契約）、blocking 規則、回歸由誰跑怎麼記——Q2 分歧 ①</td></tr>
+<tr><td><b>覆蓋度</b></td><td>OUTLINE 有 C1–C14；s31 SCRIPT 每場標題自己對應 C 編號（SCRIPT:12-147）但無機器對照；<code>example_coverage</code> 只讀 <code>.md</code>；q7 教學計畫不在版控</td><td>覆蓋宣告的格式（<code>covers:</code> 對 <code>required_steps</code>，或 SCRIPT 拍表對 C 編號）與檢查器；與講義 label 的綁定——Q3 分歧 ①</td></tr>
+<tr><td><b>多節一致的視覺語彙</b></td><td>token 與模板規則已有（ST:5-22、46-97）；但元件片專屬：s31 加 ochre 與 Ledger（ST:161）、Q7 自定語意色（Q7S:6）；「定為模板」未做（XR:44）；語意色軸與講義對位「由設計輪決定」（DS:274-276）</td><td>把片專屬 kit 升成共用元件、跨節語意色表（含與講義 <code>calcbook.sty</code> 對位的裁決）、字級下限檢查器</td></tr>
+<tr><td><b>成本帳</b></td><td>只記呼叫次數（XR:33、38、40）；Codex／agy token 與牆鐘沒記；Phase A 有完整分項（RS:120-157）</td><td>每支片一張成本表（PB:298-312 的欄位可直接用）＋TTS 前報量紀錄</td></tr>
+<tr><td><b>換機重現</b></td><td>重現指令有（Q7S:115-156）；音檔不進版控、MiMo ±10%（PB:93）、<code>atWord</code> 找不到字會 throw（ST:117）；不在 repo 的：Q7 延伸段研究報告與自驗腳本（EXTENSION:5）、Codex 稽核原始輸出與 prompt、Q7 教學計畫、s31 派工 prompt；§3.2 Phase A 音檔已遺失一次（RS:39）</td><td>付費音檔備份紀律（PB:85 教訓→§六 6.6）；派工 prompt／教學計畫進版控（比照 KICKOFF）；稽核 raw 落 scratchpad、裁決轉錄進版控（RUNBOOK:57-60 既有規則）</td></tr>
+</table>
+
+<h3>3.4 取捨攤開</h3>
+
+<h4>分歧 ①　正式化時的「內容契約」用什麼</h4>
+<div class="opts">
+<div class="opt rec"><h4>A · 兩級制：課程節用 LOCKED 內容稿，解題片用核准的教學計畫（進版控） <span class="tag t-keep">建議</span></h4><p>課程節的內容稿已有 six-lens／copyedit／sign-off／<code>screen_contract</code>／<code>examples:</code> 整套（§3.2 Phase A 現成）；解題片沒有講義出處，教學計畫＋外部一次稽核（Q7 實證）就夠。SPEC-ML:116 的「兩級製作」本來就是這個分界。</p><p class="cost">代價：兩套 KICKOFF 模板；解題片的 provenance 要 opt-out 宣告。</p></div>
+<div class="opt"><h4>B · 一律用 OUTLINE 式大綱（s31 模式）</h4><p>最輕、最自由（3B1B 式敘事是這樣長出來的）。</p><p class="cost">代價：OUTLINE 不是契約——無 <code>[source:]</code>、無 required steps、無例題折疊宣告；six-lens／NFA D7 要改審分鏡 say；s31 那兩處講義沒有的內容就是這條路的產物，得靠事後審。</p></div>
+<div class="opt"><h4>C · 一律用內容稿（Phase A 全套）</h4><p class="cost">代價：解題片沒有講義，得為它手寫一份「內容稿」；而且旁白若鎖死（D2），失去原生版「畫面驅動旁白」的紅利（見 Q4 分歧 ②）。</p></div>
+</div>
+
+<h4>分歧 ②　motion-designer 的職掌要不要正式含「旁白」</h4>
+<div class="opts">
+<div class="opt rec"><h4>甲 · 含旁白：子代理依內容契約寫 say＋畫面＋TSX，旁白經 NFA（D7 開）＋簽核 <span class="tag t-keep">建議</span></h4><p>s31／q7 就是這樣做的，使用者看片滿意；旁白配合畫面改寫（內容不變、說法可改）是 2026-09-25 設計前提（XR:14）。</p><p class="cost">代價：MD 定義檔改；NFA 每節必跑（含 D7）；旁白簽核人閘進輪次。</p></div>
+<div class="opt"><h4>乙 · 不含：旁白由內容線先定稿（Phase A），子代理只做畫面（PB D2 鎖死）</h4><p class="cost">代價：§3.2 現成產物可直接用；但 G0 的 Task D 病會以另一種形式重演——旁白先定、拍內動畫固定幀長（KIT:35-36），畫面只能「配合旁白」而不是反過來；PB:54 自己也指出 Remotion §3.1 是重寫旁白做出來的。</p></div>
+</div>
+
+<h4>分歧 ③　風格幀人閘（PB D4 (i)）要不要每節做</h4>
+<div class="opts">
+<div class="opt rec"><h4>A · 每節先 7 張靜幀＋SCRIPT.md 人閘，再實作 <span class="tag t-keep">建議</span></h4><p class="cost">§3.1 兩條模板規則都是看片後才裁決（PB:56）；靜幀比 8 分鐘片便宜一個量級。代價：一次停等點。</p></div>
+<div class="opt"><h4>B · 跳過，直接整節（s31 模式）</h4><p class="cost">代價：s31 實證＝鏡頭移動 54→6 次的返工（<code>7c2ddb9</code>）。</p></div>
+</div>
+
+<div class="box pick">
+<b>Q3 勾選</b>
+<label class="pick"><input type="checkbox"> 同意 3.1 步驟表的判定（已有／缺／碰巧）與 3.3 缺口清單</label>
+<label class="pick"><input type="checkbox"> 分歧 ①：<input type="checkbox"> A 兩級制　<input type="checkbox"> B 一律 OUTLINE　<input type="checkbox"> C 一律內容稿</label>
+<label class="pick"><input type="checkbox"> 分歧 ②：<input type="checkbox"> 甲 子代理含旁白　<input type="checkbox"> 乙 旁白先定、只做畫面</label>
+<label class="pick"><input type="checkbox"> 分歧 ③：<input type="checkbox"> A 每節風格幀人閘　<input type="checkbox"> B 跳過</label>
+<label class="pick"><input type="checkbox"> 其他／保留意見：＿＿＿＿＿＿＿＿＿＿</label>
+</div>
+
+<h2 id="q4">Q4 · 內容稿到分鏡的路徑要不要保留 <code>{show}</code> beat 切分，還是改成場景腳本加 <code>atWord()</code></h2>
+<p>答案形式依契約 §4 Q4：一條「內容稿 → 分鏡 → 配音 → 畫面」的資料流圖（Remotion 版），標每個產物的唯一源與消費者；被判多餘的產物列廢止。</p>
+
+<h3>4.1 Remotion 現況資料流（誰寫、誰讀、讀哪個欄位）</h3>
+<div class="flow">
+<div class="step tool"><b>講義 <code>chapterN.tex</code></b><span class="who">作者定稿</span></div>
+<div class="step"><b>內容稿 <code>&lt;deck&gt;.md</code></b><span class="who">作者手寫（DS:24-27）。讀者：<code>check_storyboard</code>→coverage／example／source_rev（CS:203-245）；gate-1 agents；<code>visual_need</code>／<code>animation_cue</code> 在 Remotion 路徑上<b>沒有程式消費</b>，只有人與 motion-designer 讀（CM:190-192）</span></div>
+<div class="step"><b>Remotion 分鏡 <code>&lt;片&gt;.yml</code></b><span class="who">motion-designer／主對話手寫。content 場<b>只有 <code>id</code>／<code>kind</code>／<code>say</code></b>（四支逐檔解析）。讀者：<code>tts.py</code>（<code>scene_beats</code> :811-822；<code>build_scene_plan</code> SA:37-68）、<code>check_storyboard</code>。<b>Remotion 本身不讀 yml</b>（DS:149-150）</span></div>
+<div class="step tool"><b>SCRIPT.md 拍表</b><span class="who">motion-designer 手寫。<b>沒有程式讀它</b>；旁白欄＝yml beat 逐字複本（s31 84/84、q7 51/51）。計畫中的 pedagogy OF1 輸入（PB:199）</span></div>
+<div class="step paid"><b><code>manifest.json</code>＋WAV＋words</b><span class="who"><code>tts.py</code> 寫出（:1357；scene_aligned 條目 SA:431-456）。讀者：<code>timing.ts</code> <code>buildShow</code>（S31T:47-72）、<code>Root.tsx</code>、<code>words.ts:31-44</code>、<code>chapters.py:54-68</code>、<code>listening_pack.py:46-60</code>、下一輪 reuse index（<code>tts.py:620-687</code>）</span></div>
+<div class="step"><b>TSX 場景</b><span class="who">motion-designer。經 SceneCtx 取 beats／words：<code>at</code>／<code>p</code>／<code>sp</code>／<code>end</code>／<code>has</code>／<code>atWord</code>；上畫面字串在 TSX（q7 在 i18n）</span></div>
+<div class="step tool"><b>成片</b><span class="who"><code>remotion render</code>→<code>loudnorm.py</code>→<code>chapters.py --embed</code>；人看片；<code>rewatch_pack</code> 未接</span></div>
+</div>
+<p class="small">連結方式：<code>provenance.content_script_for</code> 依 <code>meta.id</code> 找 <code>&lt;id&gt;.md</code>（PV:66-76）——現行 <code>s31_unguided</code>／<code>q7_billiards</code>／<code>ch03_act3_paper</code> 都對不到任何 <code>.md</code>，所以內容層各閘全部 skip 或 not armed。同一份旁白目前有<b>三個手動同步的複本</b>：yml <code>say</code>、SCRIPT.md 旁白欄、TSX 的 <code>atWord</code> 片語（例 <code>Rewrite.tsx:29</code> 的 "B equal to" 對 <code>s31.yml:49</code>）；沒有工具檢查三者一致。</p>
+
+<h3>4.2 <code>{show}</code> 在 Remotion 上剩下什麼功能（每個消費者一列）</h3>
+<table>
+<tr><th style="width:18%">消費者</th><th style="width:34%">用 <code>{show}</code> 做什麼</th><th style="width:26%">整場只剩一拍會怎樣</th><th>證據</th></tr>
+<tr><td><b>tts scene 模式：定位</b></td><td><code>build_scene_plan</code> 依拍切 word range，<code>map_to_beats</code> 以每拍首字 onset 寫 <code>start_seconds</code></td><td>退化：<code>beats[]</code> 只剩 <code>start</code>，words 檔照樣產出</td><td>SA:43-57、138-171；<code>tts.py:1089,1299</code></td></tr>
+<tr><td><b>tts scene 模式：驗證閘</b></td><td>拍界參與過閘：閘 3（第 2..N 拍首字機率 &lt;0.15→fail）、閘 4（長停頓的拍界豁免）、閘 5（拍長 vs 字元佔比）</td><td>閘 3 不再觸發、閘 4 失去豁免、閘 5 無意義；<b>兩個方向都有</b>——少切拍，閘 3 失敗變少但閘 4 可能誤判</td><td>SA:238-270；<code>tts.py:175-176</code>（錯誤訊息直接點名「marker 切在片語中間」）</td></tr>
+<tr><td><b>fallback ladder</b></td><td>arbiter／resynth 整場；chunk 以<b>句</b>切不以拍；<b>只有 beats 終端以拍為單位</b>，每非空拍一次 call</td><td>終端退化成整場一次 call，且沒有 words，<code>atWord</code> 只能回 undefined</td><td>SA:466-473；<code>tts.py:1243-1287,956-972</code></td></tr>
+<tr><td><b>tts beat 模式</b>（全部中文、mock、所有 fallback 場）</td><td>同時是<b>合成單位</b>與<b>唯一時間源</b>：<code>start_seconds</code> 由各拍實測長度累加</td><td><b>壞</b>：場內只剩 <code>at("start", 比例)</code>；中文完全沒有其他時間源（Q7ZH 為此多切三拍 <code>tan</code>／<code>vert</code>／<code>list</code>，Q7S:144）</td><td><code>tts.py:1012-1030</code></td></tr>
+<tr><td><b>reuse／計費</b></td><td>scene 級 <code>scene_text_hash</code> 與 marker 無關；<b>beat 級</b> key＝拍文字 hash——改 id 名免費，<b>移動 marker 位置要重合成</b></td><td>—</td><td>SA:61-65；<code>tts.py:742,958-962</code>；DS:176-177「換 marker 不花錢」只對 scene_aligned 場成立</td></tr>
+<tr><td><b>TSX <code>at()</code>／<code>p()</code>／<code>end()</code></b></td><td>以 id 查拍起訖，查不到 throw；<code>has()</code> 不 throw</td><td><b>壞</b>：<code>at("</code> 共 s31 67、q7 99、act3 57 處；84＋51＋65 拍裡只有 3 個 <code>start</code> 拍沒被 TSX 引用</td><td>KIT:23-36；<code>act3/clock.tsx:43-53</code>；<code>q7/kit.tsx:220-224</code></td></tr>
+<tr><td><b><code>check_storyboard</code></b></td><td>malformed、同場 id 重複、<code>pauses.after</code>、<code>--list</code>；<b>不檢查</b> TSX 的 <code>at(id)</code> 是否存在於 yml</td><td>這幾條空轉</td><td>CS:59-61、114-121、247-253</td></tr>
+<tr><td><b>pedagogy PD1</b></td><td>不在 <code>pedagogy.py</code>（該檔只有 PD2–PD4）；PD1 是 gate-1 agent 判「單一拍壓了 &gt;1 個承重動作」</td><td>PD1 失去判準單位</td><td>PED-RUBRIC:38；RG:228-231（修 PD1 要動場結構、影響計費）</td></tr>
+<tr><td><b><code>captions.py</code></b></td><td>每非空拍一條 cue</td><td>退化成一場一條。<b>目前沒接</b>：唯一 import 是 selftest；Remotion 不出字幕</td><td><code>captions.py:26-37,55-69</code></td></tr>
+<tr><td><b><code>pauses.py</code></b></td><td><code>after</code> 以 reveal 找拍</td><td>壞（KeyError），但 Remotion 不讀 <code>pauses:</code>；Q7 的停留寫在 code 的 <code>HOLD</code>（<code>q7/timing.ts:17-21</code>），量測端看不到——三方不一致（SPEC §6.3）</td><td><code>pauses.py:68-77</code>；DS:214-217</td></tr>
+<tr><td><b><code>rewatch_pack</code></b></td><td><code>(beat N, &lt;reveal&gt;)</code> 歸因、依 reveal 抽幀</td><td>退化成 <code>(beat 1, no reveal)</code>；且<b>目前讀不到 Remotion</b></td><td>RP:166-191、266-275、487、505、569</td></tr>
+<tr><td><code>chapters.py</code>／<code>listening_pack</code></td><td>不用拍界（只用場級欄位）</td><td>無影響</td><td><code>chapters.py:54-68</code>；<code>listening_pack.py:52-53</code></td></tr>
+</table>
+
+<h3>4.3 <code>atWord()</code> 能不能取代 beat——技術事實</h3>
+<table>
+<tr><th style="width:20%">面向</th><th>事實（證據）</th></tr>
+<tr><td>需要什麼</td><td>manifest 的 <code>alignment.words_file</code>，且絕對路徑要含 <code>/public/</code>（W:18-23）；該檔只在 scene_aligned <b>過閘</b>時才寫（<code>tts.py:1117-1121</code>）；token 由 <code>WORD_RE</code> 切、只認 ASCII（SA:26）；<code>norm</code> 只留 <code>a-z0-9</code>（W:46）</td></tr>
+<tr><td>什麼時候沒有</td><td>mock（W:9、55-57）；<code>--unit beat</code>（中文全片 Q7S:144；act3 實際落到 beat XR:26）；退回 beats 的場（s31 areas／warnings XR:33；q7 exam／halfway／writeup XR:38）；中文實驗 FA 也不寫 words（<code>tts_trial_align.py:235-242</code>）。<b>中文在結構上用不了</b>：中文片語 <code>norm</code> 後為空字串，有 words 時 throw「empty phrase」（W:68）</td></tr>
+<tr><td>失敗行為</td><td>沒 words：回 undefined、不報錯，呼叫端自己 <code>?? at()</code>；有 words 找不到片語：render 時 throw（W:84-86）；words 檔 fetch 失敗：<code>calculateMetadata</code> 階段 throw、整片出不來（W:38）。audio 與 words 的路徑解析方式不同（<code>timing.ts:41-45</code> vs W:18-23），搬批次時音檔能用、words 會讓整片 throw</td></tr>
+<tr><td>目前呼叫點</td><td>s31 10（Circle 1、Companion 1、Cycle 2、Four 1、Payoff 1、Rewrite 1、Stuck 3）、q7 3（Angles 2、Halfway 1）、act3 7；<b>全部</b>寫成 <code>atWord(…, {afterFrame: at(beat)}) ?? at(beat, 比例)</code>——每一個都以拍當錨、都退回拍。Q7 英文 halfway 退回 beats（XR:38），<code>Halfway.tsx:36</code> 因此走比例 fallback，<b>無任何警示</b></td></tr>
+<tr><td>粒度</td><td><code>atWord</code> 只給某字的 onset，沒有 end／長度；<code>end(id)</code>、<code>p(id, len)</code> 仍依賴拍（KIT:33-36）</td></tr>
+</table>
+<div class="box ok"><b>結論：<code>atWord()</code> 不能取代 beat。</b> 它是 beat 之上的<b>細卡點</b>（s31／q7 的實際用法），前提是英文、scene_aligned、過閘三者同時成立；任一不成立就靜默退回拍。beat 仍是唯一在 mock、中文、fallback 場都存在的時間契約。</div>
+
+<h3>4.4 <code>spoken.yml</code> 雙軌與 <code>animation_cue</code>／<code>screen_contract</code></h3>
+<div class="two">
+<div class="box">
+<b>雙軌的依賴鏈。</b> <code>derive_spoken.py</code> 的輸入是 <code>video/storyboards/&lt;deck&gt;.yml</code>（DSP:35、157-163）——該目錄現在只剩 <code>_fixtures</code>，實跑會 missing（推論，未執行）。<code>.spoken.yml</code> 只有 <code>ch03_trig_derivatives</code>、<code>ch03_chain_rule</code> 兩份；Remotion 四支 yml 都沒有、id 也都不以 <code>_mimo</code> 結尾（<code>act3.yml:12-13</code> 刻意避開）。Phase A 唯一的 NFA blocking（N2-01）正是雙軌 parity 的病。<b>若廢止</b>要動的程式：<code>derive_spoken.py</code>、<code>derived_check.py</code>＋selftest、<code>tts.py:9,1395-1401</code>、<code>provenance.py:66-76</code>、<code>rewatch_pack.py:446-463</code>、<code>mimo_preview.py</code>、<code>build_spoken_review.py</code>；文檔：DS:70-79、89-90／CM:153-157／RUNBOOK:31-60、178、184-186／RG:59／README:45、155／SPEC:18、99／PB:31、70-72、136、145、381／REVIEW_MODEL_DECISIONS:58、68／SPEC-pedagogy-framework:28／NFA agent :24-28。念法表有兩份（<code>derive_spoken.py:47-77</code> 摘錄 vs NFA rubric 權威）。
+</div>
+<div class="box">
+<b><code>animation_cue</code>／<code>screen_contract</code> vs SCRIPT.md 拍表的重疊。</b> 對照 <code>ch03_trig_derivatives.md:82-134</code>（<code>difference_quotient_for_sine</code>）與 <code>s31/SCRIPT.md:37-46</code>（<code>rewrite</code>）：四個數學步驟<b>兩邊重複</b>（契約的 identity／substitute／divide／factors vs 拍表的 identity／substitute／split／owe1＋owe2）；「靠兩件事」收尾意圖重複、道具（OWED 帳本）只在 SCRIPT；<b>兩邊不一致</b>：契約 <code>factors</code> 寫 <code>→1</code>（:131-133），畫面畫 <code>→ 紅色「?」</code>（:45）。只在內容稿：<code>source</code> 錨、learning_goal、含 LaTeX 的 narration、每步 reason、機器可查的 step id。只在 SCRIPT：拍切分、口語旁白、鏡頭、配色語意、token 動畫、頁標題、mock 秒數、C 編號。<code>animation_cue</code> 對照（<code>sector_inequality</code> :172-176 vs SCRIPT <code>areas</code> :48-59）：畫圓／掃 θ／高亮面積／浮出不等式重複；cue 建議「θ 緩緩縮小」SCRIPT 沒照做。<b>機械連結：無</b>（s31.yml 無 <code>ref</code>／<code>covers</code>；s31 在隔離下從 OUTLINE 生成，沒讀內容稿 XR:31）。
+</div>
+</div>
+
+<h3>4.5 取捨攤開</h3>
+
+<h4>分歧 ①　分鏡的唯一源與 <code>{show}</code> 的角色</h4>
+<div class="opts">
+<div class="opt rec"><h4>甲 · yml（<code>say</code>＋<code>{show}</code>＋<code>ref</code>／<code>covers</code>／<code>scaffold</code>）為唯一源；SCRIPT.md 為<b>生成的</b>人讀投影；<code>{show}</code> 粗切、<code>atWord</code> 細卡（現行 s31 用法正式化） <span class="tag t-keep">建議</span></h4><p>SPEC §1–§4 已是這個形狀；<code>tts.py</code>／<code>check_storyboard</code> 都吃它。把 SCRIPT.md 改成由 yml＋一張「畫面欄」YAML 生成（比照 <code>build_spoken_review.py</code>），三個旁白複本收成一個。</p><p class="cost">代價：一支生成器（sonnet 級）；motion-designer 改寫「畫面欄」而不是手寫整份 SCRIPT；yml↔TSX 拍 id 雙向對照器另做（T5 改形）。</p></div>
+<div class="opt"><h4>乙 · SCRIPT.md（逐場逐拍表）為唯一源，yml 由它生成</h4><p>對人最友善（拍表本來就是人閘的對象）。</p><p class="cost">代價：Markdown 表格當機器源會脆（LaTeX、管線符號、多行）；<code>check_storyboard</code>／<code>tts.py</code> 要多一層轉換；q7 中文版一場兩張表。</p></div>
+<div class="opt"><h4>丙 · 廢 <code>{show}</code>，整場一拍＋<code>atWord</code> 卡點</h4><p class="cost">4.2 表：mock、中文、fallback 場全部失去場內時間源；閘 3–5 失效；PD1 失去單位；TSX 現有 223 個 <code>at("</code> 要改。<b>不可行</b>，列出只為完整。</p></div>
+</div>
+
+<h4>分歧 ②　旁白是誰的（PB D2 的另一種問法）</h4>
+<div class="opts">
+<div class="opt rec"><h4>A · 分鏡 <code>say</code> 就是旁白源；內容稿 narration 是「內容契約」而非出片旁白 <span class="tag t-keep">建議</span></h4><p>RG:187-189 早已裁定「忠實度一律對 <code>say:</code> 判、內容稿 narration 不是出片旁白」；NFA rubric／agent 定義「源＝<code>.md</code> narration」與實務脫節（REPORT:28-30）是 R2-01 的根因。這條把文檔對齊實務。</p><p class="cost">代價：rubric／agent 改「源」的定義；六-lens L1 的忠實對象也要說清楚（內容稿對講義；<code>say</code> 對內容稿）。</p></div>
+<div class="opt"><h4>B · 內容稿 narration 是源，<code>say</code> 逐字＝它（PB D2 鎖死）</h4><p class="cost">代價：與原生版「畫面驅動旁白」相反；Manim 時代 Stage 2 已證明「兩者措辭全節不同」（RG:187-189）。</p></div>
+</div>
+
+<h4>分歧 ③　雙軌（<code>spoken.yml</code>／<code>derive_spoken</code>）去留</h4>
+<div class="opts">
+<div class="opt rec"><h4>甲 · 廢止雙軌：<code>_mimo</code> 派生、<code>derive_spoken</code>、<code>derived_check</code> 進 legacy；§3.2 一次性把 <code>.spoken.yml</code> 的 23 場 <code>say</code> 抄進 <code>s32.yml</code>（零計費） <span class="tag t-keep">建議</span></h4><p>Remotion 分鏡直接寫口語（SPEC §6.4 已以單軌為準）；雙軌唯一防的病（D2 parity）在單軌上不存在。</p><p class="cost">代價：4.4 左欄那串程式與文檔要改（一個 sonnet 級 task）；NFA D1／D2 維度重新定義為「<code>say</code> 對內容稿」。</p></div>
+<div class="opt"><h4>乙 · 保留給 §3.2（Phase A 已走完），§3.3 起單軌</h4><p class="cost">代價：兩套流程並存一節；PB:381 backlog 已提此案。</p></div>
+<div class="opt"><h4>丙 · 恢復雙軌（正典 LaTeX 稿＋口語稿）</h4><p class="cost">代價：Remotion 沒有「正典 storyboard」可派生（DSP 讀的目錄只剩 fixtures）；等於為 parity 病重建它的溫床。</p></div>
+</div>
+
+<h4>分歧 ④　<code>animation_cue</code>／<code>screen_contract</code> 對 Remotion 的角色</h4>
+<div class="opts">
+<div class="opt rec"><h4>A · <code>screen_contract</code> 保留為機器契約（<code>covers:</code> 對 <code>required_steps</code>）；<code>animation_cue</code> 降為「給 motion-designer 的教學意圖提示」，不列為稽核對象 <span class="tag t-keep">建議</span></h4><p>SC1／SC2 是唯一能機械擋「漏步驟」的閘（Phase A 3 條 PD1 就是這類）；<code>animation_cue</code> 在 Remotion 路徑沒有程式消費，s31 也沒照做（4.4 右欄），它本來就是 SHOULD 級的建議（CM:192）。</p><p class="cost">代價：CM §5 改寫一段；<code>visual_need</code> 同理。</p></div>
+<div class="opt"><h4>B · 兩者都廢，SCRIPT.md 拍表取代</h4><p class="cost">代價：失去撰稿期（內容稿 lock 前）就能宣告承重步驟的機會；覆蓋只能事後對拍表人工判。</p></div>
+<div class="opt"><h4>C · 兩者都升為硬契約（cue 也要逐條落實）</h4><p class="cost">代價：與「Redraw, don't reproduce」（CM:177）和設計自由相悖；s31 的紙本敘事就是不照 cue 長出來的。</p></div>
+</div>
+
+<div class="box pick">
+<b>Q4 勾選</b>
+<label class="pick"><input type="checkbox"> 分歧 ①：<input type="checkbox"> 甲 yml 為源、SCRIPT 生成、{show} 粗切＋atWord 細卡　<input type="checkbox"> 乙 SCRIPT 為源　<input type="checkbox"> 丙 廢 {show}（不建議）</label>
+<label class="pick"><input type="checkbox"> 分歧 ②：<input type="checkbox"> A <code>say</code> 是旁白源　<input type="checkbox"> B 內容稿 narration 是源（D2 鎖死）</label>
+<label class="pick"><input type="checkbox"> 分歧 ③：<input type="checkbox"> 甲 廢止雙軌　<input type="checkbox"> 乙 §3.2 保留、之後單軌　<input type="checkbox"> 丙 恢復雙軌</label>
+<label class="pick"><input type="checkbox"> 分歧 ④：<input type="checkbox"> A contract 留、cue 降提示　<input type="checkbox"> B 都廢　<input type="checkbox"> C 都升硬契約</label>
+<label class="pick"><input type="checkbox"> 其他／保留意見：＿＿＿＿＿＿＿＿＿＿</label>
+</div>
+
+<h2 id="flow">5 · 建議的 Remotion 正式流程總圖（依各題「建議」選項組成；使用者改選則圖隨之變）</h2>
+<p class="legend"><span><span class="tag t-morph">■</span> 藍邊＝確定性工具</span><span><span class="tag t-drop">■</span> 紅邊＝閘（blocking）</span><span><span class="tag t-keep">■</span> 金邊＝人閘／停等點</span><span>粉底＝計費或外部 API（先報量徵同意）</span></p>
+
+<h3>5.1 課程節（有講義出處；Q3 分歧 ① 兩級制的第一級）</h3>
+<div class="flow">
+<div class="step tool"><b>① 內容稿 LOCKED</b><span class="who">既有 Phase A 前半：six-lens→copyedit→sign-off；<code>screen_contract</code>／<code>examples:</code>／<code>source_rev</code> 在此定。§3.2 已完成</span></div>
+<div class="step human"><b>② 派工契約＋開工清單</b><span class="who">§六 6.4 Remotion 版：selftest／<code>check_storyboard</code> 武裝前提／音檔備份路徑／main tip hash。<b>停等點 0</b>：使用者填 KICKOFF 裁決表</span></div>
+<div class="step"><b>③ motion-designer 寫 yml＋畫面欄＋TSX 骨架</b><span class="who">含旁白（Q3 分歧 ② 甲）；<code>say</code> 口語、<code>{show}</code> 粗切、<code>ref: md:</code>＋<code>covers:</code>；mock 對時；7 張風格幀</span></div>
+<div class="step tool"><b>④ <code>check_storyboard</code></b><span class="who">結構＋provenance（<code>otf_enforce</code>）＋SC1／SC2＋EX＋<code>say</code> 無 <code>$</code>＋yml↔TSX 拍 id 對照（新）。0 error 才往下</span></div>
+<div class="step gate"><b>⑤ 內容 gate-1（免費）</b><span class="who">NFA 審 <code>say</code> 對內容稿（D3／D4／D7 開）＋pedagogy 讀生成的 SCRIPT 拍表（PD1／OF1／SC-honesty）。blocking＝0 才往下；修完回歸</span></div>
+<div class="step human"><b>⑥ 人閘 1：風格幀＋SCRIPT 拍表＋旁白簽核</b><span class="who">一次停等點簽三樣（6.8 ③：擋路的合一輪）</span></div>
+<div class="step paid gate"><b>⑦ 外部第二讀者（一次）</b><span class="who">Codex／agy 讀 SCRIPT 拍表＋<code>say</code>（Q7 模式，但在 TTS 前）；含「反對前提」欄。逐次報量徵同意</span></div>
+<div class="step paid"><b>⑧ TTS <code>--unit scene</code></b><span class="who">dry-run 報價→同意→合成→<code>listening_pack</code> 人閘→<b>音檔立即備份</b>到主 checkout（PB:85）</span></div>
+<div class="step"><b>⑨ 三幕實作（各自 worktree）</b><span class="who">motion-designer ×3；自審迴圈≥2 輪；<code>atWord</code> 細卡；<code>tsc</code>；render 無 label-guard throw</span></div>
+<div class="step tool"><b>⑩ 一次 merge → render → 確定性閘</b><span class="who">場序守門（全 composition）；dry-run <code>plan</code>=0 證明分鏡＝manifest；<code>rewatch_pack</code>（接 Remotion）12 s；<code>RENDER.md</code> 記 manifest sha256</span></div>
+<div class="step gate"><b>⑪ 視覺 gate-1（每次正式 render）</b><span class="who">visual-frame-audit 讀 contact sheet（去 Manim 條文後的 V1–V10）；blocking＝0</span></div>
+<div class="step human"><b>⑫ 人閘 2：使用者看片</b><span class="who">must 收齊→併行派工→一次 merge→一次審（Q1 分歧 ② 甲）；局部重渲限場長不變</span></div>
+<div class="step paid gate"><b>⑬ 里程碑 REWATCH（一節一次）</b><span class="who">三鏡（Q2 分歧 ④ B）；must 關閉即 final；停止條件＝§六 6.3 Remotion 形</span></div>
+<div class="step tool"><b>⑭ final</b><span class="who">loudnorm→chapters→<code>RENDER.md</code>→applied HTML→成本表一列</span></div>
+</div>
+
+<h3>5.2 解題片（無講義出處；第二級）</h3>
+<div class="flow">
+<div class="step human"><b>① 教學計畫（進版控）</b><span class="who">比照 Q7：使用者核准的解法與敘事；取代內容稿；<code>meta.provenance: none</code></span></div>
+<div class="step"><b>② motion-designer 整支（旁白＋畫面＋TSX，mock）</b><span class="who">s31／q7 模式；自審≥2 輪</span></div>
+<div class="step tool"><b>③ <code>check_storyboard</code>（結構＋拍 id 對照）</b><span class="who">內容層閘因無內容稿跳過——入口要印「not armed」而非綠燈</span></div>
+<div class="step paid gate"><b>④ 外部稽核一次（TTS 前）</b><span class="who">Q7 實證：mock→Codex→修→回歸（回歸要記錄，Q7 沒記）</span></div>
+<div class="step human"><b>⑤ 人閘：SCRIPT 拍表＋旁白</b><span class="who">Q7 中文版有、英文版沒有——正式化後兩者都要</span></div>
+<div class="step paid"><b>⑥ TTS→render→loudnorm</b><span class="who">同 5.1 ⑧⑩；音檔備份</span></div>
+<div class="step human"><b>⑦ 使用者看片→局部重渲→final</b><span class="who">12 s 量測（若 Q1 分歧 ① 選 A）；不跑 REWATCH 六鏡（解題片以人閘＋外部稽核為準）</span></div>
+</div>
+
+<h3>5.3 與平移版（PB）的差異一覽</h3>
+<table>
+<tr><th style="width:22%">面向</th><th style="width:39%">平移版（<code>KICKOFF-s32-remotion-phaseB.md</code>）</th><th>本稿建議</th></tr>
+<tr><td>旁白是誰的</td><td>Phase A 口語版逐字（D2 鎖死），只動 marker（PB:54、130）</td><td>分鏡 <code>say</code> 是旁白源，內容稿是內容契約；NFA 對 <code>say</code> 審、D7 開（Q4 分歧 ②A、Q2 分歧 ①A）</td></tr>
+<tr><td>分鏡怎麼來</td><td>從 legacy <code>_mimo.yml</code> 派生（<code>s32_derive.py</code>＋parity 檢查，PB:123-146）</td><td>motion-designer 依內容稿寫（可抄 Phase A 的 23 場 <code>say</code> 當起點，零計費）；不建 <code>s32_derive.py</code></td></tr>
+<tr><td>閘序</td><td>沿用七層＋三個新確定性檢查（PB:192-226）</td><td>確定性：<code>check_storyboard</code>＋拍 id 對照＋場序守門＋dry-run plan 0＋12 s；判斷：NFA／pedagogy 前置一次、視覺每 render、REWATCH 三鏡一次；外部：一次（TTS 前）</td></tr>
+<tr><td>一輪</td><td>一 merge 一 render 一審（PB:264-279）</td><td>一 merge 一審；render 不綁（Q1 分歧 ② 甲）</td></tr>
+<tr><td>新建工具</td><td><code>s32_derive.py</code>、<code>remotion_sync_check.py</code>、<code>rewatch_pack</code> 三旗標（PB:222-226）</td><td><code>rewatch_pack</code> 三旗標（同）；場序守門推廣（同 ②）；yml↔TSX 拍 id 對照；SCRIPT 生成器；<b>不建</b> <code>s32_derive.py</code>（單軌）與 <code>remotion_sync_check.py</code>（結構上不會漂，殘餘風險由 <code>RENDER.md</code>＋場序守門吃）</td></tr>
+<tr><td>停等點</td><td>4 個（PB:310）</td><td>課程節 4 個（裁決表、風格幀＋拍表＋旁白、聽感、看片）；外部呼叫 2 次（第二讀者、REWATCH）各徵同意</td></tr>
+</table>
+
+<h2 id="docs">6 · 文檔處置清單（契約 §5 第 2 條；每件一個處置建議，依賴哪題的裁決）</h2>
+<p>處置四種：<span class="tag t-keep">保留</span>（不動或只加註）／<span class="tag t-morph">改寫</span>（外科式）／<span class="tag t-drop">廢止</span>（進 legacy 或刪）／<span class="tag t-done">新立</span>。「執行輪」欄＝裁決後另開執行輪時建議的派工等級（根 <code>CLAUDE.md</code> 任務分派）。</p>
+<table>
+<tr><th style="width:22%">文檔／工具</th><th style="width:30%">現況（證據）</th><th style="width:34%">處置建議</th><th style="width:8%">依賴</th><th>執行輪</th></tr>
+<tr><td><b><code>KICKOFF-s32-remotion-phaseB.md</code></b>（含 D1–D5）</td><td>平移版流程的具體樣子：從 legacy <code>_mimo.yml</code> 派生（§3.1）、七層沿用表（§4.1）、三個新檢查器（§4.3）、G5 一 render 一輪（§5）；§2 的事實快照與 §3.3 音檔兩分支、§6 成本欄位獨立於流程</td><td><span class="tag t-morph">改寫</span>：保留 §2（事實）、§3.3（音檔 R／S 分支）、§4.3 ③（<code>rewatch_pack</code>）、§6（成本欄）、§7 待建路徑表；<b>刪</b> §3.1–3.2 派生規則與 <code>s32_derive.py</code>、§4.3 ①（<code>remotion_sync_check</code>）；§4.1／4.2 改指本稿 Q2 表；§5 派工改依 5.1 圖。D1 保留（音檔）；D2 改為 Q4 分歧 ②；D3 保留 (a)；D4 併 Q3 分歧 ③；D5 併 Q2 分歧 ④</td><td>Q1–Q4</td><td>opus</td></tr>
+<tr><td><b><code>SPEC-remotion-storyboard-schema.md</code> §6 四項</b></td><td>1 場級 <code>ref:</code> WARN／ERROR；2 PD2／SC 的場角色欄；3 <code>pauses:</code> 誰讀；4 雙軌恢復與否（SPEC:92-99）</td><td>1 → Q2 分歧 ③（建議 ERROR＋<code>meta.provenance: none</code>）；2 → <b>建議不加 <code>role:</code></b>：PD2「必須有契約」在 Remotion 由「內容稿有 <code>screen_contract</code> 的單元，其 <code>ref: md:</code> 所在場必須有 <code>covers:</code>」反向判定，不需場角色（SC1 已能算）；3 → <b>建議廢 <code>pauses:</code></b>，改在 yml 加選填 <code>hold:</code>（秒）由 <code>timing.ts</code> 與 <code>rewatch_pack</code> 共讀（Q7 的 <code>HOLD</code> 表搬進 yml），三方一致；另案是 Remotion 讀 <code>pauses:</code>（語義是「揭示後靜音」，與 HOLD「場尾停留」不同，兩者都要就兩欄都留）；4 → Q4 分歧 ③</td><td>Q2／Q4</td><td>sonnet</td></tr>
+<tr><td><b><code>check_storyboard.py</code>＋<code>doctor --smoke</code></b></td><td>唯一 render 前確定性閘（RG:80；SPEC §5）；對四支現行分鏡 0 error、provenance 全 not armed；<code>--smoke</code> 對 <code>remotion/*/*.yml</code> 全跑（doctor:476-502）</td><td><span class="tag t-keep">保留</span>並加三條（Q1 lint 改形、T5 改形、Q2 分歧 ③）：<code>say</code> 含 <code>$</code>＝error；yml 拍 id ↔ <code>src/&lt;片&gt;/</code> 的 <code>at("…")</code> 雙向對照（yml 有 TSX 沒用＝warn、TSX 用 yml 沒有＝error）；<code>meta.provenance: none</code> 宣告。<code>--smoke</code> 不動</td><td>Q1／Q2</td><td>sonnet（紅測試先行）</td></tr>
+<tr><td><b><code>REVIEW_GATES.md</code> 六份 rubric</b></td><td>SIXLENS／COPYEDIT 審內容稿，與渲染器無關；NFA 定義「源＝<code>.md</code>」與實務脫節（REPORT:28-30）；PEDAGOGY 讀 <code>storyboards/&lt;deck&gt;.yml</code>＋<code>template</code>＋<code># HOOK</code>（PED:13、39、95）；VISUAL-FRAME 含 Manim 條文（VF:4、23-24、32、49、70）；AMPLIFICATION 判「已上片」依 storyboard 文字欄（AMP:27、33）；REWATCH 寫死 27 場／1 s lead／§3.1 讀者／<code>make.py</code> 6 s（RW:13、18、35、76、126）</td><td>SIXLENS、COPYEDIT <span class="tag t-keep">保留</span>不動；NFA <span class="tag t-morph">改寫</span>「源」定義（<code>say</code> 對內容契約）、D1／D2 重定義、Tier 0 去 <code>derive --check</code>；PEDAGOGY <span class="tag t-morph">改寫</span> 輸入為 yml＋生成的 SCRIPT 拍表、去 <code>template</code>／<code># HOOK</code>、PD2 改反向判定；VISUAL-FRAME 依 Q1 分歧 ③；AMPLIFICATION 「已上片」改讀拍表；REWATCH 去寫死值、鏡數依 Q2 分歧 ④。<b>五個 gate-1 agent 定義檔同步</b>（NFA:22-28、pedagogy:19、25 的 <code>coverage.py</code> 誤名、amplification:24）</td><td>Q1／Q2／Q4</td><td>sonnet ×2（rubric、agent）</td></tr>
+<tr><td><b><code>REVIEW_GATES.md</code> §六 G0–G7</b>＋§一 各層表</td><td>§六原則層與渲染器無關（RG:177）；6.1 綁「一次 render」；6.3 條件 4 留 Remotion 對等物待定；6.4 四項綁 Manim 佈局；§一 層 4–7 表滿是「已封存」「沿用，待接」標記</td><td>§六 <span class="tag t-morph">改寫</span>：6.1 依 Q1 分歧 ②；6.3 條件 4＝<code>check_storyboard</code> 0 error＋<code>tsc</code>＋無 label-guard throw＋dry-run plan 0＋（若 A）<code>[still-gate]</code>；6.4 出 Remotion 版清單；6.6 加「付費音檔立即備份」；6.7–6.9 保留。§一 <span class="tag t-morph">重寫</span>為 Remotion 現況表（一層一列、去標記），Manim 表移 legacy 或折疊；層 5 整段刪（已退役）</td><td>Q1／Q2</td><td>opus</td></tr>
+<tr><td><b><code>RUNBOOK-mimo-narration-route.md</code></b></td><td>步驟 1–3 以 <code>.spoken.yml</code>／<code>derive_spoken</code> 為前提（RUNBOOK:31-60）；步驟 4 已改 Remotion；行號過時（:92 引 <code>tts.py:1054</code>，現為 :1423）；計費四條紀律（:86-165）是真金白銀的教訓、與渲染器無關</td><td><span class="tag t-morph">改寫</span>：步驟 1 改「分鏡 <code>say</code> 直接寫口語＋念法慣例」；步驟 2 刪（雙軌）或依 Q4 分歧 ③；步驟 3 NFA 改審 <code>say</code>；步驟 4 加 <code>RENDER.md</code> 紀錄與音檔備份；修行號；計費紀律段原樣保留。<b>替代案</b>：整份併入 <code>README.md</code> §MiMo 路線＋新流程文檔，RUNBOOK 廢止——代價是「可整段貼給單節 session」的用途消失</td><td>Q4</td><td>sonnet</td></tr>
+<tr><td><b><code>derive_spoken.py</code>＋<code>.spoken.yml</code> 雙軌</b>（含 <code>derived_check.py</code>、<code>_mimo</code> freshness、<code>mimo_preview --spoken</code>、<code>build_spoken_review.py</code>）</td><td>輸入目錄只剩 fixtures（DSP:35）；只有兩份 <code>.spoken.yml</code>；Remotion 四支都無；唯一防的病 D2 parity 在單軌不存在（Q4 4.4）</td><td>依 Q4 分歧 ③：甲 → 程式進 <code>legacy/manim_video/pipeline/</code>（<code>git mv</code>），<code>tts.py:1395-1401</code> 的 <code>_mimo</code> freshness 與 <code>provenance.py:66-76</code> 的 <code>_mimo</code> 剝除改為無害的相容碼或刪；§3.2 的 <code>.spoken.yml</code> 內容一次性抄進 <code>s32.yml</code>；乙 → 加頂註「只給 §3.2」；丙 → 不動</td><td>Q4</td><td>sonnet（零行為改變證明：selftest 全綠＋<code>tts.py --help</code>）</td></tr>
+<tr><td><b><code>CONTENT_METHODOLOGY.md</code> 的 <code>animation_cue</code>／<code>screen_contract</code></b></td><td>§5 兩欄定義（CM:183-186）；「稽核閘待定」段（:210）；「hook 內文字走 <code>brand.*</code>」節已標封存（:197-206）；§5 的 Remotion 敘述已在 2026-09-28 改寫（:175、190）</td><td>依 Q4 分歧 ④：A → <code>screen_contract</code> 段不動；<code>animation_cue</code> 段加一句「SHOULD 級提示、motion-designer 可不照做、不列稽核對象」；:210「稽核閘待定」改指本稿 Q2 表；:197-206 封存節移 legacy 或折疊；§7 checklist 加「內容稿是內容契約、不是出片旁白」</td><td>Q4</td><td>sonnet</td></tr>
+<tr><td><b><code>SPEC-motion-language.md</code></b></td><td>五條規則是設計語言、與引擎無關（SPEC-ML:5）；§0 表「已有機制」欄與 §4 驗收接線全是 Manim 實作；三門檻（6 s／12 s／R4 12 s）在 §2 規則 4</td><td><span class="tag t-morph">改寫</span> §0「已有機制」欄為 Remotion 對應（ML1 一場一張紙 <code>Sheet</code>＋桌上疊紙轉場、ML2 <code>InkReveal</code>／<code>MathStage</code> token 彈簧、ML3 鏡頭紀律六條、ML4 12 s＋「每拍都有東西在動」、ML5 語意色 token）；§4 驗收接線改為 Q1／Q2 裁決後的閘；規則本文不動</td><td>Q1</td><td>sonnet</td></tr>
+<tr><td><b><code>DESIGN.md</code></b></td><td>「MiMo 口語軌」節留白給雙軌（DS:70-79）；<code>pauses:</code> 節懸案（:199-217）；TODO manifest freshness（:55）；「換 marker 不花錢」只對一半（:176-177）</td><td><span class="tag t-morph">改寫</span>：雙軌節依 Q4 分歧 ③；<code>pauses:</code> 節依 SPEC §6.3 處置；:55 TODO 改為「dry-run plan 0＋<code>RENDER.md</code>」；:176 加「beat 模式移 marker 要重合成」的但書；資料流圖加 SCRIPT 生成器與拍 id 對照</td><td>Q4</td><td>sonnet</td></tr>
+<tr><td><b>新流程 SSOT</b></td><td>目前沒有任何文檔把原生做法寫成流程（KICKOFF §2 表末列）；PB §7 原定產出 <code>KICKOFF-section-template.md</code>（SOP v1）</td><td><span class="tag t-done">新立</span> <code>video/PIPELINE.md</code>（比照講義線 <code>handout/PIPELINE.md</code> 的「完成一章的閘序」）：5.1／5.2 兩級流程、每步的工具／閘／人閘／計費點、停止條件、成本表欄位；KICKOFF 模板從它抽。<code>experiments/remotion_styles/README.md</code> 的「進度」段改為歷史紀錄、指向它</td><td>Q1–Q4</td><td>opus</td></tr>
+<tr><td><b><code>.claude/agents/motion-designer.md</code></b></td><td>職掌無「旁白／內容」（MD:4-6）；自審只看美術（:24）；輸入指 <code>experiments/remotion_styles/README.md</code>（:16）</td><td>依 Q3 分歧 ②：甲 → 職掌加「依內容契約寫 <code>say</code>、標 <code>ref</code>／<code>covers</code>」、自審加「對照內容契約的覆蓋自查」、輸入指新 PIPELINE；乙 → 加「不改 <code>say</code>」</td><td>Q3</td><td>sonnet</td></tr>
+<tr><td><b><code>rewatch_pack.py</code></b></td><td>五處讀不到 Remotion（RP:487／505／494／64／545）；unification §3.2 誤列為「Remotion 在用」</td><td>依 Q1 分歧 ①：A → PB:226 三旗標方案（工具 task，紅測試）＋校準紙紋效度；B／C → 先不動、README 標「未接」</td><td>Q1</td><td>opus（工具）</td></tr>
+<tr><td><b><code>stillness.py</code>／<code>captions.py</code>／<code>pauses.py</code>／<code>timing.py</code> 的 Manim 常數</b></td><td>live tree 無呼叫者（stillness）、只被 selftest import（captions）、Remotion 不讀（pauses）；<code>timing.py</code> 只有 <code>text_hash</code>／<code>SYNC_TOLERANCE_SECONDS</code> 被 <code>tts.py</code> 用</td><td><span class="tag t-drop">廢止</span> stillness 進 legacy；captions <span class="tag t-keep">保留</span>（字幕是 T7 未完項，Remotion 可接 <code>@remotion/captions</code>）；pauses 依 SPEC §6.3；<code>timing.py</code> 拆：Manim 常數進 legacy、留 <code>text_hash</code>＋容差</td><td>Q1</td><td>sonnet（零行為改變）</td></tr>
+<tr><td><b><code>video/README.md</code>、<code>REBUILD_STATUS.md</code>、<code>KICKOFF-process-reform.md</code>、<code>KICKOFF-remotion-unification.md</code></b></td><td>README §狀態／§指令已是 Remotion（README:105-149）但流程指向各片 SCRIPT；process-reform 頂註說 G0–G7「照舊有效」；unification §3.2 共用層清單不實</td><td>README 加流程入口指新 PIPELINE；REBUILD_STATUS 檢討輪那行改「已裁決」；process-reform 頂註改指本稿；unification §3.2 加註「<code>rewatch_pack</code>／stillness／pauses 實際未接」</td><td>—</td><td>haiku</td></tr>
+<tr><td><b>兩處立即可修的錯（不等裁決）</b></td><td><code>s31/kit.tsx:382</code> 的 <code>size={26}</code> 低於 28 px 規則；<code>s31.yml:49,105</code>／<code>act3.yml:39-58</code> 的 “x plus h over two” 違反 NFA 念法表:48</td><td>前者屬 §6 邊界「不動 .tsx」，記進 backlog；後者改字＝重配（29 次那批的 2 場）→ <b>報量徵同意後</b>才動，或接受現況並在 README 記「未過 NFA」</td><td>—</td><td>待使用者</td></tr>
+</table>
+<div class="box pick">
+<b>處置清單勾選</b>
+<label class="pick"><input type="checkbox"> 同意上表全部處置建議（依各題裁決自動決定細節）</label>
+<label class="pick"><input type="checkbox"> 新流程 SSOT 檔名：<input type="checkbox"> <code>video/PIPELINE.md</code>　<input type="checkbox"> <code>video/KICKOFF-section-template.md</code>（PB 原案）　<input type="checkbox"> 併入 <code>DESIGN.md</code></label>
+<label class="pick"><input type="checkbox"> RUNBOOK：<input type="checkbox"> 改寫保留　<input type="checkbox"> 併入 README 後廢止</label>
+<label class="pick"><input type="checkbox"> <code>pauses:</code>：<input type="checkbox"> 廢、改 <code>hold:</code>　<input type="checkbox"> Remotion 改讀 <code>pauses:</code>　<input type="checkbox"> 兩欄都留</label>
+<label class="pick"><input type="checkbox"> 「x plus h over two」兩支現行片：<input type="checkbox"> 重配（先報量）　<input type="checkbox"> 接受現況並記錄</label>
+<label class="pick"><input type="checkbox"> 逐件保留意見：＿＿＿＿＿＿＿＿＿＿</label>
+</div>
+
+<h2 id="accept">7 · 驗收自檢（契約 §5 第 3 條）與沒做到的條款</h2>
+<table>
+<tr><th style="width:34%">驗收條</th><th>結果</th></tr>
+<tr><td>每個結論指到 §4 列的證據（路徑＋行號或 commit）</td><td>四題的表格每列附簡稱:行號（索引見 §8）；三個推翻契約前提的事實各附 commit hash；引證由三個唯讀 opus 子代理分頭蒐集、主對話抽查 12 處（RS:60、KIT:35-36／382、ROOT:15-50、<code>guard(</code> 計數、TM:80-96、Q7 commit 時間線、<code>0e00951</code> trailer、<code>a1caa63 --stat</code>、講義 §3.1 grep、SA:236-272、<code>narration.py:55-62</code>、四支 yml 拍數、<code>s31.yml:49</code> vs 念法表、W:16-24）全部對得上</td></tr>
+<tr><td>沒有一題用「沿用既有做法」帶過</td><td>Q1 每閘標廢止／保留／改形／已取代並附理由；Q2 每病給 Remotion 上的最輕形式；Q3 第一次把原生流程寫成 20 步並判已有／缺／碰巧；Q4 給資料流圖、<code>{show}</code> 剩餘功能表與 <code>atWord</code> 技術事實</td></tr>
+<tr><td>四題各至少兩個可選方案與代價</td><td>Q1 三個分歧（3／2／2 案）、Q2 四個分歧（3／2／2／3 案）、Q3 三個分歧（3／2／2 案）、Q4 四個分歧（3／2／3／3 案）；處置清單另有 4 個</td></tr>
+<tr><td><code>python tools/doc_lint.py</code> clean</td><td>本 worktree 基線＝2 條既有斷鏈（<code>REBUILD_STATUS.md:22</code>、<code>experiments/tts_workflow/README.md:43</code> 指向 gitignored 成片 <code>q7zh_gemini_iapetus_scene_trial_20260926.mp4</code>，只在主 checkout 存在；PB:107 已記為既有）；本輪新增的連結不增加斷鏈——收尾時全量落檔重驗（結果寫在 commit body）</td></tr>
+</table>
+
+<div class="box warn">
+<b>沒做到／刻意不做的條款</b>
+<ol>
+<li><b>沒有拉異家族第二讀者審這份檢討</b>（契約 §6 允許但要先報量）。若要，建議的量：Codex <code>exec -s read-only</code> 一次，輸入＝本稿＋三份子代理回報（約 3×10⁵ token 的引證）；agy 一次 <code>--mode plan</code>。兩者都要使用者先同意。</li>
+<li><b>Q7ZH 的 12 s 量測工具不在版控</b>（TW:118），所以「exam 14.2 s／foldback 12.8 s」是否用 0.05% 門檻無法確認；本稿只轉述、未重量（重量需要 <code>rewatch_pack</code> 先接 Remotion）。</li>
+<li><b>「一次 render 要 40 分鐘」</b>（契約 §2 表）找不到出處，本稿以 texlock.py:68 的 15–25 分與 LD:1710 取代；若使用者有別的出處請補。</li>
+<li><b>沒有執行 <code>derive_spoken.py</code> 確認「輸入目錄只剩 fixtures 會 missing」</b>——這是讀碼推論，執行輪動它之前應實跑一次。</li>
+<li><b>沒有為 5.1／5.2 流程估總成本</b>（token／牆鐘）：原生版沒有成本帳可比（Q3 3.3），估了也是猜；建議第一支照新流程做的節即時記錄（PB §6 欄位）。</li>
+<li>本稿沒有動任何 <code>.py</code>／<code>.yml</code>／<code>.tsx</code>、沒有改三支現行分鏡、零外部 API 呼叫；<code>s31/kit.tsx:382</code> 的 26 px 與「x plus h over two」兩處已知問題只記錄、不修。</li>
+</ol>
+</div>
+
+<h2 id="ev">8 · 證據索引（簡稱 → 路徑；行號為 2026-09-29 main tip <code>021b78c</code> 快照）</h2>
+<table>
+<tr><th style="width:12%">簡稱</th><th>路徑</th><th style="width:12%">簡稱</th><th>路徑</th></tr>
+<tr><td>KICKOFF</td><td><code>video/KICKOFF-remotion-process-review.md</code></td><td>PB</td><td><code>video/KICKOFF-s32-remotion-phaseB.md</code></td></tr>
+<tr><td>PR</td><td><code>video/KICKOFF-process-reform.md</code></td><td>RG</td><td><code>video/REVIEW_GATES.md</code></td></tr>
+<tr><td>RS</td><td><code>video/REBUILD_STATUS.md</code></td><td>XR</td><td><code>video/experiments/remotion_styles/README.md</code></td></tr>
+<tr><td>ST</td><td><code>video/remotion/STYLE.md</code></td><td>Q7S</td><td><code>video/remotion/q7/SCRIPT.md</code></td></tr>
+<tr><td>SCRIPT</td><td><code>video/remotion/s31/SCRIPT.md</code></td><td>OUTLINE</td><td><code>video/experiments/remotion_styles/OUTLINE-s31.md</code></td></tr>
+<tr><td>DS</td><td><code>video/DESIGN.md</code></td><td>SPEC</td><td><code>video/SPEC-remotion-storyboard-schema.md</code></td></tr>
+<tr><td>SPEC-ML</td><td><code>video/SPEC-motion-language.md</code></td><td>CM</td><td><code>video/CONTENT_METHODOLOGY.md</code></td></tr>
+<tr><td>RUNBOOK</td><td><code>video/RUNBOOK-mimo-narration-route.md</code></td><td>MD</td><td><code>.claude/agents/motion-designer.md</code></td></tr>
+<tr><td>PH</td><td><code>legacy/manim_video/KICKOFF-pipeline-hardening.md</code></td><td>LD</td><td><code>legacy/manim_video/DESIGN.md</code></td></tr>
+<tr><td>VF</td><td><code>video/content_scripts/_audit/VISUAL-FRAME-RUBRIC.md</code></td><td>RW</td><td><code>video/content_scripts/_audit/REWATCH-REVIEW-RUBRIC.md</code></td></tr>
+<tr><td>PED</td><td><code>video/content_scripts/_audit/PEDAGOGY-FIRSTLEARNER-RUBRIC.md</code></td><td>AMP</td><td><code>video/content_scripts/_audit/AMPLIFICATION-RUBRIC.md</code></td></tr>
+<tr><td>NFA-RUBRIC</td><td><code>video/content_scripts/_audit/NARRATION-FAITHFULNESS-RUBRIC.md</code></td><td>REPORT</td><td><code>video/content_scripts/_audit/REPORT-ch03_chain_rule-narration-faithfulness.md</code></td></tr>
+<tr><td>phaseA HTML</td><td><code>video/content_scripts/_audit/REVIEW-ch03_chain_rule-s32-phaseA-applied.html</code></td><td>signoff HTML</td><td><code>video/content_scripts/_audit/REVIEW-ch03_chain_rule-s32-narration-signoff.html</code></td></tr>
+<tr><td>RP</td><td><code>video/pipeline/rewatch_pack.py</code></td><td>TM</td><td><code>video/pipeline/timing.py</code></td></tr>
+<tr><td>SA</td><td><code>video/pipeline/scene_align.py</code></td><td>CS</td><td><code>video/pipeline/check_storyboard.py</code></td></tr>
+<tr><td>PV</td><td><code>video/pipeline/provenance.py</code></td><td>DSP</td><td><code>video/pipeline/derive_spoken.py</code></td></tr>
+<tr><td>KIT</td><td><code>video/remotion/src/s31/kit.tsx</code></td><td>S31T</td><td><code>video/remotion/src/s31/timing.ts</code></td></tr>
+<tr><td>ROOT</td><td><code>video/remotion/src/Root.tsx</code></td><td>W</td><td><code>video/remotion/src/lib/words.ts</code></td></tr>
+<tr><td>CJK</td><td><code>video/remotion/src/q7/cjk.ts</code></td><td>TW</td><td><code>video/experiments/tts_workflow/README.md</code></td></tr>
+<tr><td>EXTENSION</td><td><code>video/remotion/q7/EXTENSION.zh.md</code></td><td>GLOSSARY</td><td><code>video/remotion/q7/GLOSSARY.zh.md</code></td></tr>
+</table>
+<p class="small">commit：<code>a250581</code>／<code>15f89dd</code>／<code>0e00951</code>／<code>b0c00a3</code>（s31）、<code>07ce925</code>／<code>a1caa63</code>／<code>3fce30d</code>（Q7 英）、<code>9ac3eb1</code>／<code>3e3fc10</code>／<code>c70ae2a</code>／<code>7086c7d</code>（Q7 中）、<code>f8ed626</code>／<code>23dd48e</code>／<code>201281d</code>（§3.2 Phase A）、<code>2124a32</code>／<code>e2aac25</code>（12 s／<code>[sync]</code> 硬閘落地）。<code>git log --all --grep=NFA</code> 共 36 筆，Remotion 時代只有 <code>a1caa63</code> 一筆。</p>
+<p class="meta">本稿由主對話（Fable 5.1）彙整三個唯讀 opus 子代理的蒐證寫成；子代理回報全文留在該 session 的 task 輸出，未進版控（引證已轉錄）。裁決後另開執行輪改文檔與工具（契約 §5 第 4 條）。</p>
+</main>
+</body>
+</html>
