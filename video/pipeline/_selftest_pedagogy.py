@@ -71,18 +71,8 @@ def test_pedagogy_issues_non_dict_data():
     assert P.assumptions_registry_issues({"meta": "x"}, enforce=True) == []
 
 
-def test_schema_integration():
-    import subprocess
-    py = sys.executable
-    repo_root = Path(__file__).resolve().parent.parent.parent
-    out = subprocess.run(
-        [py, "video/pipeline/schema.py", "video/storyboards/_fixtures/scaffold.yml"],
-        capture_output=True, text=True, cwd=repo_root)
-    assert out.returncode == 0                       # warn-default never aborts
-    assert "[pedagogy]" in out.stdout
-    assert "thm_no_motive" in out.stdout             # PD2
-    assert "div_no_problem" in out.stdout            # PD3
-    assert "uses_radians" not in out.stdout          # satisfied -> no finding
+# test_schema_integration (schema.py wiring over storyboards/_fixtures/scaffold.yml) moved
+# 2026-09-28 with schema.py to legacy/manim_video/pipeline/_selftest_pedagogy_schema.py.
 
 
 if __name__ == "__main__":
@@ -92,5 +82,4 @@ if __name__ == "__main__":
     test_pedagogy_issues()
     test_pedagogy_profile_unknown_is_warn()
     test_pedagogy_issues_non_dict_data()
-    test_schema_integration()
     print("OK pedagogy self-test")

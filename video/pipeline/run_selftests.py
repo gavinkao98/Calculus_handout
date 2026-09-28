@@ -12,8 +12,8 @@ runner lived in a scratchpad. So after the 2026-08-10 layout refactor the canoni
 failed its own provenance gate and one selftest went red for weeks with nothing noticing
 (pipeline assessment 2026-09-07, F1/F4). This runner uses the ONE convention that works for
 every selftest -- `<this interpreter> -m pipeline.<name>` with cwd=video/ -- so a Phase
-close-out is one command. Manim-backed tests (sizecheck / template_registry / capacity /
-type_scale / theorem_regime) build Tex and take minutes; the rest finish in seconds.
+close-out is one command. (The Manim-backed selftests that built Tex and took minutes moved
+to legacy/manim_video/pipeline/ on 2026-09-28; what is left finishes in seconds.)
 The fast deck-level gates (schema + lint + derive --check on the canonical decks) are
 `python tools/doctor.py --smoke`, not this.
 """
@@ -27,7 +27,7 @@ from pathlib import Path
 
 HERE = Path(__file__).resolve().parent      # video/pipeline
 VIDEO = HERE.parent
-PER_TEST_TIMEOUT = 900                      # seconds; manim-backed selftests can take minutes
+PER_TEST_TIMEOUT = 900                      # seconds
 
 
 def discover() -> list[str]:

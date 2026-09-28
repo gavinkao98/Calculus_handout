@@ -7,8 +7,7 @@ render (beat_durations), compose (mux) and the sidecars (timeline/vtt) all read 
 and the player needs no new concept. This test pins:
   (a) the beat table -- the paused beat grows, every later beat shifts, the scene total grows
   (b) the WAV splice -- new length == old + seconds, and the samples on each side are intact
-  (c) schema -- a `pauses[].after` naming no {show} reveal in `say` is an ERROR (a typo'd
-      pause would otherwise silently do nothing)
+  (c) [moved 2026-09-28 with schema.py to legacy/manim_video/pipeline/_selftest_pauses_schema.py]
   (d) zero behaviour change -- a scene with no `pauses` key is returned untouched
   (e) the timing-only transform (code review 2026-09-23 B-02) -- `apply_pauses_timing` gives
       the beat table apply_pauses gives, reads and writes no file, and `shift_words` moves
@@ -23,7 +22,7 @@ import json
 import tempfile
 from pathlib import Path
 
-from pipeline import audio, pauses, schema
+from pipeline import audio, pauses
 
 _SR = audio.DEFAULT_SAMPLE_RATE
 
@@ -200,34 +199,6 @@ def test_unknown_after_raises():
         assert "step.9" in str(exc)
     else:
         raise AssertionError("a pause whose `after` names no beat must not pass silently")
-
-
-# -- (c) schema gate ---------------------------------------------------------
-
-def _errors(scene):
-    data = {"meta": {"id": "d", "section": "1.1"}, "scenes": [scene]}
-    return [m for s, m in schema.schema_storyboard(data) if s == "error"]
-
-
-def test_schema_accepts_a_well_formed_pause():
-    assert not _errors(_scene([{"after": "step.1", "seconds": 1.2}]))
-
-
-def test_schema_rejects_pause_after_unrevealed_id():
-    errs = _errors(_scene([{"after": "step.9", "seconds": 1.2}]))
-    assert any("pauses" in e and "step.9" in e for e in errs), errs
-
-
-def test_schema_rejects_malformed_pause_entries():
-    assert any("pauses" in e for e in _errors(_scene([{"seconds": 1.0}])))          # no `after`
-    assert any("pauses" in e for e in _errors(_scene([{"after": "step.0"}])))       # no `seconds`
-    assert any("pauses" in e for e in _errors(_scene([{"after": "step.0", "seconds": 0}])))
-    assert any("pauses" in e for e in _errors(_scene({"after": "step.0"})))         # not a list
-
-
-def test_schema_pause_on_non_content_scene_is_an_error():
-    errs = _errors({"id": "d1", "kind": "divider", "pauses": [{"after": "x", "seconds": 1}]})
-    assert any("pauses" in e for e in errs), errs
 
 
 if __name__ == "__main__":
